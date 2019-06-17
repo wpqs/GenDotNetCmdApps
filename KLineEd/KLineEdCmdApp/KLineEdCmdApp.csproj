@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <Version>1.0.30.0</Version>
+    <Authors>Will Stott</Authors>
+    <Company>Maximodex Limited</Company>
+    <Description>Simple line editor for authors</Description>
+    <Copyright>Will Stott</Copyright>
+    <PackageLicenseUrl>https://github.com/wpqs/GenDotNetCmdApps/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/wpqs/GenDotNetCmdApps</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="MxDotNetUtilsLib">
+      <HintPath>..\..\MxDotNetUtils\MxDotNetUtilsLib\bin\Debug\netcoreapp2.2\MxDotNetUtilsLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

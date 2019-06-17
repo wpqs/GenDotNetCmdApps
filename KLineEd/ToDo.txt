@@ -1,0 +1,97 @@
+Todo: KLineEd
+=============
+
+1. Import MxDotNetUtilsLib package (with MxReturnCode)
+2. Implement command line parameters/args and settings
+	 --DisplayLastLines 10
+	 --MaxCol 80
+	 --Audio CR bell.mpeg 2 (Key click.mpeg 2)
+	 --Backgnd text black (details black) (cmds black) (spell black)
+	 --Foregnd text green (details grey) (cmds grey) (spell red)
+	 --scrollreview on
+	 --editline on
+	 --spellcheck on
+	 --export filename.txt 
+3. Implement DisplayHeader
+     - program details
+	 - Command hints
+4. Implement program flow
+	 - DisplayHeader, ReadFile, Reformat, DisplayLastLines, WriteFile, DisplayReport
+		(Reformat changes line length if MaxCol changes)
+5. Implement basic line editor
+     - save getchar() to line buffer 
+	 - allowed characters (disallow <>)
+	 - command processing
+	 	- Esc: DisplayHeader(), DisplayLastLines, display current content of line buffer, put cursor at end
+		- LFCR: save line buffer to file, clear line buffer, DisplayLastLines
+		- Ctrl+X: save buffer, DisplayReport and exit
+	    - Automatic LFCR at end of line (> max cols)
+		- Backspace: remove character to left of current insertion point and move all subsequent chars one space left
+		- Delete: remove character at current insertion point and move all subsequent chars one space left
+		- Cursor left: move insertion position one character left
+		- Cursor right: move insertion position one character right
+		- When --editline on allow editing of other words in the line buffer besides current word
+ 			- Home: move insertion position to start of line
+			- End: move insertion position to end of line
+			- Ctrl+W: move insertion position to start of previous word
+			- Ctrl+E: move insertion position to start of next word
+6. Implement last session stats in DisplayReport
+	 - last session word count
+	 - last session duration 
+	 - last session WPM
+	 - last session line start
+	 - last session line end
+7. Implement stats meta data
+	 - append last session stats to end of file after <ends>
+	 - export without meta data
+	 - read previous session stats and calculate
+		 - total edit sessions
+		 - mean session word count
+		 - mean session duration
+		 - mean session words per min (WPM)
+	-  add stats meta data ito DisplayReport
+8. Implement content meta data
+	- book/project name
+	- chapter
+	- add content meta data to DisplayHeader
+9. Implement scroll review - allow review of lines previous to those in DisplayLastLines
+	- commands
+			- scroll up - DisplayLastLines up by one line
+			- scroll down - DisplayLastLines down by one line 	
+			- PgUp - DisplayLastLines up by number of lines displayed
+			- PgDn - DisplayLastLines down by number of lines displayed
+			- Esc - return to end so you can continue to edit
+10. Implement spelling checking
+	- automatically check last word and if not found
+	    - Tab - ignore and continue
+		- Ctrl+A - add to dictionary
+		- Ctrl+K - review added words since last version of dictionary (del allows removal)
+		- 1 ... n - replace with suggested word
+	- see	
+		- https://stackoverflow.com/questions/15252596/using-the-c-sharp-nhunspell-how-do-i-check-words
+		- https://www.codeproject.com/Articles/5277/NetSpell-Spell-Checker-for-NET
+		- https://www.codeproject.com/Articles/4572/Using-Word-s-spellchecker-in-C
+11. Implement audio
+	- play sound on keypress (read into memory at startup)
+12. Implement console colours
+	- set colours from settings
+13. Implement Structure Editing - a way of breaking-up a document into sections
+	- Command Ctrl+Q toggles between normal text editing (NTE) mode and structure editing (SE) mode
+	- Structure Editing commands
+		- Ctrl+H+1 - H1 Caps with double underline (=) on last line followed by blank line
+		- Ctrl+H+2 - H2 Mixed case with single underline (-) on last line followed by blank line
+		- Ctrl+H+3 - H3 Mixed case with no underline, blank line
+		- Ctrl+H+4 - H4 Mixed case with no underline, blank line, intent 1 tab 
+	    - Ctrl+N toggles display of notes contained in <n>...</n> in SE mode (not shown in NTE)
+			- Ctrl+S start note (Ctrl+N followed by <n>)
+			- Ctrl+E end note (</n> followed by Ctrl+N)
+		- Ctrl+Z 
+			- Save contents of line buffer and move previous heading into it, DisplayLastLines
+		- Ctrl+B 
+			- Save contents of line buffer and move next heading into it, DisplayLastLines
+		- Ctrl+Q
+			-  Save contents of line buffer and resume NTE in sected section 
+
+
+
+			 

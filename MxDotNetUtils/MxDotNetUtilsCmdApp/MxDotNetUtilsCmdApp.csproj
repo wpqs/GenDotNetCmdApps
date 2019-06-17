@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>1.0.30.0</Version>
+    <Authors>Will Stott</Authors>
+    <Company>Maximodex Limited</Company>
+    <Description>Command line .NET application for exercising the MxDotNetUtilsLib collection of useful classes for .NET development</Description>
+    <Copyright>Will Stott</Copyright>
+    <PackageLicenseUrl>https://github.com/wpqs/GenDotNetCmdApps/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/wpqs/GenDotNetCmdApps</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MxDotNetUtilsLib\MxDotNetUtilsLib.csproj" />
+  </ItemGroup>
+
+</Project>

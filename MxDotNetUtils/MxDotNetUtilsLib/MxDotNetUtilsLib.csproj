@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <Version>1.0.30.0</Version>
+    <Authors>Will Stott</Authors>
+    <Company>Maximodex Limited</Company>
+    <Description>A collection of useful classes for .NET Core development</Description>
+    <Copyright>Will Stott</Copyright>
+    <PackageLicenseUrl>https://github.com/wpqs/GenDotNetCmdApps/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/wpqs/GenDotNetCmdApps</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>
