@@ -1,0 +1,73 @@
+KLineEd Deployment Information
+==============================
+
+Values in Vault Notes, Azure MxReturnCode Keys
+
+MMM - ConnectionStrings:AzureWebJobsServiceBus
+
+Support for MxDotNetUtils
+-------------------------
+
+Add package wpqs.MxDotNetUtils
+
+Support for MxReturnCode 
+------------------------
+
+1.	KLineEdCmdApp - properties - package
+
+   Set Assembly Neutral Language = English
+   Product KLineEdCmdApp
+   Package Version 1.0.0
+   Assembly Version 1.0.0.0
+   File Version 1.0.0.0
+
+2. Add Packages to KLineEdCmdApp:
+
+Microsoft.Extensions.Configuration v2.2.0
+Microsoft.Extensions.Configuration.Json v2.2.
+Microsoft.Extensions.Configuration.UserSecrets v2.2.
+
+3. Create appsettings.json - set properties Copy to output directory if newer
+
+{
+  "ConnectionStrings": {
+    "AzureWebJobsServiceBus": "MMM"
+  },
+  "MxLogMsg": {
+    "AzureServiceBusQueueName": "mxlogmsg"
+  }
+}
+
+4. Set ConnectionStrings.AzureWebJobsServiceBus in Secret Manager (check KLineEdCmdApp.csproj contains <UserSecretsId>)
+
+	• Dotnet user-secrets list --project KLineEdCmdApp
+	• Dotnet user-secrets set ConnectionStrings:AzureWebJobsServiceBus "MMM" --project KLineEdCmdApp
+	• Dotnet user-secrets remove <key> --project KLineEdCmdApp
+
+5. Azure Portal - update configuration of MxReturnCodeFnApp to ensure logs are deleted after expiry date
+
+Login: will.chamby1832@hotmail.com
+Subscription: MxPackage
+Resource Group: resMxReturnCode
+Resource: MxReturnCodeFnApp
+   Configuration
+		LogDirectories append ";KLineEdCmdApp" 
+
+6. Update Program.cs
+
+       static int Main(string[] args)
+       {
+            var rc = new MxReturnCode<int>(invokeDetails: $"{Program.CmdAppName} v{Program.CmdAppVersion}", defaultResult: -1);
+
+            var tim = DateTime.UtcNow;
+            var cmdLineParams = new CmdLineParamsApp();
+
+            try
+            {
+                var config = new ConfigurationBuilder()?.SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile("appsettings.json")?.AddUserSecrets<Program>().Build();
+
+                rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null, config?["ConnectionStrings:AzureWebJobsServiceBus"], sbqName: config?["MxLogMsg:AzureServiceBusQueueName"]);
+
+
+
+

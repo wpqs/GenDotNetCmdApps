@@ -1,8 +1,9 @@
 Todo: KLineEd
 =============
 
-1. Import MxDotNetUtilsLib package (with MxReturnCode)
-2. Implement command line parameters/args and settings
+1. done - Import MxDotNetUtilsLib package (with MxReturnCode)
+2. done - Implement command line parameters/args and settings
+     --EditFile 'mytext.txt'
 	 --DisplayLastLines 10
 	 --MaxCol 80
 	 --Audio CR bell.mpeg 2 (Key click.mpeg 2)

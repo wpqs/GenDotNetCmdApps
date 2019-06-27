@@ -3,18 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.421
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLineEdCmdApp", "KLineEdCmdApp\KLineEdCmdApp.csproj", "{F416C783-640D-4408-B5F8-2551454BCFB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KLineEdCmdApp", "KLineEdCmdApp\KLineEdCmdApp.csproj", "{F416C783-640D-4408-B5F8-2551454BCFB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KLineEdCmdAppTest", "KLineEdCmdAppTest\KLineEdCmdAppTest.csproj", "{9F7AB9DF-9654-4F9E-B5F5-C4605092449B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KLineEdCmdAppTest", "KLineEdCmdAppTest\KLineEdCmdAppTest.csproj", "{9F7AB9DF-9654-4F9E-B5F5-C4605092449B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F416C783-640D-4408-B5F8-2551454BCFB2} = {F416C783-640D-4408-B5F8-2551454BCFB2}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{27E0A82D-1AE8-4D4A-AA63-8FACA27B106C}"
 	ProjectSection(SolutionItems) = preProject
+		Deployment.txt = Deployment.txt
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
 		ToDo.txt = ToDo.txt
+		VersionChanges.txt = VersionChanges.txt
 	EndProjectSection
 EndProject
 Global

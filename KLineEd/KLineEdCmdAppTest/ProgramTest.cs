@@ -1,7 +1,4 @@
-using System;
 using Xunit;
-using KLineEdCmdApp;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace KLineEdCmdAppTest
 {
@@ -10,7 +7,7 @@ namespace KLineEdCmdAppTest
         [Fact]
         public void GetVersion()
         {
-            Assert.Equal("v1.0.30.0", KLineEdCmdApp.Program.GetVersion());
+            Assert.Equal("1.0.30.0", KLineEdCmdApp.Program.CmdAppVersion);
         }
     }
 }
