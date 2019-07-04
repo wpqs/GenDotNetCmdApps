@@ -61,6 +61,24 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        /// </summary>
+        internal static string MxErrBadMethodParam {
+            get {
+                return ResourceManager.GetString("MxErrBadMethodParam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        /// </summary>
+        internal static string MxErrInvalidCondition {
+            get {
+                return ResourceManager.GetString("MxErrInvalidCondition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: parameter or argument is not correctly set. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application.
         /// </summary>
         internal static string MxErrInvalidParamArg {
@@ -79,7 +97,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error test. Test of error handling. Please take no action.
+        ///   Looks up a localized string similar to Error: test of error handling. Please take no action.
         /// </summary>
         internal static string MxErrTest {
             get {

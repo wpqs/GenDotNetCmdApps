@@ -4,15 +4,16 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <LangVersion>7.3</LangVersion>
-    <Version>1.0.30.0</Version>
+    <Version>1.0.31.0</Version>
     <Authors>Will Stott</Authors>
     <Company>Maximodex Limited</Company>
-    <Description>Simple line editor for authors</Description>
+    <Description>Simple line editor for authors inspired by Jack Kerouac's approach to writing 'On the Road' and Humphrey Watts' Personal Software Process</Description>
     <Copyright>Will Stott</Copyright>
     <PackageLicenseUrl>https://github.com/wpqs/GenDotNetCmdApps/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/wpqs/GenDotNetCmdApps</PackageProjectUrl>
     <UserSecretsId>F277FD00-E474-47F1-BB7D-D81D2586C3AE</UserSecretsId>
     <NeutralLanguage>en</NeutralLanguage>
+    <Product>KLineEd</Product>
   </PropertyGroup>
 
   <ItemGroup>

@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="MxErrBadMethodParam" xml:space="preserve">
+    <value>Error: internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed.</value>
+  </data>
+  <data name="MxErrInvalidCondition" xml:space="preserve">
+    <value>Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed.</value>
+  </data>
   <data name="MxErrInvalidParamArg" xml:space="preserve">
     <value>Error: parameter or argument is not correctly set. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application</value>
   </data>
@@ -124,7 +130,7 @@
     <value>Error: your settings file is invalid. The file used for saving your program parameters and arguments is corrupt. Please delete KLineEdApp.json and try again</value>
   </data>
   <data name="MxErrTest" xml:space="preserve">
-    <value>Error test. Test of error handling. Please take no action</value>
+    <value>Error: test of error handling. Please take no action</value>
   </data>
   <data name="MxErrUnsupportedParam" xml:space="preserve">
     <value>Error: parameter not supported. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application</value>

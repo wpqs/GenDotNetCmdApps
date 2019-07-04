@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
-using Microsoft.Azure.ServiceBus;
 using MxDotNetUtilsLib;
 using MxReturnCode;
 using Newtonsoft.Json;
@@ -28,7 +27,6 @@ namespace KLineEdCmdApp
 
     public class CmdLineParamsApp : CmdLineParams
     {
-        public static readonly int IntegerNotSet = -1;
         public static readonly ConsoleColor UnsetColour = ConsoleColor.DarkMagenta;
         public static readonly string ColourName = "COLOUR";
         public static readonly string EditFileNameForm = "'drive:path\\edit.txt'";
@@ -57,8 +55,8 @@ namespace KLineEdCmdApp
         public static readonly int ArgDisplayLastLinesCntMin = 0;
         public static readonly int ArgDisplayLastLinesCntMax = 50;
 
-        public static readonly int ArgMaxColDefault = 80;
-        public static readonly int ArgMaxColMax = 250;
+        public static readonly int ArgMaxColDefault = 68;   //counted from Jack Kerouac's book 'On the Road';
+        public static readonly int ArgMaxColMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
         public static readonly int ArgMaxColMin = 5;
 
         public static readonly int ArgVolDefault = 3;
@@ -88,7 +86,7 @@ namespace KLineEdCmdApp
         public static readonly string ArgYellow = "yellow";
 
         public static readonly string ArgText = "text";
-        public static readonly string ArgDetails = "details";
+        public static readonly string ArgDetails = "details";   //footer
         public static readonly string ArgCmds = "cmds";
         public static readonly string ArgSpell = "spell";
 
@@ -272,7 +270,7 @@ namespace KLineEdCmdApp
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ResetProperties", false);
 
             if (mode == ResetMode.None)
-                rc.SetError(1020101, MxError.Source.Param, "paramLine is null");
+                rc.SetError(1020101, MxError.Source.Param, "paramLine is null", "MxErrBadMethodParam");
             else
             {
                 SetPropertiesDefaults(false, mode);
@@ -291,8 +289,8 @@ namespace KLineEdCmdApp
 
             EditFile = null;
             ExportFile = null;
-            DisplayLastLinesCnt = IntegerNotSet;
-            MaxCol = IntegerNotSet;
+            DisplayLastLinesCnt = KLineEditor.PosIntegerNotSet;
+            MaxCol = KLineEditor.PosIntegerNotSet;
             AudioCRFile = null;
             AudioKeyFile = null;
 
@@ -325,7 +323,7 @@ namespace KLineEdCmdApp
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ParamProc", false);
 
             if (paramLine == null)
-                rc.SetError(1020201, MxError.Source.Param, "paramLine is null");
+                rc.SetError(1020201, MxError.Source.Param, "paramLine is null", "MxErrBadMethodParam");
             else
             {
                 var rcParam = GetParamType(paramLine);
@@ -385,7 +383,6 @@ namespace KLineEdCmdApp
                     }
                 }
             }
-
             return rc;
         }
 
@@ -774,7 +771,7 @@ namespace KLineEdCmdApp
             var rc = new MxReturnCode<Param>("CmdLineParamsApp.GetParamType", Param.Unknown);
 
             if (paramLine == null)
-                rc.SetError(1023001, MxError.Source.Param, $"param is null");
+                rc.SetError(1023001, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
             else
             {
                 var offset = paramLine.IndexOf(spaceChar);
@@ -801,9 +798,9 @@ namespace KLineEdCmdApp
             if (ExportFile == null)
                 ExportFile = savedSettings.ExportFile;
 
-            if (DisplayLastLinesCnt == IntegerNotSet)   
+            if (DisplayLastLinesCnt == KLineEditor.PosIntegerNotSet)   
                 DisplayLastLinesCnt = savedSettings.DisplayLastLinesCnt;
-            if (MaxCol == IntegerNotSet)
+            if (MaxCol == KLineEditor.PosIntegerNotSet)
                 MaxCol = savedSettings.MaxCol;
 
             if (AudioCRFile == null)
@@ -841,9 +838,9 @@ namespace KLineEdCmdApp
         {
             if (mode == ResetMode.FactoryDefaults)
             {
-                if ((DisplayLastLinesCnt == IntegerNotSet) || (unsetOnly == false))
+                if ((DisplayLastLinesCnt == KLineEditor.PosIntegerNotSet) || (unsetOnly == false))
                     DisplayLastLinesCnt = ArgDisplayLastLinesCntDefault;
-                if ((MaxCol == IntegerNotSet) || (unsetOnly == false))
+                if ((MaxCol == KLineEditor.PosIntegerNotSet) || (unsetOnly == false))
                     MaxCol = ArgMaxColDefault;
 
                 if ((ScrollReview == BoolValue.Unset) || (unsetOnly == false))

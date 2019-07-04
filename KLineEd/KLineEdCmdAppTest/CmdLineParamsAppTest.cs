@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using KLineEdCmdApp;
 using Xunit;
 
@@ -23,7 +22,7 @@ namespace KLineEdCmdAppTest
         public void TestUnknownParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--xhelp" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--xhelp" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1023002-user: the parameter --xhelp is invalid", rcParam.GetErrorUserMsg());
@@ -46,7 +45,7 @@ namespace KLineEdCmdAppTest
         public void TestHelpParamUnexpectedArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--help", "x" });
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "x" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020501-user: parameter --help has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
@@ -57,7 +56,7 @@ namespace KLineEdCmdAppTest
         public void TestResetColoursParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--reset", "colours"}); 
+            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "colours"}); 
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -67,7 +66,7 @@ namespace KLineEdCmdAppTest
         public void TestResetFactoryParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--reset", "factory-defaults" }); 
+            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults" }); 
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -77,7 +76,7 @@ namespace KLineEdCmdAppTest
         public void TestResetFactoryParamWithSettingsParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -87,7 +86,7 @@ namespace KLineEdCmdAppTest
         public void TestResetFactoryParamWithSettingsUpdateParams()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json", "update" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json", "update" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -97,7 +96,7 @@ namespace KLineEdCmdAppTest
         public void TestResetParamNoArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--reset" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--reset" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
@@ -108,7 +107,7 @@ namespace KLineEdCmdAppTest
         public void TestResetParamUnknownArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--reset", "test" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "test" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020602-user: parameter --reset has invalid argument; found test should be [colours | factory-defaults]", rcParam.GetErrorUserMsg());
@@ -119,7 +118,7 @@ namespace KLineEdCmdAppTest
         public void TestResetParamExtraArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--reset", "factory-defaults", "KLineEdApp.json", "update", "extra" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "KLineEdApp.json", "update", "extra" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 4", rcParam.GetErrorUserMsg());
@@ -130,7 +129,7 @@ namespace KLineEdCmdAppTest
         public void TestExportParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--export", "Edit.txt", "Export.txt" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.txt", "Export.txt" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -140,7 +139,7 @@ namespace KLineEdCmdAppTest
         public void TestExportParamNoArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--export" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--export" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
@@ -151,7 +150,7 @@ namespace KLineEdCmdAppTest
         public void TestExportParamNoSecondArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--export", "test.txt" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--export", "test.txt" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
@@ -162,7 +161,7 @@ namespace KLineEdCmdAppTest
         public void TestExportParamExtraArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--export", "Edit.txt", "Export.txt", "extra" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.txt", "Export.txt", "extra" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
@@ -173,7 +172,7 @@ namespace KLineEdCmdAppTest
         public void TestEditParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--edit", "Test.txt" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--edit", "Test.txt" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -183,7 +182,7 @@ namespace KLineEdCmdAppTest
         public void TestEditParamNoArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--edit" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--edit" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020801-user: parameter --edit has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
@@ -194,7 +193,7 @@ namespace KLineEdCmdAppTest
         public void TestEditParamExtraArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new string[] { "--edit", "Test.txt", "extra" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--edit", "Test.txt", "extra" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020801-user: parameter --edit has incorrect number of arguments; found 2", rcParam.GetErrorUserMsg());

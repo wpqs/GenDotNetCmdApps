@@ -2,20 +2,24 @@ Todo: KLineEd
 =============
 
 1. done - Import MxDotNetUtilsLib package (with MxReturnCode)
-2. done - Implement command line parameters/args and settings
-     --EditFile 'mytext.txt'
-	 --DisplayLastLines 10
-	 --MaxCol 80
-	 --Audio CR bell.mpeg 2 (Key click.mpeg 2)
-	 --Backgnd text black (details black) (cmds black) (spell black)
-	 --Foregnd text green (details grey) (cmds grey) (spell red)
-	 --scrollreview on
-	 --editline on
-	 --spellcheck on
+2. Implement command line parameters/args and settings
+     --Report 'mytext.txt'
+	 --EditFile 'mytext.txt'
+		 --TypingPause 60
+		 --TabSize 3
+		 --DisplayLastLines 10
+		 --MaxCol 80
+		 --Audio CR bell.mpeg 2 (Key click.mpeg 2)
+		 --Backgnd text black (details black) (cmds black) (spell black)
+		 --Foregnd text green (details grey) (cmds grey) (spell red)
+		 --scrollreview on
+		 --editline on
+		 --spellcheck on
 	 --export filename.txt 
 3. Implement DisplayHeader
-     - program details
+     - program details, filename
 	 - Command hints
+	 - footer
 4. Implement program flow
 	 - DisplayHeader, ReadFile, Reformat, DisplayLastLines, WriteFile, DisplayReport
 		(Reformat changes line length if MaxCol changes)
@@ -36,14 +40,16 @@ Todo: KLineEd
 			- End: move insertion position to end of line
 			- Ctrl+W: move insertion position to start of previous word
 			- Ctrl+E: move insertion position to start of next word
-6. Implement last session stats in DisplayReport
+
+	- GetLastLines() - reformat for linelength
+6. done - Implement last session stats in DisplayReport
 	 - last session word count
 	 - last session duration 
 	 - last session WPM
 	 - last session line start
 	 - last session line end
-7. Implement stats meta data
-	 - append last session stats to end of file after <ends>
+7. Done - Implement stats meta data
+	 - append last session stats to start of file before <start>
 	 - export without meta data
 	 - read previous session stats and calculate
 		 - total edit sessions
@@ -51,18 +57,19 @@ Todo: KLineEd
 		 - mean session duration
 		 - mean session words per min (WPM)
 	-  add stats meta data ito DisplayReport
-8. Implement content meta data
+8. Implement unit tests for Program.cs
+9. Done - Implement content meta data
 	- book/project name
 	- chapter
 	- add content meta data to DisplayHeader
-9. Implement scroll review - allow review of lines previous to those in DisplayLastLines
+10. Implement scroll review - allow review of lines previous to those in DisplayLastLines
 	- commands
 			- scroll up - DisplayLastLines up by one line
 			- scroll down - DisplayLastLines down by one line 	
 			- PgUp - DisplayLastLines up by number of lines displayed
 			- PgDn - DisplayLastLines down by number of lines displayed
 			- Esc - return to end so you can continue to edit
-10. Implement spelling checking
+11. Implement spelling checking
 	- automatically check last word and if not found
 	    - Tab - ignore and continue
 		- Ctrl+A - add to dictionary
@@ -72,11 +79,11 @@ Todo: KLineEd
 		- https://stackoverflow.com/questions/15252596/using-the-c-sharp-nhunspell-how-do-i-check-words
 		- https://www.codeproject.com/Articles/5277/NetSpell-Spell-Checker-for-NET
 		- https://www.codeproject.com/Articles/4572/Using-Word-s-spellchecker-in-C
-11. Implement audio
+12. Implement audio
 	- play sound on keypress (read into memory at startup)
-12. Implement console colours
+13. Implement console colours
 	- set colours from settings
-13. Implement Structure Editing - a way of breaking-up a document into sections
+14. Implement Structure Editing - a way of breaking-up a document into sections
 	- Command Ctrl+Q toggles between normal text editing (NTE) mode and structure editing (SE) mode
 	- Structure Editing commands
 		- Ctrl+H+1 - H1 Caps with double underline (=) on last line followed by blank line
