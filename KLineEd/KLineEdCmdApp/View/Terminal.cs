@@ -20,7 +20,7 @@ namespace KLineEdCmdApp.View
             Console.SetBufferSize(width, height);
         }
 
-        public void WriteLine(string line, params object[] args)
+        public void WriteLines(string line, params object[] args)
         {
             Console.WriteLine(line, args);
         }
@@ -28,6 +28,16 @@ namespace KLineEdCmdApp.View
         public void Write(string format, params object[] args)
         {
             Console.Write(format, args);
+        }
+
+        public char GetKeyChar(bool hide = false, char defaultVal = ' ')
+        {
+            return Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
+        }
+
+        public ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
+        {
+            return Console.ReadKey(hide).Key; //defaultVal is helpful in testing
         }
     }
 }

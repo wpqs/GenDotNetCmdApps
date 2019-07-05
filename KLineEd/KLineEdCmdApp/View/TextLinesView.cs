@@ -2,7 +2,7 @@
 
 namespace KLineEdCmdApp.View
 {
-    public class Screen
+    public class TextLinesView
     {
         public static readonly int ScreenMarginLeft = 10;
         public static readonly int ScreenMarginRight = 20;
@@ -18,10 +18,13 @@ namespace KLineEdCmdApp.View
         public int Height { private set; get; }
         public int LineWidth { private set; get; }
 
-        public Screen(ITerminal terminal)
+        public bool Ready { private set; get; }
+
+        public TextLinesView(ITerminal terminal)
         {
             Terminal = terminal;
             LineWidth = KLineEditor.PosIntegerNotSet;
+            Ready = false;
         }
 
         public MxReturnCode<bool> Setup(CmdLineParamsApp param)
@@ -45,31 +48,39 @@ namespace KLineEdCmdApp.View
 
                 // ReSharper disable once LocalizableElement
                 Terminal.Title = $"{Program.CmdAppName} v{Program.CmdAppVersion} - {param.EditFile ?? "[null]"}";
+                Ready = true;
                 rc.SetResult(true);
             }
             return rc;
         }
 
+        public char GetKey(bool hide = false)
+        {
+            return Terminal.GetKeyChar(hide);
+        }
+
         public void WriteFooter(string line)  //stats or error
         {
-            Terminal.WriteLine(line);
+            Terminal.WriteLines(line);
         }
 
         public void WriteEditLine(string line)
         {
             var padding = "";
             Terminal.Write(padding.PadLeft(ScreenMarginLeft));
-            Terminal.WriteLine(line);
+            Terminal.WriteLines(line);
         }
 
         public static void WriteTextLine(ITerminal terminal, string format, params object[] arg)
         {
-            terminal.WriteLine(format ?? "[null]", arg);
+            terminal.WriteLines(format ?? "[null]", arg);
         }
 
         public static void WriteText(ITerminal terminal, string format, params object[] arg)
         {
-            terminal.WriteLine(format ?? "[null]", arg);
+            terminal.WriteLines(format ?? "[null]", arg);
         }
+
+
     }
 }

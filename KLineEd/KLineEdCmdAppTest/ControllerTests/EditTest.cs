@@ -3,11 +3,11 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.ControllerTests
 {
-    public class EditTest : IClassFixture<ScreenFixture>
+    public class EditTest : IClassFixture<EditViewFixture>
     {
-        private readonly ScreenFixture _screen;
+        private readonly EditViewFixture _screen;
 
-        public EditTest(ScreenFixture screen)
+        public EditTest(EditViewFixture screen)
         {
             _screen = screen;
         }

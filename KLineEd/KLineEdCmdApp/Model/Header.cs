@@ -14,7 +14,7 @@ namespace KLineEdCmdApp.Model
         public static readonly string SessionsOpeningElement = "<sessions>";
         public static readonly string SessionsClosingElement = "</sessions>";
 
-        private HeaderChapter Chapter { set; get; }
+        public HeaderChapter Chapter { private set; get; }
         private List<HeaderSession> Sessions { set; get; }
 
         public Header()

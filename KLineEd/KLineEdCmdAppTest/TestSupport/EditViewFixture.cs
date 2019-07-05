@@ -4,17 +4,17 @@ using KLineEdCmdApp.View;
 
 namespace KLineEdCmdAppTest.TestSupport
 {
-    public class ScreenFixture : IDisposable
+    public class EditViewFixture : IDisposable
     {
-        public Screen Terminal { get; private set; }
+        public TextLinesView Terminal { get; private set; }
 
-        public ScreenFixture()
+        public EditViewFixture()
         {
             var cmdLineParams = new CmdLineParamsApp();
             var rcParam = cmdLineParams.Initialise(new[] { "--edit", "Test.txt" });
             if (rcParam.IsSuccess())
             {
-                Terminal = new Screen(new MockTerminal());
+                Terminal = new TextLinesView(new MockTerminal());
                 var rcTerm = Terminal.Setup(cmdLineParams);
                 if (rcTerm.IsError())
                     Terminal = null;

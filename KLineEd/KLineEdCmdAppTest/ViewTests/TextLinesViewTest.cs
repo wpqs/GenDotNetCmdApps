@@ -6,7 +6,7 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests
 {
-    public class ScreenTest
+    public class TextLinesViewTest
     {
         [Fact]
         public void TestSetup()
@@ -17,7 +17,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
 
-            var terminal = new Screen(new MockTerminal());
+            var terminal = new TextLinesView(new MockTerminal());
             Assert.True(terminal.Setup(cmdLineParams).GetResult());
 
             Assert.Equal(34, terminal.Height);

@@ -7,11 +7,11 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests
 {
-    public class EditFileTest : IClassFixture<EditFileFixture>
+    public class ChapterModelTest : IClassFixture<ChapterModelFixture>
     {
-        private readonly EditFileFixture _editfile;
+        private readonly ChapterModelFixture _editfile;
 
-        public EditFileTest(EditFileFixture editfile)
+        public ChapterModelTest(ChapterModelFixture editfile)
         {
             _editfile = editfile;
             if (File.Exists(_editfile.CreatePathFilename))
@@ -21,19 +21,19 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void InitialiseTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
             Assert.True(manuscriptNew.Close().GetResult());
 
-            var manuscriptExisting = new EditFile();
+            var manuscriptExisting = new ChapterModel();
             rc = manuscriptExisting.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptExisting.InitDone);
+            Assert.True(manuscriptExisting.Ready);
             Assert.Equal(0, manuscriptExisting.GetTextLineCount());  //check that reopening an existing file doesn't add any empty lines to body
             Assert.True(manuscriptExisting.Close().GetResult());
         }
@@ -41,47 +41,47 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void InitialiseNullTest()
         {
-            var manuscript = new EditFile();
+            var manuscript = new ChapterModel();
             var rc = manuscript.Initialise(65, null);
 
             Assert.False(rc.GetResult());
             Assert.Equal("error 1050101-param: LineWidth=65 is invalid or pathFilename=[null]", rc.GetErrorTechMsg());
-            Assert.False(manuscript.InitDone);
+            Assert.False(manuscript.Ready);
         }
 
 
         [Fact]
         public void InitialiseLineWidthNotSetTest()
         {
-            var manuscript = new EditFile();
+            var manuscript = new ChapterModel();
             var rc = manuscript.Initialise(KLineEditor.PosIntegerNotSet, _editfile.CreatePathFilename);
 
             Assert.False(rc.GetResult());
             Assert.StartsWith("error 1050101-param: LineWidth=-1 is invalid", rc.GetErrorTechMsg());
-            Assert.False(manuscript.InitDone);
+            Assert.False(manuscript.Ready);
         }
 
         [Fact]
         public void InitialiseInvalidDirectoryTest()
         {
-            var manuscript = new EditFile();
-            var rc = manuscript.Initialise(65, EditFileFixture.UnitTestInvalidPathFileName);
+            var manuscript = new ChapterModel();
+            var rc = manuscript.Initialise(65, ChapterModelFixture.UnitTestInvalidPathFileName);
 
             Assert.False(rc.GetResult());
             Assert.StartsWith("error 1050102-user: folder for edit file", rc.GetErrorUserMsg());
-            Assert.False(manuscript.InitDone);
+            Assert.False(manuscript.Ready);
         }
 
         [Fact]
         public void GetChapterReportTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
-            var data = $"Author: [author not set]{Environment.NewLine}Project: [project not set]{Environment.NewLine}Chapter: [chapter not set]{Environment.NewLine}File: {_editfile.CreatePathFilename}";
+            var data = $"Author: [author not set]{Environment.NewLine}Project: [project not set]{Environment.NewLine}Title: [title not set]{Environment.NewLine}File: {_editfile.CreatePathFilename}";
             Assert.StartsWith(data, manuscriptNew.GetChapterReport());
             Assert.True(manuscriptNew.Close().GetResult());
         }
@@ -89,11 +89,11 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void AddLineTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
             Assert.True(manuscriptNew.AddLine("test one").GetResult());
             Assert.True(manuscriptNew.AddLine("test two").GetResult());
@@ -105,11 +105,11 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void AddWordNewLineTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
             Assert.True(manuscriptNew.AddWord("aaa").GetResult());
             Assert.Equal(1, manuscriptNew.GetTextLineCount());
@@ -117,11 +117,11 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
 
-            var manuscriptExisting = new EditFile();
+            var manuscriptExisting = new ChapterModel();
             rc = manuscriptExisting.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptExisting.InitDone);
+            Assert.True(manuscriptExisting.Ready);
             Assert.Equal(1, manuscriptExisting.GetTextLineCount());  //check that reopening an existing file doesn't add any empty lines to body
             Assert.Equal("aaa", manuscriptExisting.GetLastLinesForDisplay(1).GetResult()[0]);
             Assert.True(manuscriptExisting.Close().GetResult());
@@ -130,11 +130,11 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetLastLinesTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
             Assert.True(manuscriptNew.AddLine("test one").GetResult());
             Assert.True(manuscriptNew.AddLine("test two").GetResult());
@@ -150,11 +150,11 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void SaveTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
 
             Assert.True(manuscriptNew.AddLine("test one").GetResult());
@@ -164,11 +164,11 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
 
-            var manuscriptExisting = new EditFile();
+            var manuscriptExisting = new ChapterModel();
             rc = manuscriptExisting.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptExisting.InitDone);
+            Assert.True(manuscriptExisting.Ready);
 
             Assert.Equal(3, manuscriptExisting.GetTextLineCount());  //check that reopening an existing file doesn't add any empty lines to body
             Assert.Equal("test one", manuscriptExisting.GetLastLinesForDisplay(3).GetResult()[0]);
@@ -181,22 +181,22 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void CloseTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
             Assert.True(manuscriptNew.AddLine("test oneX").GetResult());
             Assert.True(manuscriptNew.AddLine("test twoX").GetResult());
             Assert.True(manuscriptNew.AddLine("test threeX").GetResult());
             Assert.True(manuscriptNew.Close().GetResult()); //default parameter closes and saves
 
-            var manuscriptExisting = new EditFile();
+            var manuscriptExisting = new ChapterModel();
             rc = manuscriptExisting.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptExisting.InitDone);
+            Assert.True(manuscriptExisting.Ready);
             Assert.Equal(3, manuscriptExisting.GetTextLineCount());  //check that reopening an existing file doesn't add any empty lines to body
             Assert.Equal("test oneX", manuscriptExisting.GetLastLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("test twoX", manuscriptExisting.GetLastLinesForDisplay(3).GetResult()[1]);
@@ -207,11 +207,11 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void CreateNewSessionTest()
         {
-            var manuscriptNew = new EditFile();
+            var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(65, _editfile.CreatePathFilename);
 
             Assert.True(rc.GetResult());
-            Assert.True(manuscriptNew.InitDone);
+            Assert.True(manuscriptNew.Ready);
 
             Assert.True(manuscriptNew.CreateNewSession().GetResult());
             Assert.Equal(1, manuscriptNew.GetLastSession().SessionNo);

@@ -3,9 +3,8 @@ Todo: KLineEd
 
 1. done - Import MxDotNetUtilsLib package (with MxReturnCode)
 2. Implement command line parameters/args and settings
-     --Report 'mytext.txt'
 	 --EditFile 'mytext.txt'
-		 --TypingPause 60
+		 --TypingPauseSecs 60
 		 --TabSize 3
 		 --DisplayLastLines 10
 		 --MaxCol 80

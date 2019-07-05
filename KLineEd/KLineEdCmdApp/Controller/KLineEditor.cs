@@ -12,38 +12,35 @@ namespace KLineEdCmdApp
         public static readonly int PosIntegerNotSet = -1;
         public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................{Environment.NewLine}";
 
-        public Screen Vdu { private set; get; }
-        public  EditFile EditFile { private set; get; }
-        public string[] LastLines { private set; get; }
+        public TextLinesView Vdu { private set; get; }
+        public  ChapterModel EditFile { private set; get; }
 
-        public bool InitDone { private set; get; }
+        public bool Ready { private set; get; }
 
-        public MxReturnCode<bool> Start(Screen screen, string editPathFilename)
+        public KLineEditor()
+        {
+            Ready = false;
+            Vdu = null;
+            EditFile = null;
+        }
+        
+        public MxReturnCode<bool> Start(ChapterModel model, TextLinesView view)
         {
             var rc = new MxReturnCode<bool>("Edit.Setup");
 
-            if ((String.IsNullOrEmpty(editPathFilename)) || (screen == null))
-                rc.SetError(1040101, MxError.Source.Param, $"{editPathFilename ?? "[null]"} is invalid or screen is null", "MxErrBadMethodParam");
+            if ((model == null) || (model.Ready == false) || (view == null) )
+                rc.SetError(1040101, MxError.Source.Param, $"screen is null, model is null", "MxErrBadMethodParam");
             else
             {
-                if ((screen.AppParams?.EditFile != editPathFilename) || (screen.AppParams.DisplayLastLinesCnt < CmdLineParamsApp.ArgDisplayLastLinesCntMin) || (CmdLineParamsApp.ArgDisplayLastLinesCntMin < 0))
-                    rc.SetError(1040102, MxError.Source.Program, $"editFile={editPathFilename} does not match screen.AppParams.EditFile={screen.AppParams?.EditFile ?? "[null]"} or DisplayLastLinesCnt={screen.AppParams?.DisplayLastLinesCnt} less than min={CmdLineParamsApp.ArgDisplayLastLinesCntMin} or 0", "MxErrInvalidCondition");
-                else
+                Vdu = view;
+                EditFile = model;
+
+                var rcSession = model.CreateNewSession();
+                rc += rcSession;
+                if (rcSession.IsSuccess(true))
                 {
-                    Vdu = screen;
-                    EditFile = new EditFile();
-                    var rcFile = EditFile.Initialise(screen.LineWidth, editPathFilename);
-                    rc += rcFile;
-                    if (rcFile.IsSuccess(true))
-                    {
-                        var rcSession = EditFile.CreateNewSession();
-                        rc += rcSession;
-                        if (rcSession.IsSuccess(true))
-                        {
-                            InitDone = true;
-                            rc.SetResult(true);
-                        }
-                    }
+                    Ready = true;
+                    rc.SetResult(true);
                 }
             }
             return rc;
@@ -55,10 +52,10 @@ namespace KLineEdCmdApp
 
             try
             {
-                if (InitDone)
+                if (Ready)
                 {
                     EditFile.Close();
-                    InitDone = false;
+                    Ready = false;
                     rc.SetResult(true);
                 }
             }
@@ -75,7 +72,7 @@ namespace KLineEdCmdApp
 
             try
             {
-                if (InitDone)
+                if (Ready)
                 {
                     //setup VDU commands, footer
                     //display previous lines
@@ -100,7 +97,7 @@ namespace KLineEdCmdApp
         {
             var rc = string.Format(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
             rc += Environment.NewLine;
-            rc += "Run report:";
+            rc += $"Report for editing session {EditFile?.Header?.GetLastSession()?.SessionNo ?? -1} of chapter {EditFile?.Header?.Chapter?.Title ?? "[null]"}:";
             rc += Environment.NewLine;
             rc += Environment.NewLine;
             rc += EditFile?.GetReport() ??HeaderBase.ValueNotSet;
@@ -110,7 +107,7 @@ namespace KLineEdCmdApp
         private string GetCommandHints()
         {
             var rc = "[not initialised]";
-            if (InitDone)
+            if (Ready)
             {
                 rc = "Esc=refresh | Ctrl+X=exit | <- | -> | Del | BS";
             }
@@ -120,7 +117,7 @@ namespace KLineEdCmdApp
         private string GetFooter()
         {
             var rc = "[not initialised]";
-            if (InitDone)
+            if (Ready)
             {
                 //start time, current edit duration, WPM, number of words written, number of pages written, total number of words in file, total number of pages in file
                 rc = $" | {EditFile?.Folder ?? "[null]"}";

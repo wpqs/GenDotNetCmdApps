@@ -12,12 +12,12 @@ namespace KLineEdCmdApp.Model
 
         public static readonly string AuthorLabel = "Author:";
         public static readonly string ProjectLabel = "Project:";
-        public static readonly string ChapterLabel = "Chapter:";
+        public static readonly string TitleLabel = "Title:";
         public static readonly string PathFileNameLabel = "File:";
 
         public string Author { get; private set; }
         public string Project { get; private set; }
-        public string Chapter { get; private set; }
+        public string Title { get; private set; }
         public string PathFileName { get; private set; }
 
         public HeaderChapter()
@@ -33,7 +33,7 @@ namespace KLineEdCmdApp.Model
 
             if (pathFilename != null)
             {
-                if (SetAuthor("[author not set]") && SetProject("[project not set]") && SetChapter("[chapter not set]") && SetPathFileName(pathFilename))
+                if (SetAuthor("[author not set]") && SetProject("[project not set]") && SetTitle("[title not set]") && SetPathFileName(pathFilename))
                     rc = true;
             }
             return rc;
@@ -108,7 +108,7 @@ namespace KLineEdCmdApp.Model
 
             if (string.IsNullOrEmpty(HeaderBase.PropertyNotSet))   //don't test _error as calling IsValid() 
             {
-                rc =  (string.IsNullOrEmpty(PathFileName) == false) && (string.IsNullOrEmpty(Chapter) == false)
+                rc =  (string.IsNullOrEmpty(PathFileName) == false) && (string.IsNullOrEmpty(Title) == false)
                         && (string.IsNullOrEmpty(Project) == false) && (string.IsNullOrEmpty(Author) == false);
                 Error = !rc; //set Error = false if all properties are now valid, else Error = true;
             }
@@ -118,7 +118,7 @@ namespace KLineEdCmdApp.Model
         {
             Author = HeaderBase.PropertyNotSet;
             Project = HeaderBase.PropertyNotSet; 
-            Chapter = HeaderBase.PropertyNotSet;
+            Title = HeaderBase.PropertyNotSet;
             PathFileName = HeaderBase.PropertyNotSet;
             Error = true;
         }
@@ -129,7 +129,7 @@ namespace KLineEdCmdApp.Model
 
             if (name != null)
             {
-                if ((name.Contains(ProjectLabel)) || (name.Contains(ChapterLabel)) 
+                if ((name.Contains(ProjectLabel)) || (name.Contains(TitleLabel)) 
                       || (name.Contains(PathFileNameLabel)) || (name.Contains(AuthorLabel)))
                     rc = true;
             }
@@ -139,7 +139,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = HeaderBase.ValueNotSet;
             if (IsError() == false)     
-                rc = $"{AuthorLabel} {Author}{Environment.NewLine}{ProjectLabel} {Project}{Environment.NewLine}{ChapterLabel} {Chapter}{Environment.NewLine}{PathFileNameLabel} {PathFileName}";
+                rc = $"{AuthorLabel} {Author}{Environment.NewLine}{ProjectLabel} {Project}{Environment.NewLine}{TitleLabel} {Title}{Environment.NewLine}{PathFileNameLabel} {PathFileName}";
             rc += KLineEditor.ReportSectionDottedLine;
             return rc;
         }
@@ -147,7 +147,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = HeaderBase.ValueNotSet; 
             if (IsError() == false)     //order must be same as InitialiseFromString()
-                rc = $"{AuthorLabel} {Author} {ProjectLabel} {Project} {ChapterLabel} {Chapter} {PathFileNameLabel} {PathFileName}";
+                rc = $"{AuthorLabel} {Author} {ProjectLabel} {Project} {TitleLabel} {Title} {PathFileNameLabel} {PathFileName}";
             return rc;
         }
         public override MxReturnCode<bool> InitialiseFromString(string toString)
@@ -162,12 +162,12 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1060301, MxError.Source.Data, $"SetAuthor failed for {toString}", "MxErrInvalidCondition");
                 else
                 {
-                    if (SetProject(Extensions.GetPropertyFromString(toString, ProjectLabel, ChapterLabel)) == false)
+                    if (SetProject(Extensions.GetPropertyFromString(toString, ProjectLabel, TitleLabel)) == false)
                         rc.SetError(1060302, MxError.Source.Data, $"SetProject failed for {toString}", "MxErrInvalidCondition");
                     else
                     {
-                        if (SetChapter(Extensions.GetPropertyFromString(toString, ChapterLabel, PathFileNameLabel)) == false)
-                            rc.SetError(1060303, MxError.Source.Data, $"SetChapter failed for {toString}", "MxErrInvalidCondition");
+                        if (SetTitle(Extensions.GetPropertyFromString(toString, TitleLabel, PathFileNameLabel)) == false)
+                            rc.SetError(1060303, MxError.Source.Data, $"SetTitle failed for {toString}", "MxErrInvalidCondition");
                         else
                         {
                             if (SetPathFileName(Extensions.GetPropertyFromString(toString, PathFileNameLabel, null)) == false)
@@ -196,9 +196,9 @@ namespace KLineEdCmdApp.Model
             Validate();     
             return rc;
         }
-        public bool SetChapter(string name)
+        public bool SetTitle(string name)
         {
-            Chapter = GetString(name, Chapter, out var rc);
+            Title = GetString(name, Title, out var rc);
             Validate();     
             return rc;
         }

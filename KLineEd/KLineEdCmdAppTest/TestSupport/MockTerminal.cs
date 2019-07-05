@@ -1,4 +1,5 @@
-﻿using KLineEdCmdApp.View;
+﻿using System;
+using KLineEdCmdApp.View;
 
 namespace KLineEdCmdAppTest.TestSupport
 {
@@ -20,7 +21,7 @@ namespace KLineEdCmdAppTest.TestSupport
             
         }
 
-        public void WriteLine(string line, params object[] args)
+        public void WriteLines(string line, params object[] args)
         {
             
         }
@@ -28,6 +29,15 @@ namespace KLineEdCmdAppTest.TestSupport
         public void Write(string line, params object[] args)
         {
            
+        }
+        public char GetKeyChar(bool hide = false, char defaultVal = ' ')
+        {
+            return defaultVal;
+        }
+
+        public ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
+        {
+            return defaultVal;
         }
     }
 }

@@ -135,6 +135,7 @@ namespace KLineEdCmdApp
             [EnumMember(Value = "Reset")] Reset,
             [EnumMember(Value = "Export")] Export,
             [EnumMember(Value = "Edit")] Edit,
+            [EnumMember(Value = "Abort")] Abort,
             [EnumMember(Value = "Unknown")] Unknown
         }
         public enum ResetMode

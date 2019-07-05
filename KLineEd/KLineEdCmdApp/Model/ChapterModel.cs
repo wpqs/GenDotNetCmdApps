@@ -7,19 +7,20 @@ using System.IO;
 namespace KLineEdCmdApp.Model
 {
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class EditFile
+    public class ChapterModel
     {
         public string FileName { private set; get; }
         public string Folder { private set; get; }
-        public bool InitDone { private set; get; }
+        public bool Ready { private set; get; }
         public Header Header { private set; get; } 
         public Body Body { private set; get; }    
         
 
-        public EditFile()
+        public ChapterModel()
         {
             Header = new Header();
             Body = new Body();
+            Ready = false;
         }
 
         public MxReturnCode<bool>Initialise(int LineWidth, string pathFilename)
@@ -60,7 +61,7 @@ namespace KLineEdCmdApp.Model
 
                             if (rcDone.IsSuccess(true))
                             {
-                                InitDone = true;
+                                Ready = true;
                                 rc.SetResult(true);
                             }
                         }
@@ -78,13 +79,13 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("EditFile.Close");
 
-            if (InitDone == false)
+            if (Ready == false)
                 rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", "MxErrBadMethodParam");
             else
             {
                 if (save == false)
                 {
-                    InitDone = false;
+                    Ready = false;
                     rc.SetResult(true);
                 }
                 else
@@ -93,7 +94,7 @@ namespace KLineEdCmdApp.Model
                     rc += rcSave;
                     if (rcSave.IsSuccess(true))
                     {
-                        InitDone = false;
+                        Ready = false;
                         rc.SetResult(true);
                     }
                 }
@@ -105,7 +106,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("EditFile.Save");
 
-            if (InitDone == false)
+            if (Ready == false)
                 rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", "MxErrBadMethodParam");
             else
             {
@@ -123,7 +124,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("EditFile.CreateNewSession");
 
-            if (InitDone == false)
+            if (Ready == false)
                 rc.SetError(1050301, MxError.Source.Param, $"InitDone == false", "MxErrInvalidCondition");
             else
             {
@@ -139,7 +140,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("EditFile.AddLine");
 
-            if (InitDone == false)
+            if (Ready == false)
                 rc.SetError(1050401, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", "MxErrInvalidCondition");
             else
             {
@@ -156,7 +157,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("EditFile.AddWord");
 
-            if (InitDone == false)
+            if (Ready == false)
                 rc.SetError(1050501, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", "MxErrInvalidCondition");
             else
             {
@@ -173,7 +174,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<string[]>("EditFile.GetLastLinesForDisplay", null);
 
-            if (InitDone == false)
+            if (Ready == false)
                 rc.SetError(1050601, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", "MxErrInvalidCondition");
             else
             {
@@ -189,7 +190,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("EditFile.Write");
 
-            if (string.IsNullOrEmpty(pathFilename) || ((InitDone == false) && (newFile == false)))
+            if (string.IsNullOrEmpty(pathFilename) || ((Ready == false) && (newFile == false)))
                 rc.SetError(1050701, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
             else
             {
@@ -254,12 +255,12 @@ namespace KLineEdCmdApp.Model
         }
         public HeaderSession GetLastSession()
         {
-            return (InitDone) ? Header?.GetLastSession() : null;
+            return (Ready) ? Header?.GetLastSession() : null;
         }
         public string GetReport()
         {
             var rc = "";
-            if (InitDone == false)
+            if (Ready == false)
                 rc += "[not initialized]";
             else
             {
@@ -271,7 +272,7 @@ namespace KLineEdCmdApp.Model
         public string GetChapterReport()
         {
             var rc = "";
-            if (InitDone == false)
+            if (Ready == false)
                 rc += "[not initialized]";
             else
             {
@@ -282,7 +283,7 @@ namespace KLineEdCmdApp.Model
         public string GetLastSessionReport()
         {
             var rc = "";
-            if (InitDone == false)
+            if (Ready == false)
                 rc += "[not initialized]";
             else
             {
@@ -294,7 +295,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = KLineEditor.PosIntegerNotSet;
 
-            if (InitDone)
+            if (Ready)
                 rc = Body.GetLineCount();
             return rc;
         }
