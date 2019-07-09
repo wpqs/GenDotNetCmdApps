@@ -1,4 +1,5 @@
 ﻿using System;
+using KLineEdCmdApp.Model;
 
 namespace KLineEdCmdApp.View
 {
@@ -30,7 +31,7 @@ namespace KLineEdCmdApp.View
             Console.Write(format, args);
         }
 
-        public char GetKeyChar(bool hide = false, char defaultVal = ' ')
+        public char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar)
         {
             return Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
         }

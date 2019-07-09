@@ -1,4 +1,5 @@
 ﻿using System;
+using KLineEdCmdApp.Model;
 
 namespace KLineEdCmdApp.View
 {
@@ -10,7 +11,7 @@ namespace KLineEdCmdApp.View
         void SetBufferSize(int width, int height);
         void WriteLines(string line, params object[] args);
         void Write(string line, params object[] args);
-        char GetKeyChar(bool hide = false, char defaultVal = ' ');
+        char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar);
         ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);
 
     }

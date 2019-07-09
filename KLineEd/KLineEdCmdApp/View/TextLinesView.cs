@@ -1,8 +1,10 @@
-﻿using MxReturnCode;
+﻿using KLineEdCmdApp.Model;
+using MxReturnCode;
+// ReSharper disable All
 
 namespace KLineEdCmdApp.View
 {
-    public class TextLinesView
+    public class TextLinesView : ObserverView   
     {
         public static readonly int ScreenMarginLeft = 10;
         public static readonly int ScreenMarginRight = 20;
@@ -17,14 +19,36 @@ namespace KLineEdCmdApp.View
         public int Width { private set; get; }
         public int Height { private set; get; }
         public int LineWidth { private set; get; }
-
         public bool Ready { private set; get; }
 
-        public TextLinesView(ITerminal terminal)
+
+        public TextLinesView(ITerminal terminal) : base()
         {
             Terminal = terminal;
             LineWidth = KLineEditor.PosIntegerNotSet;
             Ready = false;
+        }
+
+        public override void OnUpdate(NotificationItem notificationItem)
+        {
+            ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
+            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.Char) || (change == ChapterModel.ChangeHint.Word))
+            {
+                //this View is only concerned with changes to Words and Characters so update it from the relevant objects in notification.Data
+
+            }
+        }
+
+        //public override void Subscribe(IObservable<NotificationItem> notify)
+        //{
+        //    base.Subscribe(notify);
+        //    //any actions that need to be done for the derived class during Subscribe - i.e. display message
+        //}
+
+        protected override bool Unsubscribe()
+        {
+            return base.Unsubscribe();
+            //any actions that need to be done for the derived class during Unsubscribe - i.e. display message
         }
 
         public MxReturnCode<bool> Setup(CmdLineParamsApp param)

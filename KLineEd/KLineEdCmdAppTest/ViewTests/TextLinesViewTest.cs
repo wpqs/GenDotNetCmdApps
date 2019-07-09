@@ -9,7 +9,7 @@ namespace KLineEdCmdAppTest.ViewTests
     public class TextLinesViewTest
     {
         [Fact]
-        public void TestSetup()
+        public void SetupTest()
         {
             var cmdLineParams = new CmdLineParamsApp();
             var rcParam = cmdLineParams.Initialise(new[] { "--edit", "Test.txt" });

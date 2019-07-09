@@ -97,6 +97,15 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: line is too long. You have reached the end of the line. Press the Enter key to continue.
+        /// </summary>
+        internal static string MxErrLineTooLong {
+            get {
+                return ResourceManager.GetString("MxErrLineTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: test of error handling. Please take no action.
         /// </summary>
         internal static string MxErrTest {

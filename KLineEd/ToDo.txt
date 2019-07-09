@@ -8,7 +8,7 @@ Todo: KLineEd
 		 --TabSize 3
 		 --DisplayLastLines 10
 		 --MaxCol 80
-		 --Audio CR bell.mpeg 2 (Key click.mpeg 2)
+		 --Audio CR bell.mpeg 2 (Key click.mpeg 2) (Open.mpeg 3, Close.mpg 4)
 		 --Backgnd text black (details black) (cmds black) (spell black)
 		 --Foregnd text green (details grey) (cmds grey) (spell red)
 		 --scrollreview on

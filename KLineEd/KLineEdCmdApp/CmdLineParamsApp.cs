@@ -148,7 +148,7 @@ namespace KLineEdCmdApp
         }
         public enum BoolValue
         {
-            [EnumMember(Value = "unset")] Unset = -1,
+            [EnumMember(Value = "unset")] Unset = KLineEditor.PosIntegerNotSet,
             [EnumMember(Value = "yes")] Yes,
             [EnumMember(Value = "no")] No,
 
@@ -447,7 +447,7 @@ namespace KLineEdCmdApp
             return rc;
         }
 
-        protected override string GetParamHelp(int paramId = -1) // (Param) 
+        protected override string GetParamHelp(int paramId = KLineEditor.PosIntegerNotSet) // (Param) 
         {
             var rc = "";
 

@@ -173,7 +173,7 @@ namespace KLineEdCmdApp.Model
 
                 var lastSessionNo = 0;
                 if (Sessions.Count > 0)
-                    lastSessionNo = Sessions[Sessions.Count - 1]?.SessionNo ?? -1;
+                    lastSessionNo = Sessions[Sessions.Count - 1]?.SessionNo ?? KLineEditor.PosIntegerNotSet;
 
                 if (session.SetDefaults(lastSessionNo + 1, startLineNo) == false)
                     rc.SetError(1090402, MxError.Source.Data, $"SetDefaults failed; lastSessionNo={lastSessionNo}+1, startLineNo={startLineNo}", "MxErrInvalidCondition");

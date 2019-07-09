@@ -1,7 +1,6 @@
 ﻿using System;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Properties;
-using KLineEdCmdApp.View;
 using MxReturnCode;
 
 // ReSharper disable once CheckNamespace
@@ -9,10 +8,9 @@ namespace KLineEdCmdApp
 {
     public class KLineEditor
     {
-        public static readonly int PosIntegerNotSet = -1;
+        public const int PosIntegerNotSet = -1; //used for default values of params so cannot be readonly
         public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................{Environment.NewLine}";
 
-        public TextLinesView Vdu { private set; get; }
         public  ChapterModel EditFile { private set; get; }
 
         public bool Ready { private set; get; }
@@ -20,19 +18,17 @@ namespace KLineEdCmdApp
         public KLineEditor()
         {
             Ready = false;
-            Vdu = null;
             EditFile = null;
         }
         
-        public MxReturnCode<bool> Start(ChapterModel model, TextLinesView view)
+        public MxReturnCode<bool> Start(ChapterModel model)
         {
             var rc = new MxReturnCode<bool>("Edit.Setup");
 
-            if ((model == null) || (model.Ready == false) || (view == null) )
-                rc.SetError(1040101, MxError.Source.Param, $"screen is null, model is null", "MxErrBadMethodParam");
+            if ((model == null) || (model.Ready == false)  )
+                rc.SetError(1040101, MxError.Source.Param, $"model is {((model == null) ? "[null]" : "[not ready]")}", "MxErrBadMethodParam");
             else
             {
-                Vdu = view;
                 EditFile = model;
 
                 var rcSession = model.CreateNewSession();
@@ -97,7 +93,7 @@ namespace KLineEdCmdApp
         {
             var rc = string.Format(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
             rc += Environment.NewLine;
-            rc += $"Report for editing session {EditFile?.Header?.GetLastSession()?.SessionNo ?? -1} of chapter {EditFile?.Header?.Chapter?.Title ?? "[null]"}:";
+            rc += $"Report for editing session {EditFile?.Header?.GetLastSession()?.SessionNo ?? KLineEditor.PosIntegerNotSet} of chapter {EditFile?.Header?.Chapter?.Title ?? "[null]"}:";
             rc += Environment.NewLine;
             rc += Environment.NewLine;
             rc += EditFile?.GetReport() ??HeaderBase.ValueNotSet;
@@ -106,7 +102,7 @@ namespace KLineEdCmdApp
 
         private string GetCommandHints()
         {
-            var rc = "[not initialised]";
+            var rc = "[not initialized]";
             if (Ready)
             {
                 rc = "Esc=refresh | Ctrl+X=exit | <- | -> | Del | BS";
@@ -116,7 +112,7 @@ namespace KLineEdCmdApp
 
         private string GetFooter()
         {
-            var rc = "[not initialised]";
+            var rc = "[not initialized]";
             if (Ready)
             {
                 //start time, current edit duration, WPM, number of words written, number of pages written, total number of words in file, total number of pages in file

@@ -2,21 +2,32 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.Serialization;
+
 // ReSharper disable All
 
 namespace KLineEdCmdApp.Model
 {
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class ChapterModel
+    public class ChapterModel : NotifierModel
     {
+        public enum ChangeHint
+        {
+            [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
+            [EnumMember(Value = "Line")] Line = 1,      //AppendLine()
+            [EnumMember(Value = "Word")] Word = 2,      //AppendWord()
+            [EnumMember(Value = "Status")] Status = 3,  //UpdateAllViews(Status)
+            [EnumMember(Value = "Cmd")] Cmd = 4,        //UpdateAllViews(Cmd)
+            [EnumMember(Value = "All")] All = 5,
+            [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
+        }
         public string FileName { private set; get; }
         public string Folder { private set; get; }
         public bool Ready { private set; get; }
         public Header Header { private set; get; } 
         public Body Body { private set; get; }    
-        
 
-        public ChapterModel()
+        public ChapterModel() : base()
         {
             Header = new Header();
             Body = new Body();
@@ -25,7 +36,7 @@ namespace KLineEdCmdApp.Model
 
         public MxReturnCode<bool>Initialise(int LineWidth, string pathFilename)
         {
-            var rc = new MxReturnCode<bool>("EditFileOps.Setup");
+            var rc = new MxReturnCode<bool>("ChapterModel.Setup");
 
             if ((string.IsNullOrEmpty(pathFilename)) || (LineWidth == KLineEditor.PosIntegerNotSet))
                 rc.SetError(1050101, MxError.Source.Param, $"LineWidth={LineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
@@ -77,7 +88,7 @@ namespace KLineEdCmdApp.Model
 
         public MxReturnCode<bool> Close(bool save = true)
         {
-            var rc = new MxReturnCode<bool>("EditFile.Close");
+            var rc = new MxReturnCode<bool>("ChapterModel.Close");
 
             if (Ready == false)
                 rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", "MxErrBadMethodParam");
@@ -104,7 +115,7 @@ namespace KLineEdCmdApp.Model
 
         public MxReturnCode<bool> Save()
         {
-            var rc = new MxReturnCode<bool>("EditFile.Save");
+            var rc = new MxReturnCode<bool>("ChapterModel.Save");
 
             if (Ready == false)
                 rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", "MxErrBadMethodParam");
@@ -122,7 +133,7 @@ namespace KLineEdCmdApp.Model
 
         public MxReturnCode<bool> CreateNewSession()
         {
-            var rc = new MxReturnCode<bool>("EditFile.CreateNewSession");
+            var rc = new MxReturnCode<bool>("ChapterModel.CreateNewSession");
 
             if (Ready == false)
                 rc.SetError(1050301, MxError.Source.Param, $"InitDone == false", "MxErrInvalidCondition");
@@ -136,46 +147,72 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> AddLine(string line)
+        public MxReturnCode<bool> AppendLine(string line, bool incWordCount=true)
         {
-            var rc = new MxReturnCode<bool>("EditFile.AddLine");
+            var rc = new MxReturnCode<bool>("ChapterModel.AppendLine");
 
             if (Ready == false)
                 rc.SetError(1050401, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", "MxErrInvalidCondition");
             else
             {
-                var rcAdd = Body.AddLine(line);
+                var rcAdd = Body.AppendLine(line);
                 if (rcAdd.IsError(true))
                     rc += rcAdd;        //may be called lots of times, so only log errors
                 else
+                {
+                    UpdateAllViews((int)ChangeHint.Line);
                     rc.SetResult(true);
+                }
             }
             return rc;
         }
 
-        public MxReturnCode<bool> AddWord(string word)
+        public MxReturnCode<bool> AppendWord(string word)
         {
-            var rc = new MxReturnCode<bool>("EditFile.AddWord");
+            var rc = new MxReturnCode<bool>("ChapterModel.AppendWord");
 
             if (Ready == false)
-                rc.SetError(1050501, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", "MxErrInvalidCondition");
+                rc.SetError(1050501, MxError.Source.Program, "Initialise not called or not successful", "MxErrInvalidCondition");
             else
             {
-                var rcAdd = Body.AddWord(word);
+                var rcAdd = Body.AppendWord(word);
                 if (rcAdd.IsError(true))
                     rc += rcAdd;        //may be called lots of times, so only log errors
                 else
+                {
+                    UpdateAllViews((int)ChangeHint.Word);
                     rc.SetResult(true);
+                }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> AppendChar(char c)
+        {
+            var rc = new MxReturnCode<bool>("ChapterModel.AppendChar");
+
+            if (Ready == false)
+                rc.SetError(1050601, MxError.Source.Program, "Initialise not called or not successful", "MxErrInvalidCondition");
+            else
+            {
+                var rcAdd = Body.AppendChar(c);
+                if (rcAdd.IsError(true))
+                    rc += rcAdd;        //may be called lots of times, so only log errors
+                else
+                {
+                    UpdateAllViews((int)((Char.IsWhiteSpace(c)) ? ChangeHint.Word : ChangeHint.Char));
+                    rc.SetResult(true);
+                }
             }
             return rc;
         }
 
         public MxReturnCode<string[]> GetLastLinesForDisplay(int count) //string[] returned is only for display - altering these strings will not change the document
         {
-            var rc = new MxReturnCode<string[]>("EditFile.GetLastLinesForDisplay", null);
+            var rc = new MxReturnCode<string[]>("ChapterModel.GetLastLinesForDisplay", null);
 
             if (Ready == false)
-                rc.SetError(1050601, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", "MxErrInvalidCondition");
+                rc.SetError(1050701, MxError.Source.Program, "Initialise not called or not successful", "MxErrInvalidCondition");
             else
             {
                 var rcLastLines = Body.GetLastLinesForDisplay(count);
@@ -188,10 +225,10 @@ namespace KLineEdCmdApp.Model
 
         private MxReturnCode<bool> Write(string pathFilename, bool newFile=false)
         {
-            var rc = new MxReturnCode<bool>("EditFile.Write");
+            var rc = new MxReturnCode<bool>("ChapterModel.Write");
 
             if (string.IsNullOrEmpty(pathFilename) || ((Ready == false) && (newFile == false)))
-                rc.SetError(1050701, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
+                rc.SetError(1050801, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
             else
             {
                 try
@@ -215,7 +252,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1050701, MxError.Source.Exception, e.Message);
+                    rc.SetError(1050801, MxError.Source.Exception, e.Message);
                 }
             }
             return rc;
@@ -223,10 +260,10 @@ namespace KLineEdCmdApp.Model
 
         private MxReturnCode<bool> Read(string pathFilename)
         {
-            var rc = new MxReturnCode<bool>("EditFile.Read");
+            var rc = new MxReturnCode<bool>("ChapterModel.Read");
 
             if (string.IsNullOrEmpty(pathFilename))
-                rc.SetError(1050801, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
+                rc.SetError(1050901, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
             else
             {
                 try
@@ -248,7 +285,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1050802, MxError.Source.Exception, e.Message);
+                    rc.SetError(1050902, MxError.Source.Exception, e.Message);
                 }
             }
             return rc;

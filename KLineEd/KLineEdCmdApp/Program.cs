@@ -118,29 +118,30 @@ namespace KLineEdCmdApp
                 }
                 else
                 {
-                    var screenView = new TextLinesView(terminal);
-                    var rcScreen = screenView.Setup(cmdLineParams);
+                    var textLinesView = new TextLinesView(terminal);
+                    var rcScreen = textLinesView.Setup(cmdLineParams);
                     rc += rcScreen;
                     if (rcScreen.IsSuccess(true))
                     {
-                        //editModel.AddObserver(screenView);
-
-                        var editController = new KLineEditor();
-                        var rcStart = editController.Start(editModel, screenView);
-                        rc += rcStart;
-                        if (rcStart.IsSuccess(true))
+                        using (editModel.Subscribe(textLinesView))
                         {
-                            var rcProcess = editController.Process();
-                            rc += rcProcess;
-                            if (rcProcess.IsSuccess(true))
+                            var editController = new KLineEditor();
+                            var rcStart = editController.Start(editModel);
+                            rc += rcStart;
+                            if (rcStart.IsSuccess(true))
                             {
-                                var report = editController.GetReport();
-
-                                var rcFinish = editController.Finish();
-                                rc += rcFinish;
-                                if (rcFinish.IsSuccess(true))
+                                var rcProcess = editController.Process();
+                                rc += rcProcess;
+                                if (rcProcess.IsSuccess(true))
                                 {
-                                    rc.SetResult(report);
+                                    var report = editController.GetReport();
+
+                                    var rcFinish = editController.Finish();
+                                    rc += rcFinish;
+                                    if (rcFinish.IsSuccess(true))
+                                    {
+                                        rc.SetResult(report);
+                                    }
                                 }
                             }
                         }
