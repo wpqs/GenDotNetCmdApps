@@ -1,6 +1,10 @@
 ﻿using System;
-using KLineEdCmdApp.Model;
-using KLineEdCmdApp.View;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+
+using KLineEdCmdApp;
+using KLineEdCmdApp.Utils;
+using KLineEdCmdApp.View.Base;
+
 // ReSharper disable All
 
 namespace KLineEdCmdAppTest.TestSupport
@@ -11,8 +15,8 @@ namespace KLineEdCmdAppTest.TestSupport
         public string WindowFooter { private set; get; }
         public MockObserverView() : base()
         {
-            WindowTitle = "[not set]";
-            WindowFooter = "[not set]";
+            WindowTitle = KLineEdCmdApp.Program.ValueNotSet;
+            WindowFooter = KLineEdCmdApp.Program.ValueNotSet;
         }
         public override void OnUpdate(NotificationItem notificationItem)
         {
@@ -21,7 +25,7 @@ namespace KLineEdCmdAppTest.TestSupport
             {
                 if (notificationItem.Data is MockNotifierModel data)
                 {
-                    WindowTitle = data?.Msg ?? "[not set]";
+                    WindowTitle = data?.Msg ?? KLineEdCmdApp.Program.ValueNotSet;
                     WindowFooter = "updated from model";
                 }
             }

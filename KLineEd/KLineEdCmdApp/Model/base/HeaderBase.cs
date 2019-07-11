@@ -1,12 +1,12 @@
 ﻿using System;
 using MxReturnCode;
 
-namespace KLineEdCmdApp.Model
+namespace KLineEdCmdApp.Model.Base
 {
     public abstract class HeaderBase
     {
         public static readonly string PropertyNotSet = "";
-        public static readonly string ValueNotSet = "[not set]";
+        public static readonly string ValueNotSet = Program.ValueNotSet;
 
         public abstract override string ToString();
         public  abstract string GetReport();

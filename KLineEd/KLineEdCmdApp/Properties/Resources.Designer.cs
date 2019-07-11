@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KLineEdCmdApp.Properties {
+namespace KLineEdCmdApp.Utils.Properties {
     using System;
     
     

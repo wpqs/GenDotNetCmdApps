@@ -1,5 +1,7 @@
 ﻿using System.Runtime.Serialization;
-using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Model.Base;
+using KLineEdCmdApp.Utils;
+
 // ReSharper disable All
 
 namespace KLineEdCmdAppTest.TestSupport

@@ -1,5 +1,6 @@
 ﻿using System;
 using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Model.Base;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests

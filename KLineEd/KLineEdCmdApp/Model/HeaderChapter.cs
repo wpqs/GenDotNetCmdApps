@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using KLineEdCmdApp.Model.Base;
+using KLineEdCmdApp.Utils;
 using MxReturnCode;
-// ReSharper disable All
+
 
 namespace KLineEdCmdApp.Model
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class HeaderChapter : HeaderBase
     {
         public static readonly string OpeningElement = "<chapter>";

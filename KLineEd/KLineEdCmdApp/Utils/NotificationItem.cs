@@ -1,4 +1,6 @@
-﻿namespace KLineEdCmdApp.Model
+﻿using KLineEdCmdApp.Model.Base;
+
+namespace KLineEdCmdApp.Utils
 {
     public class NotificationItem
     {

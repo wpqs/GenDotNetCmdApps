@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using KLineEdCmdApp.Model.Base;
 using MxReturnCode;
-// ReSharper disable All
 
 namespace KLineEdCmdApp.Model
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+
     public class Header
     {
         public static readonly string OpeningElement = "<header>";
@@ -33,7 +40,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Header.Validate");
 
             if (Chapter.Validate() == false)
-                rc.SetError(1090101, MxError.Source.Data, $"Chapter is invalid={Chapter.ToString()}");
+                rc.SetError(1090101, MxError.Source.Data, $"Chapter is invalid={Chapter}");
             else
             {
                 var sessionNo = 1;
@@ -173,7 +180,7 @@ namespace KLineEdCmdApp.Model
 
                 var lastSessionNo = 0;
                 if (Sessions.Count > 0)
-                    lastSessionNo = Sessions[Sessions.Count - 1]?.SessionNo ?? KLineEditor.PosIntegerNotSet;
+                    lastSessionNo = Sessions[Sessions.Count - 1]?.SessionNo ?? Program.PosIntegerNotSet;
 
                 if (session.SetDefaults(lastSessionNo + 1, startLineNo) == false)
                     rc.SetError(1090402, MxError.Source.Data, $"SetDefaults failed; lastSessionNo={lastSessionNo}+1, startLineNo={startLineNo}", "MxErrInvalidCondition");
@@ -192,7 +199,7 @@ namespace KLineEdCmdApp.Model
         }
         public int GetSessionCount()
         {
-            return Sessions?.Count ?? KLineEditor.PosIntegerNotSet;
+            return Sessions?.Count ?? Program.PosIntegerNotSet;
         }
         public HeaderSession GetLastSession()
         {

@@ -3,12 +3,18 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
-
-// ReSharper disable All
+using KLineEdCmdApp.Model.Base;
+using KLineEdCmdApp.Utils;
+using MxDotNetUtilsLib;
 
 namespace KLineEdCmdApp.Model
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+
     public class ChapterModel : NotifierModel
     {
         public enum ChangeHint
@@ -16,35 +22,61 @@ namespace KLineEdCmdApp.Model
             [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
             [EnumMember(Value = "Line")] Line = 1,      //AppendLine()
             [EnumMember(Value = "Word")] Word = 2,      //AppendWord()
-            [EnumMember(Value = "Status")] Status = 3,  //UpdateAllViews(Status)
-            [EnumMember(Value = "Cmd")] Cmd = 4,        //UpdateAllViews(Cmd)
-            [EnumMember(Value = "All")] All = 5,
+            [EnumMember(Value = "Status")] Status = 3,  //SetStatusLine()
+            [EnumMember(Value = "Msg")] Msg = 4,        //SetMsgLine()
+            [EnumMember(Value = "Cmd")] Cmd = 5,        //UpdateAllViews(Cmd)
+            [EnumMember(Value = "All")] All = 6,
             [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
         }
         public string FileName { private set; get; }
         public string Folder { private set; get; }
         public bool Ready { private set; get; }
-        public Header Header { private set; get; } 
-        public Body Body { private set; get; }    
+        public Header Header { get; } 
+        public Body Body { get; }
 
+        public string StatusLine { private set; get; }
+        public string MsgLine { private set; get; }
+        public string CmdLine { private set; get; }
+
+        // ReSharper disable once RedundantBaseConstructorCall
         public ChapterModel() : base()
         {
             Header = new Header();
             Body = new Body();
+            StatusLine = "";
+            MsgLine = "";
+            CmdLine = "";
             Ready = false;
         }
 
-        public MxReturnCode<bool>Initialise(int LineWidth, string pathFilename)
+        public void SetStatusLine()     //called from Time Thread so readonly model items
+        {
+            StatusLine = $"{DateTime.Now.ToString(MxStdFrmt.Time)} Line: {Body?.GetLineCount() ?? Program.PosIntegerNotSet} Column: {Body?.GetCharactersInLine() ?? Program.PosIntegerNotSet} Total words: {Body?.WordCount ?? Program.PosIntegerNotSet}";
+            UpdateAllViews((int)ChangeHint.Status);
+        }
+        public void SetMsgLine(string msg)
+        {
+            MsgLine = msg;
+            UpdateAllViews((int)ChangeHint.Msg);
+        }
+
+        public void SetCmdLine(string cmd)
+        {
+            CmdLine = cmd;
+            UpdateAllViews((int)ChangeHint.Cmd);
+        }
+
+        public MxReturnCode<bool>Initialise(int lineWidth, string pathFilename)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Setup");
 
-            if ((string.IsNullOrEmpty(pathFilename)) || (LineWidth == KLineEditor.PosIntegerNotSet))
-                rc.SetError(1050101, MxError.Source.Param, $"LineWidth={LineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
+            if ((string.IsNullOrEmpty(pathFilename)) || (lineWidth == Program.PosIntegerNotSet))
+                rc.SetError(1050101, MxError.Source.Param, $"LineWidth={lineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
             else
             {
                 try
                 {
-                    var rcInit = Body.Initialise(LineWidth);
+                    var rcInit = Body.Initialise(lineWidth);
                     rc += rcInit;
                     if (rcInit.IsSuccess(true))
                     {
@@ -96,6 +128,7 @@ namespace KLineEdCmdApp.Model
             {
                 if (save == false)
                 {
+                    DisconnectAllViews();
                     Ready = false;
                     rc.SetResult(true);
                 }
@@ -105,6 +138,7 @@ namespace KLineEdCmdApp.Model
                     rc += rcSave;
                     if (rcSave.IsSuccess(true))
                     {
+                        DisconnectAllViews();
                         Ready = false;
                         rc.SetResult(true);
                     }
@@ -139,7 +173,7 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1050301, MxError.Source.Param, $"InitDone == false", "MxErrInvalidCondition");
             else
             {
-                var rcSession = Header.CreateNewSession(Body?.GetLineCount() ?? KLineEditor.PosIntegerNotSet);
+                var rcSession = Header.CreateNewSession(Body?.GetLineCount() ?? Program.PosIntegerNotSet);
                 rc += rcSession;
                 if (rcSession.IsSuccess(true))
                     rc.SetResult(true);
@@ -290,6 +324,17 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
+
+        public bool RemoveAllLines()
+        {
+            var rc = false;
+            if (Ready && ((Body?.IsError() ?? true) == false))
+            {
+                Body.RemoveAllLines();
+                rc = true;
+            }
+            return rc;
+        }
         public HeaderSession GetLastSession()
         {
             return (Ready) ? Header?.GetLastSession() : null;
@@ -330,10 +375,19 @@ namespace KLineEdCmdApp.Model
         }
         public int GetTextLineCount()
         {
-            var rc = KLineEditor.PosIntegerNotSet;
+            var rc = Program.PosIntegerNotSet;
 
             if (Ready)
                 rc = Body.GetLineCount();
+            return rc;
+        }
+
+        public int GetTextWordCount()
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if (Ready)
+                rc = Body.RefreshWordCount();
             return rc;
         }
     }

@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using KLineEdCmdApp.Model.Base;
+using KLineEdCmdApp.Utils;
 using MxDotNetUtilsLib;
 using MxReturnCode;
-// ReSharper disable All
 
 namespace KLineEdCmdApp.Model
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class HeaderSession : HeaderBase
     {
         //Session: 8
@@ -173,7 +180,7 @@ namespace KLineEdCmdApp.Model
                     else
                     {
                         var headerString = file.ReadLine();
-                        if (headerString != SessionNoLabel)
+                        if ((headerString == null) || (headerString != SessionNoLabel))
                             rc.SetError(1060203, MxError.Source.Data, $"{SessionNoLabel} not at start of {firstLine}", "MxErrInvalidCondition");
                         else
                         {
@@ -212,12 +219,12 @@ namespace KLineEdCmdApp.Model
 
         public override bool Validate()
         {
-            bool rc = (SessionNo != KLineEditor.PosIntegerNotSet) && (Start != null) && (Duration != null) 
-                        && (StartLine != KLineEditor.PosIntegerNotSet) && (EndLine != KLineEditor.PosIntegerNotSet) && (LinesTyped != KLineEditor.PosIntegerNotSet)
-                        && (WordsCount != KLineEditor.PosIntegerNotSet) && (double.IsNaN(Wpm) == false)
-                        && (CorrectionsCount != KLineEditor.PosIntegerNotSet) && (double.IsNaN(Wpc) == false)
-                        && (SpellCheckCount != KLineEditor.PosIntegerNotSet) && (double.IsNaN(Wps) == false)
-                        && (TypingPauses != null) && (TypingTime != null) && (TypingPauseCount != KLineEditor.PosIntegerNotSet);
+            bool rc = (SessionNo != Program.PosIntegerNotSet) && (Start != null) && (Duration != null) 
+                        && (StartLine != Program.PosIntegerNotSet) && (EndLine != Program.PosIntegerNotSet) && (LinesTyped != Program.PosIntegerNotSet)
+                        && (WordsCount != Program.PosIntegerNotSet) && (double.IsNaN(Wpm) == false)
+                        && (CorrectionsCount != Program.PosIntegerNotSet) && (double.IsNaN(Wpc) == false)
+                        && (SpellCheckCount != Program.PosIntegerNotSet) && (double.IsNaN(Wps) == false)
+                        && (TypingPauses != null) && (TypingTime != null) && (TypingPauseCount != Program.PosIntegerNotSet);
             Error = !rc;  //set Error = false if all properties are now valid, else Error = true;
             return rc;
         }
@@ -239,22 +246,22 @@ namespace KLineEdCmdApp.Model
         }
         public override void Reset()
         {
-            SessionNo = KLineEditor.PosIntegerNotSet;
+            SessionNo = Program.PosIntegerNotSet;
             Start = null;
             Duration = null;
-            StartLine = KLineEditor.PosIntegerNotSet;
-            EndLine = KLineEditor.PosIntegerNotSet;
-            LinesTyped = KLineEditor.PosIntegerNotSet;     //calculated value
-            WordsCount = KLineEditor.PosIntegerNotSet;
+            StartLine = Program.PosIntegerNotSet;
+            EndLine = Program.PosIntegerNotSet;
+            LinesTyped = Program.PosIntegerNotSet;     //calculated value
+            WordsCount = Program.PosIntegerNotSet;
             Wpm = double.NaN;
-            CorrectionsCount = KLineEditor.PosIntegerNotSet;
+            CorrectionsCount = Program.PosIntegerNotSet;
             Wpc = double.NaN;
-            SpellCheckCount = KLineEditor.PosIntegerNotSet;
+            SpellCheckCount = Program.PosIntegerNotSet;
             Wps = double.NaN;
 
             TypingTime = null;
             TypingPauses = null;
-            TypingPauseCount = KLineEditor.PosIntegerNotSet;
+            TypingPauseCount = Program.PosIntegerNotSet;
 
             Error = true;
         }
@@ -274,7 +281,7 @@ namespace KLineEdCmdApp.Model
                 rc = "Last session stats:";
                 rc += Environment.NewLine;
                 rc += Environment.NewLine;
-                rc += $"{SessionNoLabel} {SessionNo} - {StartLineLabel} {StartLine} {EndLineLabel} {EndLine} {LinesTypedLabel} {LinesTyped}";
+                rc += $"{SessionNoLabel} {SessionNo} {StartLineLabel} {StartLine} {EndLineLabel} {EndLine} {LinesTypedLabel} {LinesTyped}";
                 rc += Environment.NewLine;
                 rc += $"{StartLabel} {Start?.ToString(MxStdFrmt.DateTime) ?? "[null]"}{DurationLabel} {Duration?.ToString(MxStdFrmtTimeSpan) ?? "[null]"} ";
                 rc += $"{TypingPausesLabel} {TypingPauseCount} {TypingTimeLabel} {TypingTime?.ToString(MxStdFrmtTimeSpan) ?? "[null]"} ";
@@ -418,14 +425,14 @@ namespace KLineEdCmdApp.Model
             StartLine = GetPosInteger(name, StartLine, out var rc);
             if (rc == true)
             {
-                if (EndLine == KLineEditor.PosIntegerNotSet)
-                    LinesTyped = KLineEditor.PosIntegerNotSet;
+                if (EndLine == Program.PosIntegerNotSet)
+                    LinesTyped = Program.PosIntegerNotSet;
                 else
                 {
                     if (EndLine < StartLine)
                     {
                         StartLine = existingStartLine;
-                        LinesTyped = KLineEditor.PosIntegerNotSet;
+                        LinesTyped = Program.PosIntegerNotSet;
                         rc = false;
                     }
                     else
@@ -448,14 +455,14 @@ namespace KLineEdCmdApp.Model
             EndLine = GetPosInteger(name, EndLine, out var rc);
             if (rc == true)
             {
-                if (StartLine == KLineEditor.PosIntegerNotSet)
-                    LinesTyped = KLineEditor.PosIntegerNotSet;
+                if (StartLine == Program.PosIntegerNotSet)
+                    LinesTyped = Program.PosIntegerNotSet;
                 else
                 {
                     if (EndLine < StartLine)
                     {
                         EndLine = existingEndLine;
-                        LinesTyped = KLineEditor.PosIntegerNotSet;
+                        LinesTyped = Program.PosIntegerNotSet;
                         rc = false;
                     }
                     else
@@ -479,7 +486,7 @@ namespace KLineEdCmdApp.Model
                     if (Math.Abs(Math.Round((double) Duration?.TotalMinutes, 1)) <= 0.0)
                         Wpm = 0.0;
                     else
-                        Wpm = (double) WordsCount / (double) Duration?.TotalMinutes;
+                        Wpm = WordsCount / (double) Duration?.TotalMinutes;
                 }
             }
             Validate();
@@ -491,9 +498,9 @@ namespace KLineEdCmdApp.Model
             if (rc == true)
             {
                 if (CorrectionsCount == 0)
-                    Wpc = (double)WordsCount;
+                    Wpc = WordsCount;
                 else
-                    Wpc = (double)WordsCount / (double)CorrectionsCount;
+                    Wpc = WordsCount / (double)CorrectionsCount;
             }
             Validate();
             return rc;
@@ -504,9 +511,9 @@ namespace KLineEdCmdApp.Model
             if (rc == true)
             {
                 if (SpellCheckCount == 0)
-                    Wps = (double) WordsCount;
+                    Wps = WordsCount;
                 else
-                    Wps = (double)WordsCount / (double)SpellCheckCount;
+                    Wps = WordsCount / (double)SpellCheckCount;
             }
             Validate();
             return rc;
@@ -568,7 +575,7 @@ namespace KLineEdCmdApp.Model
                         }
                         else
                         {
-                            pauseTime += (double)typingPause.Duration;
+                            pauseTime += typingPause.Duration;
                             TypingPauses.Add(typingPause);
                         }
                     }
@@ -597,7 +604,7 @@ namespace KLineEdCmdApp.Model
 
         private string GetTruncatedString(string value)
         {
-            var end = value.IndexOf(TypingPausesLabel);
+            var end = value.IndexOf(TypingPausesLabel, StringComparison.Ordinal);
             if ((end == -1) || (end-1 < 0))
                 return (value.Length < 50) ? value : value.Substring(0, 50);
             else

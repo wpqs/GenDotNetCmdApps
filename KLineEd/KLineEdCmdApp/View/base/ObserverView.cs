@@ -1,7 +1,7 @@
 ﻿using System;
-using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Utils;
 
-namespace KLineEdCmdApp.View
+namespace KLineEdCmdApp.View.Base
 {
     public abstract class ObserverView :  IObserverView<NotificationItem>
     {

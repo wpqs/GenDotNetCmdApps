@@ -3,26 +3,27 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.ControllerTests
 {
-    public class EditTest : IClassFixture<EditViewFixture>
+    public class KLineEditorTest : IClassFixture<ModelTextEditViewFixture>
     {
-        private readonly EditViewFixture _screen;
+        private readonly ModelTextEditViewFixture _fixture;
 
-        public EditTest(EditViewFixture screen)
+        public KLineEditorTest(ModelTextEditViewFixture fixture)
         {
-            _screen = screen;
+            _fixture = fixture;
         }
 
-        //[Fact]
-        //public void StartTest()
-        //{
-        //    var edit = new Edit();
+        [Fact]
+        public void StartTest()
+        {
+            //Assert.True(_fixture?.Model?.Ready ?? false);
+            //Assert.Equal(0, _fixture.Model.GetTextLineCount());
 
-        //    var rcEdit = edit.Start(_screen.Terminal, ScreenFixture.UnitTestEditFileName);
-        //    Assert.True(rcEdit.GetResult());
-        //    Assert.NotNull(edit.CurrentSession);
-        //    Assert.NotNull(edit.Sessions);
-        //    Assert.NotNull(edit.LastLines);
-        //}
+            //var editor = new KLineEditor();
+
+            //var rcEdit = editor.Start(_fixture.Model);
+            //Assert.True(rcEdit.GetResult());
+            //Assert.True(editor.Ready);
+        }
 
         //[Fact]
         //public void StartNullParamOneTest()

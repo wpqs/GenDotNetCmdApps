@@ -1,26 +1,54 @@
 ﻿using System;
-using KLineEdCmdApp.View;
+using KLineEdCmdApp.Utils;
 
 namespace KLineEdCmdAppTest.TestSupport
 {
     public class MockTerminal : ITerminal
     {
-        public string Title { get; set; }
+        private int _cursorLine;
+        private int _cursorColumn;
+
+        public MockTerminal()
+        {
+            _cursorLine = 0;
+            _cursorColumn = 0;
+            Error = true;
+        }
+        private bool Error { set; get; }
+
+        public bool IsError() { return Error; }
+
         public void Clear()
         {
             
         }
 
-        public void SetWindowSize(int width, int height)
+        public bool Setup(TerminalProperties props)
         {
-           
+            return true;
         }
 
-        public void SetBufferSize(int width, int height)
+        public TerminalProperties GetSettings()
         {
-            
+            return new TerminalProperties();
         }
 
+        public bool SetCursorPosition(int line, int column)
+        {
+            _cursorColumn = column;
+            _cursorLine = line;
+            return true;
+        }
+
+        public int GetCursorColumn()
+        {
+            return _cursorColumn;
+        }
+
+        public int GetCursorLine()
+        {
+            return _cursorLine;
+        }
         public void WriteLines(string line, params object[] args)
         {
             
@@ -38,6 +66,11 @@ namespace KLineEdCmdAppTest.TestSupport
         public ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
             return defaultVal;
+        }
+
+        public ConsoleKeyInfo ReadKey()
+        {
+            return new ConsoleKeyInfo('X', ConsoleKey.X, false, false, true);
         }
     }
 }

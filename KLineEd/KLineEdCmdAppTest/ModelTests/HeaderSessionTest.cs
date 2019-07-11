@@ -191,7 +191,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var session = new HeaderSession();
             Assert.True(session.SetStartLineLinesTyped(5));
             Assert.False(session.SetEndLineLinesTyped(4));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, session.LinesTyped);
+            Assert.Equal(Program.PosIntegerNotSet, session.LinesTyped);
         }
 
         [Fact]
@@ -201,7 +201,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(session.SetEndLineLinesTyped(4));
             Assert.False(session.SetStartLineLinesTyped(5));
 
-            Assert.Equal(KLineEditor.PosIntegerNotSet, session.LinesTyped);
+            Assert.Equal(Program.PosIntegerNotSet, session.LinesTyped);
         }
 
         [Fact]

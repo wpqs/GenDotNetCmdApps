@@ -1,6 +1,6 @@
 ﻿
 // ReSharper disable StringIndexOfIsCultureSpecific.1
-namespace KLineEdCmdApp
+namespace KLineEdCmdApp.Utils
 {
     public static class Extensions
     {

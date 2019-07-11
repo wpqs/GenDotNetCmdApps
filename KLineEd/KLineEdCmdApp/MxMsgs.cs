@@ -1,5 +1,8 @@
-﻿namespace KLineEdCmdApp
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace KLineEdCmdApp
 {
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public static class MxMsgs
     {
         public const string SupportedCultures = "en;";      //must end with ;
@@ -26,17 +29,23 @@
     //  each error starts with a new unit value; error1=zyyxx01, error2=zyyxx02, Last=zyyxx99 (>100 errors in method then restart with next available method number, but this shouldn't happen in well structured code)
 
 
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public static class ErrorCodeList
     {
         public const int KLineEdCmdAppProgramFirst = 1010101; //first error code in class Program.cs
         public const int CmdLineParamsAppFirst = 1020101; //first error code in class CmdLineParamsApp.cs
-        public const int ScreenFirst = 1030101; //first error code in class Screen.cs
-        public const int EditFirst = 1040101; //first error code in class Edit.cs
-        public const int EditFileFirst = 1050101; //first error code in class EditFile.cs
+        public const int KLineEditorFirst = 1030101; //first error code in class KLineEditor.cs
+       // public const int EditFirst = 1040101; //first error code in class Edit.cs
+        public const int ChapterModelFirst = 1050101; //first error code in class ChapterModel.cs
         public const int ModelHeaderChapterFirst = 1060101; //first error code in class HeaderChapter.cs
         public const int ModelHeaderSessionFirst = 1070101; //first error code in class HeaderSession.cs
         public const int ModelHeaderSessionPauseFirst = 1080101; //first error code in class HeaderSessionPause.cs
         public const int ModelHeaderFirst = 1090101; //first error code in class Header.cs
         public const int ModelBodyFirst = 1100101; //first error code in class Body.cs
+        public const int KLineEdViewFirst = 1110101; //first error code in class KLineEdView.cs
+        public const int TextEditViewFirst = 1120101; //first error code in class TextEditView.cs
+        public const int CmdsHelpViewFirst = 1130101; //first error code in class CmdsHelpView.cs
+        public const int StatusLineViewFirst = 1140101; //first error code in class StatusLineView.cs
+        public const int MsgLineViewFirst = 1150101; //first error code in class MsgLineView.cs
     }
 }

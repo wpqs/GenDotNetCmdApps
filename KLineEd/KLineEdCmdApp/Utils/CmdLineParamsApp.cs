@@ -1,15 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
+
+using Newtonsoft.Json;
 using MxDotNetUtilsLib;
 using MxReturnCode;
-using Newtonsoft.Json;
 
-// ReSharper disable All
 
-namespace KLineEdCmdApp
+
+namespace KLineEdCmdApp.Utils
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
     //when adding a new parameter:
     // a) define static readonly for i) name (SettingsParam) ii) args (SettingsArgUpdate) iii) default value(s)(SettingsArgUpdateValueDefault)
     // b) add properties for args (SettingsFile, UpdateSettingsFile) 
@@ -148,7 +157,7 @@ namespace KLineEdCmdApp
         }
         public enum BoolValue
         {
-            [EnumMember(Value = "unset")] Unset = KLineEditor.PosIntegerNotSet,
+            [EnumMember(Value = "unset")] Unset = Program.PosIntegerNotSet,
             [EnumMember(Value = "yes")] Yes,
             [EnumMember(Value = "no")] No,
 
@@ -290,8 +299,8 @@ namespace KLineEdCmdApp
 
             EditFile = null;
             ExportFile = null;
-            DisplayLastLinesCnt = KLineEditor.PosIntegerNotSet;
-            MaxCol = KLineEditor.PosIntegerNotSet;
+            DisplayLastLinesCnt = Program.PosIntegerNotSet;
+            MaxCol = Program.PosIntegerNotSet;
             AudioCRFile = null;
             AudioKeyFile = null;
 
@@ -447,7 +456,7 @@ namespace KLineEdCmdApp
             return rc;
         }
 
-        protected override string GetParamHelp(int paramId = KLineEditor.PosIntegerNotSet) // (Param) 
+        protected override string GetParamHelp(int paramId = 0) // paramId = KLineEditor.PosIntegerNotSet 
         {
             var rc = "";
 
@@ -799,9 +808,9 @@ namespace KLineEdCmdApp
             if (ExportFile == null)
                 ExportFile = savedSettings.ExportFile;
 
-            if (DisplayLastLinesCnt == KLineEditor.PosIntegerNotSet)   
+            if (DisplayLastLinesCnt == Program.PosIntegerNotSet)   
                 DisplayLastLinesCnt = savedSettings.DisplayLastLinesCnt;
-            if (MaxCol == KLineEditor.PosIntegerNotSet)
+            if (MaxCol == Program.PosIntegerNotSet)
                 MaxCol = savedSettings.MaxCol;
 
             if (AudioCRFile == null)
@@ -839,9 +848,9 @@ namespace KLineEdCmdApp
         {
             if (mode == ResetMode.FactoryDefaults)
             {
-                if ((DisplayLastLinesCnt == KLineEditor.PosIntegerNotSet) || (unsetOnly == false))
+                if ((DisplayLastLinesCnt == Program.PosIntegerNotSet) || (unsetOnly == false))
                     DisplayLastLinesCnt = ArgDisplayLastLinesCntDefault;
-                if ((MaxCol == KLineEditor.PosIntegerNotSet) || (unsetOnly == false))
+                if ((MaxCol == Program.PosIntegerNotSet) || (unsetOnly == false))
                     MaxCol = ArgMaxColDefault;
 
                 if ((ScrollReview == BoolValue.Unset) || (unsetOnly == false))

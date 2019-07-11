@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using KLineEdCmdApp.Utils;
 using MxReturnCode;
-// ReSharper disable All
 
 namespace KLineEdCmdApp.Model
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+    [SuppressMessage("ReSharper", "ConvertIfToOrExpression")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class Body
     {
         public static readonly string OpeningElement = "<body>";
@@ -28,7 +36,7 @@ namespace KLineEdCmdApp.Model
         {
             TextLines = new List<string>();
             WordCount = 0;
-            LineWidth = KLineEditor.PosIntegerNotSet;
+            LineWidth = Program.PosIntegerNotSet;
             SetTabSpaces(DefaultTabSpaceCount);
             Error = true;
         }
@@ -45,7 +53,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if (lineWidth == KLineEditor.PosIntegerNotSet)
+            if (lineWidth == Program.PosIntegerNotSet)
                 rc.SetError(1100101, MxError.Source.Param, $"lineWidth={lineWidth} not set", "MxErrBadMethodParam");
             else
             {
@@ -160,7 +168,7 @@ namespace KLineEdCmdApp.Model
                         else
                         {
                             var wordsInLine = AddLine(line);
-                            if (wordsInLine == KLineEditor.PosIntegerNotSet)
+                            if (wordsInLine == Program.PosIntegerNotSet)
                                 rc.SetError(1100405, MxError.Source.User, $"Error: line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
                             else
                             {
@@ -198,7 +206,7 @@ namespace KLineEdCmdApp.Model
                             if ((TextLines.Count == 0) || (TextLines[TextLines.Count - 1].Length + word.Length > LineWidth))
                             {                                              //word makes line too long, so append it to a new line
                                 var wordsInLine = AddLine(word);
-                                if (wordsInLine == KLineEditor.PosIntegerNotSet)
+                                if (wordsInLine == Program.PosIntegerNotSet)
                                     rc.SetError(1100505, MxError.Source.User, $"Error: line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
                                 else
                                 {
@@ -283,12 +291,12 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("Body.AutoLineBreak");
 
-            if ((lineIndex < 0) || (string.IsNullOrEmpty(appendChar) == true) || (appendChar.Length > (TabSpaces?.Length ?? KLineEditor.PosIntegerNotSet)))
-                rc.SetError(1100701, MxError.Source.Param, $"lineIndex={lineIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={appendChar.Length} > {TabSpaces?.Length ?? KLineEditor.PosIntegerNotSet}", "MxErrBadMethodParam");
+            if ((lineIndex < 0) || (string.IsNullOrEmpty(appendChar) == true) || (appendChar.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
+                rc.SetError(1100701, MxError.Source.Param, $"lineIndex={lineIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={appendChar?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", "MxErrBadMethodParam");
             else
             {
                 var breakIndex = GetLineBreakIndex(lineIndex, appendChar.Length);
-                if (breakIndex == KLineEditor.PosIntegerNotSet)
+                if (breakIndex == Program.PosIntegerNotSet)
                     rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharactersInLine()} when LineWidth={LineWidth}", "MxErrLineTooLong");
                 else
                 {
@@ -298,7 +306,7 @@ namespace KLineEdCmdApp.Model
                     else
                     {
                         var wordsInLine = AddLine(newLine + appendChar);
-                        if (wordsInLine == KLineEditor.PosIntegerNotSet)
+                        if (wordsInLine == Program.PosIntegerNotSet)
                             rc.SetError(1100704, MxError.Source.User, $"Error: line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
                         else
                         {
@@ -324,6 +332,7 @@ namespace KLineEdCmdApp.Model
                     var lastLines = new string[count];
                     var buffcnt = count - 1;
                     var filelinecnt = TextLines.Count;
+                    // ReSharper disable once UnusedVariable
                     foreach (var line in lastLines)
                     {
                         if (filelinecnt > 0)
@@ -350,7 +359,7 @@ namespace KLineEdCmdApp.Model
                 else
                 {
                     var index = -1;
-                    if ((index = text.IndexOf(Environment.NewLine)) != -1)
+                    if ((index = text.IndexOf(Environment.NewLine, StringComparison.Ordinal)) != -1)
                         rc = $"Error: invalid {textType}. It contains a new line at column {index + 1}. Delete these characters and try again.";
                     else
                     {
@@ -386,12 +395,19 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public void RemoveAllLines()
+        {
+            TextLines.Clear();
+            RefreshWordCount();
+        }
+
         public static bool IsEnteredCharacterValid(char c)
         {
+            // ReSharper disable once ReplaceWithSingleAssignment.False
             var rc = false;
 
             //only supports english
-            if ((c == '\t') || (c == ' ') || (Char.IsLetterOrDigit(c) || (Char.IsPunctuation(c)) || (Char.IsSymbol(c))))
+            if ((c == '\t') || (c == ' ') || (char.IsLetterOrDigit(c) || (char.IsPunctuation(c)) || (char.IsSymbol(c))))
             {
                 rc = true;
             }
@@ -406,7 +422,7 @@ namespace KLineEdCmdApp.Model
         }
         public int GetLineBreakIndex(int lineIndex, int spaceNeeded)
         {
-            var rc = KLineEditor.PosIntegerNotSet;
+            var rc = Program.PosIntegerNotSet;
 
             if ((lineIndex < TextLines.Count) && (spaceNeeded > 0) && (spaceNeeded + 1 < LineWidth)) //allow for space
             {
@@ -459,7 +475,7 @@ namespace KLineEdCmdApp.Model
         }
         public int GetLineCount()
         {
-            return TextLines?.Count ?? KLineEditor.PosIntegerNotSet;
+            return TextLines?.Count ?? Program.PosIntegerNotSet;
         }
         public int RefreshWordCount()
         {
@@ -471,13 +487,13 @@ namespace KLineEdCmdApp.Model
             WordCount = rc;
             return rc;
         }
-        public int GetCharactersInLine(int lineNo = KLineEditor.PosIntegerNotSet)
+        public int GetCharactersInLine(int lineNo = Program.PosIntegerNotSet)
         {
-            var rc = KLineEditor.PosIntegerNotSet;
+            var rc = Program.PosIntegerNotSet;
 
             if ((lineNo != 1) || (lineNo < TextLines.Count))
             {
-                rc = TextLines[lineNo]?.Length ?? KLineEditor.PosIntegerNotSet;
+                rc = TextLines[lineNo]?.Length ?? Program.PosIntegerNotSet;
             }
             return rc;
         }
@@ -507,11 +523,11 @@ namespace KLineEdCmdApp.Model
         }
         private int AddLine(string line)
         {
-            var rc = KLineEditor.PosIntegerNotSet;
+            var rc = Program.PosIntegerNotSet;
             if (line != null)
             {
                 var lineCount = GetLineCount() + ((line.Length > LineWidth) ? 1 : 0);
-                if ((lineCount != KLineEditor.PosIntegerNotSet) && (lineCount < Body.MaxTextLines))
+                if ((lineCount != Program.PosIntegerNotSet) && (lineCount < Body.MaxTextLines))
                 {
                     TextLines.Add(line); //add line to end of list
                     rc = GetWordsInLine(line);

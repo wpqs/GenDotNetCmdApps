@@ -1,9 +1,23 @@
 Todo: KLineEd
 =============
 
+Release work
+
+1.	Installer - Wix
+2.	Reintegrate with packages
+		MxReturnCode - interop with C++ lib for sending error messages + SetUserName
+		MxDotNetUtils - with MVC Obs 
+3.  Reporting param
+4.  Logo
+5.  Wiki
+
+Development work
+
 1. done - Import MxDotNetUtilsLib package (with MxReturnCode)
 2. Implement command line parameters/args and settings
+     --Reporting on | off
 	 --EditFile 'mytext.txt'
+	     --CursorSize 20
 		 --TypingPauseSecs 60
 		 --TabSize 3
 		 --DisplayLastLines 10
@@ -12,7 +26,7 @@ Todo: KLineEd
 		 --Backgnd text black (details black) (cmds black) (spell black)
 		 --Foregnd text green (details grey) (cmds grey) (spell red)
 		 --scrollreview on
-		 --editline on
+		 --editline 0-n  0 = BS/De disabled, 1 = edit last line, 10 = edit last ten lines, -1 edit all
 		 --spellcheck on
 	 --export filename.txt 
 3. Implement DisplayHeader

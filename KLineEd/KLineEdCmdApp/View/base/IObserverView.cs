@@ -1,7 +1,8 @@
 ﻿using System;
-using KLineEdCmdApp.Model;
 
-namespace KLineEdCmdApp.View
+using KLineEdCmdApp.Utils;
+
+namespace KLineEdCmdApp.View.Base
 {
     // ReSharper disable once UnusedTypeParameter
     public interface IObserverView<T> : IObserver<NotificationItem>

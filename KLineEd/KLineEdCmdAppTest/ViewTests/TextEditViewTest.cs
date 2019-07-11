@@ -1,12 +1,12 @@
 ﻿using System;
-using KLineEdCmdApp;
+using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests
 {
-    public class TextLinesViewTest
+    public class TextEditViewTest
     {
         [Fact]
         public void SetupTest()
@@ -17,7 +17,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
 
-            var terminal = new TextLinesView(new MockTerminal());
+            var terminal = new TextEditView(new MockTerminal());
             Assert.True(terminal.Setup(cmdLineParams).GetResult());
 
             Assert.Equal(34, terminal.Height);

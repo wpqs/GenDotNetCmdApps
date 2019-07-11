@@ -1,35 +1,52 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using KLineEdCmdApp.Model;
-using KLineEdCmdApp.Properties;
-using KLineEdCmdApp.View;
 using Microsoft.Extensions.Configuration;
 using MxDotNetUtilsLib;
 using MxReturnCode;
-// ReSharper disable All
+
+using KLineEdCmdApp.Utils;
+using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Utils.Properties;
+using KLineEdCmdApp.View;
 
 namespace KLineEdCmdApp
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+    [SuppressMessage("ReSharper", "InvertIf")]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
+    [SuppressMessage("ReSharper", "RedundantNameQualifier")]
     public class Program
     {
-        public static readonly string CmdAppVersion = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? "[not set]";
-        public static readonly string CmdAppName = typeof(Program).GetTypeInfo()?.Assembly?.GetName().Name ?? "[not set]";
-        public static readonly string CmdAppCopyright = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? "[not set]";
+        public const int PosIntegerNotSet = -1; //used for default values of params so cannot be readonly
+        public const string ValueNotSet = "[not set]";
+
+        public static readonly string CmdAppVersion = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? Program.ValueNotSet;
+        public static readonly string CmdAppName = typeof(Program).GetTypeInfo()?.Assembly?.GetName().Name ?? Program.ValueNotSet;
+        public static readonly string CmdAppCopyright = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? Program.ValueNotSet;
 
         static int Main(string[] args)
         {
-            var rc = new MxReturnCode<int>(invokeDetails: $"{Program.CmdAppName} v{Program.CmdAppVersion}", defaultResult: KLineEditor.PosIntegerNotSet);
+            var rc = new MxReturnCode<int>(invokeDetails: $"{Program.CmdAppName} v{Program.CmdAppVersion}", defaultResult: PosIntegerNotSet);
 
-            var tim = DateTime.UtcNow;
             var terminal = new Terminal();
             var cmdLineParams = new CmdLineParamsApp();
+            IConfigurationRoot config = null;
 
             try
             {
-                var config = new ConfigurationBuilder()?.SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile("appsettings.json")?.AddUserSecrets<Program>().Build();
+                var reporting = true;
+                // var reporting = (CmdLineParams.GetParamValue(args, "--reporting") == "on") ? true : false;
+                if (reporting)
+                    config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile("appsettings.json")?.AddUserSecrets<Program>().Build();
 
-                rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null, config?["ConnectionStrings:AzureWebJobsServiceBus"], sbqName: config?["MxLogMsg:AzureServiceBusQueueName"]);
+                rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null,
+                    config?["ConnectionStrings:AzureWebJobsServiceBus"], sbqName: config?["MxLogMsg:AzureServiceBusQueueName"]);
 
                 terminal.WriteLines(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
 
@@ -61,6 +78,7 @@ namespace KLineEdCmdApp
                         {
                             rc.SetError(errorCode: 1010101, errType: MxError.Source.Program, errorMsg: $"invalid Op={cmdLineParams.Op} not supported", "MxErrInvalidCondition");
                         }
+
                         if (rcOp != null)
                         {
                             rc += rcOp;
@@ -78,7 +96,6 @@ namespace KLineEdCmdApp
                 rc.SetError(errorCode: 1010102, errType: MxError.Source.Exception, e.Message);
             }
 
-            var elapsed = DateTime.UtcNow - tim;
             if (rc.IsError(reporting: true))
             {
                 terminal.WriteLines(rc.GetErrorUserMsg());
@@ -86,7 +103,7 @@ namespace KLineEdCmdApp
             }
             else
             {
-                var rcReport = GetRunReport(cmdLineParams: cmdLineParams, elapsed: elapsed);
+                var rcReport = GetRunReport(cmdLineParams: cmdLineParams);
                 rc += rcReport;
                 terminal.WriteLines(rcReport.IsError(reporting: true) ? rc.GetErrorUserMsg() : rcReport.GetResult());
             }
@@ -101,42 +118,80 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<string>("Program.EditProcessing");
 
-            var editModel = new ChapterModel();
-            var rcInitModel = editModel.Initialise(cmdLineParams.MaxCol, cmdLineParams.EditFile);
-            rc += rcInitModel;
-            if (rcInitModel.IsSuccess(true))
+            if ((cmdLineParams == null) || (terminal == null) || (terminal.IsError()))
+                rc.SetError(1010201, MxError.Source.Param, $"cmdLineParams is null, or terminal is null or error", "MxErrInvalidParamArg");
+            else
             {
-                terminal.WriteLines($"{Environment.NewLine}Ready to edit chapter: {editModel?.Header?.Chapter?.Title ?? "[null]"}{ Environment.NewLine}");
-                terminal.WriteLines(editModel.GetChapterReport());
-                terminal.WriteLines($"{Environment.NewLine}Press 'Esc' to cancel, or any other key to open the KLineEd editor...");
+                var editModel = new ChapterModel();
+                var rcInitModel = editModel.Initialise(cmdLineParams.MaxCol, cmdLineParams.EditFile);
+                rc += rcInitModel;
+                if (rcInitModel.IsSuccess(true))
+                {
+                    terminal.WriteLines($"{Environment.NewLine}Ready to edit chapter: {editModel.Header?.Chapter?.Title ?? "[null]"}{Environment.NewLine}");
+                    terminal.WriteLines(editModel.GetChapterReport());
+                    terminal.WriteLines($"{Environment.NewLine}Press 'Esc' to cancel, or any other key to open the KLineEd editor...");
 
-                var op = terminal.GetKey(true);
-                if (op == ConsoleKey.Escape)
-                {
-                    cmdLineParams.Op = CmdLineParamsApp.OpMode.Abort;
-                    rc.SetResult($"{Environment.NewLine}Edit cancelled - chapter is unchanged");
-                }
-                else
-                {
-                    var textLinesView = new TextLinesView(terminal);
-                    var rcScreen = textLinesView.Setup(cmdLineParams);
-                    rc += rcScreen;
-                    if (rcScreen.IsSuccess(true))
+                    var op = terminal.GetKey(true);
+                    if (op == ConsoleKey.Escape)
                     {
-                        using (editModel.Subscribe(textLinesView))
+                        cmdLineParams.Op = CmdLineParamsApp.OpMode.Abort;
+                        rc.SetResult($"{Environment.NewLine}Edit cancelled - chapter is unchanged");
+                    }
+                    else
+                    {
+                        var originalSettings = terminal.GetSettings();
+                        if (originalSettings?.IsError() ?? false)
+                            rc.SetError(1010202, MxError.Source.Data, $"Terminal originalSettings not saved", "MxErrInvalidCondition");
+                        else
                         {
-                            var editController = new KLineEditor();
-                            var rcStart = editController.Start(editModel);
+                            var rcRun = RunEditor(cmdLineParams, editModel, terminal);
+                            rc += rcRun;
+                            terminal.Setup(originalSettings);
+                        }
+                    }
+                }
+            }
+            return rc;
+        }
+
+        private static MxReturnCode<string> RunEditor(CmdLineParamsApp cmdLineParams, ChapterModel editModel, ITerminal terminal)
+        {
+            var rc = new MxReturnCode<string>("Program.RunEditor");
+
+            if ((cmdLineParams == null) || (editModel == null) || (editModel.Ready == false) || (terminal == null) || (terminal.IsError()))
+                rc.SetError(1010301, MxError.Source.Param, $"cmdLineParams is null, editModel is null or not read, or terminal is null or error", "MxErrInvalidParamArg");
+            else
+            {
+                var editController = new KLineEditor(terminal);
+                var rcCtrl = editController.Setup(cmdLineParams);
+                rc += rcCtrl;
+                if (rcCtrl.IsSuccess(true))
+                {
+                    var cmdsHelpView = new CmdsHelpView(terminal);
+                    var msgLineView = new MsgLineView(terminal);
+                    var statusLineView = new StatusLineView(terminal);
+                    var textEditView = new TextEditView(terminal);
+
+                    var rcSetup = SetupKlineEdViews(cmdLineParams, cmdsHelpView, msgLineView, statusLineView, textEditView);
+                    rc += rcSetup;
+                    if (rcSetup.IsSuccess(true))
+                    {
+                        using (editModel.Subscribe(cmdsHelpView)) 
+                        using (editModel.Subscribe(msgLineView)) 
+                        using (editModel.Subscribe(statusLineView)) 
+                        using (editModel.Subscribe(textEditView)) 
+                        {
+                            var rcStart = editController.Start(editModel); //start
                             rc += rcStart;
                             if (rcStart.IsSuccess(true))
                             {
-                                var rcProcess = editController.Process();
+                                var rcProcess = editController.Process(); //process
                                 rc += rcProcess;
                                 if (rcProcess.IsSuccess(true))
                                 {
                                     var report = editController.GetReport();
 
-                                    var rcFinish = editController.Finish();
+                                    var rcFinish = editController.Finish(); //finish
                                     rc += rcFinish;
                                     if (rcFinish.IsSuccess(true))
                                     {
@@ -145,20 +200,54 @@ namespace KLineEdCmdApp
                                 }
                             }
                         }
+                        if (editModel.GetSubscriberCount() > 0)
+                            rc.SetError(1010302, MxError.Source.Program, $"Views still subscribing to model; count={editModel.GetSubscriberCount()}", "MxErrInvalidCondition");
                     }
                 }
             }
             return rc;
         }
 
+        private static MxReturnCode<bool> SetupKlineEdViews(CmdLineParamsApp cmdLineParams, CmdsHelpView cmdsHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView)
+        {
+            var rc = new MxReturnCode<bool>("Program.SetupKlineEdVViews");
+
+            if ((cmdLineParams == null) || (cmdsHelpView == null) || (msgLineView == null) || (statusLineView == null) || (textEditView == null))
+                rc.SetError(101401, MxError.Source.Param, $"cmdLineParams is null, or one of the view objects is null", "MxErrInvalidParamArg");
+            else
+            {
+                var rcCmds = cmdsHelpView.Setup(cmdLineParams);
+                rc += rcCmds;
+                if (rcCmds.IsSuccess(true))
+                {
+                    var rcMsg = msgLineView.Setup(cmdLineParams);
+                    rc += rcMsg;
+                    if (rcMsg.IsSuccess(true))
+                    {
+                        var rcStatus = statusLineView.Setup(cmdLineParams);
+                        rc += rcStatus;
+                        if (rcStatus.IsSuccess(true))
+                        {
+                            var rcTxt = textEditView.Setup(cmdLineParams);
+                            rc += rcTxt;
+                            if (rcTxt.IsSuccess(true))
+                            {
+                                rc.SetResult(true);
+                            }
+                        }
+                    }
+                }
+            }
+            return rc;
+        }
         private static MxReturnCode<string> ResetProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
         {
-            var rc = new MxReturnCode<string>("Program.ResetProcessing"); ;
+            var rc = new MxReturnCode<string>("Program.ResetProcessing");
 
             try
             {
                 if (cmdLineParams.UpdateSettings != CmdLineParamsApp.BoolValue.Yes)
-                    rc.SetError(1010301, MxError.Source.Program, $"{CmdLineParamsApp.ArgSettingsUpdate} not set", "MxErrInvalidParamArg");
+                    rc.SetError(1010501, MxError.Source.Program, $"{CmdLineParamsApp.ArgSettingsUpdate} not set", "MxErrInvalidParamArg");
                 else
                 {
                     terminal.WriteLines($"resetting {EnumOps.XlatToString(cmdLineParams.ResetType)} in '{cmdLineParams.SettingsFile}'...");
@@ -172,28 +261,28 @@ namespace KLineEdCmdApp
             }
             catch (Exception e)
             {
-                rc.SetError(1010302, MxError.Source.Exception, $"{e.Message}");
+                rc.SetError(1010502, MxError.Source.Exception, $"{e.Message}");
             }
             return rc;
         }
 
         private static MxReturnCode<string> ExportProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
         {
-            var rc = new MxReturnCode<string>("Program.ExportProcessing"); ;
+            var rc = new MxReturnCode<string>("Program.ExportProcessing");
 
-            try
+            if ((cmdLineParams.EditFile == null) || (cmdLineParams.ExportFile == null))
+                rc.SetError(1010601, MxError.Source.Program, $"EditFile={cmdLineParams.EditFile ?? "[null]"}, ExportFile={cmdLineParams.ExportFile ?? "[null]"}", "MxErrInvalidParamArg");
+            else
             {
-                if ((cmdLineParams.EditFile == null) || (cmdLineParams.ExportFile == null))
-                    rc.SetError(1010401, MxError.Source.Program, $"EditFile={cmdLineParams.EditFile ?? "[null]"}, ExportFile={cmdLineParams.ExportFile ?? "[null]"}", "MxErrInvalidParamArg");
-                else
+                try
                 {
                     if (File.Exists(cmdLineParams.EditFile) == false)
-                        rc.SetError(1010402, MxError.Source.User, $"EditFile={cmdLineParams.EditFile ?? "[null]"} not found");
+                        rc.SetError(101062, MxError.Source.User, $"EditFile={cmdLineParams.EditFile ?? "[null]"} not found");
                     else
                     {
                         var folder = Path.GetDirectoryName(cmdLineParams.ExportFile);
-                        if ((string.IsNullOrEmpty(folder) == false) && (Directory.Exists(folder) == false))
-                            rc.SetError(1010403, MxError.Source.User, $"folder for output file {cmdLineParams.ExportFile} does not exist. Create folder and try again.");
+                        if ((String.IsNullOrEmpty(folder) == false) && (Directory.Exists(folder) == false))
+                            rc.SetError(1010603, MxError.Source.User, $"folder for output file {cmdLineParams.ExportFile} does not exist. Create folder and try again.");
                         else
                         {
                             terminal.WriteLines($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportFile}...");
@@ -203,41 +292,47 @@ namespace KLineEdCmdApp
                         }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                rc.SetError(1010404, MxError.Source.Exception, $"{e.Message}");
+                catch (Exception e)
+                {
+                    rc.SetError(1010604, MxError.Source.Exception, $"{e.Message}");
+                }
             }
             return rc;
         }
 
-        private static MxReturnCode<string> GetRunReport(CmdLineParamsApp cmdLineParams, TimeSpan elapsed)
+        private static MxReturnCode<string> GetRunReport(CmdLineParamsApp cmdLineParams)
         {
-            var rc = new MxReturnCode<string>("Program.GetJobDetails"); ;
-            var msg = "";
+            var rc = new MxReturnCode<string>("Program.GetRunReport");
 
-            if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Abort)
-            {
-                rc.SetResult(Environment.NewLine);
-            }
-            else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Edit)
-            {
-                msg += Environment.NewLine + "end of report" + Environment.NewLine;
-                rc.SetResult(msg);
-            }
-            else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Reset)
-            {
-                msg += Environment.NewLine + "end of report" + Environment.NewLine;
-                rc.SetResult(msg);
-            }
-            else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Help)
-            {
-                msg += Environment.NewLine + "end of report" + Environment.NewLine;
-                rc.SetResult(msg);
-            }
+            if (cmdLineParams == null) 
+                rc.SetError(10106701, MxError.Source.Program, $"cmdLineParams is null", "MxErrInvalidParamArg");
             else
             {
-                rc.SetError(1010501, MxError.Source.Program, $"invalid Op={EnumOps.XlatToString(cmdLineParams.Op)} not supported", "MxErrInvalidCondition");
+                var msg = "";
+
+                if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Abort)
+                {
+                    rc.SetResult(Environment.NewLine);
+                }
+                else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Edit)
+                {
+                    msg += Environment.NewLine + "end of report" + Environment.NewLine;
+                    rc.SetResult(msg);
+                }
+                else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Reset)
+                {
+                    msg += Environment.NewLine + "end of report" + Environment.NewLine;
+                    rc.SetResult(msg);
+                }
+                else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Help)
+                {
+                    msg += Environment.NewLine + "end of report" + Environment.NewLine;
+                    rc.SetResult(msg);
+                }
+                else
+                {
+                    rc.SetError(1010702, MxError.Source.Program, $"invalid Op={EnumOps.XlatToString(cmdLineParams.Op)} not supported", "MxErrInvalidCondition");
+                }
             }
             return rc;
         }

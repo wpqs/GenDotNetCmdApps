@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using KLineEdCmdApp.Model.Base;
+using KLineEdCmdApp.Utils;
 using MxDotNetUtilsLib;
 using MxReturnCode;
-// ReSharper disable All
 
 namespace KLineEdCmdApp.Model
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+    [SuppressMessage("ReSharper", "RedundantBoolCompare")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class HeaderSessionPause : HeaderBase
     {
         public static readonly char Separator = ',';
@@ -34,7 +41,7 @@ namespace KLineEdCmdApp.Model
         public override void Reset()
         {
             PauseTime = null;
-            Duration = KLineEditor.PosIntegerNotSet;
+            Duration = Program.PosIntegerNotSet;
             Error = true;
         }
         public override string GetReport()

@@ -13,8 +13,8 @@ namespace KLineEdCmdAppTest.ViewTests
             var model = new MockNotifierModel();
             var view = new MockObserverView();
 
-            Assert.Equal("[not set]", view.WindowTitle);
-            Assert.Equal("[not set]", view.WindowFooter);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowTitle);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowFooter);
             Assert.Equal(0, model.GetSubscriberCount());
 
             using (model.Subscribe(view))
@@ -39,8 +39,8 @@ namespace KLineEdCmdAppTest.ViewTests
             var model = new MockNotifierModel();
             var view = new MockObserverView();
 
-            Assert.Equal("[not set]", view.WindowTitle);
-            Assert.Equal("[not set]", view.WindowFooter);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowTitle);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowFooter);
             Assert.Equal(0, model.GetSubscriberCount());
 
             using (model.Subscribe(view))
@@ -66,8 +66,8 @@ namespace KLineEdCmdAppTest.ViewTests
             var model = new MockNotifierModel();
             var view = new MockObserverView();
 
-            Assert.Equal("[not set]", view.WindowTitle);
-            Assert.Equal("[not set]", view.WindowFooter);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowTitle);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowFooter);
             Assert.Equal(0, model.GetSubscriberCount());
 
             using (model.Subscribe(view))
@@ -94,8 +94,8 @@ namespace KLineEdCmdAppTest.ViewTests
             var model = new MockNotifierModel();
             var view = new MockObserverView();
 
-            Assert.Equal("[not set]", view.WindowTitle);
-            Assert.Equal("[not set]", view.WindowFooter);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowTitle);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowFooter);
             Assert.Equal(0, model.GetSubscriberCount());
 
             using (model.Subscribe(view))
@@ -123,8 +123,8 @@ namespace KLineEdCmdAppTest.ViewTests
             var model = new MockNotifierModel();
             var view = new MockObserverView();
 
-            Assert.Equal("[not set]", view.WindowTitle);
-            Assert.Equal("[not set]", view.WindowFooter);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowTitle);
+            Assert.Equal(KLineEdCmdApp.Program.ValueNotSet, view.WindowFooter);
             Assert.Equal(0, model.GetSubscriberCount());
 
             using (model.Subscribe(view))

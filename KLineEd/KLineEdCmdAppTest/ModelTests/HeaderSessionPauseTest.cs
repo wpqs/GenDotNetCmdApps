@@ -1,5 +1,6 @@
 ﻿using KLineEdCmdApp;
 using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Model.Base;
 using MxDotNetUtilsLib;
 using Xunit;
 
@@ -73,7 +74,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(info.IsError());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, info.Duration);
+            Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
 
         [Fact]
@@ -86,7 +87,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, info.Duration);
+            Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
 
         [Fact]
@@ -102,7 +103,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, info.Duration);
+            Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
 
         [Fact]
@@ -117,7 +118,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, info.Duration);
+            Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
 
         [Fact]
@@ -130,7 +131,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, info.Duration);
+            Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
 
         [Fact]
@@ -143,7 +144,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, info.Duration);
+            Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
 
         [Fact]
@@ -156,7 +157,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
-            Assert.Equal(KLineEditor.PosIntegerNotSet, info.Duration);
+            Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
     }
 }

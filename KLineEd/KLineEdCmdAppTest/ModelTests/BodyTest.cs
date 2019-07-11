@@ -1,5 +1,5 @@
 ﻿using System;
-using KLineEdCmdApp;
+using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.Model;
 using Xunit;
 // ReSharper disable All
@@ -40,6 +40,30 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.AppendLine("one").GetResult());
             Assert.Equal(0, body.GetLineCount());
         }
+
+        [Fact]
+        public void RemoveAllLinesTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(65).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.AppendLine("one").GetResult());
+            Assert.True(body.AppendLine("two").GetResult());
+            Assert.True(body.AppendLine("three").GetResult());
+            Assert.Equal(3, body.RefreshWordCount());
+            Assert.Equal(3, body.GetLineCount());
+
+            body.RemoveAllLines();
+
+            Assert.Equal(0, body.RefreshWordCount());
+            Assert.Equal(0, body.WordCount);
+            Assert.Equal(0, body.GetLineCount());
+
+
+        }
+
         [Fact]
         public void AppendOneLineTest()
         {

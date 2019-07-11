@@ -1,18 +1,24 @@
 ﻿using System;
 using KLineEdCmdApp.Model;
 
-namespace KLineEdCmdApp.View
+namespace KLineEdCmdApp.Utils
 {
     public interface ITerminal
     {
-        string Title { get; set; }
+        bool IsError();
         void Clear();
-        void SetWindowSize(int width, int height);
-        void SetBufferSize(int width, int height);
+
+        bool Setup(TerminalProperties props);
+        TerminalProperties GetSettings();
+        bool SetCursorPosition(int line, int column);
+        int GetCursorColumn();
+        int GetCursorLine();
+
         void WriteLines(string line, params object[] args);
         void Write(string line, params object[] args);
         char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar);
         ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);
+        ConsoleKeyInfo ReadKey();
 
     }
 }

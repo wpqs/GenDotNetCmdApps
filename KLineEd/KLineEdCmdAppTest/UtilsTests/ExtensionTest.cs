@@ -1,7 +1,7 @@
-﻿using KLineEdCmdApp;
+﻿using KLineEdCmdApp.Utils;
 using Xunit;
 
-namespace KLineEdCmdAppTest
+namespace KLineEdCmdAppTest.UtilsTests
 {
     public class ExtensionTest
     {

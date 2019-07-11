@@ -1,7 +1,8 @@
 ﻿using System;
-using KLineEdCmdApp.View;
+using KLineEdCmdApp.Utils;
+using KLineEdCmdApp.View.Base;
 
-namespace KLineEdCmdApp.Model
+namespace KLineEdCmdApp.Model.Base
 {
     public abstract class NotifierModel
     {
@@ -17,7 +18,7 @@ namespace KLineEdCmdApp.Model
         }
         public int GetSubscriberCount()
         {
-            return Provider?.GetSubscriberCount() ?? KLineEditor.PosIntegerNotSet;
+            return Provider?.GetSubscriberCount() ?? Program.PosIntegerNotSet;
         }
         public virtual void UpdateAllViews(int change)
         {
