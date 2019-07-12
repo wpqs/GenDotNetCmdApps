@@ -6,7 +6,8 @@ namespace KLineEdCmdApp.Utils
     public interface ITerminal
     {
         bool IsError();
-        void Clear();
+        string ErrorMsg { get; }
+        bool Clear();
 
         bool Setup(TerminalProperties props);
         TerminalProperties GetSettings();
@@ -14,8 +15,8 @@ namespace KLineEdCmdApp.Utils
         int GetCursorColumn();
         int GetCursorLine();
 
-        void WriteLines(string line, params object[] args);
-        void Write(string line, params object[] args);
+        string WriteLine(string line, params object[] args);
+        string Write(string line, params object[] args);
         char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar);
         ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);
         ConsoleKeyInfo ReadKey();

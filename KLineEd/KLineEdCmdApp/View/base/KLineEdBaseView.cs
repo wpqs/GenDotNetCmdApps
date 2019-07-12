@@ -1,4 +1,5 @@
-﻿using MxReturnCode;
+﻿using KLineEdCmdApp.Controller;
+using MxReturnCode;
 
 using KLineEdCmdApp.Utils;
 
@@ -7,9 +8,9 @@ namespace KLineEdCmdApp.View.Base
     public abstract class KLineEdBaseView : ObserverView
     {
         protected ITerminal Terminal { set; get; }
-        public int Width { private set; get; }
-        public int Height { private set; get; }
-        public int LineWidth { private set; get; }
+        public int WindowHeight { private set; get; }
+        public int WindowWidth { private set; get; }
+        public int DisplayLineWidth { private set; get; }
         public bool Ready { private set; get; }
 
 
@@ -17,7 +18,7 @@ namespace KLineEdCmdApp.View.Base
         public KLineEdBaseView(ITerminal terminal) : base()
         {
             Terminal = terminal;
-            LineWidth = Program.PosIntegerNotSet;
+            DisplayLineWidth = Program.PosIntegerNotSet;
             Ready = false;
         }
 
@@ -30,12 +31,17 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
             else
             {
-                LineWidth = param.MaxCol;
-                Width = KLineEditor.ScreenMarginLeft + LineWidth + KLineEditor.ScreenMarginRight;
-                Height = KLineEditor.CmdLineCnt + KLineEditor.ScreenMarginTop + param.DisplayLastLinesCnt + KLineEditor.ScreenMarginBottom + KLineEditor.FooterCnt;
+                DisplayLineWidth = param.DisplayLineWidth;
+                WindowHeight = KLineEditor.CmdsHelpLineCount + KLineEditor.MsgLineCount + KLineEditor.EditAreaMarginTop + param.DisplayLastLinesCnt + KLineEditor.EditAreaMarginBottom + KLineEditor.StatusLineCount;
+                WindowWidth = KLineEditor.EditAreaMarginLeft + DisplayLineWidth + KLineEditor.EditAreaMarginRight;
 
-                Ready = true;
-                rc.SetResult(true);
+                if ((WindowWidth < Program.ValueOverflow.Length) || (WindowHeight > KLineEditor.MaxHeight))
+                    rc.SetError(1110101, MxError.Source.User, $"param.DisplayLineWidth={param.DisplayLineWidth}, param.DisplayLastLinesCnt{param.DisplayLastLinesCnt}", "MxErrInvalidSettingsFile");
+                else
+                {
+                    Ready = true;
+                    rc.SetResult(true);
+                }
 
             }
             return rc;

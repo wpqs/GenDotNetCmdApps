@@ -12,15 +12,15 @@ namespace KLineEdCmdAppTest.TestSupport
         {
             _cursorLine = 0;
             _cursorColumn = 0;
-            Error = true;
+            ErrorMsg = null;
         }
-        private bool Error { set; get; }
 
-        public bool IsError() { return Error; }
+        public bool IsError() { return (ErrorMsg != null); }
+        public string ErrorMsg { get; }
 
-        public void Clear()
+        public bool Clear()
         {
-            
+            return true;
         }
 
         public bool Setup(TerminalProperties props)
@@ -49,14 +49,23 @@ namespace KLineEdCmdAppTest.TestSupport
         {
             return _cursorLine;
         }
-        public void WriteLines(string line, params object[] args)
+        public string WriteLine(string line, params object[] args)
         {
-            
+            string rc = null;
+
+            rc = string.Format(line, args);
+
+            return rc;
         }
 
-        public void Write(string line, params object[] args)
+        public string Write(string msg, params object[] args)
         {
-           
+            string rc = null;
+
+            rc = string.Format(msg, args);
+
+            return rc;
+
         }
         public char GetKeyChar(bool hide = false, char defaultVal = ' ')
         {

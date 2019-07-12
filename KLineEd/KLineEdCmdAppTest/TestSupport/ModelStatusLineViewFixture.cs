@@ -1,23 +1,20 @@
 ﻿using System;
-using System.IO;
-using KLineEdCmdApp.Utils;
-using KLineEdCmdApp.Model;
+using System.Collections.Generic;
+using System.Text;
 using KLineEdCmdApp.View;
 using KLineEdCmdAppTest.TestSupport.Base;
-using MxDotNetUtilsLib;
 
 namespace KLineEdCmdAppTest.TestSupport
 {
-    public class ModelTextEditViewFixture :  ModelViewBaseFixture
+    public class ModelStatusLineViewFixture : ModelViewBaseFixture
     {
-        public TextEditView View { get; }
-
-        public ModelTextEditViewFixture()
+        public StatusLineView View { get; }
+        public ModelStatusLineViewFixture() : base()
         {
             if (Error == TestConst.UnitTestNone)
             {
                 Error = TestConst.UnitTestNotSet;
-                View = new TextEditView(new MockTerminal());
+                View = new StatusLineView(new MockTerminal());
                 var rcTerm = View.Setup(AppCmdLineParams);
                 if (rcTerm.IsError())
                     Error = rcTerm.GetErrorTechMsg();

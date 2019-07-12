@@ -7,6 +7,7 @@ namespace KLineEdCmdApp.View.Base
     {
         public abstract void OnUpdate(NotificationItem notificationItem);
 
+        public string LastTerminalOutput { protected set; get; }
         private IDisposable _unsubscriber;
         private bool _unsubscribing;
 

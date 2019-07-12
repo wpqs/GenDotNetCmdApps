@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using KLineEdCmdApp.Controller;
 using KLineEdCmdApp.Model;
 using MxReturnCode;
 using KLineEdCmdApp.Utils;
@@ -16,27 +17,15 @@ namespace KLineEdCmdApp.View
 
         }
 
-        public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
-        {
-            var rc = new MxReturnCode<bool>("CmdsHelpView.Setup");
-
-            var rcBase = base.Setup(param);
-            rc += rcBase;
-            if (rcBase.IsSuccess(true))
-            {
-
-                rc.SetResult(true);
-            }
-            return rc;
-        }
-
         public override void OnUpdate(NotificationItem notificationItem)
         {
             if (((ChapterModel.ChangeHint)notificationItem.Change) == ChapterModel.ChangeHint.Cmd)
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
-                Terminal.SetCursorPosition(0, 5);
-                Terminal.WriteLines(model?.CmdLine ?? Program.ValueNotSet);
+                Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRow, KLineEditor.CmdsHelpLineLeftCol);
+
+                var cmds = model?.CmdsHelpLine ?? Program.ValueNotSet;
+                LastTerminalOutput = Terminal.Write((cmds.Length <= WindowWidth) ? cmds : (cmds.Substring(0, WindowWidth - Program.ValueOverflow.Length) + Program.ValueOverflow));
             }
         }
     }

@@ -6,8 +6,15 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests
 {
-    public class TextEditViewTest
+    public class TextEditViewTest : IClassFixture<ModelTextEditViewFixture>
     {
+        private readonly ModelTextEditViewFixture _fixture;
+
+        public TextEditViewTest(ModelTextEditViewFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
         [Fact]
         public void SetupTest()
         {
@@ -20,8 +27,8 @@ namespace KLineEdCmdAppTest.ViewTests
             var terminal = new TextEditView(new MockTerminal());
             Assert.True(terminal.Setup(cmdLineParams).GetResult());
 
-            Assert.Equal(34, terminal.Height);
-            Assert.Equal(110, terminal.Width);
+            Assert.Equal(25, terminal.WindowHeight);
+            Assert.Equal(93, terminal.WindowWidth);
         }
     }
 }

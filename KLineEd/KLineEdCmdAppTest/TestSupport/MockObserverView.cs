@@ -1,7 +1,4 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-
-using KLineEdCmdApp;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View.Base;
 

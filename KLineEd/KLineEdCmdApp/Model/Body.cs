@@ -354,8 +354,8 @@ namespace KLineEdCmdApp.Model
                 rc = $"Error: Unexpected {textType}; it is null. This is a program error. Please save your work and restart the program.";
             else
             {
-                if (text.Length > CmdLineParamsApp.ArgMaxColMax)
-                    rc = $"Error: invalid {textType}. It has {text.Length} characters, but only {CmdLineParamsApp.ArgMaxColMax} allowed. Delete some characters and try again.";
+                if (text.Length > CmdLineParamsApp.ArgDisplayLineWidthMax)
+                    rc = $"Error: invalid {textType}. It has {text.Length} characters, but only {CmdLineParamsApp.ArgDisplayLineWidthMax} allowed. Delete some characters and try again.";
                 else
                 {
                     var index = -1;
@@ -491,7 +491,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = Program.PosIntegerNotSet;
 
-            if ((lineNo != 1) || (lineNo < TextLines.Count))
+            if ((lineNo != -1) && (lineNo <= TextLines.Count))
             {
                 rc = TextLines[lineNo]?.Length ?? Program.PosIntegerNotSet;
             }

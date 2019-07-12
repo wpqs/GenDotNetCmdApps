@@ -42,10 +42,11 @@ namespace KLineEdCmdApp
         public const int ModelHeaderSessionPauseFirst = 1080101; //first error code in class HeaderSessionPause.cs
         public const int ModelHeaderFirst = 1090101; //first error code in class Header.cs
         public const int ModelBodyFirst = 1100101; //first error code in class Body.cs
-        public const int KLineEdViewFirst = 1110101; //first error code in class KLineEdView.cs
+        public const int KLineEdBaseViewFirst = 1110101; //first error code in class KLineEdView.cs
         public const int TextEditViewFirst = 1120101; //first error code in class TextEditView.cs
         public const int CmdsHelpViewFirst = 1130101; //first error code in class CmdsHelpView.cs
         public const int StatusLineViewFirst = 1140101; //first error code in class StatusLineView.cs
         public const int MsgLineViewFirst = 1150101; //first error code in class MsgLineView.cs
+
     }
 }

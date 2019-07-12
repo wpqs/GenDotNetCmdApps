@@ -32,7 +32,7 @@ namespace KLineEdCmdApp.Utils
     //--help
     //--reset colours --settings 'mysettings.json' (update)
     //--export 'drive:path\\filename'
-    //--edit 'drive:path\\filename' (--displaylastlines 10 --maxcol 80 --audiocr bell.mpeg 2 --audiokey click.mpeg 2 --backgnd text black details black cmds black spell black --foregnd text white details white cmds white spell white --scrollreview on --editline on  --spellcheck on --settings 'mysettings.json' (update))  
+    //--edit 'drive:path\\filename' (--displaylastlines 10 --DisplayLineWidth 80 --audiocr bell.mpeg 2 --audiokey click.mpeg 2 --backgnd text black details black cmds black spell black --foregnd text white details white cmds white spell white --scrollreview on --editline on  --spellcheck on --settings 'mysettings.json' (update))  
 
     public class CmdLineParamsApp : CmdLineParams
     {
@@ -51,7 +51,7 @@ namespace KLineEdCmdApp.Utils
 
         public static readonly string ParamEditFile = "--edit"; // filename.txt
         public static readonly string ParamDisplayLastLines = "--displaylastlines"; // 10
-        public static readonly string ParamMaxCol = "--maxcol"; // 80
+        public static readonly string ParamDisplayLineWidth = "--DisplayLineWidth"; // 80
         public static readonly string ParamAudioCR = "--audiocr"; //bell.mpeg 2
         public static readonly string ParamAudioKeyPress = "--audiokey"; //click.mpeg 4
         public static readonly string ParamBackGndColour = "--backgnd"; // text black(details black) (cmds black) (spell black)
@@ -64,9 +64,9 @@ namespace KLineEdCmdApp.Utils
         public static readonly int ArgDisplayLastLinesCntMin = 0;
         public static readonly int ArgDisplayLastLinesCntMax = 50;
 
-        public static readonly int ArgMaxColDefault = 68;   //counted from Jack Kerouac's book 'On the Road';
-        public static readonly int ArgMaxColMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
-        public static readonly int ArgMaxColMin = 5;
+        public static readonly int ArgDisplayLineWidthDefault = 68;   //counted from Jack Kerouac's book 'On the Road';
+        public static readonly int ArgDisplayLineWidthMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
+        public static readonly int ArgDisplayLineWidthMin = 5;
 
         public static readonly int ArgVolDefault = 3;
         public static readonly int ArgVolMax = 10;
@@ -109,7 +109,7 @@ namespace KLineEdCmdApp.Utils
         public string EditFile { set; get; }
         public string ExportFile { set; get; }
         public int DisplayLastLinesCnt { set; get; }
-        public int MaxCol { set; get; }
+        public int DisplayLineWidth { set; get; }
         public string AudioCRFile { set; get; }
         public string AudioKeyFile { set; get; }
 
@@ -169,10 +169,8 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = "--reset")] Reset,
             [EnumMember(Value = "--edit")] EditFile,
             [EnumMember(Value = "--export")] ExportFile,
-
-            [EnumMember(Value = "--displaylastlines")]
-            DisplayLastLines,
-            [EnumMember(Value = "--maxcol")] MaxCol,
+            [EnumMember(Value = "--displaylastlines")]DisplayLastLines,
+            [EnumMember(Value = "--displaylinewidth")] DisplayLineWidth,
             [EnumMember(Value = "--audiocr")] AudioCR,
             [EnumMember(Value = "--audiokey")] AudioKey,
             [EnumMember(Value = "--backgnd")] BackGndColour,
@@ -192,7 +190,7 @@ namespace KLineEdCmdApp.Utils
             rc += "ExportFile=" + (ExportFile ?? "[null]") + Environment.NewLine;
 
             rc += "DisplayLastLines=" + DisplayLastLinesCnt + Environment.NewLine;
-            rc += "MaxCol=" + MaxCol + Environment.NewLine;
+            rc += "DisplayLineWidth=" + DisplayLineWidth + Environment.NewLine;
 
             rc += "AudioCRFile=" + (AudioCRFile ?? "[null]") + Environment.NewLine;
             rc += "AudioKeyFile=" + (AudioKeyFile ?? "[null]") + Environment.NewLine;
@@ -225,7 +223,7 @@ namespace KLineEdCmdApp.Utils
             //--export 'drive:path\\filename' 'drive:path\\filename' |
             //--edit 'drive:path\\filename'
             //   (--displaylastlines 10 <min 0 max 50>
-            //    --maxcol 80 <min 0 max 250>
+            //    --DisplayLineWidth 80 <min 0 max 250>
             //    --audiocr 'drive:path\\filename' 3 <min 0 max 10>
             //    --audiokey 'drive:path\\filename' 3 <min 0 max 10>
             //    --backgnd text COLOUR details COLOUR cmds COLOUR spell COLOUR
@@ -300,7 +298,7 @@ namespace KLineEdCmdApp.Utils
             EditFile = null;
             ExportFile = null;
             DisplayLastLinesCnt = Program.PosIntegerNotSet;
-            MaxCol = Program.PosIntegerNotSet;
+            DisplayLineWidth = Program.PosIntegerNotSet;
             AudioCRFile = null;
             AudioKeyFile = null;
 
@@ -810,8 +808,8 @@ namespace KLineEdCmdApp.Utils
 
             if (DisplayLastLinesCnt == Program.PosIntegerNotSet)   
                 DisplayLastLinesCnt = savedSettings.DisplayLastLinesCnt;
-            if (MaxCol == Program.PosIntegerNotSet)
-                MaxCol = savedSettings.MaxCol;
+            if (DisplayLineWidth == Program.PosIntegerNotSet)
+                DisplayLineWidth = savedSettings.DisplayLineWidth;
 
             if (AudioCRFile == null)
                 AudioCRFile = savedSettings.AudioCRFile;
@@ -850,8 +848,8 @@ namespace KLineEdCmdApp.Utils
             {
                 if ((DisplayLastLinesCnt == Program.PosIntegerNotSet) || (unsetOnly == false))
                     DisplayLastLinesCnt = ArgDisplayLastLinesCntDefault;
-                if ((MaxCol == Program.PosIntegerNotSet) || (unsetOnly == false))
-                    MaxCol = ArgMaxColDefault;
+                if ((DisplayLineWidth == Program.PosIntegerNotSet) || (unsetOnly == false))
+                    DisplayLineWidth = ArgDisplayLineWidthDefault;
 
                 if ((ScrollReview == BoolValue.Unset) || (unsetOnly == false))
                     ScrollReview = BoolValue.Yes;

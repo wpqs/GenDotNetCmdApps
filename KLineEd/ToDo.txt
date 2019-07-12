@@ -21,10 +21,10 @@ Development work
 		 --TypingPauseSecs 60
 		 --TabSize 3
 		 --DisplayLastLines 10
-		 --MaxCol 80
-		 --Audio CR bell.mpeg 2 (Key click.mpeg 2) (Open.mpeg 3, Close.mpg 4)
-		 --Backgnd text black (details black) (cmds black) (spell black)
-		 --Foregnd text green (details grey) (cmds grey) (spell red)
+		 --DisplayLineWidth 80
+		 --Volumne 1 (0-9)
+		 --Backgnd text black (msg-error red) (msg-warn black) (msg-note black) (cmds black) (status black)
+		 --Foregnd text green (msg-error black) (msg-warn yellow) (msg-note green) (cmds grey) (status grey)
 		 --scrollreview on
 		 --editline 0-n  0 = BS/De disabled, 1 = edit last line, 10 = edit last ten lines, -1 edit all
 		 --spellcheck on

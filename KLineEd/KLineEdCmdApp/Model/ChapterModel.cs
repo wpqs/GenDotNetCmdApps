@@ -36,7 +36,7 @@ namespace KLineEdCmdApp.Model
 
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }
-        public string CmdLine { private set; get; }
+        public string CmdsHelpLine { private set; get; }
 
         // ReSharper disable once RedundantBaseConstructorCall
         public ChapterModel() : base()
@@ -45,7 +45,7 @@ namespace KLineEdCmdApp.Model
             Body = new Body();
             StatusLine = "";
             MsgLine = "";
-            CmdLine = "";
+            CmdsHelpLine = "";
             Ready = false;
         }
 
@@ -62,7 +62,7 @@ namespace KLineEdCmdApp.Model
 
         public void SetCmdLine(string cmd)
         {
-            CmdLine = cmd;
+            CmdsHelpLine = cmd;
             UpdateAllViews((int)ChangeHint.Cmd);
         }
 
@@ -286,7 +286,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1050801, MxError.Source.Exception, e.Message);
+                    rc.SetError(1050802, MxError.Source.Exception, e.Message);
                 }
             }
             return rc;

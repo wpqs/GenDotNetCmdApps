@@ -7,7 +7,7 @@ namespace KLineEdCmdAppTest
         [Fact]
         public void GetVersionTest()
         {
-            Assert.Equal("1.0.33.0", KLineEdCmdApp.Program.CmdAppVersion);
+            Assert.Equal("1.0.34.0", KLineEdCmdApp.Program.CmdAppVersion);
         }
     }
 }

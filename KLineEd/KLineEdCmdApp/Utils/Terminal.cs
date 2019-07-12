@@ -10,38 +10,47 @@ namespace KLineEdCmdApp.Utils
     [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+    [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
     public class Terminal : ITerminal
     {
+        public static readonly ConsoleKey InvalidKey = ConsoleKey.F24;
+  
+        public string ErrorMsg { private set; get; }
 
-        private bool Error { set; get; }
-
-        public bool IsError() { return Error; }
+        public bool IsError() { return (ErrorMsg ==null) ? false : true; }
 
         public Terminal()
         {
-           Error = false;
+           ErrorMsg = null;
         }
         public bool Setup(TerminalProperties props)
         {
-            Error = true;
+            ErrorMsg = Program.ValueNotSet;
             if (props.IsError() == false)
             {
-                Console.Title = props.Title;
+                try
+                {
+                    Console.Title = props.Title;
 
-                Console.SetWindowSize(props.WindowWidth, props.WindowHeight); //must set window before buffer
-                Console.SetBufferSize(props.BufferWidth, props.BufferHeight);
+                    Console.SetWindowSize(props.WindowWidth, props.WindowHeight); //must set window before buffer
+                    Console.SetBufferSize(props.BufferWidth, props.BufferHeight);
 
-                Console.CursorSize = props.CursorSize;
-                Console.WindowTop = props.WindowTop;
-                Console.WindowLeft = props.WindowLeft;
-                Console.CursorTop = props.CursorTop;
-                Console.CursorLeft = props.CursorLeft;
-                Console.ForegroundColor = props.ForegroundColor;
-                Console.BackgroundColor = props.BackgroundColor;
+                    Console.CursorSize = props.CursorSize;
+                    Console.WindowTop = props.WindowTop;
+                    Console.WindowLeft = props.WindowLeft;
+                    Console.CursorTop = props.CursorTop;
+                    Console.CursorLeft = props.CursorLeft;
+                    Console.ForegroundColor = props.ForegroundColor;
+                    Console.BackgroundColor = props.BackgroundColor;
 
-                Error = false;
+                    ErrorMsg = null;
+                }
+                catch (Exception e)
+                {
+                    ErrorMsg = e.Message;
+                }
             }
-            return Error ? false : true;
+            return (ErrorMsg == null) ? true : false;
         }
 
         public TerminalProperties GetSettings()
@@ -75,45 +84,133 @@ namespace KLineEdCmdApp.Utils
             var rc = false;
             if ((line >= 0) && (line < Console.BufferHeight) && (column >= 0) && (column < Console.BufferWidth))
             {
-                Console.CursorLeft = column;
-                Console.CursorTop = line;
-                rc = true;
+                try
+                {
+                    Console.CursorLeft = column;
+                    Console.CursorTop = line;
+                    rc = true;
+                }
+                catch (Exception e)
+                {
+                    ErrorMsg = e.Message;
+                }
             }
             return rc;
         }
         public int GetCursorColumn()
         {
-            return Console.CursorLeft;
+            var rc = Program.PosIntegerNotSet;
+            try
+            {
+                rc = Console.CursorLeft;
+            }
+            catch (Exception e)
+            {
+                ErrorMsg = e.Message;
+            }
+            return rc;
         }
         public int GetCursorLine()
         {
-            return Console.CursorTop;
+            var rc = Program.PosIntegerNotSet;
+            try
+            {
+                rc = Console.CursorTop; 
+            }
+            catch (Exception e)
+            {
+                ErrorMsg = e.Message;
+            }
+            return rc;
         }
-        public void Clear()
+        public bool Clear()
         {
-            Console.Clear();
+            var rc = false;
+            try
+            {
+                Console.Clear();
+                rc = true;
+            }
+            catch (Exception e)
+            {
+                ErrorMsg = e.Message;
+            }
+            return rc;
         }
-        public void WriteLines(string line, params object[] args)
+        public string WriteLine(string line, params object[] args)
         {
-            Console.WriteLine(line, args);
+            string rc = null;
+            if (line != null)
+            {
+                try
+                {
+                    Console.WriteLine(line, args);
+                    rc = string.Format(line, args);
+                }
+                catch (Exception e)
+                {
+                    ErrorMsg = e.Message;
+                }
+            }
+            return rc;
         }
-        public void Write(string format, params object[] args)
+        public string Write(string msg, params object[] args)
         {
-            Console.Write(format, args);
+            string rc = null;
+            if (msg != null)
+            {
+                try
+                {
+                    Console.Write(msg, args);
+                    rc = string.Format(msg, args);
+                }
+                catch (Exception e)
+                {
+                    ErrorMsg = e.Message;
+                }
+            }
+            return rc;
         }
         public char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar)
         {
-            return Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
+            var rc = (char) 0;
+            try
+            {
+                rc = Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
+            }
+            catch (Exception e)
+            {
+                ErrorMsg = e.Message;
+            }
+            return rc;
         }
 
         public ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
-            return Console.ReadKey(hide).Key; //defaultVal is helpful in testing
+            var rc =Terminal.InvalidKey;
+            try
+            {
+                rc = Console.ReadKey(hide).Key; //defaultVal is helpful in testing
+            }
+            catch (Exception e)
+            {
+                ErrorMsg = e.Message;
+            }
+            return rc;
         }
 
         public ConsoleKeyInfo ReadKey()
         {
-            return Console.ReadKey();
+            ConsoleKeyInfo? rc = null;
+            try
+            {
+                rc = Console.ReadKey();
+            }
+            catch (Exception e)
+            {
+                ErrorMsg = e.Message;
+            }
+            return (ConsoleKeyInfo) rc;
         }
     }
 }

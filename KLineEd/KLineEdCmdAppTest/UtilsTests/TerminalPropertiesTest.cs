@@ -90,22 +90,27 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var props = new TerminalProperties();
             props.WindowTop = -1;
-            Assert.Equal($"Error: WindowTop={props.WindowTop} is out of range (WindowHeight={TerminalProperties.DefaultWindowHeight}, BufferHeight={TerminalProperties.DefaultBufferHeight})", props.GetValidationError());
-            //makes no sense!!!
-            //props.BufferHeight = props.WindowHeight;
-            //props.WindowTop = 1;    //inverted so 
-            //Assert.Equal($"Error: WindowTop={props.WindowTop} is out of range (WindowHeight={TerminalProperties.DefaultWindowHeight}, BufferHeight={TerminalProperties.DefaultBufferHeight})", props.GetValidationError());
+            Assert.Equal($"Error: WindowTop={props.WindowTop} is less than zero", props.GetValidationError());
+            props.WindowHeight = 50;
+            props.BufferHeight = props.WindowHeight;
+            props.WindowTop = 0;    //ok to display line 50 of buffer in bottom line of window
+            Assert.Null(props.GetValidationError());
+            props.WindowTop = 1;    //attempting to display line 51 of buffer in bottom line of window - it doesn't exist!
+            Assert.StartsWith($"Error: BufferHeight={props.BufferHeight} is out of range (WindowTop={props.WindowTop}, WindowHeight={props.WindowHeight})", props.GetValidationError());
         }
         [Fact]
         public void GetValidationErrorWindowLeftTest()
         {
             var props = new TerminalProperties();
             props.WindowLeft = -1;
-            Assert.Equal($"Error: WindowLeft={props.WindowLeft} is out of range (WindowWidth={TerminalProperties.DefaultWindowWidth}, BufferWidth={TerminalProperties.DefaultBufferWidth})", props.GetValidationError());
-            //makes no sense!!!
-            //props.BufferWidth = props.WindowWidth;
-            //props.WindowLeft = 1;
-            //Assert.Equal($"Error: WindowLeft={props.WindowLeft} is out of range (WindowWidth={TerminalProperties.DefaultWindowWidth}, BufferWidth={TerminalProperties.DefaultBufferWidth})", props.GetValidationError());
+            Assert.Equal($"Error: WindowLeft={props.WindowLeft} is less than zero", props.GetValidationError());
+
+            props.WindowWidth = 120;
+            props.BufferWidth = props.WindowWidth;
+            props.WindowLeft = 0;  //ok to display column 120 of buffer in RHS of window
+            Assert.Null(props.GetValidationError());
+            props.WindowLeft = 1;  //attempting to display column 121 of buffer in right most column of window - it doesn't exist! 
+            Assert.Equal($"Error: BufferWidth={props.BufferWidth} is out of range (WindowLeft={props.WindowLeft}, WindowWidth={props.WindowWidth})", props.GetValidationError());
 
         }
         [Fact]
@@ -113,9 +118,9 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var props = new TerminalProperties();
             props.CursorSize = 0;
-            Assert.Equal($"Error: CursorSize={props.CursorSize} is out of range", props.GetValidationError());
+            Assert.Equal($"Error: CursorSize={props.CursorSize} is out of range 1-100", props.GetValidationError());
             props.CursorSize = 101;
-            Assert.Equal($"Error: CursorSize={props.CursorSize} is out of range", props.GetValidationError());
+            Assert.Equal($"Error: CursorSize={props.CursorSize} is out of range 1-100", props.GetValidationError());
 
         }
         [Fact]

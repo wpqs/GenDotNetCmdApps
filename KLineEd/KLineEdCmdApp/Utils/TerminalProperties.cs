@@ -9,10 +9,10 @@ namespace KLineEdCmdApp.Utils
     {
         public const string DefaultTitle = Program.ValueNotSet;
 
-        public const int DefaultBufferHeight = 80;
+        public const int DefaultBufferHeight = 100;
         public const int DefaultBufferWidth = 120;
-        public const int DefaultWindowHeight = 80;
-        public const int DefaultWindowWidth = 80;
+        public const int DefaultWindowHeight = 30;
+        public const int DefaultWindowWidth = 120;
         public const int DefaultCursorSize = 20;
         public const int DefaultWindowTop = 0;
         public const int DefaultWindowLeft = 0;
@@ -97,16 +97,16 @@ namespace KLineEdCmdApp.Utils
                                 rc = $"Error: WindowWidth={WindowWidth} is out of range (WindowLeft={WindowLeft})";
                             else
                             {
-                                if ((WindowTop < 0) || ((WindowTop + WindowHeight) > BufferHeight))
-                                    rc = $"Error: WindowTop={WindowTop} is out of range (WindowHeight={WindowHeight}, BufferHeight={BufferHeight})";
+                                if (WindowTop < 0) // || ((WindowTop + WindowHeight) > BufferHeight)) - checked by prior BufferHeight test
+                                    rc = $"Error: WindowTop={WindowTop} is less than zero";
                                 else
                                 {
-                                    if ((WindowLeft < 0) || ((WindowLeft + WindowWidth) > BufferWidth))
-                                        rc = $"Error: WindowLeft={WindowLeft} is out of range (WindowWidth={WindowWidth}, BufferWidth={BufferWidth})";
+                                    if (WindowLeft < 0) // || ((WindowLeft + WindowWidth) > BufferWidth)) - checked by prior BufferWidth test
+                                        rc = $"Error: WindowLeft={WindowLeft} is less than zero";
                                     else
                                     {
                                         if ((CursorSize <= 0) || (CursorSize > 100))
-                                            rc = $"Error: CursorSize={CursorSize} is out of range";
+                                            rc = $"Error: CursorSize={CursorSize} is out of range 1-100";
                                         else
                                         {
                                             if ((CursorTop < 0) || (CursorTop >= BufferHeight))

@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using KLineEdCmdApp.Controller;
 using Microsoft.Extensions.Configuration;
 using MxDotNetUtilsLib;
 using MxReturnCode;
@@ -9,7 +10,6 @@ using MxReturnCode;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils.Properties;
-using KLineEdCmdApp.View;
 
 namespace KLineEdCmdApp
 {
@@ -25,6 +25,7 @@ namespace KLineEdCmdApp
     {
         public const int PosIntegerNotSet = -1; //used for default values of params so cannot be readonly
         public const string ValueNotSet = "[not set]";
+        public const string ValueOverflow = "...";
 
         public static readonly string CmdAppVersion = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? Program.ValueNotSet;
         public static readonly string CmdAppName = typeof(Program).GetTypeInfo()?.Assembly?.GetName().Name ?? Program.ValueNotSet;
@@ -48,7 +49,7 @@ namespace KLineEdCmdApp
                 rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null,
                     config?["ConnectionStrings:AzureWebJobsServiceBus"], sbqName: config?["MxLogMsg:AzureServiceBusQueueName"]);
 
-                terminal.WriteLines(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
+                terminal.WriteLine(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
 
                 var rcParams = cmdLineParams.Initialise(args: args);
                 rc += rcParams;
@@ -56,7 +57,7 @@ namespace KLineEdCmdApp
                 {
                     if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Help)
                     {
-                        terminal.WriteLines(cmdLineParams.HelpHint);
+                        terminal.WriteLine(cmdLineParams.HelpHint);
                         rc.SetResult(val: 0);
                     }
                     else
@@ -84,7 +85,7 @@ namespace KLineEdCmdApp
                             rc += rcOp;
                             if (rcOp.IsSuccess(reporting: true))
                             {
-                                terminal.WriteLines(rcOp.GetResult());
+                                terminal.WriteLine(rcOp.GetResult());
                                 rc.SetResult(val: 0);
                             }
                         }
@@ -98,19 +99,19 @@ namespace KLineEdCmdApp
 
             if (rc.IsError(reporting: true))
             {
-                terminal.WriteLines(rc.GetErrorUserMsg());
-                terminal.WriteLines(cmdLineParams.HelpHint);
+                terminal.WriteLine(rc.GetErrorUserMsg());
+                terminal.WriteLine(cmdLineParams.HelpHint);
             }
             else
             {
                 var rcReport = GetRunReport(cmdLineParams: cmdLineParams);
                 rc += rcReport;
-                terminal.WriteLines(rcReport.IsError(reporting: true) ? rc.GetErrorUserMsg() : rcReport.GetResult());
+                terminal.WriteLine(rcReport.IsError(reporting: true) ? rc.GetErrorUserMsg() : rcReport.GetResult());
             }
 
             // DisplayTextLine(cmdLineParams.ToString());
 
-            terminal.WriteLines((rc.IsSuccess()) ? $"program ends - bye-bye :-) return code {rc.GetResult()} - success" : $"program abends: return code {rc.GetResult()} - failure");
+            terminal.WriteLine((rc.IsSuccess()) ? $"program ends - bye-bye :-) return code {rc.GetResult()} - success" : $"program abends: return code {rc.GetResult()} - failure");
             return rc.GetResult();
         }
 
@@ -123,13 +124,13 @@ namespace KLineEdCmdApp
             else
             {
                 var editModel = new ChapterModel();
-                var rcInitModel = editModel.Initialise(cmdLineParams.MaxCol, cmdLineParams.EditFile);
+                var rcInitModel = editModel.Initialise(cmdLineParams.DisplayLineWidth, cmdLineParams.EditFile);
                 rc += rcInitModel;
                 if (rcInitModel.IsSuccess(true))
                 {
-                    terminal.WriteLines($"{Environment.NewLine}Ready to edit chapter: {editModel.Header?.Chapter?.Title ?? "[null]"}{Environment.NewLine}");
-                    terminal.WriteLines(editModel.GetChapterReport());
-                    terminal.WriteLines($"{Environment.NewLine}Press 'Esc' to cancel, or any other key to open the KLineEd editor...");
+                    terminal.WriteLine($"{Environment.NewLine}Ready to edit chapter: {editModel.Header?.Chapter?.Title ?? "[null]"}{Environment.NewLine}");
+                    terminal.WriteLine(editModel.GetChapterReport());
+                    terminal.WriteLine($"{Environment.NewLine}Press 'Esc' to cancel, or any other key to open the KLineEd editor...");
 
                     var op = terminal.GetKey(true);
                     if (op == ConsoleKey.Escape)
@@ -144,9 +145,11 @@ namespace KLineEdCmdApp
                             rc.SetError(1010202, MxError.Source.Data, $"Terminal originalSettings not saved", "MxErrInvalidCondition");
                         else
                         {
-                            var rcRun = RunEditor(cmdLineParams, editModel, terminal);
+                            var rcRun = KLineEditor.RunEditor(cmdLineParams, editModel, terminal);
                             rc += rcRun;
-                            terminal.Setup(originalSettings);
+
+                            if (terminal.Setup(originalSettings) == false)
+                                rc.SetError(1010203, MxError.Source.Data, $"Error: Terminal settings not restored. {terminal?.ErrorMsg ?? Program.ValueNotSet }. Please report this error.", "MxErrInvalidCondition");
                         }
                     }
                 }
@@ -154,92 +157,6 @@ namespace KLineEdCmdApp
             return rc;
         }
 
-        private static MxReturnCode<string> RunEditor(CmdLineParamsApp cmdLineParams, ChapterModel editModel, ITerminal terminal)
-        {
-            var rc = new MxReturnCode<string>("Program.RunEditor");
-
-            if ((cmdLineParams == null) || (editModel == null) || (editModel.Ready == false) || (terminal == null) || (terminal.IsError()))
-                rc.SetError(1010301, MxError.Source.Param, $"cmdLineParams is null, editModel is null or not read, or terminal is null or error", "MxErrInvalidParamArg");
-            else
-            {
-                var editController = new KLineEditor(terminal);
-                var rcCtrl = editController.Setup(cmdLineParams);
-                rc += rcCtrl;
-                if (rcCtrl.IsSuccess(true))
-                {
-                    var cmdsHelpView = new CmdsHelpView(terminal);
-                    var msgLineView = new MsgLineView(terminal);
-                    var statusLineView = new StatusLineView(terminal);
-                    var textEditView = new TextEditView(terminal);
-
-                    var rcSetup = SetupKlineEdViews(cmdLineParams, cmdsHelpView, msgLineView, statusLineView, textEditView);
-                    rc += rcSetup;
-                    if (rcSetup.IsSuccess(true))
-                    {
-                        using (editModel.Subscribe(cmdsHelpView)) 
-                        using (editModel.Subscribe(msgLineView)) 
-                        using (editModel.Subscribe(statusLineView)) 
-                        using (editModel.Subscribe(textEditView)) 
-                        {
-                            var rcStart = editController.Start(editModel); //start
-                            rc += rcStart;
-                            if (rcStart.IsSuccess(true))
-                            {
-                                var rcProcess = editController.Process(); //process
-                                rc += rcProcess;
-                                if (rcProcess.IsSuccess(true))
-                                {
-                                    var report = editController.GetReport();
-
-                                    var rcFinish = editController.Finish(); //finish
-                                    rc += rcFinish;
-                                    if (rcFinish.IsSuccess(true))
-                                    {
-                                        rc.SetResult(report);
-                                    }
-                                }
-                            }
-                        }
-                        if (editModel.GetSubscriberCount() > 0)
-                            rc.SetError(1010302, MxError.Source.Program, $"Views still subscribing to model; count={editModel.GetSubscriberCount()}", "MxErrInvalidCondition");
-                    }
-                }
-            }
-            return rc;
-        }
-
-        private static MxReturnCode<bool> SetupKlineEdViews(CmdLineParamsApp cmdLineParams, CmdsHelpView cmdsHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView)
-        {
-            var rc = new MxReturnCode<bool>("Program.SetupKlineEdVViews");
-
-            if ((cmdLineParams == null) || (cmdsHelpView == null) || (msgLineView == null) || (statusLineView == null) || (textEditView == null))
-                rc.SetError(101401, MxError.Source.Param, $"cmdLineParams is null, or one of the view objects is null", "MxErrInvalidParamArg");
-            else
-            {
-                var rcCmds = cmdsHelpView.Setup(cmdLineParams);
-                rc += rcCmds;
-                if (rcCmds.IsSuccess(true))
-                {
-                    var rcMsg = msgLineView.Setup(cmdLineParams);
-                    rc += rcMsg;
-                    if (rcMsg.IsSuccess(true))
-                    {
-                        var rcStatus = statusLineView.Setup(cmdLineParams);
-                        rc += rcStatus;
-                        if (rcStatus.IsSuccess(true))
-                        {
-                            var rcTxt = textEditView.Setup(cmdLineParams);
-                            rc += rcTxt;
-                            if (rcTxt.IsSuccess(true))
-                            {
-                                rc.SetResult(true);
-                            }
-                        }
-                    }
-                }
-            }
-            return rc;
-        }
         private static MxReturnCode<string> ResetProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
         {
             var rc = new MxReturnCode<string>("Program.ResetProcessing");
@@ -250,7 +167,7 @@ namespace KLineEdCmdApp
                     rc.SetError(1010501, MxError.Source.Program, $"{CmdLineParamsApp.ArgSettingsUpdate} not set", "MxErrInvalidParamArg");
                 else
                 {
-                    terminal.WriteLines($"resetting {EnumOps.XlatToString(cmdLineParams.ResetType)} in '{cmdLineParams.SettingsFile}'...");
+                    terminal.WriteLine($"resetting {EnumOps.XlatToString(cmdLineParams.ResetType)} in '{cmdLineParams.SettingsFile}'...");
                     var rcReset = cmdLineParams.ResetProperties(cmdLineParams.ResetType); //writes to settingsfile
                     rc += rcReset;
                     if (rcReset.IsError(true))
@@ -285,7 +202,7 @@ namespace KLineEdCmdApp
                             rc.SetError(1010603, MxError.Source.User, $"folder for output file {cmdLineParams.ExportFile} does not exist. Create folder and try again.");
                         else
                         {
-                            terminal.WriteLines($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportFile}...");
+                            terminal.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportFile}...");
                             //process editfile to remove all metadata - see EditFileOps class
                             File.Copy(cmdLineParams.EditFile, cmdLineParams.ExportFile, true);
                             rc.SetResult("...succeeded");
