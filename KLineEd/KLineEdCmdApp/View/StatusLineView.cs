@@ -35,24 +35,47 @@ namespace KLineEdCmdApp.View
                 {
                     StatusLineForeGndColour = param.ForeGndDetailsColour; //todo rename param.StatusLineForeGndColour    
                     StatusLineBackGndColour = param.BackGndDetailsColour; //todo rename param.StatusLineBackGndColour 
-                    StatusLineRow = WindowHeight - KLineEditor.StatusLineCount - 1;
+                    StatusLineRow = WindowHeight - KLineEditor.StatusLineRowCount - 1;
 
                     if (Terminal.SetCursorPosition(StatusLineRow, KLineEditor.StatusLineLeftCol) == false)
                         rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                     else
                     {
                         if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
-                            rc.SetError(1200103, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRow}, LeftCol={KLineEditor.MsgLineLeftCol}", "MxErrInvalidCondition");
+                            rc.SetError(1200103, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", "MxErrInvalidCondition");
                         else
                         {
-                            if (Terminal.Write(BlankLine) == null)
-                                rc.SetError(1200104, MxError.Source.Program, $"StatusLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
-                            else
+                            var rcClear = ClearLine();
+                            rc += rcClear;
+                            if (rcClear.IsSuccess(true))
                             {
                                 Ready = true;
                                 rc.SetResult(true);
                             }
                         }
+                    }
+                }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> ClearLine()
+        {
+            var rc = new MxReturnCode<bool>("StatusLineView.ClearLine");
+
+            if (Terminal.SetCursorPosition(StatusLineRow, 0) == false)
+                rc.SetError(1200201, MxError.Source.Program, $"StatusLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+            else
+            {
+                if (Terminal.Write(BlankLine) == null)
+                    rc.SetError(1200202, MxError.Source.Program, $"StatusLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                else
+                {
+                    if (Terminal.SetCursorPosition(StatusLineRow, KLineEditor.StatusLineLeftCol) == false)
+                        rc.SetError(1200203, MxError.Source.Program, $"StatusLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    else
+                    {
+                        rc.SetResult(true);
                     }
                 }
             }
@@ -66,20 +89,21 @@ namespace KLineEdCmdApp.View
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)
-                    DisplayErrorMsg(1200201, "Program Error. Unable to access data needed for display. Please quit and report this problem.");
+                    DisplayErrorMsg(1200301, "Program Error. Unable to access data needed for display. Please quit and report this problem.");
                 else
                 {
                     if (Terminal.SetColour(StatusLineForeGndColour,StatusLineBackGndColour) == false)
-                        DisplayErrorMsg(1200202, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                        DisplayErrorMsg(1200302, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                     else
                     {
-                        if (Terminal.SetCursorPosition(StatusLineRow, KLineEditor.StatusLineLeftCol) == false)
-                            DisplayErrorMsg(1200203, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                        var rcClear = ClearLine();
+                        if (rcClear.IsError(true))
+                            DisplayMxErrorMsg(rcClear.GetErrorUserMsg());
                         else
                         {
                             var status = model.StatusLine ?? Program.ValueNotSet;
                             if ((LastTerminalOutput = Terminal.Write(GetTextForLine(status, WindowWidth - KLineEditor.StatusLineLeftCol))) == null)
-                                DisplayErrorMsg(1200204, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                DisplayErrorMsg(1200304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                         }
                     }
                 }

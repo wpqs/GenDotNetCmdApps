@@ -1,4 +1,5 @@
-﻿using KLineEdCmdApp.Model;
+﻿using KLineEdCmdApp.Controller;
+using KLineEdCmdApp.Model;
 using MxReturnCode;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View.Base;

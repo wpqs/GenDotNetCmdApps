@@ -37,22 +37,40 @@ namespace KLineEdCmdApp.View
                     CmdsHelpForeGndColour = ConsoleColor.Blue;// param.ForeGndCmdsColour; //todo rename ForeGndCmdsHelpColour
                     CmdsHelpBackGndColour = ConsoleColor.Black;// param.BackGndCmdsColour; //todo rename BackGndCmdsHelpColour
 
-                    if (Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRow, KLineEditor.CmdsHelpLineLeftCol) == false)
-                        rc.SetError(1120101, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
+                        rc.SetError(1120102, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                   else
+                    {
+                        var rcClear = ClearLine();
+                        rc += rcClear;
+                        if (rcClear.IsSuccess(true))
+                        { 
+                            Ready = true;
+                            rc.SetResult(true);
+                        }
+                    }
+                }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> ClearLine()
+        {
+            var rc = new MxReturnCode<bool>("CmdHelpView.ClearLine");
+
+            if (Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRowIndex, 0) == false)
+                rc.SetError(1120201, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+            else
+            {
+                if (Terminal.Write(BlankLine) == null)
+                    rc.SetError(1120203, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                else
+                {
+                    if (Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRowIndex, KLineEditor.CmdsHelpLineLeftCol) == false)
+                        rc.SetError(1120204, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                     else
                     {
-                        if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
-                            rc.SetError(1120102, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
-                        else
-                        {
-                            if (Terminal.Write(BlankLine) == null)
-                                rc.SetError(1120103, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
-                            else
-                            {
-                                Ready = true;
-                                rc.SetResult(true);
-                            }
-                        }
+                        rc.SetResult(true);
                     }
                 }
             }
@@ -66,20 +84,21 @@ namespace KLineEdCmdApp.View
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)
-                    DisplayErrorMsg(1120201, "Program Error. Unable to access data needed for display. Please quit and report this problem.");
+                    DisplayErrorMsg(1120301, "Program Error. Unable to access data needed for display. Please quit and report this problem.");
                 else
                 {
                     if (Terminal.SetColour(CmdsHelpForeGndColour, CmdsHelpBackGndColour) == false)
-                        DisplayErrorMsg(1120202, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                        DisplayErrorMsg(1120302, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                     else
                     {
-                        if (Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRow, KLineEditor.CmdsHelpLineLeftCol) == false)
-                            DisplayErrorMsg(1120203, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                        var rcClear = ClearLine();
+                        if (rcClear.IsError(true))
+                            DisplayMxErrorMsg(rcClear.GetErrorUserMsg());
                         else
                         {
                             var cmds = model.CmdsHelpLine ?? Program.ValueNotSet;
                             if((LastTerminalOutput = Terminal.Write(GetTextForLine(cmds, WindowWidth - KLineEditor.CmdsHelpLineLeftCol))) == null)
-                                DisplayErrorMsg(1120204, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                DisplayErrorMsg(1120304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                         }
                     }
                 }

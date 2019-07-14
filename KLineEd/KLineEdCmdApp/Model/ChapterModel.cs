@@ -48,6 +48,7 @@ namespace KLineEdCmdApp.Model
             StatusLine = "";
             MsgLine = "";
             CmdsHelpLine = "";
+            Mode = KLineEditor.CmdMode.Unknown;
             Ready = false;
         }
 
@@ -57,21 +58,24 @@ namespace KLineEdCmdApp.Model
             UpdateAllViews((int)ChangeHint.All);
         }
 
-        public void SetStatusLine()     //called from Time Thread so readonly model items
+        public void SetStatusLine(bool update=true)     //called from Time Thread so readonly model items
         {
             StatusLine = $"{DateTime.Now.ToString(MxStdFrmt.Time)} Line: {Body?.GetLineCount() ?? Program.PosIntegerNotSet} Column: {Body?.GetCharactersInLine() ?? Program.PosIntegerNotSet} Total words: {Body?.WordCount ?? Program.PosIntegerNotSet}";
-            UpdateAllViews((int)ChangeHint.Status);
+            if (update)
+                UpdateAllViews((int)ChangeHint.Status);
         }
-        public void SetMsgLine(string msg)
+        public void SetMsgLine(string msg, bool update = true)
         {
             MsgLine = msg;
-            UpdateAllViews((int)ChangeHint.Msg);
+            if (update)
+                UpdateAllViews((int)ChangeHint.Msg);
         }
 
-        public void SetCmdLine(string cmd)
+        public void SetCmdLine(string cmd, bool update = true)
         {
             CmdsHelpLine = cmd;
-            UpdateAllViews((int)ChangeHint.Cmd);
+            if (update)
+                UpdateAllViews((int)ChangeHint.Cmd);
         }
 
         public MxReturnCode<bool>Initialise(int lineWidth, string pathFilename)

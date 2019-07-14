@@ -65,12 +65,13 @@ namespace KLineEdCmdApp.View
                 int lineCnt = 0;
                 for (; lineCnt < DisplayLinesHeight; lineCnt++)
                 {
-                    if (Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRow + lineCnt, KLineEditor.CmdsHelpLineLeftCol) == false)
+                    if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + lineCnt, 0) == false)
                         rc.SetError(1140201, MxError.Source.Program, $"TextEditView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                     else
                     {
+                        //var blank = $"{lineCnt}";
+                        //blank = blank.PadRight(WindowWidth-2, '.') + 'x';
                         Terminal.Write(BlankLine);
-                        lineCnt++;
                     }
                     if (Terminal.IsError())
                         break;
@@ -100,29 +101,39 @@ namespace KLineEdCmdApp.View
                     {
                         case ChapterModel.ChangeHint.All:
                         {
-                            var rcRes = model.GetLastLinesForDisplay(DisplayLinesHeight);
-                            if (rcRes.IsError(true))
-                                DisplayMxErrorMsg(rcRes.GetErrorUserMsg());
+                            var rcClear = ClearTextArea();
+                            if (rcClear.IsError(true))
+                                DisplayMxErrorMsg(rcClear.GetErrorUserMsg());
                             else
                             {
-                                var row = 0;
-                                var lastDisplayRow = model.Body?.LastDisplayRowIndex ?? 0;
-                                var lines = rcRes.GetResult();
-                                foreach (var line in lines)
+                                var rcRes = model.GetLastLinesForDisplay(DisplayLinesHeight);
+                                if (rcRes.IsError(true))
+                                    DisplayMxErrorMsg(rcRes.GetErrorUserMsg());
+                                else
                                 {
-                                    if (row <= lastDisplayRow)
+                                    if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex, KLineEditor.EditAreaMarginLeft) == false)
+                                        DisplayErrorMsg(1140303, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                    else
                                     {
-                                        if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRow + row, KLineEditor.EditAreaMarginLeft) == false)
-                                            DisplayErrorMsg(1140303, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                        else
+                                        var row = 0;
+                                        var lines = rcRes.GetResult();
+                                        foreach (var line in lines)
                                         {
-                                            if ((LastTerminalOutput = Terminal.Write(line)) == null)
-                                                DisplayErrorMsg(1140304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                            if (line != null)
+                                            {
+                                                if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + row, KLineEditor.EditAreaMarginLeft) == false)
+                                                    DisplayErrorMsg(1140303, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                                else
+                                                {
+                                                    if ((LastTerminalOutput = Terminal.Write(line)) == null)
+                                                        DisplayErrorMsg(1140304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                                }
+                                            }
+                                            if (Terminal.IsError())
+                                                break;
+                                            row++;
                                         }
-                                        if (Terminal.IsError())
-                                            break;
                                     }
-                                    row++;
                                 }
                             }
                         }
@@ -134,18 +145,24 @@ namespace KLineEdCmdApp.View
                                 DisplayMxErrorMsg(rcRes.GetErrorUserMsg());
                             else
                             {
-                                var lastDisplayRow = model.Body?.LastDisplayRowIndex ?? 0;
-                                var lines = rcRes.GetResult();
-                                foreach (var line in lines)
+                                if (Terminal.Write(BlankLine) == null)
+                                    DisplayErrorMsg(1140305, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                else
                                 {
-                                    if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRow + lastDisplayRow, KLineEditor.EditAreaMarginLeft) == false)
-                                        DisplayErrorMsg(1140305, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                    else
+                                    var lastDisplayRow = model.Body?.LastDisplayRowIndex ?? 0;
+                                    var lines = rcRes.GetResult();
+                                    foreach (var line in lines)
                                     {
-                                        if((LastTerminalOutput = Terminal.Write(line)) == null)
+                                        if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + lastDisplayRow, KLineEditor.EditAreaMarginLeft) == false)
                                             DisplayErrorMsg(1140306, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                        else
+                                        {
+                                            if ((LastTerminalOutput = Terminal.Write(line)) == null)
+                                                DisplayErrorMsg(1140307, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                                        }
+
+                                        break;
                                     }
-                                    break;
                                 }
                             }
                         }
@@ -156,7 +173,7 @@ namespace KLineEdCmdApp.View
                             var lastDisplayCol = model.Body?.LastDisplayColumnIndex ?? 0;
                             var lastWord = model.Body?.GetWordInLine() ?? Body.WordNotSet;
 
-                            if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRow + lastDisplayRow, KLineEditor.EditAreaMarginLeft + lastDisplayCol) == false)
+                            if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + lastDisplayRow, KLineEditor.EditAreaMarginLeft + lastDisplayCol) == false)
                                 DisplayErrorMsg(1140307, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                             else
                             {
@@ -171,7 +188,7 @@ namespace KLineEdCmdApp.View
                             var lastDisplayCol = model.Body?.LastDisplayColumnIndex ?? 0;
                             var lastChar = model.Body?.GetCharInLine(lastDisplayRow, lastDisplayCol) ?? Body.NullChar;
 
-                            if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRow + lastDisplayRow, KLineEditor.EditAreaMarginLeft + lastDisplayCol) == false)
+                            if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + lastDisplayRow, KLineEditor.EditAreaMarginLeft + lastDisplayCol) == false)
                                 DisplayErrorMsg(1140309, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                             else
                             {
@@ -184,7 +201,7 @@ namespace KLineEdCmdApp.View
                         {
                             var row = model.Body?.LastDisplayRowIndex ?? 0;
                             var col = model.Body?.GetCharInLine() ?? 0;
-                            if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRow + row, KLineEditor.EditAreaMarginLeft + col) == false)
+                            if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + row, KLineEditor.EditAreaMarginLeft + col) == false)
                                 DisplayErrorMsg(1140311, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                         }
                         break;

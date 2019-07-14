@@ -42,7 +42,6 @@ namespace KLineEdCmdApp.View.Base
         public ConsoleColor MsgLineInfoForeGndColour { private set; get; }
         public ConsoleColor MsgLineInfoBackGndColour { private set; get; }
 
-
         public bool Ready { protected set; get; }
 
         // ReSharper disable once RedundantBaseConstructorCall
@@ -84,16 +83,16 @@ namespace KLineEdCmdApp.View.Base
                 MsgLineInfoForeGndColour = ConsoleColor.Gray;             //todo add param.MsgLineInfoForeGndColour
                 MsgLineInfoBackGndColour = ConsoleColor.Black;            //todo add param.MsgLineInfoBackGndColour 
 
-                WindowHeight = KLineEditor.CmdsHelpLineCount + KLineEditor.MsgLineCount + KLineEditor.EditAreaMarginTop + DisplayLinesHeight + KLineEditor.EditAreaMarginBottom + KLineEditor.StatusLineCount;
+                WindowHeight = KLineEditor.CmdsHelpLineRowCount + KLineEditor.MsgLineRowCount + KLineEditor.EditAreaMarginTopRowCount + DisplayLinesHeight + KLineEditor.EditAreaMarginBottomRowCount + KLineEditor.StatusLineRowCount;
                 WindowWidth = KLineEditor.EditAreaMarginLeft + DisplayLineWidth + KLineEditor.EditAreaMarginRight;
 
                 if ((WindowWidth < KLineEditor.MinWindowWidth) || (WindowWidth > KLineEditor.MaxWindowWidth) || (WindowHeight > KLineEditor.MaxWindowHeight) || (WindowHeight < KLineEditor.MinWindowHeight))
                     rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.DisplayLineWidth} (min={KLineEditor.MinWindowWidth}, max={KLineEditor.MaxWindowWidth}), param.DisplayLastLinesCnt{param.DisplayLastLinesCnt} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", "MxErrInvalidSettingsFile");
                 else
                 {
-                    BlankLine = BlankLine.PadLeft(WindowWidth);
-                   // Ready = true;     //set in derived class
-                    rc.SetResult(true);
+                   // BlankLine = BlankLine.PadLeft(WindowWidth-2, '.') + 'x';
+                    BlankLine = BlankLine.PadLeft(WindowWidth - 1, ' ');
+                    rc.SetResult(true); 
                 }
             }
             return rc;
@@ -110,28 +109,26 @@ namespace KLineEdCmdApp.View.Base
 
         public bool DisplayMsg(MsgType msgType, string msg)
         {
-            var rc = false;
-            if (Terminal.SetCursorPosition(KLineEditor.MsgLineRow, KLineEditor.MsgLineLeftCol))
-            {
-                // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                if (msg == null)
-                    LastTerminalOutput = Terminal.Write(MsgSetup(MsgType.Error, $"Error: 1110201 {Program.ValueNotSet}"));
-                else
-                    LastTerminalOutput = Terminal.Write(MsgSetup(msgType, GetTextForLine(msg, WindowWidth - KLineEditor.MsgLineLeftCol)));
-                rc = true;
-            }
-            return rc;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (msg == null)
+                LastTerminalOutput = Terminal.Write(MsgSetup(MsgType.Error, $"Error: 1110201 {Program.ValueNotSet}"));
+            else
+                LastTerminalOutput = Terminal.Write(MsgSetup(msgType, GetTextForLine(msg, WindowWidth - KLineEditor.MsgLineLeftCol)));
+  
+            return true;
         }
 
         private string MsgSetup(MsgType msgType, string msg)
         {
             var rc = Program.ValueNotSet;
 
+            Terminal.SetCursorPosition(KLineEditor.MsgLineRowIndex, 0);
+
             switch (msgType)
             {
                 case MsgType.Clear:
                 {
-                    Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
+                    Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
                     Terminal.Write(BlankLine);
                 }
                 break;
@@ -167,6 +164,8 @@ namespace KLineEdCmdApp.View.Base
                 }
                 break;
             }
+            Terminal.SetCursorPosition(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
+
             return rc;
         }
 
@@ -174,7 +173,12 @@ namespace KLineEdCmdApp.View.Base
         {
             var rc = Program.ValueOverflow;
             if ((text != null) && (maxLength > 0) && (maxLength <= KLineEditor.MaxWindowWidth))
-                rc = (text.Length <= maxLength) ? text : (text.Substring(0, maxLength - Program.ValueOverflow.Length) + Program.ValueOverflow);
+            {
+                if(text.Length <= maxLength) 
+                    rc = text;
+                else
+                   rc = text.Substring(0, maxLength - Program.ValueOverflow.Length) + Program.ValueOverflow;
+            }
             return rc;
         }
     }
