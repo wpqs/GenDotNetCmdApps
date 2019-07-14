@@ -16,11 +16,12 @@ namespace KLineEdCmdApp.Controller
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class KLineEditor
     {
-        public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................{Environment.NewLine}";
+        public static readonly int MaxWindowHeight = Console.LargestWindowHeight;  
+        public static readonly int MaxWindowWidth = Console.LargestWindowWidth;
+        public static readonly int MinWindowHeight = 4; //Cmds, Msg, Text, Status
+        public static readonly int MinWindowWidth = Program.ValueOverflow.Length;
 
-        public static readonly int MaxHeight = 500;     //todo find correct value
-
-        //display vertical layout: CmdHelp, Msg, 
+    //display vertical layout: CmdHelp, Msg, - note: any change to CmdsHelpLineCount, MsgLineCount, Status LineCount needs changes to their view.setup()
         public static readonly int CmdsHelpLineRow = 0;
         public static readonly int CmdsHelpLineCount = 1;   //height = mdsHelpLineRow + CmdsHelpLineCount + MsgLineCount + EditAreaMarginTop + param.DisplayLastLinesCnt +  EditAreaMarginBottom + StatusLineCount
         public static readonly int MsgLineRow = CmdsHelpLineRow + CmdsHelpLineCount;
@@ -32,7 +33,7 @@ namespace KLineEdCmdApp.Controller
         public static readonly int EditAreaMarginBottom = 10;
         public static readonly int StatusLineCount = 1;
 
-        //display horizontal layout:
+    //display horizontal layout:
         //TextEditingMode 
         public static readonly int EditAreaMarginLeft = 5;
         //param.DisplayLineWidth
@@ -42,6 +43,8 @@ namespace KLineEdCmdApp.Controller
         public static readonly int MsgLineLeftCol = 3;        //width -= MsgLineLeftCol;      
         public static readonly int StatusLineLeftCol = 1;     //width -= StatusLineLeftCol;   
 
+
+        public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................{Environment.NewLine}";
 
         public enum CmdMode
         {
@@ -105,6 +108,7 @@ namespace KLineEdCmdApp.Controller
 
         private string GetCmdHelpLine()
         {
+            // ReSharper disable once RedundantAssignment
             var rc = "";
             if (Mode == CmdMode.TextEditing)
                 rc = $"Text Editing: Esc=Refresh F1=Help  Ctrl+Q=Quit";
@@ -139,7 +143,7 @@ namespace KLineEdCmdApp.Controller
                         using (editModel.Subscribe(cmdsHelpView))
                         using (editModel.Subscribe(msgLineView))
                         using (editModel.Subscribe(statusLineView))
-                        using (editModel.Subscribe(textEditView))
+                        using (editModel.Subscribe(textEditView))           //make the last view to be notified so it sets the cursor back to EditArea
                         {
                             var rcStart = editController.Start(editModel); //start
                             rc += rcStart;
@@ -217,7 +221,7 @@ namespace KLineEdCmdApp.Controller
 
                     var settings = new TerminalProperties
                     {
-                        Title = $"{Program.CmdAppName} v{Program.CmdAppVersion} - {param.EditFile ?? "[null]"}: Chapter {editModel?.Header?.Chapter?.Title ?? Program.ValueNotSet}",
+                        Title = $"{Program.CmdAppName} v{Program.CmdAppVersion} - {param.EditFile ?? "[null]"}: Chapter {editModel.Header?.Chapter?.Title ?? Program.ValueNotSet}",
                         BufferHeight = Height,
                         BufferWidth = Width,
                         WindowHeight = Height,

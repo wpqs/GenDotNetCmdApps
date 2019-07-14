@@ -760,12 +760,12 @@ namespace KLineEdCmdAppTest.ModelTests
   [Fact]
         public void GetWordsInLineTest()
         {
-            Assert.Equal(0, Body.GetWordsInLine(null));
-            Assert.Equal(0, Body.GetWordsInLine(""));
-            Assert.Equal(1, Body.GetWordsInLine("one"));
-            Assert.Equal(2, Body.GetWordsInLine("one two"));
-            Assert.Equal(3, Body.GetWordsInLine("one two\tthree"));
-            Assert.Equal(3, Body.GetWordsInLine($"one two{Environment.NewLine}three"));
+            Assert.Equal(0, Body.GetWordCountInLine(null));
+            Assert.Equal(0, Body.GetWordCountInLine(""));
+            Assert.Equal(1, Body.GetWordCountInLine("one"));
+            Assert.Equal(2, Body.GetWordCountInLine("one two"));
+            Assert.Equal(3, Body.GetWordCountInLine("one two\tthree"));
+            Assert.Equal(3, Body.GetWordCountInLine($"one two{Environment.NewLine}three"));
         }
 
         [Fact]

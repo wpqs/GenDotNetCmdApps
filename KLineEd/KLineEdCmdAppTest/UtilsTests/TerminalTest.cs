@@ -10,14 +10,14 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var terminal = new Terminal();
 
-            Assert.False(terminal.IsError());
+            Assert.True(terminal.IsError());
         }
 
         [Fact]
         public void SetupTest()
         {
             var terminal = new Terminal();
-            Assert.True(terminal.IsError() == false);
+            Assert.True(terminal.IsError());
 
             var props = new TerminalProperties();
             Assert.True(terminal.Setup(props));

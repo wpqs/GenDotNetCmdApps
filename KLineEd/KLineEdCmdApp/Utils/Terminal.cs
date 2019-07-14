@@ -11,6 +11,7 @@ namespace KLineEdCmdApp.Utils
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class Terminal : ITerminal
     {
         public static readonly ConsoleKey InvalidKey = ConsoleKey.F24;
@@ -19,14 +20,20 @@ namespace KLineEdCmdApp.Utils
 
         public bool IsError() { return (ErrorMsg ==null) ? false : true; }
 
+        private void SetError(int errorNo, string errMsg)
+        {
+            ErrorMsg = $"Error: {errorNo} {errMsg ?? Program.ValueNotSet}";
+        }
+
         public Terminal()
         {
-           ErrorMsg = null;
+            SetError(1210101, "Terminal not setup");
         }
         public bool Setup(TerminalProperties props)
         {
-            ErrorMsg = Program.ValueNotSet;
-            if (props.IsError() == false)
+            if (props.IsError())
+                SetError(1210201, props.GetValidationError());
+            else
             {
                 try
                 {
@@ -47,66 +54,86 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    ErrorMsg = e.Message;
+                    SetError(1210202, e.Message);
                 }
             }
-            return (ErrorMsg == null) ? true : false;
+            return (IsError()) ? false : true;
         }
 
         public TerminalProperties GetSettings()
         {
             TerminalProperties rc = null;
-            if (IsError() == false)
+
+            var props = new TerminalProperties
             {
-                var props = new TerminalProperties
-                {
-                    Title = Console.Title,
-                    BufferWidth = Console.BufferWidth,
-                    BufferHeight = Console.BufferHeight,
-                    WindowWidth = Console.WindowWidth,
-                    WindowHeight = Console.WindowHeight,
-                    CursorSize = Console.CursorSize,
-                    WindowTop = Console.WindowTop,
-                    WindowLeft = Console.WindowLeft,
-                    CursorTop = Console.CursorTop,
-                    CursorLeft = Console.CursorLeft,
-                    ForegroundColor = Console.ForegroundColor,
-                    BackgroundColor = Console.BackgroundColor
-                };
-                if (props.Validate())
-                    rc = props;
+                Title = Console.Title,
+                BufferWidth = Console.BufferWidth,
+                BufferHeight = Console.BufferHeight,
+                WindowWidth = Console.WindowWidth,
+                WindowHeight = Console.WindowHeight,
+                CursorSize = Console.CursorSize,
+                WindowTop = Console.WindowTop,
+                WindowLeft = Console.WindowLeft,
+                CursorTop = Console.CursorTop,
+                CursorLeft = Console.CursorLeft,
+                ForegroundColor = Console.ForegroundColor,
+                BackgroundColor = Console.BackgroundColor
+            };
+            if (props.Validate() == false)
+                SetError(1210301, props.GetValidationError());
+            else
+            {
+                rc = props;
+                ErrorMsg = null;
             }
             return rc;
         }
 
+        public bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour)
+        {
+            try
+            {
+                Console.ForegroundColor = msgLineErrorForeGndColour;
+                Console.BackgroundColor = msgLineErrorBackGndColour;
+                ErrorMsg = null;
+            }
+            catch (Exception e)
+            {
+                SetError(1210401, e.Message);
+            }
+            return (IsError()) ? false : true;
+        }
         public bool SetCursorPosition(int line, int column)
         {
-            var rc = false;
-            if ((line >= 0) && (line < Console.BufferHeight) && (column >= 0) && (column < Console.BufferWidth))
+            if ((line < 0) || (line >= Console.BufferHeight) || (column < 0) || (column >= Console.BufferWidth))
+                SetError(1210501, $"Invalid cursor position: line={line}, column={column}");
+            else
             {
                 try
                 {
                     Console.CursorLeft = column;
                     Console.CursorTop = line;
-                    rc = true;
+                    ErrorMsg = null;
                 }
                 catch (Exception e)
                 {
-                    ErrorMsg = e.Message;
+                    SetError(1210502, e.Message);
                 }
             }
-            return rc;
+            return (IsError()) ? false : true;
         }
+
         public int GetCursorColumn()
         {
             var rc = Program.PosIntegerNotSet;
             try
             {
                 rc = Console.CursorLeft;
+                ErrorMsg = null;
             }
             catch (Exception e)
             {
-                ErrorMsg = e.Message;
+                SetError(1210601, e.Message);
             }
             return rc;
         }
@@ -115,41 +142,45 @@ namespace KLineEdCmdApp.Utils
             var rc = Program.PosIntegerNotSet;
             try
             {
-                rc = Console.CursorTop; 
+                rc = Console.CursorTop;
+                ErrorMsg = null;
             }
             catch (Exception e)
             {
-                ErrorMsg = e.Message;
+                SetError(1210701, e.Message);
             }
             return rc;
         }
         public bool Clear()
         {
-            var rc = false;
             try
             {
                 Console.Clear();
-                rc = true;
+                ErrorMsg = null;
             }
             catch (Exception e)
             {
-                ErrorMsg = e.Message;
+                SetError(1210801, e.Message);
             }
-            return rc;
+            return (IsError()) ? false : true;
         }
+
         public string WriteLine(string line, params object[] args)
         {
             string rc = null;
-            if (line != null)
+            if (line == null)
+                SetError(1210901, "line is null");
+            else
             {
                 try
                 {
                     Console.WriteLine(line, args);
                     rc = string.Format(line, args);
+                    ErrorMsg = null;
                 }
                 catch (Exception e)
                 {
-                    ErrorMsg = e.Message;
+                    SetError(1210902, e.Message);
                 }
             }
             return rc;
@@ -157,16 +188,19 @@ namespace KLineEdCmdApp.Utils
         public string Write(string msg, params object[] args)
         {
             string rc = null;
-            if (msg != null)
+            if (msg == null)
+                SetError(1211001, "msg is null");
+            else
             {
                 try
                 {
                     Console.Write(msg, args);
                     rc = string.Format(msg, args);
+                    ErrorMsg = null;
                 }
                 catch (Exception e)
                 {
-                    ErrorMsg = e.Message;
+                    SetError(1211002, e.Message);
                 }
             }
             return rc;
@@ -177,10 +211,11 @@ namespace KLineEdCmdApp.Utils
             try
             {
                 rc = Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
+                ErrorMsg = null;
             }
             catch (Exception e)
             {
-                ErrorMsg = e.Message;
+                SetError(1211101, e.Message);
             }
             return rc;
         }
@@ -194,23 +229,23 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                ErrorMsg = e.Message;
+                SetError(1211201, e.Message);
             }
             return rc;
         }
 
         public ConsoleKeyInfo ReadKey()
         {
-            ConsoleKeyInfo? rc = null;
+            var rc = new ConsoleKeyInfo('\0', ConsoleKey.Clear, false, false, false);
             try
             {
                 rc = Console.ReadKey();
             }
             catch (Exception e)
             {
-                ErrorMsg = e.Message;
+                SetError(1211301, e.Message);
             }
-            return (ConsoleKeyInfo) rc;
+            return rc;
         }
     }
 }

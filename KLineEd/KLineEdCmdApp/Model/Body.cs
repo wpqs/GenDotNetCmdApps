@@ -24,6 +24,9 @@ namespace KLineEdCmdApp.Model
         public static readonly char DisallowedCharClosingAngle = '>';
         public static readonly int  DefaultTabSpaceCount = 3;
 
+        public const string WordMissing = "[???]";
+        public const string WordNotSet = "[?]";
+
         public const int LastLine = -1;         //used to provide parameter default values so cannot be readonly
         public const int LastColumn = -1;
         public const char NullChar = (char)0;
@@ -36,6 +39,8 @@ namespace KLineEdCmdApp.Model
         {
             TextLines = new List<string>();
             WordCount = 0;
+            LastDisplayRowIndex = 0;
+            LastDisplayColumnIndex = 0;
             LineWidth = Program.PosIntegerNotSet;
             SetTabSpaces(DefaultTabSpaceCount);
             Error = true;
@@ -43,6 +48,8 @@ namespace KLineEdCmdApp.Model
 
         public List<string> TextLines { private set; get; }
         public int WordCount { private set; get; }
+        public int LastDisplayColumnIndex { private set; get; }
+        public int LastDisplayRowIndex { private set; get; }
         public int LineWidth { private set; get; }
         private string TabSpaces { set; get; }
         private bool Error { set; get; }
@@ -58,6 +65,8 @@ namespace KLineEdCmdApp.Model
             else
             {
                 LineWidth = lineWidth;
+                LastDisplayRowIndex = 0;
+                LastDisplayColumnIndex = 0;
                 SetTabSpaces(3);    //TabSpaceCount
                 Error = false;
                 rc.SetResult(true);
@@ -329,6 +338,8 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100802, MxError.Source.Program, "IsError() == true, Initialise not called?", "MxErrInvalidCondition");
                 else
                 {
+                    LastDisplayColumnIndex = 0;
+                    LastDisplayRowIndex = 0;
                     var lastLines = new string[count];
                     var buffcnt = count - 1;
                     var filelinecnt = TextLines.Count;
@@ -336,7 +347,11 @@ namespace KLineEdCmdApp.Model
                     foreach (var line in lastLines)
                     {
                         if (filelinecnt > 0)
+                        {
                             lastLines[buffcnt--] = TextLines[(filelinecnt--) - 1];
+                            LastDisplayColumnIndex = lastLines[buffcnt + 1]?.Length ?? Program.PosIntegerNotSet;
+                            LastDisplayRowIndex++;
+                        }
                         else
                             lastLines[buffcnt--] = null;
                     }
@@ -460,6 +475,24 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
+        public string GetWordInLine(int lineNo = Body.LastLine, int wordNo = Program.PosIntegerNotSet)
+        {
+            var rc = Body.WordNotSet;
+
+            var lineIndex = (lineNo != Body.LastLine) ? lineNo - 1 : TextLines.Count - 1;
+            if ((lineIndex >= 0) && (lineIndex < TextLines.Count))
+            {
+                var line = TextLines[lineIndex];
+                var lineWordCount = GetWordCountInLine(line);
+                var wordIndex = (wordNo == Program.PosIntegerNotSet) ? lineWordCount : wordNo;
+                if ((wordIndex >= 0) && (wordIndex < lineWordCount))
+                {
+                    rc = line.Snip(GetWordIndexInLine(line, wordIndex), GetWordIndexInLine(line, wordIndex, false)) ?? Body.WordMissing;
+                }
+            }
+            return rc;
+        }
+
         public char GetCharInLine(int lineNo = Body.LastLine, int columnNo = Body.LastColumn)
         {
             var rc = Body.NullChar;
@@ -482,7 +515,7 @@ namespace KLineEdCmdApp.Model
             var rc = 0;
             foreach (var line in TextLines)
             {
-                rc += GetWordsInLine(line);
+                rc += GetWordCountInLine(line);
             }
             WordCount = rc;
             return rc;
@@ -497,7 +530,7 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
-        public static int GetWordsInLine(string line)
+        public static int GetWordCountInLine(string line)
         {
             var rc = 0;
             if (string.IsNullOrEmpty(line) == false)
@@ -521,6 +554,46 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
+
+        public static int GetWordIndexInLine(string line, int wordNo =1, bool startIndex=true)
+        {
+            var rc = Program.PosIntegerNotSet;
+            if ((string.IsNullOrEmpty(line) == false) && (wordNo > 0))
+            {
+                var charIndex = 0;
+                var wordIndex = wordNo - 1;
+                int wordCount = 0;
+                bool wordItem = false;
+
+                foreach (char c in line)
+                {
+                    if (char.IsWhiteSpace(c))
+                        wordItem = false;
+                    else
+                    {
+                        if (wordItem == false)
+                            wordCount++;
+                        wordItem = true;
+                    }
+                    if (wordCount == wordIndex)
+                    {
+                        if (startIndex)
+                        {
+                            rc = charIndex;
+                            break;
+                        }
+                        if (wordItem == false)
+                        {
+                            rc = charIndex-1;
+                            break;
+                        }
+                    }
+                    charIndex++;
+                }
+            }
+            return rc;
+        }
+
         private int AddLine(string line)
         {
             var rc = Program.PosIntegerNotSet;
@@ -530,7 +603,7 @@ namespace KLineEdCmdApp.Model
                 if ((lineCount != Program.PosIntegerNotSet) && (lineCount < Body.MaxTextLines))
                 {
                     TextLines.Add(line); //add line to end of list
-                    rc = GetWordsInLine(line);
+                    rc = GetWordCountInLine(line);
                 }
             }
             return rc;

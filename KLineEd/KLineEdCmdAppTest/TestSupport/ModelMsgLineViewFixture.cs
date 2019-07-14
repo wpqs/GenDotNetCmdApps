@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using KLineEdCmdApp.View;
+﻿using KLineEdCmdApp.View;
 using KLineEdCmdAppTest.TestSupport.Base;
 
 namespace KLineEdCmdAppTest.TestSupport
@@ -9,6 +6,7 @@ namespace KLineEdCmdAppTest.TestSupport
     public class ModelMsgLineViewFixture : ModelViewBaseFixture
     {
         public MsgLineView View { get; }
+        // ReSharper disable once RedundantBaseConstructorCall
         public ModelMsgLineViewFixture() : base()
         {
             if (Error == TestConst.UnitTestNone)

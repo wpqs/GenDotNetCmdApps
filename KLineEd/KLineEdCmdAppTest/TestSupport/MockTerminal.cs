@@ -1,17 +1,24 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Utils;
 
 namespace KLineEdCmdAppTest.TestSupport
 {
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class MockTerminal : ITerminal
     {
-        private int _cursorLine;
-        private int _cursorColumn;
+        public int CursorLine { get; private set; }
+        public int CursorColumn { get; private set; }
+
+        public ConsoleColor ForeGndColour { get; private set; }
+        public ConsoleColor BackGndColour { get; private set; }
 
         public MockTerminal()
         {
-            _cursorLine = 0;
-            _cursorColumn = 0;
+            CursorLine = 0;
+            CursorColumn = 0;
+            ForeGndColour = ConsoleColor.Gray;
+            BackGndColour = ConsoleColor.Black;
             ErrorMsg = null;
         }
 
@@ -35,22 +42,31 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public bool SetCursorPosition(int line, int column)
         {
-            _cursorColumn = column;
-            _cursorLine = line;
+            CursorColumn = column;
+            CursorLine = line;
             return true;
         }
 
         public int GetCursorColumn()
         {
-            return _cursorColumn;
+            return CursorColumn;
         }
 
         public int GetCursorLine()
         {
-            return _cursorLine;
+            return CursorLine;
         }
+
+        public bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour)
+        {
+            ForeGndColour = msgLineErrorForeGndColour;
+            BackGndColour = msgLineErrorBackGndColour;
+            return true;
+        }
+
         public string WriteLine(string line, params object[] args)
         {
+            // ReSharper disable once RedundantAssignment
             string rc = null;
 
             rc = string.Format(line, args);
@@ -60,6 +76,7 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public string Write(string msg, params object[] args)
         {
+            // ReSharper disable once RedundantAssignment
             string rc = null;
 
             rc = string.Format(msg, args);

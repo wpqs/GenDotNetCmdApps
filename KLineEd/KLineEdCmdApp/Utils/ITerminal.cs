@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
 
 namespace KLineEdCmdApp.Utils
 {
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public interface ITerminal
     {
         bool IsError();
@@ -21,5 +23,6 @@ namespace KLineEdCmdApp.Utils
         ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);
         ConsoleKeyInfo ReadKey();
 
+        bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour);
     }
 }

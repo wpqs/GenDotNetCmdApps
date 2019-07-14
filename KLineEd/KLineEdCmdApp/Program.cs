@@ -149,7 +149,7 @@ namespace KLineEdCmdApp
                             rc += rcRun;
 
                             if (terminal.Setup(originalSettings) == false)
-                                rc.SetError(1010203, MxError.Source.Data, $"Error: Terminal settings not restored. {terminal?.ErrorMsg ?? Program.ValueNotSet }. Please report this error.", "MxErrInvalidCondition");
+                                rc.SetError(1010203, MxError.Source.Data, $"Error: Terminal settings not restored. {terminal.ErrorMsg ?? Program.ValueNotSet }. Please report this error.", "MxErrInvalidCondition");
                         }
                     }
                 }

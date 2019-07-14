@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using KLineEdCmdAppTest.TestSupport;
-using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+﻿using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests
@@ -25,7 +20,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.View.Ready);
 
             _fixture.Model.SetMsgLine("test msg");
-            Assert.Equal("test msg", _fixture.View.LastTerminalOutput);
+            Assert.Equal("Info: test msg", _fixture.View.LastTerminalOutput);
         }
     }
 }

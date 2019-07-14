@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using KLineEdCmdApp.View;
+﻿using KLineEdCmdApp.View;
 using KLineEdCmdAppTest.TestSupport.Base;
 
 namespace KLineEdCmdAppTest.TestSupport
@@ -10,6 +7,7 @@ namespace KLineEdCmdAppTest.TestSupport
     {
         public CmdsHelpView View { get; }
 
+        // ReSharper disable once RedundantBaseConstructorCall
         public ModelCmdsHelpViewFixture() : base()
         {
             if (Error == TestConst.UnitTestNone)

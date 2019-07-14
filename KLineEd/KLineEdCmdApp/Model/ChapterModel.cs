@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
+using KLineEdCmdApp.Controller;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
 using MxDotNetUtilsLib;
@@ -34,6 +35,7 @@ namespace KLineEdCmdApp.Model
         public Header Header { get; } 
         public Body Body { get; }
 
+        public KLineEditor.CmdMode Mode { private set; get; }
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }
         public string CmdsHelpLine { private set; get; }
@@ -47,6 +49,12 @@ namespace KLineEdCmdApp.Model
             MsgLine = "";
             CmdsHelpLine = "";
             Ready = false;
+        }
+
+        public void SetMode(KLineEditor.CmdMode mode)
+        {
+            Mode = mode;
+            UpdateAllViews((int)ChangeHint.All);
         }
 
         public void SetStatusLine()     //called from Time Thread so readonly model items

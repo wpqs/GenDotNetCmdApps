@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.Model;
-using KLineEdCmdApp.View;
 
 
 namespace KLineEdCmdAppTest.TestSupport.Base 
@@ -23,8 +20,8 @@ namespace KLineEdCmdAppTest.TestSupport.Base
 
             Error = TestConst.UnitTestNotSet;
 
-            //if (File.Exists(TestConst.UnitTestSharedTestsPathFileName))
-            //    File.Delete(TestConst.UnitTestSharedTestsPathFileName);
+            if (File.Exists(TestConst.UnitTestSharedTestsPathFileName))
+                File.Delete(TestConst.UnitTestSharedTestsPathFileName);
 
             Model = new ChapterModel();
             var rcModel = Model.Initialise(65, TestConst.UnitTestSharedTestsPathFileName);

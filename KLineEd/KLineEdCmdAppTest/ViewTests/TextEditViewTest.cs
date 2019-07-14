@@ -24,11 +24,11 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
 
-            var terminal = new TextEditView(new MockTerminal());
-            Assert.True(terminal.Setup(cmdLineParams).GetResult());
+            var view = new TextEditView(new MockTerminal());
+            Assert.True(view.Setup(cmdLineParams).GetResult());
 
-            Assert.Equal(25, terminal.WindowHeight);
-            Assert.Equal(93, terminal.WindowWidth);
+            Assert.Equal(25, view.WindowHeight);
+            Assert.Equal(93, view.WindowWidth);
         }
     }
 }
