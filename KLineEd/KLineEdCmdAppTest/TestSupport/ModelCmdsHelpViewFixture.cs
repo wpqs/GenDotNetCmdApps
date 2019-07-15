@@ -5,7 +5,7 @@ namespace KLineEdCmdAppTest.TestSupport
 {
     public class ModelCmdsHelpViewFixture : ModelViewBaseFixture
     {
-        public CmdsHelpView View { get; }
+        public ModeHelpView View { get; }
 
         // ReSharper disable once RedundantBaseConstructorCall
         public ModelCmdsHelpViewFixture() : base()
@@ -13,7 +13,7 @@ namespace KLineEdCmdAppTest.TestSupport
             if (Error == TestConst.UnitTestNone)
             {
                 Error = TestConst.UnitTestNotSet;
-                View = new CmdsHelpView(new MockTerminal());
+                View = new ModeHelpView(new MockTerminal());
                 var rcTerm = View.Setup(AppCmdLineParams);
                 if (rcTerm.IsError())
                     Error = rcTerm.GetErrorTechMsg();

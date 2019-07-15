@@ -1,6 +1,6 @@
 ﻿namespace KLineEdCmdApp.View
 {
-    class DetailsEditView
+    class PropsEditView
     {
     }
 }

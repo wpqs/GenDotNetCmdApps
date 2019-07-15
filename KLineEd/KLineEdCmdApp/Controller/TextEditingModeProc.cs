@@ -6,13 +6,13 @@ namespace KLineEdCmdApp.Controller
 {
     public class TextEditingModeProc : ModeProc
     {
-        public override KLineEditor.CmdMode ProcessKey(ConsoleKey key, ChapterModel model)
+        public override KLineEditor.OpMode ProcessKey(ConsoleKey key, ChapterModel model)
         {
-            var rc = KLineEditor.CmdMode.Error;
-            if (base.ProcessKey(key, model) != KLineEditor.CmdMode.Error)
+            var rc = KLineEditor.OpMode.Error;
+            if (base.ProcessKey(key, model) != KLineEditor.OpMode.Error)
             {
                 //do stuff related to TextEditing, updating the model as needed
-                rc = KLineEditor.CmdMode.TextEditing;
+                rc = KLineEditor.OpMode.TextEditing;
             }
             return rc;
         }

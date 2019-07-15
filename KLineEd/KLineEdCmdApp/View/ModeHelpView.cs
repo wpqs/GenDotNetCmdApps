@@ -11,12 +11,12 @@ namespace KLineEdCmdApp.View
 {
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public class CmdsHelpView : KLineEdBaseView
+    public class ModeHelpView : KLineEdBaseView
     {
         public ConsoleColor CmdsHelpForeGndColour { private set; get; }
         public ConsoleColor CmdsHelpBackGndColour { private set; get; }
 
-        public CmdsHelpView(ITerminal terminal) : base(terminal)
+        public ModeHelpView(ITerminal terminal) : base(terminal)
         {
             CmdsHelpForeGndColour = ConsoleColor.Gray;
             CmdsHelpBackGndColour = ConsoleColor.Black;
@@ -24,7 +24,7 @@ namespace KLineEdCmdApp.View
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
         {
-            var rc = new MxReturnCode<bool>("CmdHelpView.Setup");
+            var rc = new MxReturnCode<bool>("ModeHelpView.Setup");
 
             if (param == null)
                 rc.SetError(1120101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
@@ -56,18 +56,18 @@ namespace KLineEdCmdApp.View
 
         public MxReturnCode<bool> ClearLine()
         {
-            var rc = new MxReturnCode<bool>("CmdHelpView.ClearLine");
+            var rc = new MxReturnCode<bool>("ModeHelpView.ClearLine");
 
-            if (Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRowIndex, 0) == false)
-                rc.SetError(1120201, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+            if (Terminal.SetCursorPosition(KLineEditor.ModeHelpLineRowIndex, 0) == false)
+                rc.SetError(1120201, MxError.Source.Program, $"ModeHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
             else
             {
                 if (Terminal.Write(BlankLine) == null)
-                    rc.SetError(1120203, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    rc.SetError(1120203, MxError.Source.Program, $"ModeHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                 else
                 {
-                    if (Terminal.SetCursorPosition(KLineEditor.CmdsHelpLineRowIndex, KLineEditor.CmdsHelpLineLeftCol) == false)
-                        rc.SetError(1120204, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    if (Terminal.SetCursorPosition(KLineEditor.ModeHelpLineRowIndex, KLineEditor.ModeHelpLineLeftCol) == false)
+                        rc.SetError(1120204, MxError.Source.Program, $"ModeHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                     else
                     {
                         rc.SetResult(true);
@@ -97,7 +97,7 @@ namespace KLineEdCmdApp.View
                         else
                         {
                             var cmds = model.CmdsHelpLine ?? Program.ValueNotSet;
-                            if((LastTerminalOutput = Terminal.Write(GetTextForLine(cmds, WindowWidth - KLineEditor.CmdsHelpLineLeftCol))) == null)
+                            if((LastTerminalOutput = Terminal.Write(GetTextForLine(cmds, WindowWidth - KLineEditor.ModeHelpLineLeftCol))) == null)
                                 DisplayErrorMsg(1120304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                         }
                     }

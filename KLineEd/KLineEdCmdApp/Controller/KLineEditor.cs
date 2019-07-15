@@ -18,13 +18,13 @@ namespace KLineEdCmdApp.Controller
     {
         public static readonly int MaxWindowHeight = Console.LargestWindowHeight;  
         public static readonly int MaxWindowWidth = Console.LargestWindowWidth;
-        public static readonly int MinWindowHeight = 4; //Cmds, Msg, Text, Status
+        public static readonly int MinWindowHeight = 4; //ModeHelp, Msg, Text, Status
         public static readonly int MinWindowWidth = Program.ValueOverflow.Length;
 
-    //display vertical layout: CmdHelp, Msg, - note: any change to CmdsHelpLineCount, MsgLineCount, Status LineCount needs changes to their view.setup()
-        public static readonly int CmdsHelpLineRowIndex = 0;
-        public static readonly int CmdsHelpLineRowCount = 1;   //height = mdsHelpLineRow + CmdsHelpLineCount + MsgLineCount + EditAreaMarginTop + param.DisplayLastLinesCnt +  EditAreaMarginBottom + StatusLineCount
-        public static readonly int MsgLineRowIndex = CmdsHelpLineRowIndex + CmdsHelpLineRowCount;
+    //display vertical layout: CmdHelp, Msg, - note: any change to ModeHelpLineCount, MsgLineCount, Status LineCount needs changes to their view.setup()
+        public static readonly int ModeHelpLineRowIndex = 0;
+        public static readonly int ModeHelpLineRowCount = 1;   //height = ModeHelpLineRow + ModeHelpLineCount + MsgLineCount + EditAreaMarginTop + param.DisplayLastLinesCnt +  EditAreaMarginBottom + StatusLineCount
+        public static readonly int MsgLineRowIndex = ModeHelpLineRowIndex + ModeHelpLineRowCount;
         public static readonly int MsgLineRowCount = 1;
         public static readonly int EditAreaMarginTopRowIndex = MsgLineRowIndex + MsgLineRowCount;
         public static readonly int EditAreaMarginTopRowCount = 2;
@@ -38,19 +38,19 @@ namespace KLineEdCmdApp.Controller
         public static readonly int EditAreaMarginLeft = 5;
         //param.DisplayLineWidth
         public static readonly int EditAreaMarginRight = 20;  //width = EditAreaMarginLeft + param.DisplayLineWidth + EditAreaMarginRight
-        //CmdHelpLine, MsgLine, StatusLine
-        public static readonly int CmdsHelpLineLeftCol = 1;   //width -= CmdsHelpLineLeftCol;
+        //ModeHelpLine, MsgLine, StatusLine
+        public static readonly int ModeHelpLineLeftCol = 1;   //width -= ModeHelpLineLeftCol;
         public static readonly int MsgLineLeftCol = 3;        //width -= MsgLineLeftCol;      
         public static readonly int StatusLineLeftCol = 1;     //width -= StatusLineLeftCol;   
 
 
         public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................{Environment.NewLine}";
 
-        public enum CmdMode
+        public enum OpMode
         {
-            [EnumMember(Value = "TextEditing")] TextEditing = 0,        //AppendChar()
-            [EnumMember(Value = "DetailsEditing")] DetailsEditing = 1,  //AppendLine()
-            [EnumMember(Value = "SpellingCheck")] SpellCheck = 2,       //AppendWord()
+            [EnumMember(Value = "TextEditing")] TextEditing = 0,        
+            [EnumMember(Value = "PropertiesEditing")] PropertiesEditing = 1, 
+            [EnumMember(Value = "SpellChecking")] SpellChecking = 2,       
             [EnumMember(Value = "Error")] Error = 3,                    //error state
             [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
         }
@@ -83,18 +83,18 @@ namespace KLineEdCmdApp.Controller
             }
         }
 
-        public ModeProc SetMode(CmdMode mode)
+        public ModeProc SetMode(OpMode opMode)
         {
             ModeProc rc = null;
 
             if (Chapter != null)
             {
-                if (mode == CmdMode.TextEditing)
+                if (opMode == OpMode.TextEditing)
                 {
-                    Chapter.SetCmdLine(GetCmdHelpLine(mode), false);
+                    Chapter.SetModeHelpLine(GetModeHelpLine(opMode), false);
                     Chapter.SetMsgLine("hello Will...", false);
                     Chapter.SetStatusLine(false);
-                    Chapter.SetMode(mode);
+                    Chapter.SetMode(opMode);
 
                     rc = TextEditProc;
                 }
@@ -103,11 +103,11 @@ namespace KLineEdCmdApp.Controller
         }
 
 
-        private string GetCmdHelpLine(CmdMode mode)
+        private string GetModeHelpLine(OpMode opMode)
         {
             // ReSharper disable once RedundantAssignment
             var rc = "";
-            if (mode == CmdMode.TextEditing)
+            if (opMode == OpMode.TextEditing)
                 rc = $"Text Editing: Esc=Refresh F1=Help  Ctrl+Q=Quit";
             else
                 rc = $"Unsupported: Esc=Refresh F1=Help Ctrl+Q=Quit";
@@ -128,7 +128,7 @@ namespace KLineEdCmdApp.Controller
                 rc += rcCtrl;
                 if (rcCtrl.IsSuccess(true))
                 {
-                    var cmdsHelpView = new CmdsHelpView(terminal);
+                    var cmdsHelpView = new ModeHelpView(terminal);
                     var msgLineView = new MsgLineView(terminal);
                     var statusLineView = new StatusLineView(terminal);
                     var textEditView = new TextEditView(terminal);
@@ -169,7 +169,7 @@ namespace KLineEdCmdApp.Controller
             return rc;
         }
 
-        private static MxReturnCode<bool> SetupViews(CmdLineParamsApp cmdLineParams, CmdsHelpView cmdsHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView)
+        private static MxReturnCode<bool> SetupViews(CmdLineParamsApp cmdLineParams, ModeHelpView cmdsHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView)
         {
             var rc = new MxReturnCode<bool>("Program.SetupKlineEdVViews");
 
@@ -214,7 +214,7 @@ namespace KLineEdCmdApp.Controller
                 {
                     LineWidth = param.DisplayLineWidth;
                     Width = EditAreaMarginLeft + LineWidth + EditAreaMarginRight;
-                    Height = CmdsHelpLineRowCount + EditAreaMarginTopRowCount + param.DisplayLastLinesCnt + EditAreaMarginBottomRowCount + StatusLineRowCount;
+                    Height = ModeHelpLineRowCount + EditAreaMarginTopRowCount + param.DisplayLastLinesCnt + EditAreaMarginBottomRowCount + StatusLineRowCount;
 
                     var settings = new TerminalProperties
                     {
@@ -278,8 +278,8 @@ namespace KLineEdCmdApp.Controller
                     //  setup VDU commands, footer
                     //  display previous lines
 
-                    var cmdModeChange = CmdMode.Unknown;
-                    var cmdMode = CmdMode.TextEditing;
+                    var cmdModeChange = OpMode.Unknown;
+                    var cmdMode = OpMode.TextEditing;
                     while (true)
                     {
                         ModeProc mode = null;

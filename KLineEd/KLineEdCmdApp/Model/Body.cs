@@ -24,9 +24,6 @@ namespace KLineEdCmdApp.Model
         public static readonly char DisallowedCharClosingAngle = '>';
         public static readonly int  DefaultTabSpaceCount = 3;
 
-        public const string WordMissing = "[???]";
-        public const string WordNotSet = "[?]";
-
         public const int LastLine = -1;         //used to provide parameter default values so cannot be readonly
         public const int LastColumn = -1;
         public const char NullChar = (char)0;
@@ -39,8 +36,6 @@ namespace KLineEdCmdApp.Model
         {
             TextLines = new List<string>();
             WordCount = 0;
-            LastDisplayRowIndex = 0;
-            LastDisplayColumnIndex = 0;
             LineWidth = Program.PosIntegerNotSet;
             SetTabSpaces(DefaultTabSpaceCount);
             Error = true;
@@ -48,10 +43,8 @@ namespace KLineEdCmdApp.Model
 
         public List<string> TextLines { private set; get; }
         public int WordCount { private set; get; }
-        public int LastDisplayColumnIndex { private set; get; }
-        public int LastDisplayRowIndex { private set; get; }
         public int LineWidth { private set; get; }
-        private string TabSpaces { set; get; }
+        public string TabSpaces { private set; get; }
         private bool Error { set; get; }
 
         public bool IsError(){ return Error; }
@@ -65,8 +58,6 @@ namespace KLineEdCmdApp.Model
             else
             {
                 LineWidth = lineWidth;
-                LastDisplayRowIndex = 0;
-                LastDisplayColumnIndex = 0;
                 SetTabSpaces(3);    //TabSpaceCount
                 Error = false;
                 rc.SetResult(true);
@@ -172,8 +163,8 @@ namespace KLineEdCmdApp.Model
                         rc.SetError(1100403, MxError.Source.User, $"text.Length={lineLen} > LineWidth={LineWidth}", "MxErrLineTooLong");
                     else
                     {
-                        if (Body.GetErrorsForEnteredString(line) != null)
-                            rc.SetError(1100404, MxError.Source.User, Body.GetErrorsForEnteredString(line));
+                        if (Body.GetErrorsInEnteredText(line) != null)
+                            rc.SetError(1100404, MxError.Source.User, Body.GetErrorsInEnteredText(line));
                         else
                         {
                             var wordsInLine = AddLine(line);
@@ -208,8 +199,8 @@ namespace KLineEdCmdApp.Model
                         rc.SetError(110503, MxError.Source.User, $"word.Length={lineLen} > LineWidth={LineWidth}", "MxErrLineTooLong");
                     else
                     {
-                        if (Body.GetErrorsForEnteredString(word, "word") != null)
-                            rc.SetError(1100504, MxError.Source.User, Body.GetErrorsForEnteredString(word));
+                        if (Body.GetErrorsInEnteredText(word, "word") != null)
+                            rc.SetError(1100504, MxError.Source.User, Body.GetErrorsInEnteredText(word));
                         else
                         {
                             if ((TextLines.Count == 0) || (TextLines[TextLines.Count - 1].Length + word.Length > LineWidth))
@@ -244,8 +235,8 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("Body.AppendChar");
 
-            if (Body.GetErrorsForEnteredCharacter(c) != null)
-                rc.SetError(1100601, MxError.Source.User, Body.GetErrorsForEnteredCharacter(c));
+            if (Body.GetErrorsInEnteredCharacter(c) != null)
+                rc.SetError(1100601, MxError.Source.User, Body.GetErrorsInEnteredCharacter(c));
             else
             {
                 var lineIndex = TextLines.Count - 1;
@@ -254,7 +245,7 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100602, MxError.Source.Program, $"appendChar={appendChar} for c={c} length <= 0", "MxErrInvalidCondition");
                 else
                 {
-                    var lastChar = GetCharInLine();                     //get last character in last line
+                    var lastChar = GetCharacterInLine();                     //get last character in last line
                     if ((lastChar == Body.NullChar) || (lineIndex < 0))
                     {                                                   
                         if (AddFirstCharToChapter(appendChar) == false)
@@ -306,7 +297,7 @@ namespace KLineEdCmdApp.Model
             {
                 var breakIndex = GetLineBreakIndex(lineIndex, appendChar.Length);
                 if (breakIndex == Program.PosIntegerNotSet)
-                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharactersInLine()} when LineWidth={LineWidth}", "MxErrLineTooLong");
+                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharacterCountInLine()} when LineWidth={LineWidth}", "MxErrLineTooLong");
                 else
                 {
                     var newLine = SplitLine(lineIndex, breakIndex);
@@ -338,22 +329,16 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100802, MxError.Source.Program, "IsError() == true, Initialise not called?", "MxErrInvalidCondition");
                 else
                 {
-                    LastDisplayColumnIndex = 0;
-                    LastDisplayRowIndex = 0;
                     var lastLines = new string[count];
-                    var buffcnt = count - 1;
-                    var filelinecnt = TextLines.Count;
+                    var buffCount = count - 1;
+                    var fileLineCount = TextLines.Count;
                     // ReSharper disable once UnusedVariable
                     foreach (var line in lastLines)
                     {
-                        if (filelinecnt > 0)
-                        {
-                            lastLines[buffcnt--] = TextLines[(filelinecnt--) - 1];
-                            LastDisplayColumnIndex = lastLines[buffcnt + 1]?.Length ?? Program.PosIntegerNotSet;
-                            LastDisplayRowIndex++;
-                        }
+                        if (fileLineCount > 0)
+                            lastLines[buffCount--] = TextLines[(fileLineCount--) - 1];
                         else
-                            lastLines[buffcnt--] = null;
+                            lastLines[buffCount--] = null;
                     }
                     rc.SetResult(lastLines);
                 }
@@ -361,7 +346,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public static string GetErrorsForEnteredString(string text, string textType="line")
+        public static string GetErrorsInEnteredText(string text, string textType="line")
         {
             string rc = null;
 
@@ -396,7 +381,7 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
-        public static string GetErrorsForEnteredCharacter(char c)
+        public static string GetErrorsInEnteredCharacter(char c)
         {
             string rc = null;
 
@@ -430,9 +415,12 @@ namespace KLineEdCmdApp.Model
         }
         public int SetTabSpaces(int count)
         {
-            TabSpaces = "";
-            for (int x = 0; x < count; x++)
-                TabSpaces += " ";
+            if (count > 0)
+            {
+                TabSpaces = "";
+                for (int x = 0; x < count; x++)
+                    TabSpaces += " ";
+            }
             return TabSpaces.Length;   
         }
         public int GetLineBreakIndex(int lineIndex, int spaceNeeded)
@@ -475,25 +463,37 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
+
+        public int RefreshWordCount()
+        {
+            var rc = 0;
+            foreach (var line in TextLines)
+            {
+                rc += GetWordCountInLine(line);
+            }
+            WordCount = rc;
+            return rc;
+        }
+
         public string GetWordInLine(int lineNo = Body.LastLine, int wordNo = Program.PosIntegerNotSet)
         {
-            var rc = Body.WordNotSet;
+            string rc = null;
 
             var lineIndex = (lineNo != Body.LastLine) ? lineNo - 1 : TextLines.Count - 1;
             if ((lineIndex >= 0) && (lineIndex < TextLines.Count))
             {
                 var line = TextLines[lineIndex];
                 var lineWordCount = GetWordCountInLine(line);
-                var wordIndex = (wordNo == Program.PosIntegerNotSet) ? lineWordCount : wordNo;
-                if ((wordIndex >= 0) && (wordIndex < lineWordCount))
+                wordNo = (wordNo == Program.PosIntegerNotSet) ? lineWordCount : wordNo;
+                if ((wordNo > 0) && (wordNo <= lineWordCount))
                 {
-                    rc = line.Snip(GetWordIndexInLine(line, wordIndex), GetWordIndexInLine(line, wordIndex, false)) ?? Body.WordMissing;
+                    rc = line.Snip(GetIndexOfWord(line, wordNo), GetIndexOfWord(line, wordNo, false)) ?? null;
                 }
             }
             return rc;
         }
 
-        public char GetCharInLine(int lineNo = Body.LastLine, int columnNo = Body.LastColumn)
+        public char GetCharacterInLine(int lineNo = Body.LastLine, int columnNo = Body.LastColumn)
         {
             var rc = Body.NullChar;
 
@@ -510,23 +510,18 @@ namespace KLineEdCmdApp.Model
         {
             return TextLines?.Count ?? Program.PosIntegerNotSet;
         }
-        public int RefreshWordCount()
-        {
-            var rc = 0;
-            foreach (var line in TextLines)
-            {
-                rc += GetWordCountInLine(line);
-            }
-            WordCount = rc;
-            return rc;
-        }
-        public int GetCharactersInLine(int lineNo = Program.PosIntegerNotSet)
+
+        public int GetCharacterCountInLine(int lineNo = Program.PosIntegerNotSet) //default to LastLine
         {
             var rc = Program.PosIntegerNotSet;
 
-            if ((lineNo != -1) && (lineNo <= TextLines.Count))
+            if (TextLines != null)
             {
-                rc = TextLines[lineNo]?.Length ?? Program.PosIntegerNotSet;
+                var lineIndex = (lineNo == Program.PosIntegerNotSet) ? (TextLines?.Count - 1 ?? Program.PosIntegerNotSet) : lineNo - 1;
+                if ((lineIndex >= 0) && (lineIndex < (TextLines?.Count ?? Program.PosIntegerNotSet)))
+                {
+                    rc = TextLines?[lineIndex]?.Length ?? Program.PosIntegerNotSet;
+                }
             }
             return rc;
         }
@@ -555,17 +550,16 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public static int GetWordIndexInLine(string line, int wordNo =1, bool startIndex=true)
+        public static int GetIndexOfWord(string text, int wordNo =1, bool startIndex=true)
         {
             var rc = Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(line) == false) && (wordNo > 0))
+            if ((string.IsNullOrEmpty(text) == false) && (wordNo > 0))
             {
                 var charIndex = 0;
-                var wordIndex = wordNo - 1;
                 int wordCount = 0;
                 bool wordItem = false;
 
-                foreach (char c in line)
+                foreach (char c in text)
                 {
                     if (char.IsWhiteSpace(c))
                         wordItem = false;
@@ -575,7 +569,7 @@ namespace KLineEdCmdApp.Model
                             wordCount++;
                         wordItem = true;
                     }
-                    if (wordCount == wordIndex)
+                    if (wordCount == wordNo)
                     {
                         if (startIndex)
                         {
@@ -590,6 +584,10 @@ namespace KLineEdCmdApp.Model
                     }
                     charIndex++;
                 }
+
+                if ((rc == Program.PosIntegerNotSet) && (wordCount == wordNo) && (startIndex == false))
+                    rc = text.Length - 1;
+
             }
             return rc;
         }
@@ -622,7 +620,7 @@ namespace KLineEdCmdApp.Model
                 }
                 else
                 {
-                    var lastChar = GetCharInLine();
+                    var lastChar = GetCharacterInLine();
                     if (lastChar == 0)
                         TextLines[TextLines.Count - 1] = word; //add first word in last (current) line
                     else

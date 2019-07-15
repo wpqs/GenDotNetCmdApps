@@ -1,6 +1,7 @@
 ﻿using System;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.Model;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Xunit;
 // ReSharper disable All
 
@@ -9,6 +10,42 @@ namespace KLineEdCmdAppTest.ModelTests
 {
     public class BodyTest
     {
+
+        [Fact]
+        public void IsEnteredCharacterValidTest()
+        {
+            Assert.True(Body.IsEnteredCharacterValid('a'));
+            Assert.True(Body.IsEnteredCharacterValid('z'));
+            Assert.True(Body.IsEnteredCharacterValid('A'));
+            Assert.True(Body.IsEnteredCharacterValid('Z'));
+            Assert.True(Body.IsEnteredCharacterValid('0'));
+            Assert.True(Body.IsEnteredCharacterValid('9'));
+            Assert.True(Body.IsEnteredCharacterValid(' '));
+            Assert.True(Body.IsEnteredCharacterValid('\t'));
+            Assert.True(Body.IsEnteredCharacterValid('*'));
+
+            Assert.False(Body.IsEnteredCharacterValid('\0'));
+        }
+
+        [Fact]
+        public void SetTabSpacesTest()
+        {
+            var body = new Body();
+
+            Assert.Equal(3, body.SetTabSpaces(3));
+            Assert.Equal("   ", body.TabSpaces);
+
+            Assert.Equal(3, body.SetTabSpaces(0));
+            Assert.Equal("   ", body.TabSpaces);
+
+            Assert.Equal(3, body.SetTabSpaces(-1));
+            Assert.Equal("   ", body.TabSpaces);
+
+            Assert.Equal(5, body.SetTabSpaces(5));
+            Assert.Equal("     ", body.TabSpaces);
+
+        }
+
         [Fact]
         public void GetLineCountTest()
         {
@@ -60,8 +97,57 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.RefreshWordCount());
             Assert.Equal(0, body.WordCount);
             Assert.Equal(0, body.GetLineCount());
+        }
+
+        [Fact]
+        public void GetIndexOfWordTest()
+        {
+            var text = "0123 5678 ABCDE";
+
+            Assert.Equal(0, Body.GetIndexOfWord(text));
+            Assert.Equal(3, Body.GetIndexOfWord(text, 1, false));
+            Assert.Equal(5, Body.GetIndexOfWord(text, 2));
+            Assert.Equal(8, Body.GetIndexOfWord(text, 2, false));
+            Assert.Equal(10, Body.GetIndexOfWord(text, 3));
+            Assert.Equal(14, Body.GetIndexOfWord(text, 3, false));
+
+            Assert.Equal(-1, Body.GetIndexOfWord(text, 0));
+            Assert.Equal(-1, Body.GetIndexOfWord(text, 0, false));
+
+            Assert.Equal(-1, Body.GetIndexOfWord(text, 4));
+            Assert.Equal(-1, Body.GetIndexOfWord(text, 4, false));
+
+            Assert.Equal(-1, Body.GetIndexOfWord(text, -1));
+            Assert.Equal(-1, Body.GetIndexOfWord(text, -1, false));
+
+        }
+
+        [Fact]
+        public void GetWordInLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(65).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.AppendLine("one two three four").GetResult());
+            Assert.Equal(4, body.RefreshWordCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(18, body.GetCharacterCountInLine());
+            Assert.Equal("one two three four", body.GetLastLinesForDisplay(1).GetResult()[0]);
+
+            Assert.Equal("one", body.GetWordInLine(Body.LastLine, 1));
+            Assert.Equal("two", body.GetWordInLine(Body.LastLine, 2));
+            Assert.Equal("three", body.GetWordInLine(Body.LastLine, 3));
+            Assert.Equal("four", body.GetWordInLine(Body.LastLine, 4));
+            Assert.Equal("four", body.GetWordInLine(Body.LastLine, -1));
+            Assert.Equal("four", body.GetWordInLine(Body.LastLine));
 
 
+            Assert.Null(body.GetWordInLine(Body.LastLine, 5));
+            Assert.Null(body.GetWordInLine(Body.LastLine, 0));
+            Assert.Null(body.GetWordInLine(Body.LastLine, -2));
         }
 
         [Fact]
@@ -74,7 +160,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.True(body.AppendLine("one").GetResult());
             Assert.Equal(1, body.RefreshWordCount());
+            Assert.Equal(1, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.GetCharacterCountInLine());
             Assert.Equal("one", body.GetLastLinesForDisplay(1).GetResult()[0]);
         }
         [Fact]
@@ -771,36 +859,36 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetEnteredTextErrorsTest()
         {
-            Assert.Null(Body.GetErrorsForEnteredString(""));
-            Assert.Null(Body.GetErrorsForEnteredString("this text is fine"));
-            Assert.StartsWith("Error: Unexpected line; it is null. This is a program error. Please save your work and restart the program.", Body.GetErrorsForEnteredString(null));
-            Assert.StartsWith("Error: invalid line. It contains a new line at column 7", Body.GetErrorsForEnteredString($"hello {Environment.NewLine}"));
-            Assert.StartsWith("Error: invalid line. It contains the disallowed character '<' at column 8", Body.GetErrorsForEnteredString($"hello .<hi"));
-            Assert.StartsWith("Error: invalid line. It contains the disallowed character '>' at column 9", Body.GetErrorsForEnteredString($"hello hi>"));
+            Assert.Null(Body.GetErrorsInEnteredText(""));
+            Assert.Null(Body.GetErrorsInEnteredText("this text is fine"));
+            Assert.StartsWith("Error: Unexpected line; it is null. This is a program error. Please save your work and restart the program.", Body.GetErrorsInEnteredText(null));
+            Assert.StartsWith("Error: invalid line. It contains a new line at column 7", Body.GetErrorsInEnteredText($"hello {Environment.NewLine}"));
+            Assert.StartsWith("Error: invalid line. It contains the disallowed character '<' at column 8", Body.GetErrorsInEnteredText($"hello .<hi"));
+            Assert.StartsWith("Error: invalid line. It contains the disallowed character '>' at column 9", Body.GetErrorsInEnteredText($"hello hi>"));
 
             var line = "0123456789112345678921234567893123456789412345678951234567896123456789712345678981234567899123456789";
             line += "0123456789112345678921234567893123456789412345678951234567896123456789712345678981234567899123456789";
             line += "012345678911234567892123456789312345678941234567895";
-            Assert.StartsWith("Error: invalid line. It has 251 characters, but only 250 allowed", Body.GetErrorsForEnteredString(line));
+            Assert.StartsWith("Error: invalid line. It has 251 characters, but only 250 allowed", Body.GetErrorsInEnteredText(line));
 
         }
 
         [Fact]
         public void GetEnteredCharErrorsTest()
         {
-            Assert.Null(Body.GetErrorsForEnteredCharacter('a'));
-            Assert.Null(Body.GetErrorsForEnteredCharacter('9'));
-            Assert.Null(Body.GetErrorsForEnteredCharacter('{'));
-            Assert.Null(Body.GetErrorsForEnteredCharacter('@'));
+            Assert.Null(Body.GetErrorsInEnteredCharacter('a'));
+            Assert.Null(Body.GetErrorsInEnteredCharacter('9'));
+            Assert.Null(Body.GetErrorsInEnteredCharacter('{'));
+            Assert.Null(Body.GetErrorsInEnteredCharacter('@'));
 
-            Assert.Null(Body.GetErrorsForEnteredCharacter(' '));
-            Assert.Null(Body.GetErrorsForEnteredCharacter('\t'));
+            Assert.Null(Body.GetErrorsInEnteredCharacter(' '));
+            Assert.Null(Body.GetErrorsInEnteredCharacter('\t'));
 
-            Assert.StartsWith("Error: disallowed character '<'.", Body.GetErrorsForEnteredCharacter('<'));
-            Assert.StartsWith("Error: disallowed character '>'.", Body.GetErrorsForEnteredCharacter('>'));
+            Assert.StartsWith("Error: disallowed character '<'.", Body.GetErrorsInEnteredCharacter('<'));
+            Assert.StartsWith("Error: disallowed character '>'.", Body.GetErrorsInEnteredCharacter('>'));
 
-            Assert.StartsWith("Error: invalid character; 0x0.", Body.GetErrorsForEnteredCharacter(Body.NullChar));
-            Assert.StartsWith("Error: invalid character; 0xF.", Body.GetErrorsForEnteredCharacter((char)15));
+            Assert.StartsWith("Error: invalid character; 0x0.", Body.GetErrorsInEnteredCharacter(Body.NullChar));
+            Assert.StartsWith("Error: invalid character; 0xF.", Body.GetErrorsInEnteredCharacter((char)15));
        }
 
         [Fact]
@@ -816,9 +904,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.WordCount);
 
-            Assert.Equal('a', body.GetCharInLine(Body.LastLine));
-            Assert.Equal('a', body.GetCharInLine());
-            Assert.Equal(Body.NullChar, body.GetCharInLine(0));
+            Assert.Equal('a', body.GetCharacterInLine(Body.LastLine));
+            Assert.Equal('a', body.GetCharacterInLine());
+            Assert.Equal(Body.NullChar, body.GetCharacterInLine(0));
         }
 
         [Fact]
@@ -831,7 +919,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
 
-            Assert.Equal(Body.NullChar, body.GetCharInLine());
+            Assert.Equal(Body.NullChar, body.GetCharacterInLine());
         }
 
         [Fact]
@@ -846,7 +934,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
 
-            Assert.Equal(Body.NullChar, body.GetCharInLine());
+            Assert.Equal(Body.NullChar, body.GetCharacterInLine());
         }
 
         [Fact]
@@ -863,20 +951,20 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.GetLineCount());
             Assert.Equal(3, body.WordCount);
 
-            Assert.Equal('a', body.GetCharInLine(1));
-            Assert.Equal('a', body.GetCharInLine(1, 7));
-            Assert.Equal('3', body.GetCharInLine(1,3));
-            Assert.Equal('b', body.GetCharInLine(2));
-            Assert.Equal('b', body.GetCharInLine(2, 7));
-            Assert.Equal('4', body.GetCharInLine(2,4));
-            Assert.Equal('c', body.GetCharInLine(3));
-            Assert.Equal('c', body.GetCharInLine(3, 7));
-            Assert.Equal('5', body.GetCharInLine(3,5));
+            Assert.Equal('a', body.GetCharacterInLine(1));
+            Assert.Equal('a', body.GetCharacterInLine(1, 7));
+            Assert.Equal('3', body.GetCharacterInLine(1,3));
+            Assert.Equal('b', body.GetCharacterInLine(2));
+            Assert.Equal('b', body.GetCharacterInLine(2, 7));
+            Assert.Equal('4', body.GetCharacterInLine(2,4));
+            Assert.Equal('c', body.GetCharacterInLine(3));
+            Assert.Equal('c', body.GetCharacterInLine(3, 7));
+            Assert.Equal('5', body.GetCharacterInLine(3,5));
 
-            Assert.Equal(Body.NullChar, body.GetCharInLine(0));
-            Assert.Equal(Body.NullChar, body.GetCharInLine(3, -2));
-            Assert.Equal(Body.NullChar, body.GetCharInLine(3, 8));
-            Assert.Equal(Body.NullChar, body.GetCharInLine(4));
+            Assert.Equal(Body.NullChar, body.GetCharacterInLine(0));
+            Assert.Equal(Body.NullChar, body.GetCharacterInLine(3, -2));
+            Assert.Equal(Body.NullChar, body.GetCharacterInLine(3, 8));
+            Assert.Equal(Body.NullChar, body.GetCharacterInLine(4));
 
         }
 

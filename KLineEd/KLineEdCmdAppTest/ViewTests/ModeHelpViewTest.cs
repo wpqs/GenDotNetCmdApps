@@ -19,7 +19,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.Model.Ready);
             Assert.True(_fixture.View.Ready);
 
-            _fixture.Model.SetCmdLine("test cmd");
+            _fixture.Model.SetModeHelpLine("test cmd");
             Assert.Equal("test cmd", _fixture.View.LastTerminalOutput);
         }
     }

@@ -35,7 +35,7 @@ namespace KLineEdCmdApp.Model
         public Header Header { get; } 
         public Body Body { get; }
 
-        public KLineEditor.CmdMode Mode { private set; get; }
+        public KLineEditor.OpMode OpMode { private set; get; }
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }
         public string CmdsHelpLine { private set; get; }
@@ -48,19 +48,19 @@ namespace KLineEdCmdApp.Model
             StatusLine = "";
             MsgLine = "";
             CmdsHelpLine = "";
-            Mode = KLineEditor.CmdMode.Unknown;
+            OpMode = KLineEditor.OpMode.Unknown;
             Ready = false;
         }
 
-        public void SetMode(KLineEditor.CmdMode mode)
+        public void SetMode(KLineEditor.OpMode opMode)
         {
-            Mode = mode;
+            OpMode = opMode;
             UpdateAllViews((int)ChangeHint.All);
         }
 
         public void SetStatusLine(bool update=true)     //called from Time Thread so readonly model items
         {
-            StatusLine = $"{DateTime.Now.ToString(MxStdFrmt.Time)} Line: {Body?.GetLineCount() ?? Program.PosIntegerNotSet} Column: {Body?.GetCharactersInLine() ?? Program.PosIntegerNotSet} Total words: {Body?.WordCount ?? Program.PosIntegerNotSet}";
+            StatusLine = $"{DateTime.Now.ToString(MxStdFrmt.Time)} Line: {Body?.GetLineCount() ?? Program.PosIntegerNotSet} Column: {Body?.GetCharacterCountInLine()+1 ?? Program.PosIntegerNotSet} Total words: {Body?.WordCount ?? Program.PosIntegerNotSet}";
             if (update)
                 UpdateAllViews((int)ChangeHint.Status);
         }
@@ -71,7 +71,7 @@ namespace KLineEdCmdApp.Model
                 UpdateAllViews((int)ChangeHint.Msg);
         }
 
-        public void SetCmdLine(string cmd, bool update = true)
+        public void SetModeHelpLine(string cmd, bool update = true)
         {
             CmdsHelpLine = cmd;
             if (update)
