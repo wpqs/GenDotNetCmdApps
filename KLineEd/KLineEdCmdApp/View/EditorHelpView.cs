@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using KLineEdCmdApp.Controller;
 using KLineEdCmdApp.Model;
 using MxReturnCode;
 using KLineEdCmdApp.Utils;
@@ -11,12 +10,12 @@ namespace KLineEdCmdApp.View
 {
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
-    public class ModeHelpView : KLineEdBaseView
+    public class EditorHelpView : BaseView
     {
         public ConsoleColor CmdsHelpForeGndColour { private set; get; }
         public ConsoleColor CmdsHelpBackGndColour { private set; get; }
 
-        public ModeHelpView(ITerminal terminal) : base(terminal)
+        public EditorHelpView(ITerminal terminal) : base(terminal)
         {
             CmdsHelpForeGndColour = ConsoleColor.Gray;
             CmdsHelpBackGndColour = ConsoleColor.Black;
@@ -24,7 +23,7 @@ namespace KLineEdCmdApp.View
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
         {
-            var rc = new MxReturnCode<bool>("ModeHelpView.Setup");
+            var rc = new MxReturnCode<bool>("EditorHelpView.Setup");
 
             if (param == null)
                 rc.SetError(1120101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
@@ -56,18 +55,18 @@ namespace KLineEdCmdApp.View
 
         public MxReturnCode<bool> ClearLine()
         {
-            var rc = new MxReturnCode<bool>("ModeHelpView.ClearLine");
+            var rc = new MxReturnCode<bool>("EditorHelpView.ClearLine");
 
             if (Terminal.SetCursorPosition(KLineEditor.ModeHelpLineRowIndex, 0) == false)
-                rc.SetError(1120201, MxError.Source.Program, $"ModeHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                rc.SetError(1120201, MxError.Source.Program, $"EditorHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
             else
             {
                 if (Terminal.Write(BlankLine) == null)
-                    rc.SetError(1120203, MxError.Source.Program, $"ModeHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    rc.SetError(1120203, MxError.Source.Program, $"EditorHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                 else
                 {
                     if (Terminal.SetCursorPosition(KLineEditor.ModeHelpLineRowIndex, KLineEditor.ModeHelpLineLeftCol) == false)
-                        rc.SetError(1120204, MxError.Source.Program, $"ModeHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                        rc.SetError(1120204, MxError.Source.Program, $"EditorHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                     else
                     {
                         rc.SetResult(true);
@@ -80,7 +79,7 @@ namespace KLineEdCmdApp.View
         public override void OnUpdate(NotificationItem notificationItem)
         {
             ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
-            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.Cmd))
+            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.HelpLine))
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)
@@ -96,7 +95,7 @@ namespace KLineEdCmdApp.View
                             DisplayMxErrorMsg(rcClear.GetErrorUserMsg());
                         else
                         {
-                            var cmds = model.CmdsHelpLine ?? Program.ValueNotSet;
+                            var cmds = model.EditorHelpLine ?? Program.ValueNotSet;
                             if((LastTerminalOutput = Terminal.Write(GetTextForLine(cmds, WindowWidth - KLineEditor.ModeHelpLineLeftCol))) == null)
                                 DisplayErrorMsg(1120304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                         }

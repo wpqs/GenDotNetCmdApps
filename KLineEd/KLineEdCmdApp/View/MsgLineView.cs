@@ -5,7 +5,7 @@ using KLineEdCmdApp.View.Base;
 
 namespace KLineEdCmdApp.View
 {
-    public class MsgLineView : KLineEdBaseView
+    public class MsgLineView : BaseView
     {
         public MsgLineView(ITerminal terminal) : base(terminal)
         {
@@ -23,7 +23,7 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    if (DisplayMsg(MsgType.Clear, BlankLine) == false)
+                    if (DisplayMsg(MsgType.Clear, "") == false)
                         rc.SetError(1130102, MxError.Source.Program, $"MsgLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
                     else
                     {
@@ -38,7 +38,7 @@ namespace KLineEdCmdApp.View
         public override void OnUpdate(NotificationItem notificationItem)
         {
             ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
-            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.Msg))
+            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.MsgLine))
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)

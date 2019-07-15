@@ -1,7 +1,7 @@
 ﻿using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
-namespace KLineEdCmdAppTest.ControllerTests
+namespace KLineEdCmdAppTest
 {
     public class KLineEditorTest : IClassFixture<ModelTextEditViewFixture>
     {

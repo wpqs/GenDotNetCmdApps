@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using KLineEdCmdApp.Controller;
 using MxReturnCode;
 
 using KLineEdCmdApp.Model;
@@ -15,7 +14,7 @@ namespace KLineEdCmdApp.View
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
 
-    public class TextEditView : KLineEdBaseView   
+    public class TextEditView : BaseView   
     {
         public ConsoleColor EditAreaForeGndColour { private set; get; }
         public ConsoleColor EditAreaBackGndColour { private set; get; }
@@ -217,7 +216,6 @@ namespace KLineEdCmdApp.View
                         break;
                         default:
                         {
-                            var lastChar = model.Body?.GetCharacterInLine() ?? Body.NullChar;
                             var lastDisplayRowIndex = model.Body?.GetLineCount() - 1 ?? Program.PosIntegerNotSet;
                             var lastDisplayColIndex = model.Body?.GetCharacterCountInLine()-1 ?? Program.PosIntegerNotSet;
 

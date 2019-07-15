@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
+using KLineEdCmdApp.Controller;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
@@ -10,7 +10,7 @@ using KLineEdCmdApp.View;
 using MxReturnCode;
 
 // ReSharper disable once CheckNamespace
-namespace KLineEdCmdApp.Controller
+namespace KLineEdCmdApp
 {
     [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     [SuppressMessage("ReSharper", "IdentifierTypo")]
@@ -46,76 +46,60 @@ namespace KLineEdCmdApp.Controller
 
         public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................{Environment.NewLine}";
 
-        public enum OpMode
-        {
-            [EnumMember(Value = "TextEditing")] TextEditing = 0,        
-            [EnumMember(Value = "PropertiesEditing")] PropertiesEditing = 1, 
-            [EnumMember(Value = "SpellChecking")] SpellChecking = 2,       
-            [EnumMember(Value = "Error")] Error = 3,                    //error state
-            [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
-        }
-
-        private TextEditingModeProc TextEditProc { set; get; }
-
+        private EditingBaseController Controller { set; get; }
         public ITerminal Terminal { set; get; }
+        public ChapterModel Chapter { private set; get; }
 
         public int Width { private set; get; }
         public int Height { private set; get; }
         public int LineWidth { private set; get; }
 
-        public  ChapterModel Chapter { private set; get; }
-
         public bool Ready { private set; get; }
 
         public KLineEditor()
         {
+            Controller = null;
             Terminal = null;
             Chapter = null;
+            Width = Program.PosIntegerNotSet;
+            Height = Program.PosIntegerNotSet;
             LineWidth = Program.PosIntegerNotSet;
-            TextEditProc = new TextEditingModeProc();
+
             Ready = false;
         }
-        public KLineEditor(ITerminal terminal) : this()
-        {
-            if (terminal.IsError() == false)
-            {
-                Terminal = terminal;
-            }
-        }
 
-        public ModeProc SetMode(OpMode opMode)
-        {
-            ModeProc rc = null;
+        //public void SetMode(EditModeController.EditingMode editingMode)
+        //{
+        //    if (Chapter != null)
+        //    {
+        //        switch (editingMode)
+        //        {
+        //            case EditModeController.EditingMode.Text:
+        //            {
+        //                Mode = TextEditProc;
+        //                break;
+        //            }
+        //            case EditModeController.EditingMode.Properties:
+        //            {
+        //                break;
+        //            }
+        //            case EditModeController.EditingMode.Spell:
+        //            {
+        //                break;
+        //            }
+        //            case EditModeController.EditingMode.Error:
+        //            default:
+        //            {
+        //                break;
+        //            }
+        //        }
+        //        Chapter.SetModeHelpLine(Mode?.GetModeHelpLine() ?? Program.ValueNotSet, false);
+        //        Chapter.SetMode(Mode);
+        //    }
+        //}
 
-            if (Chapter != null)
-            {
-                if (opMode == OpMode.TextEditing)
-                {
-                    Chapter.SetModeHelpLine(GetModeHelpLine(opMode), false);
-                    Chapter.SetMsgLine("hello Will...", false);
-                    Chapter.SetStatusLine(false);
-                    Chapter.SetMode(opMode);
 
-                    rc = TextEditProc;
-                }
-            }
-            return rc;
-        }
-
-
-        private string GetModeHelpLine(OpMode opMode)
-        {
-            // ReSharper disable once RedundantAssignment
-            var rc = "";
-            if (opMode == OpMode.TextEditing)
-                rc = $"Text Editing: Esc=Refresh F1=Help  Ctrl+Q=Quit";
-            else
-                rc = $"Unsupported: Esc=Refresh F1=Help Ctrl+Q=Quit";
-
-            return rc;
-        }
-
-        public static MxReturnCode<string> RunEditor(CmdLineParamsApp cmdLineParams, ChapterModel editModel, ITerminal terminal)
+        public MxReturnCode<string> Run(CmdLineParamsApp cmdLineParams, ChapterModel editModel, ITerminal terminal)
         {
             var rc = new MxReturnCode<string>("Program.RunEditor");
 
@@ -123,12 +107,11 @@ namespace KLineEdCmdApp.Controller
                 rc.SetError(1010301, MxError.Source.Param, $"cmdLineParams is null, editModel is null or not read, or terminal is null or error", "MxErrInvalidParamArg");
             else
             {
-                var editController = new KLineEditor(terminal);
-                var rcCtrl = editController.Initialise(cmdLineParams, editModel);
-                rc += rcCtrl;
-                if (rcCtrl.IsSuccess(true))
+                var rcInit = Initialise(cmdLineParams, editModel, terminal);
+                rc += rcInit;
+                if (rcInit.IsSuccess(true))
                 {
-                    var cmdsHelpView = new ModeHelpView(terminal);
+                    var cmdsHelpView = new EditorHelpView(terminal);
                     var msgLineView = new MsgLineView(terminal);
                     var statusLineView = new StatusLineView(terminal);
                     var textEditView = new TextEditView(terminal);
@@ -142,17 +125,17 @@ namespace KLineEdCmdApp.Controller
                         using (editModel.Subscribe(statusLineView))
                         using (editModel.Subscribe(textEditView))           //make the last view to be notified so it sets the cursor back to EditArea
                         {
-                            var rcStart = editController.Start(editModel); //start
+                            var rcStart = Start(editModel); //start
                             rc += rcStart;
                             if (rcStart.IsSuccess(true))
                             {
-                                var rcProcess = editController.Process(); //process
+                                var rcProcess = Process(); //process
                                 rc += rcProcess;
                                 if (rcProcess.IsSuccess(true))
                                 {
-                                    var report = editController.GetReport();
+                                    var report = GetReport();
 
-                                    var rcFinish = editController.Finish(); //finish
+                                    var rcFinish = Finish(); //finish
                                     rc += rcFinish;
                                     if (rcFinish.IsSuccess(true))
                                     {
@@ -169,15 +152,15 @@ namespace KLineEdCmdApp.Controller
             return rc;
         }
 
-        private static MxReturnCode<bool> SetupViews(CmdLineParamsApp cmdLineParams, ModeHelpView cmdsHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView)
+        private static MxReturnCode<bool> SetupViews(CmdLineParamsApp cmdLineParams, EditorHelpView editorHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView)
         {
             var rc = new MxReturnCode<bool>("Program.SetupKlineEdVViews");
 
-            if ((cmdLineParams == null) || (cmdsHelpView == null) || (msgLineView == null) || (statusLineView == null) || (textEditView == null))
+            if ((cmdLineParams == null) || (editorHelpView == null) || (msgLineView == null) || (statusLineView == null) || (textEditView == null))
                 rc.SetError(101401, MxError.Source.Param, $"cmdLineParams is null, or one of the view objects is null", "MxErrInvalidParamArg");
             else
             {
-                var rcCmds = cmdsHelpView.Setup(cmdLineParams);
+                var rcCmds = editorHelpView.Setup(cmdLineParams);
                 rc += rcCmds;
                 if (rcCmds.IsSuccess(true))
                 {
@@ -202,35 +185,44 @@ namespace KLineEdCmdApp.Controller
             return rc;
         }
 
-        private MxReturnCode<bool> Initialise(CmdLineParamsApp param, ChapterModel editModel)
+        private MxReturnCode<bool> Initialise(CmdLineParamsApp param, ChapterModel model, ITerminal terminal)
         {
-            var rc = new MxReturnCode<bool>("KLineEditor.Setup");
+            var rc = new MxReturnCode<bool>("KLineEditor. Initialise");
 
-            if ((param == null) || ((editModel?.Ready ?? false ) == false) )
+            if ((param == null) || ((model?.Ready ?? false ) == false) || (terminal?.IsError() ?? true)) 
                 rc.SetError(1030101, MxError.Source.Param, $"param is null or editModel null, not ready", "MxErrBadMethodParam");
             else
             {
                 try
                 {
+                    terminal.Clear();
+
                     LineWidth = param.DisplayLineWidth;
                     Width = EditAreaMarginLeft + LineWidth + EditAreaMarginRight;
                     Height = ModeHelpLineRowCount + EditAreaMarginTopRowCount + param.DisplayLastLinesCnt + EditAreaMarginBottomRowCount + StatusLineRowCount;
 
                     var settings = new TerminalProperties
                     {
-                        Title = $"{Program.CmdAppName} v{Program.CmdAppVersion} - {param.EditFile ?? "[null]"}: Chapter {editModel.Header?.Chapter?.Title ?? Program.ValueNotSet}",
+                        Title = $"{Program.CmdAppName} v{Program.CmdAppVersion} - {param.EditFile ?? "[null]"}: Chapter {model.Header?.Chapter?.Title ?? Program.ValueNotSet}",
                         BufferHeight = Height,
                         BufferWidth = Width,
                         WindowHeight = Height,
                         WindowWidth = Width
                     };
-                    if ((settings.Validate() == false) || Terminal.Setup(settings) == false)
+                    if ((settings.Validate() == false) || terminal.Setup(settings) == false)
                         rc.SetError(1030102, MxError.Source.User, $"Terminal.Setup() failed; {settings.GetValidationError()} or Terminal.ErrorMSg={Terminal?.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidSettingsFile");
                     else
                     {
-                        Terminal.Clear();
-                        Ready = true;
-                        rc.SetResult(true);
+                        Controller = new TextEditingController();   //if model is new, then PropsEditingController() 
+                        var rcInit = Controller.Initialise(terminal, model);
+                        rc += rcInit;
+                        if (rcInit.IsSuccess(true))
+                        {
+                            Terminal = terminal;
+                            Chapter = model;
+                            Ready = true;
+                            rc.SetResult(true);
+                        }
                     }
                 }
                 catch (Exception e)
@@ -270,30 +262,16 @@ namespace KLineEdCmdApp.Controller
             {
                 if (Ready)  //report error
                 {
-                    //setup VDU commands, footer
-                    //display previous lines
-                    //while()
-                    //  process input from user and add to line buffer or process cmds
-                    //  at end of line append to file
-                    //  setup VDU commands, footer
-                    //  display previous lines
-
-                    var cmdModeChange = OpMode.Unknown;
-                    var cmdMode = OpMode.TextEditing;
                     while (true)
                     {
-                        ModeProc mode = null;
-                        if (cmdModeChange != cmdMode)
-                            mode = SetMode(cmdMode);
-                        if (mode == null)
-                            break;  //report error
-  
+                        Chapter.SetEditorHelpLine(Controller.GetModeHelpLine());
+                        Chapter.SetMsgLine("hello Will...");
+                        Chapter.SetStatusLine();
+
                         var op = Terminal.GetKey(true);
                         if (op == ConsoleKey.Escape)
                             break;
-
-                        cmdModeChange = mode.ProcessKey(op, Chapter);
-
+                        Controller.ProcessKey(op, Chapter);
 
                         //ConsoleKeyInfo op = Terminal.ReadKey();
                         //if ((op.Key == ConsoleKey.A) && (op.Modifiers == ConsoleModifiers.Control))
@@ -317,7 +295,7 @@ namespace KLineEdCmdApp.Controller
             {
                 if (Ready)
                 {
-                    Chapter.Close();
+                    Chapter.Close(true);
                     Ready = false;
                     rc.SetResult(true);
                 }

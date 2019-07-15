@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using KLineEdCmdApp.Controller;
 using MxReturnCode;
 
 using KLineEdCmdApp.Utils;
@@ -12,7 +11,7 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "CommentTypo")]
     [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     [SuppressMessage("ReSharper", "RedundantCaseLabel")]
-    public abstract class KLineEdBaseView : ObserverView
+    public abstract class BaseView : ObserverView
     {
         public static readonly string ErrorModelNull = "\a";
         public static readonly string ErrorMsgPrecursor = "Error:";
@@ -45,7 +44,7 @@ namespace KLineEdCmdApp.View.Base
         public bool Ready { protected set; get; }
 
         // ReSharper disable once RedundantBaseConstructorCall
-        public KLineEdBaseView(ITerminal terminal) : base()
+        public BaseView(ITerminal terminal) : base()
         {
             Terminal = terminal;
             DisplayLineWidth = Program.PosIntegerNotSet;
@@ -67,7 +66,7 @@ namespace KLineEdCmdApp.View.Base
 
         public virtual MxReturnCode<bool> Setup(CmdLineParamsApp param)
         {
-            var rc = new MxReturnCode<bool>("KLineEdBaseView.Setup");
+            var rc = new MxReturnCode<bool>("BaseView.Setup");
 
             if (param == null)
                 rc.SetError(1110101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
@@ -120,6 +119,7 @@ namespace KLineEdCmdApp.View.Base
 
         private string MsgSetup(MsgType msgType, string msg)
         {
+            // ReSharper disable once RedundantAssignment
             var rc = Program.ValueNotSet;
 
             Terminal.SetCursorPosition(KLineEditor.MsgLineRowIndex, 0);
@@ -130,14 +130,15 @@ namespace KLineEdCmdApp.View.Base
                 {
                     Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
                     Terminal.Write(BlankLine);
+                    rc = "";
                 }
                 break;
                 case MsgType.Error:
                 {
                     Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
                     Terminal.Write(BlankLine);
-                    if ((msg.StartsWith(KLineEdBaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(KLineEdBaseView.ErrorMsgPrecursor.ToLower()) == false))
-                        rc = $"{KLineEdBaseView.ErrorMsgPrecursor} {msg}";
+                    if ((msg.StartsWith(BaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(BaseView.ErrorMsgPrecursor.ToLower()) == false))
+                        rc = $"{BaseView.ErrorMsgPrecursor} {msg}";
                     else
                         rc = msg;
                 }
@@ -146,8 +147,8 @@ namespace KLineEdCmdApp.View.Base
                 {
                     Terminal.SetColour(MsgLineWarnForeGndColour, MsgLineWarnBackGndColour);
                     Terminal.Write(BlankLine);
-                    if ((msg.StartsWith(KLineEdBaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(KLineEdBaseView.WarnMsgPrecursor.ToLower()) == false))
-                        rc = $"{KLineEdBaseView.WarnMsgPrecursor} {msg}";
+                    if ((msg.StartsWith(BaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(BaseView.WarnMsgPrecursor.ToLower()) == false))
+                        rc = $"{BaseView.WarnMsgPrecursor} {msg}";
                     else
                         rc = msg;
                 }
@@ -157,8 +158,8 @@ namespace KLineEdCmdApp.View.Base
                 {
                     Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
                     Terminal.Write(BlankLine);
-                    if ((msg.StartsWith(KLineEdBaseView.InfoMsgPrecursor) == false) && (msg.StartsWith(KLineEdBaseView.InfoMsgPrecursor.ToLower()) == false))
-                        rc = $"{KLineEdBaseView.InfoMsgPrecursor} {msg}";
+                    if ((msg.StartsWith(BaseView.InfoMsgPrecursor) == false) && (msg.StartsWith(BaseView.InfoMsgPrecursor.ToLower()) == false))
+                        rc = $"{BaseView.InfoMsgPrecursor} {msg}";
                     else
                         rc = msg;
                 }

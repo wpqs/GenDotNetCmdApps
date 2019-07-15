@@ -1,5 +1,4 @@
 ﻿using System;
-using KLineEdCmdApp.Controller;
 using KLineEdCmdApp.Model;
 using MxReturnCode;
 using KLineEdCmdApp.Utils;
@@ -8,7 +7,7 @@ using KLineEdCmdApp.View.Base;
 
 namespace KLineEdCmdApp.View
 {
-    public class StatusLineView : KLineEdBaseView
+    public class StatusLineView : BaseView
     {
         public ConsoleColor StatusLineForeGndColour { private set; get; }
         public ConsoleColor StatusLineBackGndColour { private set; get; }
@@ -37,23 +36,19 @@ namespace KLineEdCmdApp.View
                     StatusLineBackGndColour = param.BackGndDetailsColour; //todo rename param.StatusLineBackGndColour 
                     StatusLineRow = WindowHeight - KLineEditor.StatusLineRowCount - 1;
 
-                    if (Terminal.SetCursorPosition(StatusLineRow, KLineEditor.StatusLineLeftCol) == false)
-                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
+                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", "MxErrInvalidCondition");
                     else
                     {
-                        if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
-                            rc.SetError(1200103, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", "MxErrInvalidCondition");
-                        else
+                        var rcClear = ClearLine();
+                        rc += rcClear;
+                        if (rcClear.IsSuccess(true))
                         {
-                            var rcClear = ClearLine();
-                            rc += rcClear;
-                            if (rcClear.IsSuccess(true))
-                            {
-                                Ready = true;
-                                rc.SetResult(true);
-                            }
+                            Ready = true;
+                            rc.SetResult(true);
                         }
                     }
+
                 }
             }
             return rc;
@@ -85,7 +80,7 @@ namespace KLineEdCmdApp.View
         public override void OnUpdate(NotificationItem notificationItem)
         {
             ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
-            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.Status))
+            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.StatusLine))
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)

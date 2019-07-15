@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
-using KLineEdCmdApp.Controller;
+using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
 using MxDotNetUtilsLib;
@@ -23,10 +23,10 @@ namespace KLineEdCmdApp.Model
             [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
             [EnumMember(Value = "Line")] Line = 1,      //AppendLine()
             [EnumMember(Value = "Word")] Word = 2,      //AppendWord()
-            [EnumMember(Value = "Status")] Status = 3,  //SetStatusLine()
-            [EnumMember(Value = "Msg")] Msg = 4,        //SetMsgLine()
-            [EnumMember(Value = "Cmd")] Cmd = 5,        //UpdateAllViews(Cmd)
-            [EnumMember(Value = "All")] All = 6,
+            [EnumMember(Value = "StatusLine")] StatusLine = 3,  //SetStatusLine()
+            [EnumMember(Value = "MsgLine")] MsgLine = 4,        //SetMsgLine()
+            [EnumMember(Value = "HelpLine")] HelpLine = 5,      //SetEditorHelpLine()
+            [EnumMember(Value = "All")] All = 6,        //RefreshDisplay()
             [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
         }
         public string FileName { private set; get; }
@@ -35,10 +35,10 @@ namespace KLineEdCmdApp.Model
         public Header Header { get; } 
         public Body Body { get; }
 
-        public KLineEditor.OpMode OpMode { private set; get; }
+        public EditingBaseController OpMode { private set; get; }
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }
-        public string CmdsHelpLine { private set; get; }
+        public string EditorHelpLine { private set; get; }
 
         // ReSharper disable once RedundantBaseConstructorCall
         public ChapterModel() : base()
@@ -47,12 +47,12 @@ namespace KLineEdCmdApp.Model
             Body = new Body();
             StatusLine = "";
             MsgLine = "";
-            CmdsHelpLine = "";
-            OpMode = KLineEditor.OpMode.Unknown;
+            EditorHelpLine = "";
+            OpMode = null;
             Ready = false;
         }
 
-        public void SetMode(KLineEditor.OpMode opMode)
+        public void SetMode(EditingBaseController opMode)
         {
             OpMode = opMode;
             UpdateAllViews((int)ChangeHint.All);
@@ -62,20 +62,20 @@ namespace KLineEdCmdApp.Model
         {
             StatusLine = $"{DateTime.Now.ToString(MxStdFrmt.Time)} Line: {Body?.GetLineCount() ?? Program.PosIntegerNotSet} Column: {Body?.GetCharacterCountInLine()+1 ?? Program.PosIntegerNotSet} Total words: {Body?.WordCount ?? Program.PosIntegerNotSet}";
             if (update)
-                UpdateAllViews((int)ChangeHint.Status);
+                UpdateAllViews((int)ChangeHint.StatusLine);
         }
         public void SetMsgLine(string msg, bool update = true)
         {
             MsgLine = msg;
             if (update)
-                UpdateAllViews((int)ChangeHint.Msg);
+                UpdateAllViews((int)ChangeHint.MsgLine);
         }
 
-        public void SetModeHelpLine(string cmd, bool update = true)
+        public void SetEditorHelpLine(string text, bool update = true)
         {
-            CmdsHelpLine = cmd;
+            EditorHelpLine = text;
             if (update)
-                UpdateAllViews((int)ChangeHint.Cmd);
+                UpdateAllViews((int)ChangeHint.HelpLine);
         }
 
         public MxReturnCode<bool>Initialise(int lineWidth, string pathFilename)

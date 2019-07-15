@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using KLineEdCmdApp.Controller;
 using Microsoft.Extensions.Configuration;
 using MxDotNetUtilsLib;
 using MxReturnCode;
@@ -145,7 +144,8 @@ namespace KLineEdCmdApp
                             rc.SetError(1010202, MxError.Source.Data, $"Terminal originalSettings not saved", "MxErrInvalidCondition");
                         else
                         {
-                            var rcRun = KLineEditor.RunEditor(cmdLineParams, editModel, terminal);
+                            var editor = new KLineEditor();
+                            var rcRun = editor.Run(cmdLineParams, editModel, terminal);
                             rc += rcRun;
 
                             if (terminal.Setup(originalSettings) == false)

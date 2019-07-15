@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using KLineEdCmdApp.Controller;
 using KLineEdCmdApp.Model.Base;
 
 namespace KLineEdCmdApp.Model

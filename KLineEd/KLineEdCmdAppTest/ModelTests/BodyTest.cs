@@ -1,7 +1,6 @@
 ﻿using System;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.Model;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Xunit;
 // ReSharper disable All
 
