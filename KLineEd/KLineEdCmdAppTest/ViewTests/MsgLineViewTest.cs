@@ -20,7 +20,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.View.Ready);
 
             _fixture.Model.SetMsgLine("test msg");
-            Assert.Equal("Info: test msg", _fixture.View.LastTerminalOutput);
+            Assert.Equal("info: test msg", _fixture.View.LastTerminalOutput);
         }
     }
 }

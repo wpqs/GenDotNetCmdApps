@@ -13,10 +13,19 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "RedundantCaseLabel")]
     public abstract class BaseView : ObserverView
     {
-        public static readonly string ErrorModelNull = "\a";
-        public static readonly string ErrorMsgPrecursor = "Error:";
-        public static readonly string WarnMsgPrecursor = "Warn:";
-        public static readonly string InfoMsgPrecursor = "Info:";
+        public static readonly string ErrorMsgPrecursor = "error";
+        public static readonly string WarnMsgPrecursor = "warn:";
+        public static readonly string InfoMsgPrecursor = "info:";
+
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
+        public enum ErrorType
+        {
+            [EnumMember(Value = "exception")] exception = 0,
+            [EnumMember(Value = "program")] program = 1,
+            [EnumMember(Value = "data")] data = 2,
+            [EnumMember(Value = "param")]param = 3,
+            [EnumMember(Value = "user")] user = 4
+        }
 
         public enum MsgType
         {
@@ -97,11 +106,43 @@ namespace KLineEdCmdApp.View.Base
             return rc;
         }
 
-        public void DisplayErrorMsg(int errorNo, string msg)
+        public static bool IsCriticalError(string displayMsg)
         {
-            DisplayMsg(MsgType.Error, $"Error: {errorNo} {msg}");
+            var rc = true;
+            if (displayMsg == null)
+                rc = false;
+            else
+            {                                                                                           //"error 1010102-exception: msg"
+                if (displayMsg.StartsWith(BaseView.ErrorMsgPrecursor) == false)
+                    rc = false;
+                else
+                {
+                    int startIndex = displayMsg.IndexOf('-');
+                    if (startIndex != -1)
+                    {
+                        int endIndex = displayMsg.IndexOf(':', startIndex+1);
+                        var errType = displayMsg.Snip(startIndex+1, endIndex - 1);
+                        if (errType != null)
+                        {
+                            if (errType == MxDotNetUtilsLib.EnumOps.XlatToString(ErrorType.user))
+                                rc = false;
+                        }
+                    }
+                }
+            }
+            return rc;
         }
-        public void DisplayMxErrorMsg(string msg)
+
+        public static string FormatMxErrorMsg(int errorNo, ErrorType errType, string errMsg) //"error 1010102-exception: msg"
+        {
+            return $"{ BaseView.ErrorMsgPrecursor} {errorNo}-{errType}: {errMsg ?? Program.ValueNotSet}";
+        }
+
+        public void DisplayErrorMsg(int errorNo, ErrorType errType, string msg)
+        {
+            DisplayMsg(MsgType.Error, BaseView.FormatMxErrorMsg(errorNo, errType, msg));  //msg is formatted as "error 1010102-exception: msg"
+        }
+        public void DisplayMxErrorMsg(string msg)                                //msg is formatted as "error 1010102-exception: msg"
         {
             DisplayMsg(MsgType.Error, msg);
         }
@@ -110,11 +151,24 @@ namespace KLineEdCmdApp.View.Base
         {
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (msg == null)
-                LastTerminalOutput = Terminal.Write(MsgSetup(MsgType.Error, $"Error: 1110201 {Program.ValueNotSet}"));
+                LastTerminalOutput = Terminal.Write(MsgSetup(MsgType.Error, BaseView.TruncateTextForLine(BaseView.FormatMxErrorMsg(1110201, ErrorType.program, "DisplayMsg is null"), WindowWidth - KLineEditor.MsgLineLeftCol)));
             else
-                LastTerminalOutput = Terminal.Write(MsgSetup(msgType, GetTextForLine(msg, WindowWidth - KLineEditor.MsgLineLeftCol)));
+                LastTerminalOutput = Terminal.Write(MsgSetup(msgType, BaseView.TruncateTextForLine(msg, WindowWidth - KLineEditor.MsgLineLeftCol)));
   
             return true;
+        }
+
+        public static string TruncateTextForLine(string text, int maxLength)
+        {
+            var rc = Program.ValueOverflow;
+            if ((text != null) && (maxLength > 0) && (maxLength <= KLineEditor.MaxWindowWidth) && (maxLength >= Program.ValueOverflow.Length))
+            {
+                if (text.Length <= maxLength)
+                    rc = text;
+                else
+                    rc = text.Substring(0, maxLength - Program.ValueOverflow.Length) + Program.ValueOverflow;
+            }
+            return rc;
         }
 
         private string MsgSetup(MsgType msgType, string msg)
@@ -167,19 +221,6 @@ namespace KLineEdCmdApp.View.Base
             }
             Terminal.SetCursorPosition(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
 
-            return rc;
-        }
-
-        public string GetTextForLine(string text, int maxLength)
-        {
-            var rc = Program.ValueOverflow;
-            if ((text != null) && (maxLength > 0) && (maxLength <= KLineEditor.MaxWindowWidth))
-            {
-                if(text.Length <= maxLength) 
-                    rc = text;
-                else
-                   rc = text.Substring(0, maxLength - Program.ValueOverflow.Length) + Program.ValueOverflow;
-            }
             return rc;
         }
     }

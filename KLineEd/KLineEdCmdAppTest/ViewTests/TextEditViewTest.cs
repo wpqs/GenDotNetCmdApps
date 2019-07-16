@@ -1,6 +1,4 @@
-﻿using System;
-using KLineEdCmdApp.Utils;
-using KLineEdCmdApp.View;
+﻿using KLineEdCmdApp.Controller;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
@@ -18,17 +16,51 @@ namespace KLineEdCmdAppTest.ViewTests
         [Fact]
         public void SetupTest()
         {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new[] { "--edit", "Test.txt" });
+            Assert.True(_fixture.View.Ready);
 
-            Assert.True(rcParam.GetResult());
-            Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
+            Assert.Equal(25, _fixture.View.WindowHeight);
+            Assert.Equal(93, _fixture.View.WindowWidth);
 
-            var view = new TextEditView(new MockTerminal());
-            Assert.True(view.Setup(cmdLineParams).GetResult());
+        }
 
-            Assert.Equal(25, view.WindowHeight);
-            Assert.Equal(93, view.WindowWidth);
+        [Fact]
+        public void OnUpdateTest()
+        {
+
+            Assert.Equal(TestConst.UnitTestNone, _fixture.Error);
+            Assert.True(_fixture.Model.Ready);
+            Assert.True(_fixture.View.Ready);
+
+           _fixture.Model.SetEditorHelpLine(TextEditingController.EditorHelpText);
+
+            _fixture.Model.AppendChar('a');
+            Assert.Equal("a", _fixture.View.LastTerminalOutput);
+
+            _fixture.Model.AppendWord("hello");
+            Assert.Equal("hello", _fixture.View.LastTerminalOutput);
+
+            _fixture.Model.Refresh();
+            Assert.Equal("a hello", _fixture.View.LastTerminalOutput);
+
+            _fixture.Model.AppendWord("world");
+            Assert.Equal("world", _fixture.View.LastTerminalOutput);
+
+            _fixture.Model.Refresh();
+            Assert.Equal("a hello world", _fixture.View.LastTerminalOutput);
+
+            _fixture.Model.AppendChar('s');
+            Assert.Equal("s", _fixture.View.LastTerminalOutput);
+
+            _fixture.Model.Refresh();
+            Assert.Equal("a hello worlds", _fixture.View.LastTerminalOutput);
+            Assert.Equal(1, _fixture.Model.GetTextLineCount());
+
+            _fixture.Model.AppendLine("hello 1234  byebye");
+            Assert.Equal("hello 1234  byebye", _fixture.View.LastTerminalOutput);
+            Assert.Equal(2, _fixture.Model.GetTextLineCount());
+
+            _fixture.Model.Refresh();
+            Assert.Equal("hello 1234  byebye", _fixture.View.LastTerminalOutput);
         }
     }
 }

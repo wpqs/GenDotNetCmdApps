@@ -75,46 +75,46 @@ namespace KLineEdCmdApp.Utils
         public string GetValidationError()
         {
             // ReSharper disable once RedundantAssignment
-            var rc = "Error: [unknown]";
+            var rc = $"[unknown]";
 
             if (Title == null)
-                rc = "Error: Title is null";
+                rc = $"Title is null";
             else
             {
                 if ((BufferHeight < 0) || (BufferHeight >= Int16.MaxValue) || (BufferHeight < (WindowTop + WindowHeight)))
-                    rc = $"Error: BufferHeight={BufferHeight} is out of range (WindowTop={WindowTop}, WindowHeight={WindowHeight})";
+                    rc = $"BufferHeight={BufferHeight} is out of range (WindowTop={WindowTop}, WindowHeight={WindowHeight})";
                 else
                 {
                     if ((BufferWidth < 0) || (BufferWidth >= Int16.MaxValue) || (BufferWidth < (WindowLeft + WindowWidth)))
-                        rc = $"Error: BufferWidth={BufferWidth} is out of range (WindowLeft={WindowLeft}, WindowWidth={WindowWidth})";
+                        rc = $"BufferWidth={BufferWidth} is out of range (WindowLeft={WindowLeft}, WindowWidth={WindowWidth})";
                     else
                     {
                         if ((WindowHeight < 0) || ((WindowHeight + WindowTop) >= Int16.MaxValue) || (WindowHeight > Console.LargestWindowHeight))
-                            rc = $"Error: WindowHeight={WindowHeight} is out of range (WindowTop={WindowTop})";
+                            rc = $"WindowHeight={WindowHeight} is out of range (WindowTop={WindowTop})";
                         else
                         {
                             if ((WindowWidth < 0) || ((WindowWidth + WindowLeft) >= Int16.MaxValue) || (WindowWidth > Console.LargestWindowWidth))
-                                rc = $"Error: WindowWidth={WindowWidth} is out of range (WindowLeft={WindowLeft})";
+                                rc = $"WindowWidth={WindowWidth} is out of range (WindowLeft={WindowLeft})";
                             else
                             {
                                 if (WindowTop < 0) // || ((WindowTop + WindowHeight) > BufferHeight)) - checked by prior BufferHeight test
-                                    rc = $"Error: WindowTop={WindowTop} is less than zero";
+                                    rc = $"WindowTop={WindowTop} is less than zero";
                                 else
                                 {
                                     if (WindowLeft < 0) // || ((WindowLeft + WindowWidth) > BufferWidth)) - checked by prior BufferWidth test
-                                        rc = $"Error: WindowLeft={WindowLeft} is less than zero";
+                                        rc = $"WindowLeft={WindowLeft} is less than zero";
                                     else
                                     {
                                         if ((CursorSize <= 0) || (CursorSize > 100))
-                                            rc = $"Error: CursorSize={CursorSize} is out of range 1-100";
+                                            rc = $"CursorSize={CursorSize} is out of range 1-100";
                                         else
                                         {
                                             if ((CursorTop < 0) || (CursorTop >= BufferHeight))
-                                                rc = $"Error: CursorTop={CursorTop} is out of range (BufferHeight={BufferHeight})";
+                                                rc = $"CursorTop={CursorTop} is out of range (BufferHeight={BufferHeight})";
                                             else
                                             {
                                                 if ((CursorLeft < 0) || (CursorLeft >= BufferWidth))
-                                                    rc = $"Error: CursorLeft={CursorLeft} is out of range (BufferWidth={BufferWidth})";
+                                                    rc = $"CursorLeft={CursorLeft} is out of range (BufferWidth={BufferWidth})";
                                                 else
                                                 {
                                                     rc = null;

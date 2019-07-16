@@ -1,10 +1,12 @@
-﻿using KLineEdCmdApp.Model;
+﻿using System.Diagnostics.CodeAnalysis;
+using KLineEdCmdApp.Model;
 using MxReturnCode;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View.Base;
 
 namespace KLineEdCmdApp.View
 {
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     public class MsgLineView : BaseView
     {
         public MsgLineView(ITerminal terminal) : base(terminal)
@@ -42,10 +44,15 @@ namespace KLineEdCmdApp.View
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)
-                    DisplayErrorMsg(1130201, "Program Error. Unable to access data needed for display. Please quit and report this problem.");
+                    DisplayErrorMsg(1130201, ErrorType.program, $"Unable to access data needed for display. Please quit and report this problem.");
                 else
                 {
-                    DisplayMsg(MsgType.Info, model.MsgLine ?? Program.ValueNotSet);
+                    if (model.MsgLine.StartsWith(BaseView.ErrorMsgPrecursor))
+                        DisplayMsg(MsgType.Error, model.MsgLine);
+                    else if (model.MsgLine.StartsWith(BaseView.WarnMsgPrecursor))
+                        DisplayMsg(MsgType.Warning, model.MsgLine);
+                    else
+                        DisplayMsg(MsgType.Info, model.MsgLine);
                 }
             }
         }

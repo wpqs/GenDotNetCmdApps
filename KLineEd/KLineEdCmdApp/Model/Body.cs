@@ -169,7 +169,7 @@ namespace KLineEdCmdApp.Model
                         {
                             var wordsInLine = AddLine(line);
                             if (wordsInLine == Program.PosIntegerNotSet)
-                                rc.SetError(1100405, MxError.Source.User, $"Error: line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
+                                rc.SetError(1100405, MxError.Source.User, $"Line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
                             else
                             {
                                 WordCount += wordsInLine;
@@ -207,7 +207,7 @@ namespace KLineEdCmdApp.Model
                             {                                              //word makes line too long, so append it to a new line
                                 var wordsInLine = AddLine(word);
                                 if (wordsInLine == Program.PosIntegerNotSet)
-                                    rc.SetError(1100505, MxError.Source.User, $"Error: line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
+                                    rc.SetError(1100505, MxError.Source.User, $"Line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
                                 else
                                 {
                                     WordCount += wordsInLine;
@@ -307,7 +307,7 @@ namespace KLineEdCmdApp.Model
                     {
                         var wordsInLine = AddLine(newLine + appendChar);
                         if (wordsInLine == Program.PosIntegerNotSet)
-                            rc.SetError(1100704, MxError.Source.User, $"Error: line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
+                            rc.SetError(1100704, MxError.Source.User, $"Line count exceeded. Chapters are allowed a maximum of {Body.MaxTextLines} lines. Start a new Chapter and continue.");
                         else
                         {
                             rc.SetResult(true);
@@ -351,29 +351,29 @@ namespace KLineEdCmdApp.Model
             string rc = null;
 
             if (text == null)
-                rc = $"Error: Unexpected {textType}; it is null. This is a program error. Please save your work and restart the program.";
+                rc = $"unexpected {textType}; it is null. This is a program error. Please save your work and restart the program.";
             else
             {
                 if (text.Length > CmdLineParamsApp.ArgDisplayLineWidthMax)
-                    rc = $"Error: invalid {textType}. It has {text.Length} characters, but only {CmdLineParamsApp.ArgDisplayLineWidthMax} allowed. Delete some characters and try again.";
+                    rc = $"invalid {textType}. It has {text.Length} characters, but only {CmdLineParamsApp.ArgDisplayLineWidthMax} allowed. Delete some characters and try again.";
                 else
                 {
                     var index = -1;
                     if ((index = text.IndexOf(Environment.NewLine, StringComparison.Ordinal)) != -1)
-                        rc = $"Error: invalid {textType}. It contains a new line at column {index + 1}. Delete these characters and try again.";
+                        rc = $"invalid {textType}. It contains a new line at column {index + 1}. Delete these characters and try again.";
                     else
                     {
                         string output = new string(text.Where(c => ((IsEnteredCharacterValid(c) == true))).ToArray());
                         if (output.Length != text.Length)
-                            rc = $"Error: invalid {textType}. It contains {text.Length - output.Length} disallowed characters. Retype the text and try again.";
+                            rc = $"invalid {textType}. It contains {text.Length - output.Length} disallowed characters. Retype the text and try again.";
                         else
                         {
                             if ((index = text.IndexOf(DisallowedCharOpeningAngle)) != -1)
-                                rc = $"Error: invalid {textType}. It contains the disallowed character '{DisallowedCharOpeningAngle}' at column {index + 1}. Delete this character and try again.";
+                                rc = $"invalid {textType}. It contains the disallowed character '{DisallowedCharOpeningAngle}' at column {index + 1}. Delete this character and try again.";
                             else
                             {
                                 if ((index = text.IndexOf(DisallowedCharClosingAngle)) != -1)
-                                    rc = $"Error: invalid {textType}. It contains the disallowed character '{DisallowedCharClosingAngle}' at column {index + 1}. Delete this character and try again.";
+                                    rc = $"invalid {textType}. It contains the disallowed character '{DisallowedCharClosingAngle}' at column {index + 1}. Delete this character and try again.";
                             }
                         }
                     }
@@ -386,11 +386,11 @@ namespace KLineEdCmdApp.Model
             string rc = null;
 
             if (IsEnteredCharacterValid(c) == false)
-                rc = String.Format("Error: invalid character; 0x{0:X}. This character cannot be typed into a chapter. Please delete it and try again.", (int)c);
+                rc = $"invalid character; 0x{(int) c:X}. This character cannot be typed into a chapter. Please delete it and try again.";
             else
             {
                 if ((c == DisallowedCharOpeningAngle) || ((c == DisallowedCharClosingAngle)))
-                    rc = $"Error: disallowed character '{c}'. This character cannot be typed into a chapter. Please delete it and try again.";
+                    rc = $"disallowed character '{c}'. This character cannot be typed into a chapter. Please delete it and try again.";
             }
             return rc;
         }

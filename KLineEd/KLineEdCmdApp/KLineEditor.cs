@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using KLineEdCmdApp.Controller;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
@@ -68,37 +67,6 @@ namespace KLineEdCmdApp
             Ready = false;
         }
 
-        //public void SetMode(EditModeController.EditingMode editingMode)
-        //{
-        //    if (Chapter != null)
-        //    {
-        //        switch (editingMode)
-        //        {
-        //            case EditModeController.EditingMode.Text:
-        //            {
-        //                Mode = TextEditProc;
-        //                break;
-        //            }
-        //            case EditModeController.EditingMode.Properties:
-        //            {
-        //                break;
-        //            }
-        //            case EditModeController.EditingMode.Spell:
-        //            {
-        //                break;
-        //            }
-        //            case EditModeController.EditingMode.Error:
-        //            default:
-        //            {
-        //                break;
-        //            }
-        //        }
-        //        Chapter.SetModeHelpLine(Mode?.GetModeHelpLine() ?? Program.ValueNotSet, false);
-        //        Chapter.SetMode(Mode);
-        //    }
-        //}
-
-
         public MxReturnCode<string> Run(CmdLineParamsApp cmdLineParams, ChapterModel editModel, ITerminal terminal)
         {
             var rc = new MxReturnCode<string>("Program.RunEditor");
@@ -111,19 +79,21 @@ namespace KLineEdCmdApp
                 rc += rcInit;
                 if (rcInit.IsSuccess(true))
                 {
-                    var cmdsHelpView = new EditorHelpView(terminal);
+                    var editHelpView = new EditorHelpView(terminal);
                     var msgLineView = new MsgLineView(terminal);
                     var statusLineView = new StatusLineView(terminal);
                     var textEditView = new TextEditView(terminal);
+                    var propsEditView = new PropsEditView(terminal);
 
-                    var rcSetup = SetupViews(cmdLineParams, cmdsHelpView, msgLineView, statusLineView, textEditView);
+                    var rcSetup = SetupViews(cmdLineParams, editHelpView, msgLineView, statusLineView, textEditView, propsEditView);
                     rc += rcSetup;
                     if (rcSetup.IsSuccess(true))
                     {
-                        using (editModel.Subscribe(cmdsHelpView))
+                        using (editModel.Subscribe(editHelpView))
                         using (editModel.Subscribe(msgLineView))
                         using (editModel.Subscribe(statusLineView))
-                        using (editModel.Subscribe(textEditView))           //make the last view to be notified so it sets the cursor back to EditArea
+                        using (editModel.Subscribe(textEditView))   //make sure the EditAreaViews are notified after editHelp, msg, status so the cursor to set back to EditArea
+                        using (editModel.Subscribe(propsEditView))      
                         {
                             var rcStart = Start(editModel); //start
                             rc += rcStart;
@@ -152,11 +122,11 @@ namespace KLineEdCmdApp
             return rc;
         }
 
-        private static MxReturnCode<bool> SetupViews(CmdLineParamsApp cmdLineParams, EditorHelpView editorHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView)
+        private static MxReturnCode<bool> SetupViews(CmdLineParamsApp cmdLineParams, EditorHelpView editorHelpView, MsgLineView msgLineView, StatusLineView statusLineView, TextEditView textEditView, PropsEditView propsEditView)
         {
             var rc = new MxReturnCode<bool>("Program.SetupKlineEdVViews");
 
-            if ((cmdLineParams == null) || (editorHelpView == null) || (msgLineView == null) || (statusLineView == null) || (textEditView == null))
+            if ((cmdLineParams == null) || (editorHelpView == null) || (msgLineView == null) || (statusLineView == null) || (textEditView == null) || (propsEditView == null))
                 rc.SetError(101401, MxError.Source.Param, $"cmdLineParams is null, or one of the view objects is null", "MxErrInvalidParamArg");
             else
             {
@@ -176,7 +146,12 @@ namespace KLineEdCmdApp
                             rc += rcTxt;
                             if (rcTxt.IsSuccess(true))
                             {
-                                rc.SetResult(true);
+                                var rcProps = propsEditView.Setup(cmdLineParams);
+                                rc += rcProps;
+                                if (rcProps.IsSuccess(true))
+                                {
+                                    rc.SetResult(true);
+                                }
                             }
                         }
                     }
@@ -213,16 +188,10 @@ namespace KLineEdCmdApp
                         rc.SetError(1030102, MxError.Source.User, $"Terminal.Setup() failed; {settings.GetValidationError()} or Terminal.ErrorMSg={Terminal?.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidSettingsFile");
                     else
                     {
-                        Controller = new TextEditingController();   //if model is new, then PropsEditingController() 
-                        var rcInit = Controller.Initialise(terminal, model);
-                        rc += rcInit;
-                        if (rcInit.IsSuccess(true))
-                        {
-                            Terminal = terminal;
-                            Chapter = model;
-                            Ready = true;
-                            rc.SetResult(true);
-                        }
+                        Terminal = terminal;
+                        Chapter = model;
+                        Ready = true;
+                        rc.SetResult(true);
                     }
                 }
                 catch (Exception e)
@@ -262,17 +231,27 @@ namespace KLineEdCmdApp
             {
                 if (Ready)  //report error
                 {
+                    Controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController); //create PropsEditingController if mode is new
                     while (true)
                     {
-                        Chapter.SetEditorHelpLine(Controller.GetModeHelpLine());
-                        Chapter.SetMsgLine("hello Will...");
+                        //within this loop report all non-critical errors using BaseView.DisplayErrorMsg(no, type, msg)
+                        //or BaseView.DisplayMxErrorMsg(msg) - in both cases error message is formatted as "error 1010102-exception: msg"
+
                         Chapter.SetStatusLine();
 
                         var op = Terminal.GetKey(true);
+
+                        Controller = EditingBaseController.ProcessKey(Controller, Chapter, op);
+                        if (Controller?.IsCritialError() ?? true)
+                        {
+                            rc.SetError(1030301, MxError.Source.Program, $"Controller null or critical error {Controller?.DisplayMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                            break;
+                        }
+                        if(Controller.IsDisplayMsg())
+                            Chapter.SetMsgLine(Controller.DisplayMsg);
+
                         if (op == ConsoleKey.Escape)
                             break;
-                        Controller.ProcessKey(op, Chapter);
-
                         //ConsoleKeyInfo op = Terminal.ReadKey();
                         //if ((op.Key == ConsoleKey.A) && (op.Modifiers == ConsoleModifiers.Control))
                         //    break;
@@ -295,6 +274,7 @@ namespace KLineEdCmdApp
             {
                 if (Ready)
                 {
+                    // ReSharper disable once RedundantArgumentDefaultValue
                     Chapter.Close(true);
                     Ready = false;
                     rc.SetResult(true);

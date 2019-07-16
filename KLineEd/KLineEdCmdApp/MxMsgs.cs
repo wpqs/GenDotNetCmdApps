@@ -32,6 +32,7 @@ namespace KLineEdCmdApp
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public static class ErrorCodeList
     {
+        public const int ErrorNoLength = 7;
         public const int KLineEdCmdAppProgramFirst = 1010101; //first error code in class Program.cs
         public const int CmdLineParamsAppFirst = 1020101; //first error code in class CmdLineParamsApp.cs
         public const int KLineEditorFirst = 1030101; //first error code in class KLineEditor.cs
@@ -46,11 +47,13 @@ namespace KLineEdCmdApp
         public const int CmdsHelpViewFirst = 1120101; //first error code in class CmdsHelpView.cs
         public const int MsgLineViewFirst = 1130101; //first error code in class MsgLineView.cs
         public const int TextEditViewFirst = 1140101; //first error code in class TextEditView.cs
-        public const int DetailsEditViewFirst = 1150101; //first error code in class DetailsEditViewView.cs
-        public const int SpellEditViewFirst = 1150101; //first error code in class SpellEditViewView.cs
+        public const int PropsEditViewFirst = 1150101; //first error code in class PropsEditViewView.cs
+        public const int SpellEditViewFirst = 1160101; //first error code in class SpellEditViewView.cs
 
         public const int StatusLineViewFirst = 1200101; //first error code in class StatusLineView.cs
         public const int TerminalFirst = 1210101; //first error code in class Terminal.cs
+        public const int ControllerFactoryFirst = 1220101; //first error code in class ControllerFactory.cs
+
 
     }
 }

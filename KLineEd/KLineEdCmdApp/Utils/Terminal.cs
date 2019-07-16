@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
+using KLineEdCmdApp.View.Base;
 
 namespace KLineEdCmdApp.Utils
 {
@@ -20,19 +21,19 @@ namespace KLineEdCmdApp.Utils
 
         public bool IsError() { return (ErrorMsg ==null) ? false : true; }
 
-        private void SetError(int errorNo, string errMsg)
+        private void SetError(int errorNo, BaseView.ErrorType errType, string errMsg)
         {
-            ErrorMsg = $"Error: {errorNo} {errMsg ?? Program.ValueNotSet}";
+            ErrorMsg = BaseView.FormatMxErrorMsg(errorNo, errType, errMsg);
         }
 
         public Terminal()
         {
-            SetError(1210101, "Terminal not setup");
+            SetError(1210101, BaseView.ErrorType.program, "Terminal not setup");
         }
         public bool Setup(TerminalProperties props)
         {
-            if (props.IsError())
-                SetError(1210201, props.GetValidationError());
+            if ((props == null) || (props.IsError()))
+                SetError(1210201, BaseView.ErrorType.data, props?.GetValidationError() ?? Program.ValueNotSet);
             else
             {
                 try
@@ -54,7 +55,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    SetError(1210202, e.Message);
+                    SetError(1210202, BaseView.ErrorType.exception, e.Message);
                 }
             }
             return (IsError()) ? false : true;
@@ -80,7 +81,7 @@ namespace KLineEdCmdApp.Utils
                 BackgroundColor = Console.BackgroundColor
             };
             if (props.Validate() == false)
-                SetError(1210301, props.GetValidationError());
+                SetError(1210301, BaseView.ErrorType.program, props.GetValidationError());
             else
             {
                 rc = props;
@@ -99,14 +100,14 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                SetError(1210401, e.Message);
+                SetError(1210401, BaseView.ErrorType.exception, e.Message);
             }
             return (IsError()) ? false : true;
         }
         public bool SetCursorPosition(int line, int column)
         {
             if ((line < 0) || (line >= Console.BufferHeight) || (column < 0) || (column >= Console.BufferWidth))
-                SetError(1210501, $"Invalid cursor position: line={line}, column={column}");
+                SetError(1210501, BaseView.ErrorType.param, $"Invalid cursor position: line={line}, column={column}");
             else
             {
                 try
@@ -117,7 +118,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    SetError(1210502, e.Message);
+                    SetError(1210502, BaseView.ErrorType.exception, e.Message);
                 }
             }
             return (IsError()) ? false : true;
@@ -133,7 +134,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                SetError(1210601, e.Message);
+                SetError(1210601, BaseView.ErrorType.exception, e.Message);
             }
             return rc;
         }
@@ -147,7 +148,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                SetError(1210701, e.Message);
+                SetError(1210701, BaseView.ErrorType.exception, e.Message);
             }
             return rc;
         }
@@ -160,7 +161,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                SetError(1210801, e.Message);
+                SetError(1210801, BaseView.ErrorType.exception, e.Message);
             }
             return (IsError()) ? false : true;
         }
@@ -169,7 +170,7 @@ namespace KLineEdCmdApp.Utils
         {
             string rc = null;
             if (line == null)
-                SetError(1210901, "line is null");
+                SetError(1210901, BaseView.ErrorType.exception, "line is null");
             else
             {
                 try
@@ -180,7 +181,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    SetError(1210902, e.Message);
+                    SetError(1210902, BaseView.ErrorType.exception, e.Message);
                 }
             }
             return rc;
@@ -189,7 +190,7 @@ namespace KLineEdCmdApp.Utils
         {
             string rc = null;
             if (msg == null)
-                SetError(1211001, "msg is null");
+                SetError(1211001, BaseView.ErrorType.param, "msg is null");
             else
             {
                 try
@@ -200,7 +201,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    SetError(1211002, e.Message);
+                    SetError(1211002, BaseView.ErrorType.exception, e.Message);
                 }
             }
             return rc;
@@ -215,7 +216,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                SetError(1211101, e.Message);
+                SetError(1211101, BaseView.ErrorType.exception, e.Message);
             }
             return rc;
         }
@@ -229,7 +230,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                SetError(1211201, e.Message);
+                SetError(1211201, BaseView.ErrorType.exception, e.Message);
             }
             return rc;
         }
@@ -243,7 +244,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                SetError(1211301, e.Message);
+                SetError(1211301, BaseView.ErrorType.exception, e.Message);
             }
             return rc;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
 using MxReturnCode;
 using KLineEdCmdApp.Utils;
@@ -7,6 +8,7 @@ using KLineEdCmdApp.View.Base;
 
 namespace KLineEdCmdApp.View
 {
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     public class StatusLineView : BaseView
     {
         public ConsoleColor StatusLineForeGndColour { private set; get; }
@@ -84,11 +86,11 @@ namespace KLineEdCmdApp.View
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)
-                    DisplayErrorMsg(1200301, "Program Error. Unable to access data needed for display. Please quit and report this problem.");
+                    DisplayErrorMsg(1200301, ErrorType.program, $"Unable to access data needed for display. Please quit and report this problem.");
                 else
                 {
                     if (Terminal.SetColour(StatusLineForeGndColour,StatusLineBackGndColour) == false)
-                        DisplayErrorMsg(1200302, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                        DisplayErrorMsg(1200302, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                     else
                     {
                         var rcClear = ClearLine();
@@ -97,8 +99,8 @@ namespace KLineEdCmdApp.View
                         else
                         {
                             var status = model.StatusLine ?? Program.ValueNotSet;
-                            if ((LastTerminalOutput = Terminal.Write(GetTextForLine(status, WindowWidth - KLineEditor.StatusLineLeftCol))) == null)
-                                DisplayErrorMsg(1200304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                            if ((LastTerminalOutput = Terminal.Write(BaseView.TruncateTextForLine(status, WindowWidth - KLineEditor.StatusLineLeftCol))) == null)
+                                DisplayErrorMsg(1200304, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                         }
                     }
                 }

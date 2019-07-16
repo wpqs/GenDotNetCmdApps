@@ -10,6 +10,7 @@ namespace KLineEdCmdApp.View
 {
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     public class EditorHelpView : BaseView
     {
         public ConsoleColor CmdsHelpForeGndColour { private set; get; }
@@ -83,11 +84,11 @@ namespace KLineEdCmdApp.View
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)
-                    DisplayErrorMsg(1120301, "Program Error. Unable to access data needed for display. Please quit and report this problem.");
+                    DisplayErrorMsg(1120301, ErrorType.program, $"Unable to access data needed for display. Please quit and report this problem.");
                 else
                 {
                     if (Terminal.SetColour(CmdsHelpForeGndColour, CmdsHelpBackGndColour) == false)
-                        DisplayErrorMsg(1120302, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                        DisplayErrorMsg(1120302, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                     else
                     {
                         var rcClear = ClearLine();
@@ -96,8 +97,8 @@ namespace KLineEdCmdApp.View
                         else
                         {
                             var cmds = model.EditorHelpLine ?? Program.ValueNotSet;
-                            if((LastTerminalOutput = Terminal.Write(GetTextForLine(cmds, WindowWidth - KLineEditor.ModeHelpLineLeftCol))) == null)
-                                DisplayErrorMsg(1120304, $"Program Error. Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                            if((LastTerminalOutput = Terminal.Write(BaseView.TruncateTextForLine(cmds, WindowWidth - KLineEditor.ModeHelpLineLeftCol))) == null)
+                                DisplayErrorMsg(1120304, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
                         }
                     }
                 }

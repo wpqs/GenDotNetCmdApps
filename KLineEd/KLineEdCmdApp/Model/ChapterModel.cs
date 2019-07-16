@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
+using KLineEdCmdApp.View.Base;
 using MxDotNetUtilsLib;
 
 namespace KLineEdCmdApp.Model
@@ -23,10 +24,11 @@ namespace KLineEdCmdApp.Model
             [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
             [EnumMember(Value = "Line")] Line = 1,      //AppendLine()
             [EnumMember(Value = "Word")] Word = 2,      //AppendWord()
-            [EnumMember(Value = "StatusLine")] StatusLine = 3,  //SetStatusLine()
-            [EnumMember(Value = "MsgLine")] MsgLine = 4,        //SetMsgLine()
-            [EnumMember(Value = "HelpLine")] HelpLine = 5,      //SetEditorHelpLine()
-            [EnumMember(Value = "All")] All = 6,        //RefreshDisplay()
+            [EnumMember(Value = "Props")] Props = 3,      //AppendWord()
+            [EnumMember(Value = "StatusLine")] StatusLine = 4,  //SetStatusLine()
+            [EnumMember(Value = "MsgLine")] MsgLine = 5,        //SetMsgLine()
+            [EnumMember(Value = "HelpLine")] HelpLine = 6,      //SetEditorHelpLine()
+            [EnumMember(Value = "All")] All = 7,        //RefreshDisplay()
             [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
         }
         public string FileName { private set; get; }
@@ -71,11 +73,35 @@ namespace KLineEdCmdApp.Model
                 UpdateAllViews((int)ChangeHint.MsgLine);
         }
 
+        public void SetErrorMsg(int errorNo, string msg, bool update = true)
+        {
+            MsgLine = $"{BaseView.ErrorMsgPrecursor} {errorNo} {msg}";
+            if (update)
+                UpdateAllViews((int)ChangeHint.MsgLine);
+        }
+
+        public void SetMxErrorMsg(string msg, bool update = true)
+        {
+            MsgLine = msg;
+            if (update)
+                UpdateAllViews((int)ChangeHint.MsgLine);
+        }
+
         public void SetEditorHelpLine(string text, bool update = true)
         {
-            EditorHelpLine = text;
+            EditorHelpLine = text; //use to discover the active editor - TextEditView, etc
             if (update)
                 UpdateAllViews((int)ChangeHint.HelpLine);
+        }
+
+        public void Refresh()
+        {
+            UpdateAllViews((int)ChangeHint.All);
+        }
+
+        public string GetTabSpaces()
+        {
+            return Body?.TabSpaces ?? Program.ValueNotSet;
         }
 
         public MxReturnCode<bool>Initialise(int lineWidth, string pathFilename)

@@ -21,6 +21,7 @@ namespace KLineEdCmdAppTest.ViewTests
 
             _fixture.Model.SetStatusLine();
             Assert.Contains("Total words:", _fixture.View.LastTerminalOutput);
+
         }
     }
 }
