@@ -57,6 +57,11 @@ namespace KLineEdCmdAppTest.TestSupport
             return CursorLine;
         }
 
+        public bool IsKeyAvailable()
+        {
+            return true;
+        }
+
         public bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour)
         {
             ForeGndColour = msgLineErrorForeGndColour;

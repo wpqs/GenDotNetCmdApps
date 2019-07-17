@@ -12,8 +12,6 @@ namespace KLineEdCmdApp.Controller
 
         public static readonly string EditorHelpText = $"{PropsEditView.PropsEditorMode} Esc=Refresh F1=Help  Ctrl+Q=Quit Edit: Author={AuthorLineEditKey} Project={ProjectLineEditKey} Title={TitleLineEditKey}";
 
-
-
         protected override EditingBaseController ProcessKey(ConsoleKey key)
         {
             EditingBaseController controller = this;

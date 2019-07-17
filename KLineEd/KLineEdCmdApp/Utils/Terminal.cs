@@ -90,6 +90,11 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
+        public bool IsKeyAvailable()
+        {
+            return Console.KeyAvailable;
+        }
+
         public bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour)
         {
             try
@@ -248,5 +253,6 @@ namespace KLineEdCmdApp.Utils
             }
             return rc;
         }
+
     }
 }

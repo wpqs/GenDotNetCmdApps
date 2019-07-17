@@ -24,11 +24,12 @@ namespace KLineEdCmdApp.Model
             [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
             [EnumMember(Value = "Line")] Line = 1,      //AppendLine()
             [EnumMember(Value = "Word")] Word = 2,      //AppendWord()
-            [EnumMember(Value = "Props")] Props = 3,      //AppendWord()
-            [EnumMember(Value = "StatusLine")] StatusLine = 4,  //SetStatusLine()
-            [EnumMember(Value = "MsgLine")] MsgLine = 5,        //SetMsgLine()
-            [EnumMember(Value = "HelpLine")] HelpLine = 6,      //SetEditorHelpLine()
-            [EnumMember(Value = "All")] All = 7,        //RefreshDisplay()
+            [EnumMember(Value = "Props")] Props = 3,      //SetAuthor(), SetTitle(), SetProject() - change to char
+            [EnumMember(Value = "Spell")] Spell = 4,      //
+            [EnumMember(Value = "StatusLine")] StatusLine = 5,  //SetStatusLine()
+            [EnumMember(Value = "MsgLine")] MsgLine = 6,        //SetMsgLine()
+            [EnumMember(Value = "HelpLine")] HelpLine = 7,      //SetEditorHelpLine()
+            [EnumMember(Value = "All")] All = 8,        //RefreshDisplay()
             [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
         }
         public string FileName { private set; get; }

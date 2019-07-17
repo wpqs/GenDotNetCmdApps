@@ -28,6 +28,12 @@ namespace KLineEdCmdApp.Model
             Reset();    
         }
 
+        public HeaderSessionPause(DateTime? tim, int duration) : this()
+        {
+            PauseTime = tim;
+            Duration = duration;
+        }
+
         public override bool Validate()
         {
             // ReSharper disable once ReplaceWithSingleAssignment.False

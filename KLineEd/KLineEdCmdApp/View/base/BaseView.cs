@@ -11,6 +11,7 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "CommentTypo")]
     [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     [SuppressMessage("ReSharper", "RedundantCaseLabel")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public abstract class BaseView : ObserverView
     {
         public static readonly string ErrorMsgPrecursor = "error";
@@ -32,14 +33,13 @@ namespace KLineEdCmdApp.View.Base
             [EnumMember(Value = "Error")] Error = 0,        
             [EnumMember(Value = "Warning")] Warning = 1,  
             [EnumMember(Value = "Info")] Info= 2,
-            [EnumMember(Value = "Clear")] Clear = 3,
-            [EnumMember(Value = "Unknown")] Unknown =4
+            [EnumMember(Value = "Unknown")] Unknown =3
         }
         protected ITerminal Terminal { set; get; }
         public int WindowHeight { private set; get; }
         public int WindowWidth { private set; get; }
-        public int DisplayLineWidth { private set; get; }
-        public int DisplayLinesHeight { private set; get; }
+        public int EditAreaWidth { private set; get; }
+        public int EditAreaHeight { private set; get; }
 
         protected string BlankLine { private set; get; }
 
@@ -56,8 +56,8 @@ namespace KLineEdCmdApp.View.Base
         public BaseView(ITerminal terminal) : base()
         {
             Terminal = terminal;
-            DisplayLineWidth = Program.PosIntegerNotSet;
-            DisplayLinesHeight = Program.PosIntegerNotSet;
+            EditAreaWidth = Program.PosIntegerNotSet;
+            EditAreaHeight = Program.PosIntegerNotSet;
             WindowHeight = Program.PosIntegerNotSet;
             WindowWidth = Program.PosIntegerNotSet;
 
@@ -81,8 +81,8 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
             else
             {
-                DisplayLineWidth = param.DisplayLineWidth;
-                DisplayLinesHeight = param.DisplayLastLinesCnt;
+                EditAreaWidth = param.DisplayLineWidth;                    //todo rename param.DisplayLineWidth 
+                EditAreaHeight = param.DisplayLastLinesCnt;                //todo rename param.DisplayLastLinesCnt  
 
                 MsgLineErrorForeGndColour = param.ForeGndSpellColour;     //todo rename param.MsgLineErrorForeGndColour   
                 MsgLineErrorBackGndColour = param.BackGndSpellColour;     //todo rename param.MsgLineErrorForeGndColour 
@@ -91,14 +91,15 @@ namespace KLineEdCmdApp.View.Base
                 MsgLineInfoForeGndColour = ConsoleColor.Gray;             //todo add param.MsgLineInfoForeGndColour
                 MsgLineInfoBackGndColour = ConsoleColor.Black;            //todo add param.MsgLineInfoBackGndColour 
 
-                WindowHeight = KLineEditor.ModeHelpLineRowCount + KLineEditor.MsgLineRowCount + KLineEditor.EditAreaMarginTopRowCount + DisplayLinesHeight + KLineEditor.EditAreaMarginBottomRowCount + KLineEditor.StatusLineRowCount;
-                WindowWidth = KLineEditor.EditAreaMarginLeft + DisplayLineWidth + KLineEditor.EditAreaMarginRight;
+                WindowHeight = KLineEditor.ModeHelpLineRowCount + KLineEditor.MsgLineRowCount + KLineEditor.EditAreaMarginTopRowCount + EditAreaHeight + KLineEditor.EditAreaMarginBottomRowCount + KLineEditor.StatusLineRowCount;
+                WindowWidth = KLineEditor.EditAreaMarginLeft + EditAreaWidth + KLineEditor.EditAreaMarginRight;
 
                 if ((WindowWidth < KLineEditor.MinWindowWidth) || (WindowWidth > KLineEditor.MaxWindowWidth) || (WindowHeight > KLineEditor.MaxWindowHeight) || (WindowHeight < KLineEditor.MinWindowHeight))
                     rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.DisplayLineWidth} (min={KLineEditor.MinWindowWidth}, max={KLineEditor.MaxWindowWidth}), param.DisplayLastLinesCnt{param.DisplayLastLinesCnt} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", "MxErrInvalidSettingsFile");
                 else
                 {
-                   // BlankLine = BlankLine.PadLeft(WindowWidth-2, '.') + 'x';
+                    //BlankLine = "0";  //see also EditAreaView.ClearEditAreaText()
+                    //BlankLine = BlankLine.PadRight(WindowWidth-2, '.') + 'x';
                     BlankLine = BlankLine.PadLeft(WindowWidth - 1, ' ');
                     rc.SetResult(true); 
                 }
@@ -106,6 +107,75 @@ namespace KLineEdCmdApp.View.Base
             return rc;
         }
 
+        public MxReturnCode<bool> SetCursorPosition(int rowIndex, int leftColIndex)
+        {
+            var rc = new MxReturnCode<bool>("BaseView.SetCursorPosition");
+
+            if ((rowIndex < 0) || (rowIndex >= WindowHeight) || ((leftColIndex < 0) || (leftColIndex >= (WindowWidth - Program.ValueOverflow.Length))))
+                rc.SetError(1110201, MxError.Source.Param, $"rowIndex={rowIndex}, leftColIndex={leftColIndex}, WinHt={WindowHeight} WinWd={WindowWidth}", "MxErrBadMethodParam");
+            else
+            {
+                if (Terminal.SetCursorPosition(rowIndex, leftColIndex) == false)
+                    rc.SetError(1110202, MxError.Source.Program, $"BaseView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                else
+                    rc.SetResult(true);
+            }
+            return rc;
+        }
+        public MxReturnCode<bool> ClearLine(int rowIndex, int leftColIndex)
+        {
+            var rc = new MxReturnCode<bool>("BaseView.ClearLine");
+
+            if ((rowIndex < 0) || (rowIndex >= WindowHeight) || ((leftColIndex < 0) || (leftColIndex >= (WindowWidth - Program.ValueOverflow.Length))))
+                rc.SetError(1110301, MxError.Source.Param, $"rowIndex={rowIndex}, leftColIndex={leftColIndex}, WinHt={WindowHeight} WinWd={WindowWidth}", "MxErrBadMethodParam");
+            else
+            {
+                if (Terminal.SetCursorPosition(rowIndex, 0) == false)
+                    rc.SetError(1110302, MxError.Source.Program, $"BaseView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                else
+                {
+                    if (Terminal.Write(BlankLine) == null)
+                        rc.SetError(1110303, MxError.Source.Program, $"BaseView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    else
+                    {
+                        if (Terminal.SetCursorPosition(rowIndex, leftColIndex) == false)
+                            rc.SetError(1110304, MxError.Source.Program, $"BaseView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                        else
+                        {
+                            rc.SetResult(true);
+                        }
+                    }
+                }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> DisplayLine(int rowIndex, int leftColIndex, string text, bool clear=true)
+        {
+            var rc = new MxReturnCode<bool>("BaseView.DisplayLine");
+             
+            if ((text == null) || (rowIndex < 0) || (rowIndex >= WindowHeight) || ((leftColIndex < 0) || (leftColIndex >= (WindowWidth - Program.ValueOverflow.Length))))
+                rc.SetError(1110401, MxError.Source.Param, $"rowIndex={rowIndex}, leftColIndex={leftColIndex}, WinHt={WindowHeight} WinWd={WindowWidth}", "MxErrBadMethodParam");
+            else
+            {
+                if (clear)
+                    rc += ClearLine(rowIndex, leftColIndex);
+                else
+                    rc += SetCursorPosition(rowIndex, leftColIndex);
+
+                if (rc.IsSuccess(true))
+                {
+                    if ((LastTerminalOutput = Terminal.Write(BaseView.TruncateTextForLine(text, WindowWidth - leftColIndex))) == null)
+                        rc.SetError(1110402, MxError.Source.Data, $"rowIndex={rowIndex}, leftColIndex={leftColIndex}, text={text}", "MxErrInvalidCondition");
+                    else
+                    {
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            return rc;
+        }
+       
         public static bool IsCriticalError(string displayMsg)
         {
             var rc = true;
@@ -151,10 +221,10 @@ namespace KLineEdCmdApp.View.Base
         {
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (msg == null)
-                LastTerminalOutput = Terminal.Write(MsgSetup(MsgType.Error, BaseView.TruncateTextForLine(BaseView.FormatMxErrorMsg(1110201, ErrorType.program, "DisplayMsg is null"), WindowWidth - KLineEditor.MsgLineLeftCol)));
+                DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, BaseView.FormatMxErrorMsg(1110201, ErrorType.program, "DisplayMsg is null"), true);
             else
-                LastTerminalOutput = Terminal.Write(MsgSetup(msgType, BaseView.TruncateTextForLine(msg, WindowWidth - KLineEditor.MsgLineLeftCol)));
-  
+                DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, MsgSetup(msgType, msg), true);
+
             return true;
         }
 
@@ -176,21 +246,11 @@ namespace KLineEdCmdApp.View.Base
             // ReSharper disable once RedundantAssignment
             var rc = Program.ValueNotSet;
 
-            Terminal.SetCursorPosition(KLineEditor.MsgLineRowIndex, 0);
-
             switch (msgType)
             {
-                case MsgType.Clear:
-                {
-                    Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
-                    Terminal.Write(BlankLine);
-                    rc = "";
-                }
-                break;
                 case MsgType.Error:
                 {
                     Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
-                    Terminal.Write(BlankLine);
                     if ((msg.StartsWith(BaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(BaseView.ErrorMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.ErrorMsgPrecursor} {msg}";
                     else
@@ -200,7 +260,6 @@ namespace KLineEdCmdApp.View.Base
                 case MsgType.Warning:
                 {
                     Terminal.SetColour(MsgLineWarnForeGndColour, MsgLineWarnBackGndColour);
-                    Terminal.Write(BlankLine);
                     if ((msg.StartsWith(BaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(BaseView.WarnMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.WarnMsgPrecursor} {msg}";
                     else
@@ -211,7 +270,6 @@ namespace KLineEdCmdApp.View.Base
                 default:
                 {
                     Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
-                    Terminal.Write(BlankLine);
                     if ((msg.StartsWith(BaseView.InfoMsgPrecursor) == false) && (msg.StartsWith(BaseView.InfoMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.InfoMsgPrecursor} {msg}";
                     else
@@ -219,8 +277,6 @@ namespace KLineEdCmdApp.View.Base
                 }
                 break;
             }
-            Terminal.SetCursorPosition(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
-
             return rc;
         }
     }

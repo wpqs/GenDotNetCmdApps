@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
+using Microsoft.WindowsAzure.Storage.Blob;
 using MxDotNetUtilsLib;
 using MxReturnCode;
 
@@ -72,6 +73,7 @@ namespace KLineEdCmdApp.Model
         public static readonly string TypingPausesLabel = $"Typing pauses:";
         public static readonly string ProperiesEndLabel = $"[end]";
 
+        public bool PauseState { get; private set; }
         public int SessionNo { get; private set; }
         public DateTime? Start { get; private set; }       
         public TimeSpan? Duration { get; private set; }     
@@ -262,6 +264,7 @@ namespace KLineEdCmdApp.Model
             TypingTime = null;
             TypingPauses = null;
             TypingPauseCount = Program.PosIntegerNotSet;
+            PauseState = false;
 
             Error = true;
         }
@@ -378,6 +381,18 @@ namespace KLineEdCmdApp.Model
                     Reset();
             }
             return rc;
+        }
+
+        public void SetPause()
+        {
+            PauseState = true;
+        }
+
+        public void AddPause(in DateTime utcNow, in DateTime lastKeyStroke)
+        {
+            var pause = new HeaderSessionPause(utcNow, (int)(utcNow-lastKeyStroke).TotalSeconds);
+            TypingPauses.Add(pause);
+            PauseState = false;
         }
 
         public string GetAssessment()

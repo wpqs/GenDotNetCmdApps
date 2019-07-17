@@ -22,7 +22,7 @@ namespace KLineEdCmdApp.Utils
         char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar);
         ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);
         ConsoleKeyInfo ReadKey();
-
+        bool IsKeyAvailable();
         bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour);
     }
 }

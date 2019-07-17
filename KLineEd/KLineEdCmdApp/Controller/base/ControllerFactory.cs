@@ -6,7 +6,7 @@ namespace KLineEdCmdApp.Controller.Base
     {
         public static readonly string TextEditingController = "TextEditingController";
         public static readonly string PropsEditingController = "PropsEditingController";
-
+        public static readonly string SpellEditingController = "SpellEditingController";
         public static EditingBaseController Make(ChapterModel model, string className)
         {
             EditingBaseController rc = null;
@@ -20,9 +20,14 @@ namespace KLineEdCmdApp.Controller.Base
                 {
                     if (className == PropsEditingController)
                         controller = new PropsEditingController();
+                    else
+                    {
+                        if (className == SpellEditingController)
+                            controller = new SpellEditingController();
 
-                    //create other Editors here
+                        //create other Editors here
 
+                    }
                 }
 
                 if (controller == null)

@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using MxReturnCode;
+
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View.Base;
@@ -18,14 +20,18 @@ namespace KLineEdCmdApp.View
 
         public override void OnUpdate(NotificationItem notificationItem)
         {
+            var rc = new MxReturnCode<bool>("PropsEditView.OnUpdate");
+
             base.OnUpdate(notificationItem);
 
             ChapterModel model = notificationItem.Data as ChapterModel;
             if (model == null)
-                DisplayErrorMsg(1150101, ErrorType.program, $"Unable to access data needed for display. Please quit and report this problem.");
+                rc.SetError(1150101, MxError.Source.Param, $"model is null", "MxErrBadMethodParam");
             else
             {
-                if (model.EditorHelpLine?.StartsWith(PropsEditView.PropsEditorMode) ?? false)
+                if ((model.EditorHelpLine?.StartsWith(PropsEditView.PropsEditorMode) ?? false) == false)
+                    rc.SetResult(true);
+                else
                 {
                     var authorLine = $"1.{model.GetTabSpaces()}{HeaderChapter.AuthorLabel} {model.Header?.Chapter.Author ?? Program.ValueNotSet}";
                     var projectLine = $"2.{model.GetTabSpaces()}{HeaderChapter.ProjectLabel} {model.Header?.Chapter.Project ?? Program.ValueNotSet}";
@@ -38,72 +44,41 @@ namespace KLineEdCmdApp.View
                         case ChapterModel.ChangeHint.Props:
                         case ChapterModel.ChangeHint.All:
                         {
-                            var rcClear = ClearTextArea();
-                            if (rcClear.IsError(true))
-                                DisplayMxErrorMsg(rcClear.GetErrorUserMsg());
-                            else
-                            {
-                                if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex+ AuthorLineNo, KLineEditor.EditAreaMarginLeft) == false)
-                                    DisplayErrorMsg(1150201, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                else
-                                {
-                                    if ((LastTerminalOutput = Terminal.Write(authorLine)) == null)
-                                        DisplayErrorMsg(11450202, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                    else
-                                    { 
-                                        if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + ProjectLineNo, KLineEditor.EditAreaMarginLeft) == false)
-                                            DisplayErrorMsg(1150203, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                        else
-                                        {
-                                            if ((LastTerminalOutput = Terminal.Write(projectLine)) == null)
-                                                DisplayErrorMsg(1150204, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                            else
-                                            {
-                                                if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + TitleLineNo, KLineEditor.EditAreaMarginLeft) == false)
-                                                    DisplayErrorMsg(1150205, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                                else
-                                                {
-                                                    if ((LastTerminalOutput = Terminal.Write(titleLine)) == null)
-                                                        DisplayErrorMsg(1150206, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                                    else
-                                                    {
-                                                        if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + FilenameLineLineNo, KLineEditor.EditAreaMarginLeft) == false)
-                                                            DisplayErrorMsg(1150207, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                                        else
-                                                        {
-                                                            if ((LastTerminalOutput = Terminal.Write(filenameLine)) == null)
-                                                                DisplayErrorMsg(1150208, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
-                                                            else { }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            rc += ClearEditAreaText();
+                            if (rc.IsSuccess(true))
+                                rc += DisplayEditAreaLine(AuthorLineNo, authorLine, false);
+                            if (rc.IsSuccess(true))
+                                rc += DisplayEditAreaLine(ProjectLineNo, projectLine, false);
+                            if (rc.IsSuccess(true))
+                                rc += DisplayEditAreaLine(TitleLineNo, titleLine, false);
+                            if (rc.IsSuccess(true))
+                                rc += DisplayEditAreaLine(FilenameLineLineNo, filenameLine, false);
+                            if (rc.IsSuccess(true))
+                                rc += SetEditAreaCursor(AuthorLineNo, authorLine.Length); //Model.PropsEdit.Row, Model.PropsEdit.Col
+                                if (rc.IsSuccess(true))
+                                rc.SetResult(true);
                             break;
                         }
                         case ChapterModel.ChangeHint.StatusLine:   //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
                         case ChapterModel.ChangeHint.MsgLine:
                         case ChapterModel.ChangeHint.HelpLine:
-                        {
-                            var lastDisplayRowIndex = model.Body?.GetLineCount() - 1 ?? Program.PosIntegerNotSet;
-                            var lastDisplayColIndex = model.Body?.GetCharacterCountInLine() - 1 ?? Program.PosIntegerNotSet;
-
-                            if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + ((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex),
-                                    KLineEditor.EditAreaMarginLeft + ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex)) == false)
-                                DisplayErrorMsg(1140601, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+                        {           //get from Model ActivePropLine and ActivePropColumn and set line accordingly
+                            rc += SetEditAreaCursor(AuthorLineNo, authorLine.Length); //Model.PropsEdit.Row, Model.PropsEdit.Col
+                                if (rc.IsSuccess(true))
+                                rc.SetResult(true);
                             break;
                         }
                         // ReSharper disable once RedundantEmptySwitchSection
                         default:
                         {
+                            rc.SetError(1150101, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", "MxErrInvalidCondition");
                             break;
                         }
                     }
                 }
             }
+            if (rc.IsError(true))
+                DisplayMxErrorMsg(rc.GetErrorUserMsg());
         }
     }
 }

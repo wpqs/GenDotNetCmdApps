@@ -3,17 +3,16 @@ using KLineEdCmdAppTest.TestSupport.Base;
 
 namespace KLineEdCmdAppTest.TestSupport
 {
-    public class ModelCmdsHelpViewFixture : ModelViewBaseFixture
+    public class ModelSpellEditViewFixture : ModelViewBaseFixture
     {
-        public EditorHelpLineView View { get; }
+        public SpellEditView View { get; }
 
-        // ReSharper disable once RedundantBaseConstructorCall
-        public ModelCmdsHelpViewFixture() : base()
+        public ModelSpellEditViewFixture()
         {
             if (Error == TestConst.UnitTestNone)
             {
                 Error = TestConst.UnitTestNotSet;
-                View = new EditorHelpLineView(new MockTerminal());
+                View = new SpellEditView(new MockTerminal());
                 var rcTerm = View.Setup(AppCmdLineParams);
                 if (rcTerm.IsError())
                     Error = rcTerm.GetErrorTechMsg();

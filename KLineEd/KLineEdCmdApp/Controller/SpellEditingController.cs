@@ -4,9 +4,10 @@ using KLineEdCmdApp.View;
 
 namespace KLineEdCmdApp.Controller
 {
-    public class TextEditingController : EditingBaseController
+    public class SpellEditingController : EditingBaseController
     {
-        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Esc=Refresh F1=Help  Ctrl+Q=Quit";
+        public static readonly string EditorHelpText = $"{SpellEditView.SpellEditorMode} Esc=Refresh F1=Help  Ctrl+Q=Quit";
+
         protected override EditingBaseController ProcessKey(ConsoleKey key)
         {
             EditingBaseController controller = this;
@@ -14,10 +15,7 @@ namespace KLineEdCmdApp.Controller
             {
                 //do stuff related to TextEditing, updating the model as needed
                 if (key == ConsoleKey.F1)
-                    controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController);
-                if (key == ConsoleKey.F2)
-                    controller = ControllerFactory.Make(Chapter, ControllerFactory.SpellEditingController);
-
+                    controller = ControllerFactory.Make(Chapter, ControllerFactory.TextEditingController);
             }
             return controller;
         }

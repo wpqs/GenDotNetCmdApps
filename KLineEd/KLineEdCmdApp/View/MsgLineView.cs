@@ -25,12 +25,17 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    if (DisplayMsg(MsgType.Clear, "") == false)
-                        rc.SetError(1130102, MxError.Source.Program, $"MsgLineView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
+                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", "MxErrInvalidCondition");
                     else
                     {
-                        Ready = true;
-                        rc.SetResult(true);
+                        var rcClear = ClearLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
+                        rc += rcClear;
+                        if (rcClear.IsSuccess(true))
+                        {
+                            Ready = true;
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }
@@ -39,12 +44,16 @@ namespace KLineEdCmdApp.View
 
         public override void OnUpdate(NotificationItem notificationItem)
         {
+            var rc = new MxReturnCode<bool>("MsgLineView.OnUpdate");
+
             ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
-            if ((change == ChapterModel.ChangeHint.All) || (change == ChapterModel.ChangeHint.MsgLine))
+            if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.MsgLine))
+                rc.SetResult(true);
+            else
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)
-                    DisplayErrorMsg(1130201, ErrorType.program, $"Unable to access data needed for display. Please quit and report this problem.");
+                    rc.SetError(1130201, MxError.Source.Program, "model is null", "MxErrInvalidCondition");
                 else
                 {
                     if (model.MsgLine.StartsWith(BaseView.ErrorMsgPrecursor))
@@ -53,8 +62,12 @@ namespace KLineEdCmdApp.View
                         DisplayMsg(MsgType.Warning, model.MsgLine);
                     else
                         DisplayMsg(MsgType.Info, model.MsgLine);
+
+                    rc.SetResult(true);
                 }
             }
+            if (rc.IsError(true))
+                DisplayMxErrorMsg(rc.GetErrorUserMsg());
         }
     }
 }
