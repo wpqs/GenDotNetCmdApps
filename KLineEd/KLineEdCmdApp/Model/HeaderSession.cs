@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
-using Microsoft.WindowsAzure.Storage.Blob;
 using MxDotNetUtilsLib;
 using MxReturnCode;
 
@@ -53,8 +52,6 @@ namespace KLineEdCmdApp.Model
 
         public static readonly int PauseRecordsPerLine = 5;
 
-        public static readonly string MxStdFrmtTimeSpan = "hh\\:mm\\:ss";
-
         public static readonly string DefaultDuration = "00:00:00";
 
         public static readonly string SessionNoLabel = "Session:";
@@ -73,7 +70,7 @@ namespace KLineEdCmdApp.Model
         public static readonly string TypingPausesLabel = $"Typing pauses:";
         public static readonly string ProperiesEndLabel = $"[end]";
 
-        public bool PauseState { get; private set; }
+
         public int SessionNo { get; private set; }
         public DateTime? Start { get; private set; }       
         public TimeSpan? Duration { get; private set; }     
@@ -87,14 +84,25 @@ namespace KLineEdCmdApp.Model
         public double Wpc { get; private set; }      
         public int SpellCheckCount { get; private set; }   
         public double Wps { get; private set; }
+        private List<HeaderSessionPause> TypingPauses { get; set; }
         public int TypingPauseCount { get; private set; }
-        private List<HeaderSessionPause> TypingPauses { get; set; }  
-        
         public HeaderSession()
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             Reset();
         }
+
+        public bool SetDuration(DateTime endTime)
+        {
+            var rc = false;
+            if ((Start != null) && (endTime > Start))
+            {
+                Duration = endTime - Start;
+                rc = Validate();
+            }
+            return rc;
+        }
+
 
         public static MxReturnCode<HeaderSession> Create(StreamReader file, string closingElementSessions) 
         {
@@ -145,7 +153,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("HeaderSession.Write");
 
             if ((file == null) || (IsError() == true))
-                rc.SetError(1060101, MxError.Source.Param, "file is null or not initialized", "MxErrBadMethodParam");
+                rc.SetError(1060101, MxError.Source.Param, "file is null or not initialized", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -160,7 +168,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1060102, MxError.Source.Exception, e.Message, "MxErrInvalidCondition");
+                    rc.SetError(1060102, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
 
@@ -171,19 +179,19 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("HeaderSession.Read");
 
             if (file == null)
-                rc.SetError(1060201, MxError.Source.Param, "file is null", "MxErrBadMethodParam");
+                rc.SetError(1060201, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     var firstLine = file.ReadLine();
                     if (firstLine != OpeningElement)
-                        rc.SetError(1060202, MxError.Source.Data, $"first line is {firstLine}", "MxErrInvalidCondition");
+                        rc.SetError(1060202, MxError.Source.Data, $"first line is {firstLine}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         var headerString = file.ReadLine();
                         if ((headerString == null) || (headerString != SessionNoLabel))
-                            rc.SetError(1060203, MxError.Source.Data, $"{SessionNoLabel} not at start of {firstLine}", "MxErrInvalidCondition");
+                            rc.SetError(1060203, MxError.Source.Data, $"{SessionNoLabel} not at start of {firstLine}", MxMsgs.MxErrInvalidCondition);
                         else
                         {
                             while (headerString.EndsWith(ProperiesEndLabel) == false)
@@ -191,7 +199,7 @@ namespace KLineEdCmdApp.Model
                                 var line = file.ReadLine();
                                 if ((line == null) || (line.EndsWith(HeaderSessionPause.Terminator) == false))
                                 {
-                                    rc.SetError(1060204, MxError.Source.Data, $"{ProperiesEndLabel} not found or {line} does not end with '{HeaderSessionPause.Terminator}'", "MxErrInvalidCondition");
+                                    rc.SetError(1060204, MxError.Source.Data, $"{ProperiesEndLabel} not found or {line} does not end with '{HeaderSessionPause.Terminator}'", MxMsgs.MxErrInvalidCondition);
                                     break;
                                 }
                                 headerString += line + Environment.NewLine;
@@ -202,7 +210,7 @@ namespace KLineEdCmdApp.Model
 
                                 var lastLine = file.ReadLine();
                                 if (lastLine != ClosingElement)
-                                    rc.SetError(1060205, MxError.Source.Data, $"last line is {lastLine}", "MxErrInvalidCondition");
+                                    rc.SetError(1060205, MxError.Source.Data, $"last line is {lastLine}", MxMsgs.MxErrInvalidCondition);
                                 else
                                 {
                                     rc.SetResult(true);
@@ -213,7 +221,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1060206, MxError.Source.Exception, e.Message, "MxErrInvalidCondition");
+                    rc.SetError(1060206, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -264,9 +272,23 @@ namespace KLineEdCmdApp.Model
             TypingTime = null;
             TypingPauses = null;
             TypingPauseCount = Program.PosIntegerNotSet;
-            PauseState = false;
 
             Error = true;
+        }
+
+        public bool AddSessionPause(DateTime lastKeyPress)
+        {
+            var rc = false;
+
+            if (TypingPauses == null)
+                TypingPauses = new List<HeaderSessionPause>();
+            var pause = new HeaderSessionPause(lastKeyPress);
+            if (pause.Validate())
+            {
+                TypingPauses.Add(pause);
+                rc = true;
+            }
+            return rc;
         }
 
         //Session: 4
@@ -286,8 +308,8 @@ namespace KLineEdCmdApp.Model
                 rc += Environment.NewLine;
                 rc += $"{SessionNoLabel} {SessionNo} {StartLineLabel} {StartLine} {EndLineLabel} {EndLine} {LinesTypedLabel} {LinesTyped}";
                 rc += Environment.NewLine;
-                rc += $"{StartLabel} {Start?.ToString(MxStdFrmt.DateTime) ?? "[null]"}{DurationLabel} {Duration?.ToString(MxStdFrmtTimeSpan) ?? "[null]"} ";
-                rc += $"{TypingPausesLabel} {TypingPauseCount} {TypingTimeLabel} {TypingTime?.ToString(MxStdFrmtTimeSpan) ?? "[null]"} ";
+                rc += $"{StartLabel} {Start?.ToString(MxStdFrmt.DateTime) ?? "[null]"}{DurationLabel} {Duration?.ToString(Header.MxStdFrmtTimeSpan) ?? "[null]"} ";
+                rc += $"{TypingPausesLabel} {TypingPauseCount} {TypingTimeLabel} {TypingTime?.ToString(Header.MxStdFrmtTimeSpan) ?? "[null]"} ";
                 rc += Environment.NewLine;
                 rc += $"{WordsCountLabel} {WordsCount} {WpmLabel} {Wpm:F1}";
                 //rc += Environment.NewLine;
@@ -312,7 +334,7 @@ namespace KLineEdCmdApp.Model
                          // //ToString(MxStdFrmt.DateTime) appends a space, but ToString(MxStdFrmtTimeSpan) doesn't
                 rc =  $"{SessionNoLabel} {SessionNo} ";
                 rc += $"{StartLabel} {Start?.ToString(MxStdFrmt.DateTime) ?? "[null]"}";
-                rc += $"{DurationLabel} {Duration?.ToString(MxStdFrmtTimeSpan) ?? "[null]"} ";
+                rc += $"{DurationLabel} {Duration?.ToString(Header.MxStdFrmtTimeSpan) ?? "[null]"} ";
                 rc += $"{StartLineLabel} {StartLine}";  //no space here for some reason
                 rc += $"{EndLineLabel} {EndLine} ";
                 rc += $"{WordsCountLabel} {WordsCount} ";
@@ -332,35 +354,35 @@ namespace KLineEdCmdApp.Model
             if (toString != null)
             {                //order must be same as ToString()
                 if (SetSessionNo(Extensions.GetPropertyFromString(toString, SessionNoLabel, StartLabel)) == false)
-                    rc.SetError(1070101, MxError.Source.Data, $"SetSessionNo failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                    rc.SetError(1070101, MxError.Source.Data, $"SetSessionNo failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                 else
                 {
                     if (SetStartTime(Extensions.GetPropertyFromString(toString, StartLabel, DurationLabel)) == false)
-                        rc.SetError(1070102, MxError.Source.Data, $"SetStartTime failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                        rc.SetError(1070102, MxError.Source.Data, $"SetStartTime failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                     else
                     {
                         if (SetDuration(Extensions.GetPropertyFromString(toString, DurationLabel, StartLineLabel)) == false)
-                            rc.SetError(1070103, MxError.Source.Data, $"SetDuration failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                            rc.SetError(1070103, MxError.Source.Data, $"SetDuration failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                         else
                         {
                             if (SetStartLineLinesTyped(Extensions.GetPropertyFromString(toString, StartLineLabel, EndLineLabel)) == false)
-                                rc.SetError(1070104, MxError.Source.Data, $"SetStartLineLinesTyped failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                                rc.SetError(1070104, MxError.Source.Data, $"SetStartLineLinesTyped failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                             else
                             {
                                 if (SetEndLineLinesTyped(Extensions.GetPropertyFromString(toString, EndLineLabel, WordsCountLabel)) == false)
-                                    rc.SetError(1070105, MxError.Source.Data, $"SetEndLineLinesTyped failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                                    rc.SetError(1070105, MxError.Source.Data, $"SetEndLineLinesTyped failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                                 else
                                 {
                                     if (SetWordsCountWpm(Extensions.GetPropertyFromString(toString, WordsCountLabel, CorrectionsCountLabel)) == false)
-                                        rc.SetError(1070106, MxError.Source.Data, $"SetWordsCountWpm failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                                        rc.SetError(1070106, MxError.Source.Data, $"SetWordsCountWpm failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                                     else
                                     {
                                         if (SetCorrectionsCountWpc(Extensions.GetPropertyFromString(toString, CorrectionsCountLabel, SpellCheckCountLabel)) == false)
-                                            rc.SetError(1070107, MxError.Source.Data, $"SetCorrectionsCountWpc failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                                            rc.SetError(1070107, MxError.Source.Data, $"SetCorrectionsCountWpc failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                                         else
                                         {
                                             if (SetSpellCheckCountWps(Extensions.GetPropertyFromString(toString, SpellCheckCountLabel, TypingPausesLabel)) == false)
-                                                rc.SetError(1070108, MxError.Source.Data, $"SetSpellCheckCountWps failed: toString={GetTruncatedString(toString)}", "MxErrInvalidCondition");
+                                                rc.SetError(1070108, MxError.Source.Data, $"SetSpellCheckCountWps failed: toString={GetTruncatedString(toString)}", MxMsgs.MxErrInvalidChapterFile);
                                             else
                                             {
                                                 var rcPauses = SetTypingPausesTypingTime(Extensions.GetPropertyFromString(toString.Replace(Environment.NewLine, ""), TypingPausesLabel, ProperiesEndLabel));
@@ -381,18 +403,6 @@ namespace KLineEdCmdApp.Model
                     Reset();
             }
             return rc;
-        }
-
-        public void SetPause()
-        {
-            PauseState = true;
-        }
-
-        public void AddPause(in DateTime utcNow, in DateTime lastKeyStroke)
-        {
-            var pause = new HeaderSessionPause(utcNow, (int)(utcNow-lastKeyStroke).TotalSeconds);
-            TypingPauses.Add(pause);
-            PauseState = false;
         }
 
         public string GetAssessment()
@@ -536,11 +546,10 @@ namespace KLineEdCmdApp.Model
 
         public string GetTypingPausesString()
         {
-            string rc = HeaderBase.ValueNotSet;
+            string rc = "";
 
             if (TypingPauses != null)
             {
-                rc = "";
                 var recordCnt = 0;
                 foreach (var pause in TypingPauses)
                 {
@@ -554,14 +563,34 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
+
+        public MxReturnCode<bool> SetTypingPausesTypingTime()
+        {
+            var rc = new MxReturnCode<bool>("HeaderSession.SetTypingPausesTypingTime()");
+
+            var pauseTime = 0.0;
+            foreach (var pause in TypingPauses)
+                pauseTime += pause.Duration;
+
+            if (Duration == null)
+                rc.SetError(1070201, MxError.Source.Param, $"Duration=nul", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+                var sessionSeconds = Duration?.TotalSeconds ?? 0.0;
+                TypingTime = new TimeSpan(0, 0, (int)(sessionSeconds - pauseTime));
+                TypingPauseCount = TypingPauses.Count;
+                rc.SetResult(true);
+            }
+            return rc;
+        }
         public MxReturnCode<bool> SetTypingPausesTypingTime(string pauseList)
         {
-            var rc = new MxReturnCode<bool>("HeaderSession.SetTypingPausesTypingTime");
+            var rc = new MxReturnCode<bool>("HeaderSession.SetTypingPausesTypingTime(string)");
 
             var existingPauses = TypingPauses;
             var existingTypingTime = TypingTime;
             if ((Duration == null) || (IsLabelFound(pauseList) == true))
-                rc.SetError(1070201, MxError.Source.Param, $"Duration=null or pauseList contains a label", "MxErrBadMethodParam");
+                rc.SetError(1070301, MxError.Source.Param, $"Duration=null or pauseList contains a label", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (TypingPauses != null)
@@ -585,7 +614,7 @@ namespace KLineEdCmdApp.Model
                         var rcInit = typingPause.InitialiseFromString(pause + HeaderSessionPause.Terminator);
                         if (rcInit.IsError(true) || typingPause.IsError())
                         {
-                            rc.SetError(1070202, MxError.Source.Data, $"TypingPause.InitialiseFromString({pause + HeaderSessionPause.Terminator}) failed", "MxErrInvalidCondition");
+                            rc.SetError( 1070302, MxError.Source.Data, $"TypingPause.InitialiseFromString({pause + HeaderSessionPause.Terminator}) failed", MxMsgs.MxErrInvalidCondition);
                             break;
                         }
                         else
@@ -597,8 +626,8 @@ namespace KLineEdCmdApp.Model
                     if (rc.IsSuccess())
                     {
                         var sessionSeconds = Duration?.TotalSeconds ?? 0.0;
-                        if (sessionSeconds <= pauseTime)
-                            rc.SetError(1070203, MxError.Source.Data, $"sessionSeconds={sessionSeconds} is less or equal to= pauseTime={pauseTime}", "MxErrInvalidCondition");
+                        if (sessionSeconds < pauseTime)
+                            rc.SetError(1070303, MxError.Source.Data, $"sessionSeconds={sessionSeconds} is less or equal to= pauseTime={pauseTime}", MxMsgs.MxErrInvalidChapterFile);
                         else
                         {
                             TypingTime = new TimeSpan(0, 0, (int)(sessionSeconds - pauseTime));

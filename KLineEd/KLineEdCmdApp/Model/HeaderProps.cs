@@ -13,10 +13,10 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class HeaderChapter : HeaderBase
+    public class HeaderProps : HeaderBase
     {
-        public static readonly string OpeningElement = "<chapter>";
-        public static readonly string ClosingElement = "</chapter>";
+        public static readonly string OpeningElement = "<props>";
+        public static readonly string ClosingElement = "</props>";
 
         public static readonly string AuthorLabel = "Author:";
         public static readonly string ProjectLabel = "Project:";
@@ -28,7 +28,7 @@ namespace KLineEdCmdApp.Model
         public string Title { get; private set; }
         public string PathFileName { get; private set; }
 
-        public HeaderChapter()
+        public HeaderProps()
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             Reset();
@@ -49,10 +49,10 @@ namespace KLineEdCmdApp.Model
 
         public MxReturnCode<bool> Write(StreamWriter file, bool newFile = false)
         {
-            var rc = new MxReturnCode<bool>("HeaderChapter.Write");
+            var rc = new MxReturnCode<bool>("HeaderProps.Write");
 
             if (file == null)
-                rc.SetError(1060101, MxError.Source.Param, "file is null", "MxErrBadMethodParam");
+                rc.SetError(1060101, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -68,24 +68,24 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1060102, MxError.Source.Exception, e.Message, "MxErrInvalidCondition");
+                    rc.SetError(1060102, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
         }
         public MxReturnCode<bool> Read(StreamReader file)
         {
-            var rc = new MxReturnCode<bool>("HeaderChapter.Read");
+            var rc = new MxReturnCode<bool>("HeaderProps.Read");
 
             if (file == null)
-                rc.SetError(1060201, MxError.Source.Param, "file is null", "MxErrBadMethodParam");
+                rc.SetError(1060201, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     var firstLine = file.ReadLine();
                     if (firstLine != OpeningElement)
-                        rc.SetError(1060202, MxError.Source.User, $"first line is {firstLine}", "MxErrInvalidCondition");
+                        rc.SetError(1060202, MxError.Source.User, $"first line is {firstLine}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         var lastLine = file.ReadLine();
@@ -95,7 +95,7 @@ namespace KLineEdCmdApp.Model
                             lastLine = file.ReadLine();
                         }
                         if (lastLine != ClosingElement)
-                            rc.SetError(1060203, MxError.Source.User, $"last line is {lastLine}", "MxErrInvalidCondition");
+                            rc.SetError(1060203, MxError.Source.User, $"last line is {lastLine}", MxMsgs.MxErrInvalidCondition);
                         else
                         {
                             rc.SetResult(true);
@@ -104,7 +104,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1060204, MxError.Source.Exception, e.Message, "MxErrInvalidCondition");
+                    rc.SetError(1060204, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -160,26 +160,26 @@ namespace KLineEdCmdApp.Model
         }
         public override MxReturnCode<bool> InitialiseFromString(string toString)
         {
-            var rc = new MxReturnCode<bool>("HeaderChapter.InitialiseFromString");
+            var rc = new MxReturnCode<bool>("HeaderProps.InitialiseFromString");
 
             Reset();
 
             if (toString != null)
             {       //order must be same as ToString()
                 if (SetAuthor(Extensions.GetPropertyFromString(toString, AuthorLabel, ProjectLabel)) == false)
-                    rc.SetError(1060301, MxError.Source.Data, $"SetAuthor failed for {toString}", "MxErrInvalidCondition");
+                    rc.SetError(1060301, MxError.Source.Data, $"SetAuthor failed for {toString}", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     if (SetProject(Extensions.GetPropertyFromString(toString, ProjectLabel, TitleLabel)) == false)
-                        rc.SetError(1060302, MxError.Source.Data, $"SetProject failed for {toString}", "MxErrInvalidCondition");
+                        rc.SetError(1060302, MxError.Source.Data, $"SetProject failed for {toString}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         if (SetTitle(Extensions.GetPropertyFromString(toString, TitleLabel, PathFileNameLabel)) == false)
-                            rc.SetError(1060303, MxError.Source.Data, $"SetTitle failed for {toString}", "MxErrInvalidCondition");
+                            rc.SetError(1060303, MxError.Source.Data, $"SetTitle failed for {toString}", MxMsgs.MxErrInvalidCondition);
                         else
                         {
                             if (SetPathFileName(Extensions.GetPropertyFromString(toString, PathFileNameLabel, null)) == false)
-                                rc.SetError(1060304, MxError.Source.Data, $"SetPathFileName failed for {toString}", "MxErrInvalidCondition");
+                                rc.SetError(1060304, MxError.Source.Data, $"SetPathFileName failed for {toString}", MxMsgs.MxErrInvalidCondition);
                             else
                             {
                                 rc.SetResult(true);

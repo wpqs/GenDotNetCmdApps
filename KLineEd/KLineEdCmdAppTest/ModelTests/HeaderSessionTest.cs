@@ -17,7 +17,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session.IsError());
             Assert.Equal(4, session.SessionNo);
             Assert.Equal("23-06-19 12:10:00", session.Start?.ToString(MxStdFrmt.DateTime));
-            Assert.Equal("02:13:34", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
             Assert.Equal(210, session.StartLine);
             Assert.Equal(350, session.EndLine);
             Assert.Equal(350-210, session.LinesTyped);
@@ -27,7 +27,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3.6, session.Wpc, 1);
             Assert.Equal(255, session.SpellCheckCount);
             Assert.Equal(13.7, session.Wps, 1);
-            Assert.Equal("02:01:04", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:01:04", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data, session.ToString());
         }
@@ -41,7 +41,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session.IsError());
             Assert.Equal(0, session.SessionNo);
             Assert.Equal("01-01-00 00:00:00", session.Start?.ToString(MxStdFrmt.DateTime));
-            Assert.Equal("00:00:00", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("00:00:00", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
             Assert.Equal(1, session.StartLine);
             Assert.Equal(1, session.EndLine);
             Assert.Equal(0, session.LinesTyped);
@@ -51,7 +51,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0.0, session.Wpc, 0);
             Assert.Equal(0, session.SpellCheckCount);
             Assert.Equal(0.0, session.Wps, 0);
-            Assert.Equal("00:00:00", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("00:00:00", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data, session.ToString());
         }
@@ -65,7 +65,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session.IsError());
             Assert.Equal(999999, session.SessionNo);
             Assert.Equal("23-06-19 00:00:00", session.Start?.ToString(MxStdFrmt.DateTime));
-            Assert.Equal("23:59:59", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("23:59:59", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
             Assert.Equal(1, session.StartLine);
             Assert.Equal(99999, session.EndLine);
             Assert.Equal(99998, session.LinesTyped);
@@ -75,7 +75,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(10, session.Wpc, 0);
             Assert.Equal(66666, session.SpellCheckCount);
             Assert.Equal(15.0, session.Wps, 0);
-            Assert.Equal("23:59:00", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("23:59:00", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data, session.ToString());
         }
@@ -89,7 +89,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session.IsError());
             Assert.Equal(999999, session.SessionNo);
             Assert.Equal("23-06-19 23:59:59", session.Start?.ToString(MxStdFrmt.DateTime));
-            Assert.Equal("01:00:00", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("01:00:00", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
  
             Assert.Equal(data, session.ToString());
         }
@@ -101,8 +101,8 @@ namespace KLineEdCmdAppTest.ModelTests
             var session = new HeaderSession();
             Assert.True(session.InitialiseFromString(data).GetResult());
             Assert.False(session.IsError());
-            Assert.Equal("02:13:34", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:13:34", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data, session.ToString());
         }
@@ -114,8 +114,8 @@ namespace KLineEdCmdAppTest.ModelTests
             var session = new HeaderSession();
             Assert.True(session.InitialiseFromString(data + "Typing pauses:[end]").GetResult());
             Assert.False(session.IsError());
-            Assert.Equal("02:13:34", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:13:34", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data + "Typing pauses: [end]", session.ToString());
         }
@@ -129,8 +129,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session.IsError());
             Assert.Equal(4, session.SessionNo);
             Assert.Equal("23-06-19 12:10:00", session.Start?.ToString(MxStdFrmt.DateTime));
-            Assert.Equal("02:13:34", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:01:04", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:01:04", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data, session.ToString());
         }
@@ -144,8 +144,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session.IsError());
             Assert.Equal(4, session.SessionNo);
             Assert.Equal("23-06-19 12:10:00", session.Start?.ToString(MxStdFrmt.DateTime));
-            Assert.Equal("02:13:34", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:01:04", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:01:04", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data, session.ToString());
         }
@@ -161,8 +161,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session.IsError());
             Assert.Equal(4, session.SessionNo);
             Assert.Equal("23-06-19 12:10:00", session.Start?.ToString(MxStdFrmt.DateTime));
-            Assert.Equal("02:13:34", session.Duration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:01:04", session.TypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", session.Duration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:01:04", session.TypingTime?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(data.Replace(Environment.NewLine, ""), session.ToString());
         }

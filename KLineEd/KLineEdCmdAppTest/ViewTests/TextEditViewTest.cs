@@ -1,5 +1,7 @@
 ﻿using KLineEdCmdApp.Controller;
 using KLineEdCmdAppTest.TestSupport;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
+using MxReturnCode;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests
@@ -40,26 +42,33 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.Equal("hello", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.Refresh();
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.AppendWord("world");
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("world", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.Refresh();
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello world", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.AppendChar('s');
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("s", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.Refresh();
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello worlds", _fixture.View.LastTerminalOutput);
             Assert.Equal(1, _fixture.Model.GetTextLineCount());
 
             _fixture.Model.AppendLine("hello 1234  byebye");
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("hello 1234  byebye", _fixture.View.LastTerminalOutput);
             Assert.Equal(2, _fixture.Model.GetTextLineCount());
 
             _fixture.Model.Refresh();
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("hello 1234  byebye", _fixture.View.LastTerminalOutput);
         }
     }

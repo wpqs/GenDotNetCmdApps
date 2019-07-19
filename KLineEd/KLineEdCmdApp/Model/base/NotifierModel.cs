@@ -28,7 +28,7 @@ namespace KLineEdCmdApp.Model.Base
         {
             Provider?.Notify(new NotificationItem { ErrorMsg = msg });
         }
-        protected virtual void DisconnectAllViews()
+        public virtual void DisconnectAllViews()
         {
             Provider?.Notify(new NotificationItem { Unsubscribe = true });
         }

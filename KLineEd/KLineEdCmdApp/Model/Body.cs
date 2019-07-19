@@ -54,7 +54,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
             if (lineWidth == Program.PosIntegerNotSet)
-                rc.SetError(1100101, MxError.Source.Param, $"lineWidth={lineWidth} not set", "MxErrBadMethodParam");
+                rc.SetError(1100101, MxError.Source.Param, $"lineWidth={lineWidth} not set", MxMsgs.MxErrBadMethodParam);
             else
             {
                 LineWidth = lineWidth;
@@ -70,13 +70,13 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.Write");
 
             if (file == null)
-                rc.SetError(1100201, MxError.Source.Param, "file is null", "MxErrBadMethodParam");
+                rc.SetError(1100201, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     if (IsError())
-                        rc.SetError(1100202, MxError.Source.Program, "IsError() == true, Initialise not called?", "MxErrInvalidCondition");
+                        rc.SetError(1100202, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         file.WriteLine(OpeningElement);
@@ -92,7 +92,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1100203, MxError.Source.Exception, e.Message, "MxErrInvalidCondition");
+                    rc.SetError(1100203, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
 
@@ -104,18 +104,18 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.Read");
 
             if (file == null)
-                rc.SetError(1100301, MxError.Source.Param, "file is null", "MxErrBadMethodParam");
+                rc.SetError(1100301, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     if (IsError())
-                        rc.SetError(1100302, MxError.Source.Program, "IsError() == true, Initialise not called?", "MxErrInvalidCondition");
+                        rc.SetError(1100302, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         var firstLine = file.ReadLine();
                         if (firstLine != OpeningElement)
-                            rc.SetError(1100303, MxError.Source.User, $"first line is {firstLine}", "MxErrInvalidCondition");
+                            rc.SetError(1100303, MxError.Source.User, $"first line is {firstLine}", MxMsgs.MxErrInvalidCondition);
                         else
                         {
                             string lastLine = null;
@@ -129,7 +129,7 @@ namespace KLineEdCmdApp.Model
                             }
 
                             if (lastLine != ClosingElement)
-                                rc.SetError(1100304, MxError.Source.User, $"last line is {lastLine}", "MxErrInvalidCondition");
+                                rc.SetError(1100304, MxError.Source.User, $"last line is {lastLine}", MxMsgs.MxErrInvalidCondition);
                             else
                             {
                                 WordCount = RefreshWordCount();
@@ -140,7 +140,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1100305, MxError.Source.Exception, e.Message, "MxErrInvalidCondition");
+                    rc.SetError(1100305, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -151,16 +151,16 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.AppendLine");
 
             if (line == null) // allow lines that are empty - i.e. user hits enter key
-                rc.SetError(1100401, MxError.Source.Param, "text is null", "MxErrBadMethodParam");
+                rc.SetError(1100401, MxError.Source.Param, "text is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError())
-                    rc.SetError(1100402, MxError.Source.Program, "IsError() == true, Initialise not called?", "MxErrInvalidCondition");
+                    rc.SetError(1100402, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     var lineLen = line.Length;
                     if (lineLen > LineWidth)
-                        rc.SetError(1100403, MxError.Source.User, $"text.Length={lineLen} > LineWidth={LineWidth}", "MxErrLineTooLong");
+                        rc.SetError(1100403, MxError.Source.User, $"text.Length={lineLen} > LineWidth={LineWidth}", MxMsgs.MxErrLineTooLong);
                     else
                     {
                         if (Body.GetErrorsInEnteredText(line) != null)
@@ -187,16 +187,16 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.AppendWord");
 
             if (string.IsNullOrWhiteSpace(word)) 
-                rc.SetError(1100501, MxError.Source.Param, "word is null", "MxErrBadMethodParam");
+                rc.SetError(1100501, MxError.Source.Param, "word is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError())
-                    rc.SetError(1100502, MxError.Source.Program, "IsError() == true, Initialise not called?", "MxErrInvalidCondition");
+                    rc.SetError(1100502, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     var lineLen = word.Length;
                     if (lineLen > LineWidth)
-                        rc.SetError(110503, MxError.Source.User, $"word.Length={lineLen} > LineWidth={LineWidth}", "MxErrLineTooLong");
+                        rc.SetError(110503, MxError.Source.User, $"word.Length={lineLen} > LineWidth={LineWidth}", MxMsgs.MxErrLineTooLong);
                     else
                     {
                         if (Body.GetErrorsInEnteredText(word, "word") != null)
@@ -217,7 +217,7 @@ namespace KLineEdCmdApp.Model
                             else
                             {
                                 if (AddWord(word) == false)
-                                    rc.SetError(1100506, MxError.Source.Program, $"word={word ?? "[null]"} is NullorEmpty", "MxErrInvalidCondition");
+                                    rc.SetError(1100506, MxError.Source.Program, $"word={word ?? "[null]"} is NullorEmpty", MxMsgs.MxErrInvalidCondition);
                                 else
                                 {
                                     WordCount++;
@@ -242,14 +242,14 @@ namespace KLineEdCmdApp.Model
                 var lineIndex = TextLines.Count - 1;
                 var appendChar = (Char.IsWhiteSpace(c)) ? ((c == '\t') ? TabSpaces : Body.SpaceChar.ToString()) :  c.ToString();
                 if (appendChar.Length <= 0)
-                    rc.SetError(1100602, MxError.Source.Program, $"appendChar={appendChar} for c={c} length <= 0", "MxErrInvalidCondition");
+                    rc.SetError(1100602, MxError.Source.Program, $"appendChar={appendChar} for c={c} length <= 0", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     var lastChar = GetCharacterInLine();                     //get last character in last line
                     if ((lastChar == Body.NullChar) || (lineIndex < 0))
                     {                                                   
                         if (AddFirstCharToChapter(appendChar) == false)
-                            rc.SetError(1100603, MxError.Source.Program, $"AddFirstCharToChapter({appendChar ?? "[null]"}) failed", "MxErrInvalidCondition");
+                            rc.SetError(1100603, MxError.Source.Program, $"AddFirstCharToChapter({appendChar ?? "[null]"}) failed", MxMsgs.MxErrInvalidCondition);
                         else
                             rc.SetResult(true);
                     }
@@ -272,7 +272,7 @@ namespace KLineEdCmdApp.Model
                             else
                             {                                           //space, so start new word
                                 if (AddWord(appendChar) == false)
-                                    rc.SetError(1100604, MxError.Source.Program, $"appendChar={appendChar ?? "[null]"} is NullorEmpty", "MxErrInvalidCondition");
+                                    rc.SetError(1100604, MxError.Source.Program, $"appendChar={appendChar ?? "[null]"} is NullorEmpty", MxMsgs.MxErrInvalidCondition);
                                 else
                                 {
                                     if (string.IsNullOrWhiteSpace(appendChar) == false)
@@ -292,17 +292,17 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.AutoLineBreak");
 
             if ((lineIndex < 0) || (string.IsNullOrEmpty(appendChar) == true) || (appendChar.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
-                rc.SetError(1100701, MxError.Source.Param, $"lineIndex={lineIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={appendChar?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", "MxErrBadMethodParam");
+                rc.SetError(1100701, MxError.Source.Param, $"lineIndex={lineIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={appendChar?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var breakIndex = GetLineBreakIndex(lineIndex, appendChar.Length);
                 if (breakIndex == Program.PosIntegerNotSet)
-                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharacterCountInLine()} when LineWidth={LineWidth}", "MxErrLineTooLong");
+                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharacterCountInLine()} when LineWidth={LineWidth}", MxMsgs.MxErrLineTooLong);
                 else
                 {
                     var newLine = SplitLine(lineIndex, breakIndex);
                     if (newLine == null)
-                        rc.SetError(1100703, MxError.Source.User, $"SplitLine({lineIndex}, {breakIndex}) is null for TextLines.Count={TextLines.Count}", "MxErrLineTooLong");
+                        rc.SetError(1100703, MxError.Source.User, $"SplitLine({lineIndex}, {breakIndex}) is null for TextLines.Count={TextLines.Count}", MxMsgs.MxErrLineTooLong);
                     else
                     {
                         var wordsInLine = AddLine(newLine + appendChar);
@@ -322,11 +322,11 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<string[]>("Body.GetLastLinesForDisplay", null);
 
             if (count > CmdLineParamsApp.ArgDisplayLastLinesCntMax)
-                rc.SetError(1100801, MxError.Source.Param, $"count={count} > {CmdLineParamsApp.ArgDisplayLastLinesCntMax}", "MxErrBadMethodParam");
+                rc.SetError(1100801, MxError.Source.Param, $"count={count} > {CmdLineParamsApp.ArgDisplayLastLinesCntMax}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError())
-                    rc.SetError(1100802, MxError.Source.Program, "IsError() == true, Initialise not called?", "MxErrInvalidCondition");
+                    rc.SetError(1100802, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     var lastLines = new string[count];

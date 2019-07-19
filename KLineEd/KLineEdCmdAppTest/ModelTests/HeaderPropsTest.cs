@@ -5,13 +5,13 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests
 {
-    public class HeaderChapterTest
+    public class HeaderPropsTest
     {
         [Fact]
         public void ToStringTest()
         {
             var data = $"Author: Wills Project: A23 Title: B23 File: C23";
-            var info = new HeaderChapter();
+            var info = new HeaderProps();
             Assert.True(info.InitialiseFromString(data).GetResult());
             Assert.False(info.IsError());
             Assert.Equal(data, info.ToString());
@@ -25,7 +25,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetReportTest()
         {
             var data = $"Author: Wills{Environment.NewLine}Project: A23{Environment.NewLine}Title: B23{Environment.NewLine}File: C23";
-            var info = new HeaderChapter();
+            var info = new HeaderProps();
             Assert.True(info.InitialiseFromString(data).GetResult());
             Assert.False(info.IsError());
             Assert.StartsWith(data, info.GetReport());
@@ -35,7 +35,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void InitialiseFromStringTest()
         {
             var data = $"Author: Wills Project: A23 Title: B23 File: C23";
-            var info = new HeaderChapter();
+            var info = new HeaderProps();
             Assert.True(info.InitialiseFromString(data).GetResult());
             Assert.False(info.IsError());
             Assert.Equal(data, info.ToString());
@@ -52,7 +52,7 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void NullTest()
         {
-            var info = new HeaderChapter();
+            var info = new HeaderProps();
             Assert.False(info.InitialiseFromString(null).GetResult());
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
@@ -65,7 +65,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void MissingAuthorPropertyTest()
         {
             var data = $"Project: A23 Title: B23 File: C23";
-            var info = new HeaderChapter();
+            var info = new HeaderProps();
             Assert.False(info.InitialiseFromString(data).GetResult());
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
@@ -79,7 +79,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void MissingChapterPropertyTest()
         {
             var data = $"Author: Wills Project: A23 File: C23";
-            var info = new HeaderChapter();
+            var info = new HeaderProps();
             Assert.False(info.InitialiseFromString(data).GetResult());
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
@@ -93,7 +93,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void MissingFilePropertyTest()
         {
             var data = $"Author: Wills Project: A23 Title: B23";
-            var info = new HeaderChapter();
+            var info = new HeaderProps();
             Assert.False(info.InitialiseFromString(data).GetResult());
             Assert.True(info.IsError());
             Assert.Equal(HeaderBase.ValueNotSet, info.ToString());

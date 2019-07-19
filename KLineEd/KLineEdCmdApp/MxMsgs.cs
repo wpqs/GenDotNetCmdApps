@@ -20,6 +20,10 @@ namespace KLineEdCmdApp
         public const string MxErrBadMethodParam = "MxErrBadMethodParam";  //Error: internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed.
         public const string MxErrInvalidCondition = "MxErrInvalidCondition"; //Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed.
         public const string MxErrLineTooLong = "MxErrLineTooLong"; //Error: line is too long. You have reached the end of the line. Press the Enter key to continue
+        public const string MxErrInvalidChapterFile = "MxErrInvalidChapterFile"; //Error: chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again 
+        public const string MxErrException = "MxErrException"; //Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed.
+        public const string MxErrSystemFailure = "MxErrSystemFailure"; //Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
+
     }
 
     //Whilst you should try to avoid duplicating error code values in your code base, doing so doesn't break anything. The following conventions may help:

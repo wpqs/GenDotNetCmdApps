@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
-using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View.Base;
@@ -35,10 +34,10 @@ namespace KLineEdCmdApp.Model
         public string FileName { private set; get; }
         public string Folder { private set; get; }
         public bool Ready { private set; get; }
-        public Header Header { get; } 
-        public Body Body { get; }
+        public Header ChapterHeader { get; } 
+        public Body ChapterBody { get; }
 
-        public EditingBaseController OpMode { private set; get; }
+
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }
         public string EditorHelpLine { private set; get; }
@@ -46,24 +45,29 @@ namespace KLineEdCmdApp.Model
         // ReSharper disable once RedundantBaseConstructorCall
         public ChapterModel() : base()
         {
-            Header = new Header();
-            Body = new Body();
+            ChapterHeader = new Header();
+            ChapterBody = new Body();
             StatusLine = "";
             MsgLine = "";
             EditorHelpLine = "";
-            OpMode = null;
             Ready = false;
-        }
-
-        public void SetMode(EditingBaseController opMode)
-        {
-            OpMode = opMode;
-            UpdateAllViews((int)ChangeHint.All);
         }
 
         public void SetStatusLine(bool update=true)     //called from Time Thread so readonly model items
         {
-            StatusLine = $"{DateTime.Now.ToString(MxStdFrmt.Time)} Line: {Body?.GetLineCount() ?? Program.PosIntegerNotSet} Column: {Body?.GetCharacterCountInLine()+1 ?? Program.PosIntegerNotSet} Total words: {Body?.WordCount ?? Program.PosIntegerNotSet}";
+            var elapsed = DateTime.UtcNow - ChapterHeader.GetLastSession()?.Start;
+
+            if (elapsed?.TotalDays > 0.99)
+                StatusLine = $"{(elapsed?.TotalDays ?? 0.0).ToString(Header.MxStdFrmtDouble0)} days {elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
+            else
+                StatusLine = $"{elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
+
+            StatusLine += $"Line: {ChapterBody?.GetLineCount() ?? Program.PosIntegerNotSet} ";
+            StatusLine += $"Column: {ChapterBody?.GetCharacterCountInLine() + 1 ?? Program.PosIntegerNotSet} ";
+            StatusLine += $"Total words: {ChapterBody?.WordCount ?? Program.PosIntegerNotSet} ";
+
+            StatusLine += $"{(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)}";
+            
             if (update)
                 UpdateAllViews((int)ChangeHint.StatusLine);
         }
@@ -102,7 +106,7 @@ namespace KLineEdCmdApp.Model
 
         public string GetTabSpaces()
         {
-            return Body?.TabSpaces ?? Program.ValueNotSet;
+            return ChapterBody?.TabSpaces ?? Program.ValueNotSet;
         }
 
         public MxReturnCode<bool>Initialise(int lineWidth, string pathFilename)
@@ -110,12 +114,12 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.Setup");
 
             if ((string.IsNullOrEmpty(pathFilename)) || (lineWidth == Program.PosIntegerNotSet))
-                rc.SetError(1050101, MxError.Source.Param, $"LineWidth={lineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
+                rc.SetError(1050101, MxError.Source.Param, $"LineWidth={lineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
-                    var rcInit = Body.Initialise(lineWidth);
+                    var rcInit = ChapterBody.Initialise(lineWidth);
                     rc += rcInit;
                     if (rcInit.IsSuccess(true))
                     {
@@ -143,6 +147,7 @@ namespace KLineEdCmdApp.Model
 
                             if (rcDone.IsSuccess(true))
                             {
+                                ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgPauseWaitSecsDefault); //todo set from value
                                 Ready = true;
                                 rc.SetResult(true);
                             }
@@ -151,7 +156,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1050103, MxError.Source.Exception, e.Message);
+                    rc.SetError(1050103, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -162,7 +167,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.Close");
 
             if (Ready == false)
-                rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", "MxErrBadMethodParam");
+                rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (save == false)
@@ -191,7 +196,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.Save");
 
             if (Ready == false)
-                rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", "MxErrBadMethodParam");
+                rc.SetError(1050201, MxError.Source.Param, $"InitDone == false", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var rcWrite = Write($"{Folder}\\{FileName}");
@@ -209,10 +214,10 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.CreateNewSession");
 
             if (Ready == false)
-                rc.SetError(1050301, MxError.Source.Param, $"InitDone == false", "MxErrInvalidCondition");
+                rc.SetError(1050301, MxError.Source.Param, $"InitDone == false", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var rcSession = Header.CreateNewSession(Body?.GetLineCount() ?? Program.PosIntegerNotSet);
+                var rcSession = ChapterHeader.CreateNewSession(ChapterBody?.GetLineCount() ?? Program.PosIntegerNotSet);
                 rc += rcSession;
                 if (rcSession.IsSuccess(true))
                     rc.SetResult(true);
@@ -225,10 +230,10 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.AppendLine");
 
             if (Ready == false)
-                rc.SetError(1050401, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", "MxErrInvalidCondition");
+                rc.SetError(1050401, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var rcAdd = Body.AppendLine(line);
+                var rcAdd = ChapterBody.AppendLine(line);
                 if (rcAdd.IsError(true))
                     rc += rcAdd;        //may be called lots of times, so only log errors
                 else
@@ -245,10 +250,10 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.AppendWord");
 
             if (Ready == false)
-                rc.SetError(1050501, MxError.Source.Program, "Initialise not called or not successful", "MxErrInvalidCondition");
+                rc.SetError(1050501, MxError.Source.Program, "Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var rcAdd = Body.AppendWord(word);
+                var rcAdd = ChapterBody.AppendWord(word);
                 if (rcAdd.IsError(true))
                     rc += rcAdd;        //may be called lots of times, so only log errors
                 else
@@ -265,10 +270,10 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.AppendChar");
 
             if (Ready == false)
-                rc.SetError(1050601, MxError.Source.Program, "Initialise not called or not successful", "MxErrInvalidCondition");
+                rc.SetError(1050601, MxError.Source.Program, "Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var rcAdd = Body.AppendChar(c);
+                var rcAdd = ChapterBody.AppendChar(c);
                 if (rcAdd.IsError(true))
                     rc += rcAdd;        //may be called lots of times, so only log errors
                 else
@@ -285,10 +290,10 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<string[]>("ChapterModel.GetLastLinesForDisplay", null);
 
             if (Ready == false)
-                rc.SetError(1050701, MxError.Source.Program, "Initialise not called or not successful", "MxErrInvalidCondition");
+                rc.SetError(1050701, MxError.Source.Program, "Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var rcLastLines = Body.GetLastLinesForDisplay(count);
+                var rcLastLines = ChapterBody.GetLastLinesForDisplay(count);
                 rc += rcLastLines;
                 if (rcLastLines.IsSuccess(true))
                     rc.SetResult(rcLastLines.GetResult());
@@ -301,7 +306,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.Write");
 
             if (string.IsNullOrEmpty(pathFilename) || ((Ready == false) && (newFile == false)))
-                rc.SetError(1050801, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
+                rc.SetError(1050801, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -309,12 +314,12 @@ namespace KLineEdCmdApp.Model
                     using (var file = new StreamWriter(pathFilename)) //default StreamBuffer size is 1024
                     {
                         if (newFile)
-                            Header.SetDefaults(pathFilename);
-                        var rcHeader = Header.Write(file, newFile);
+                            ChapterHeader.SetDefaults(pathFilename);
+                        var rcHeader = ChapterHeader.Write(file, newFile);
                         rc += rcHeader;
                         if (rcHeader.IsSuccess(true))
                         {
-                            var rcBody = Body.Write(file);
+                            var rcBody = ChapterBody.Write(file);
                             rc += rcBody;
                             if (rcBody.IsSuccess(true))
                             {
@@ -325,7 +330,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1050802, MxError.Source.Exception, e.Message);
+                    rc.SetError(1050802, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -336,18 +341,18 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("ChapterModel.Read");
 
             if (string.IsNullOrEmpty(pathFilename))
-                rc.SetError(1050901, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", "MxErrBadMethodParam");
+                rc.SetError(1050901, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     using (var file = new StreamReader(pathFilename)) //default StreamBuffer size is 1024
                     {
-                        var rcHeader = Header.Read(file);
+                        var rcHeader = ChapterHeader.Read(file);
                         rc += rcHeader;
                         if (rcHeader.IsSuccess(true))
                         {
-                            var rcBody = Body.Read(file);
+                            var rcBody = ChapterBody.Read(file);
                             rc += rcBody;
                             if (rcBody.IsSuccess(true))
                             {
@@ -358,7 +363,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1050902, MxError.Source.Exception, e.Message);
+                    rc.SetError(1050902, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -367,16 +372,16 @@ namespace KLineEdCmdApp.Model
         public bool RemoveAllLines()
         {
             var rc = false;
-            if (Ready && ((Body?.IsError() ?? true) == false))
+            if (Ready && ((ChapterBody?.IsError() ?? true) == false))
             {
-                Body.RemoveAllLines();
+                ChapterBody.RemoveAllLines();
                 rc = true;
             }
             return rc;
         }
         public HeaderSession GetLastSession()
         {
-            return (Ready) ? Header?.GetLastSession() : null;
+            return (Ready) ? ChapterHeader?.GetLastSession() : null;
         }
         public string GetReport()
         {
@@ -397,7 +402,7 @@ namespace KLineEdCmdApp.Model
                 rc += "[not initialized]";
             else
             {
-                rc += Header?.GetChapterReport(Body.GetLineCount(), Body.WordCount) ?? "[chapter info not available]";
+                rc += ChapterHeader?.GetChapterReport(ChapterBody.GetLineCount(), ChapterBody.WordCount) ?? "[chapter info not available]";
             }
             return rc;
         }
@@ -408,7 +413,7 @@ namespace KLineEdCmdApp.Model
                 rc += "[not initialized]";
             else
             {
-                rc += Header?.GetLastSessionReport() ?? "[chapter info not available]";
+                rc += ChapterHeader?.GetLastSessionReport() ?? "[chapter info not available]";
             }
             return rc;
         }
@@ -417,7 +422,7 @@ namespace KLineEdCmdApp.Model
             var rc = Program.PosIntegerNotSet;
 
             if (Ready)
-                rc = Body.GetLineCount();
+                rc = ChapterBody.GetLineCount();
             return rc;
         }
 
@@ -426,7 +431,7 @@ namespace KLineEdCmdApp.Model
             var rc = Program.PosIntegerNotSet;
 
             if (Ready)
-                rc = Body.RefreshWordCount();
+                rc = ChapterBody.RefreshWordCount();
             return rc;
         }
     }

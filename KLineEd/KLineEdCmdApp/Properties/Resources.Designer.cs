@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KLineEdCmdApp.Utils.Properties {
+namespace KLineEdCmdApp.Properties {
     using System;
     
     
@@ -70,6 +70,24 @@ namespace KLineEdCmdApp.Utils.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        /// </summary>
+        internal static string MxErrException {
+            get {
+                return ResourceManager.GetString("MxErrException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again.
+        /// </summary>
+        internal static string MxErrInvalidChapterFile {
+            get {
+                return ResourceManager.GetString("MxErrInvalidChapterFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed..
         /// </summary>
         internal static string MxErrInvalidCondition {
@@ -102,6 +120,15 @@ namespace KLineEdCmdApp.Utils.Properties {
         internal static string MxErrLineTooLong {
             get {
                 return ResourceManager.GetString("MxErrLineTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
+        /// </summary>
+        internal static string MxErrSystemFailure {
+            get {
+                return ResourceManager.GetString("MxErrSystemFailure", resourceCulture);
             }
         }
         

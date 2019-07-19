@@ -50,6 +50,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamExportFile = "--export"; // editfilename.txt exportfilename.txt
 
         public static readonly string ParamEditFile = "--edit"; // filename.txt
+        public static readonly string ParamPauseWaitSecs = "--typingpause";
         public static readonly string ParamDisplayLastLines = "--displaylastlines"; // 10
         public static readonly string ParamDisplayLineWidth = "--DisplayLineWidth"; // 80
         public static readonly string ParamAudioCR = "--audiocr"; //bell.mpeg 2
@@ -59,6 +60,10 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamScrollReviewMode = "--scrollreview"; // on | off
         public static readonly string ParamEditLineMode = "--editline"; // on | off
         public static readonly string ParamSpellCheckMode = "--spellcheck"; // on | off
+
+        public static readonly int ArgPauseWaitSecsDefault = 60;
+        public static readonly int ArgPauseWaitSecsMin = 0;
+        public static readonly int ArgPauseWaitSecsMax = 86400; //24 * 60 * 60 - 24 hours
 
         public static readonly int ArgDisplayLastLinesCntDefault = 10;
         public static readonly int ArgDisplayLastLinesCntMin = 0;
@@ -278,7 +283,7 @@ namespace KLineEdCmdApp.Utils
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ResetProperties", false);
 
             if (mode == ResetMode.None)
-                rc.SetError(1020101, MxError.Source.Param, "paramLine is null", "MxErrBadMethodParam");
+                rc.SetError(1020101, MxError.Source.Param, "paramLine is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 SetPropertiesDefaults(false, mode);
@@ -331,7 +336,7 @@ namespace KLineEdCmdApp.Utils
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ParamProc", false);
 
             if (paramLine == null)
-                rc.SetError(1020201, MxError.Source.Param, "paramLine is null", "MxErrBadMethodParam");
+                rc.SetError(1020201, MxError.Source.Param, "paramLine is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var rcParam = GetParamType(paramLine);
@@ -385,7 +390,7 @@ namespace KLineEdCmdApp.Utils
                         default: //case Param.Unknown:
                         {
                             HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\"{Environment.NewLine}{Environment.NewLine}No further information{Environment.NewLine}";
-                            rc.SetError(1020202, MxError.Source.Program, $"Unsupported parameter {paramLine}", "MxErrUnsupportedParam");
+                            rc.SetError(1020202, MxError.Source.Program, $"Unsupported parameter {paramLine}", MxMsgs.MxErrUnknownParam);
                         }
                         break;
                     }
@@ -449,7 +454,7 @@ namespace KLineEdCmdApp.Utils
             else
             {
                 HelpHint = $"{Environment.NewLine}No further information{Environment.NewLine}";
-                rc.SetError(1020305, MxError.Source.Program, $"Unsupported parameter={EnumOps.XlatToString(Op)}", "MxErrUnsupportedParam");
+                rc.SetError(1020305, MxError.Source.Program, $"Unsupported parameter={EnumOps.XlatToString(Op)}", MxMsgs.MxErrUnknownParam);
             }
             return rc;
         }
@@ -571,7 +576,7 @@ namespace KLineEdCmdApp.Utils
                         var savedValues = File.ReadAllText(SettingsFile);
                         var savedSettings = JsonConvert.DeserializeObject<CmdLineParamsApp>(savedValues, jSettings);
                         if (errors.Count > 0)
-                            rc.SetError(1020401, MxError.Source.User, $"errors={errors.Count}; first={errors[0]}", "MxErrInvalidSettingsFile");
+                            rc.SetError(1020401, MxError.Source.User, $"errors={errors.Count}; first={errors[0]}", MxMsgs.MxErrInvalidSettingsFile);
                         else
                         {
                             UpdateProperties(savedSettings);
@@ -587,7 +592,7 @@ namespace KLineEdCmdApp.Utils
                     {
                         var newValues = JsonConvert.SerializeObject(this, jSettings);
                         if (errors.Count > 0)
-                            rc.SetError(1020402, MxError.Source.User, $"errors={errors.Count}; first={errors[0]}", "MxErrInvalidSettingsFile");
+                            rc.SetError(1020402, MxError.Source.User, $"errors={errors.Count}; first={errors[0]}", MxMsgs.MxErrInvalidSettingsFile);
                         else
                         {
                             File.WriteAllText(SettingsFile, newValues);
@@ -598,7 +603,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                rc.SetError(1020403, MxError.Source.Exception, $"{e.Message}");
+                rc.SetError(1020403, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             if (rc.IsError(true))
                 HelpHint = $"{Environment.NewLine}no further information.{Environment.NewLine}";
@@ -779,7 +784,7 @@ namespace KLineEdCmdApp.Utils
             var rc = new MxReturnCode<Param>("CmdLineParamsApp.GetParamType", Param.Unknown);
 
             if (paramLine == null)
-                rc.SetError(1023001, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
+                rc.SetError(1023001, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var offset = paramLine.IndexOf(spaceChar);

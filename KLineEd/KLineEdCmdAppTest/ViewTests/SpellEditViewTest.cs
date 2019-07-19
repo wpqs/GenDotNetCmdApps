@@ -32,6 +32,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.View.Ready);
 
             _fixture.Model.SetEditorHelpLine(SpellEditingController.EditorHelpText);
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
         }
     }
 }

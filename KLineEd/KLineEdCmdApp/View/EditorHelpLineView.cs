@@ -28,7 +28,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("EditorHelpLineView.Setup");
 
             if (param == null)
-                rc.SetError(1120101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
+                rc.SetError(1120101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var rcBase = base.Setup(param);
@@ -39,7 +39,7 @@ namespace KLineEdCmdApp.View
                     EditorHelpLineBackGndColour = ConsoleColor.Black;// param.BackGndCmdsColour; //todo rename BackGndCmdsHelpColour
 
                     if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
-                        rc.SetError(1120102, MxError.Source.Program, $"CmdsHelpView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                        rc.SetError(1120102, Terminal.GetErrorSource(), $"EditHelpLineView. {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
                    else
                     {
                         var rcClear = ClearLine(KLineEditor.EditorHelpLineRowIndex, KLineEditor.EditorHelpLineLeftCol);
@@ -59,31 +59,37 @@ namespace KLineEdCmdApp.View
         {
             var rc = new MxReturnCode<bool>("EditorHelpLineView.OnUpdate");
 
-            ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
-            if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.HelpLine))
-                rc.SetResult(true);
+            base.OnUpdate(notificationItem);
+            if (IsError())
+                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
-                ChapterModel model = notificationItem.Data as ChapterModel;
-                if (model == null)
-                    rc.SetError(1120301, MxError.Source.Program, "model is null", "MxErrInvalidCondition");
+                ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
+                if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.HelpLine))
+                    rc.SetResult(true);
                 else
                 {
-                    if (Terminal.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
-                        rc.SetError(1120302, MxError.Source.Program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    ChapterModel model = notificationItem.Data as ChapterModel;
+                    if (model == null)
+                        rc.SetError(1120301, MxError.Source.Program, "model is null", MxMsgs.MxErrInvalidCondition);
                     else
                     {
-                        var helpText = model.EditorHelpLine ?? Program.ValueNotSet;
-                        rc += DisplayLine(KLineEditor.EditorHelpLineRowIndex, KLineEditor.EditorHelpLineLeftCol, helpText, true);
-                        if (rc.IsSuccess(true))
+                        if (Terminal.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
+                            rc.SetError(1120302, Terminal.GetErrorSource(), $"EditHelpLineView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+                        else
                         {
-                            rc.SetResult(true);
+                            var helpText = model.EditorHelpLine ?? Program.ValueNotSet;
+                            rc += DisplayLine(KLineEditor.EditorHelpLineRowIndex, KLineEditor.EditorHelpLineLeftCol, helpText, true);
+                            if (rc.IsSuccess(true))
+                            {
+                                rc.SetResult(true);
+                            }
                         }
                     }
                 }
             }
             if (rc.IsError(true))
-                DisplayMxErrorMsg(rc.GetErrorUserMsg());
+                DisplayErrorMsg(rc);
         }
     }
 }

@@ -28,105 +28,110 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("TextEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-
-            ChapterModel model = notificationItem.Data as ChapterModel;
-            if (model == null)
-                rc.SetError(1140101, MxError.Source.Param, $"model is null", "MxErrBadMethodParam");
+            if (IsError())
+                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
-                if ((model.EditorHelpLine?.StartsWith(TextEditView.TextEditorMode) ?? false) == false)
-                    rc.SetResult(true);
+                ChapterModel model = notificationItem.Data as ChapterModel;
+                if (model == null)
+                    rc.SetError(1140101, MxError.Source.Param, $"model is null", MxMsgs.MxErrBadMethodParam);
                 else
                 {
-                    var lastDisplayRowIndex = model.Body?.GetLineCount() - 1 ?? Program.PosIntegerNotSet;
-                    var lastDisplayColIndex = model.Body?.GetCharacterCountInLine() - 1 ?? Program.PosIntegerNotSet;
-
-                    ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
-                    switch (change)
+                    if ((model.EditorHelpLine?.StartsWith(TextEditView.TextEditorMode) ?? false) == false)
+                        rc.SetResult(true);
+                    else
                     {
-                        case ChapterModel.ChangeHint.All:
+                        var lastDisplayRowIndex = model.ChapterBody?.GetLineCount() - 1 ?? Program.PosIntegerNotSet;
+                        var lastDisplayColIndex = model.ChapterBody?.GetCharacterCountInLine() - 1 ?? Program.PosIntegerNotSet;
+
+                        ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
+                        switch (change)
                         {
-                            rc += ClearEditAreaText();
-                            if (rc.IsSuccess(true))
+                            case ChapterModel.ChangeHint.All:
                             {
-                                var rcRes = model.GetLastLinesForDisplay(EditAreaHeight);
+                                rc += ClearEditAreaText();
+                                if (rc.IsSuccess(true))
+                                {
+                                    var rcRes = model.GetLastLinesForDisplay(EditAreaHeight);
+                                    rc += rcRes;
+                                    if (rcRes.IsSuccess(true))
+                                    {
+                                        var row = 0;
+                                        var lines = rcRes.GetResult();
+                                        foreach (var line in lines)
+                                        {
+                                            if (line != null)
+                                                rc += DisplayEditAreaLine(row, line, false);
+                                            if (rc.IsError(true) || Terminal.IsError())
+                                                break;
+                                            row++;
+                                        }
+                                        if (rc.IsSuccess())
+                                            rc.SetResult(true);
+                                    }
+                                }
+                                break;
+                            }
+                            case ChapterModel.ChangeHint.Line:
+                            {
+                                var rcRes = model.GetLastLinesForDisplay(1);
                                 rc += rcRes;
                                 if (rcRes.IsSuccess(true))
                                 {
-                                    var row = 0;
-                                    var lines = rcRes.GetResult();
-                                    foreach (var line in lines)
+                                    var line = rcRes.GetResult()?[0] ?? null;
+                                    if (line != null)
                                     {
-                                        if (line != null)
-                                            rc += DisplayEditAreaLine(row, line, false);
-                                        if (rc.IsError(true) || Terminal.IsError())
-                                            break;
-                                        row++;
+                                        rc += DisplayEditAreaLine((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex, line, true);
+                                        if (rc.IsSuccess(true))
+                                            rc.SetResult(true);
                                     }
-                                    if (rc.IsSuccess())
-                                        rc.SetResult(true);
                                 }
+
+                                break;
                             }
-                            break;
-                        }
-                        case ChapterModel.ChangeHint.Line:
-                        {
-                            var rcRes = model.GetLastLinesForDisplay(1);
-                            rc += rcRes;
-                            if (rcRes.IsSuccess(true))
+                            case ChapterModel.ChangeHint.Word:
                             {
-                                var line = rcRes.GetResult()?[0] ?? null;
-                                if (line != null)
+                                var lastWord = model.ChapterBody?.GetWordInLine() ?? null;
+                                if (lastWord != null)
                                 {
-                                    rc += DisplayEditAreaLine((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex, line, true);
+                                    rc += DisplayEditAreaWord(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex), lastWord);
                                     if (rc.IsSuccess(true))
                                         rc.SetResult(true);
                                 }
+                                break;
                             }
-                            break;
-                        }
-                        case ChapterModel.ChangeHint.Word:
-                        {
-                            var lastWord = model.Body?.GetWordInLine() ?? null;
-                            if (lastWord != null)
+                            case ChapterModel.ChangeHint.Char:
                             {
-                                rc += DisplayEditAreaWord(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex), lastWord);
+                                var lastChar = model.ChapterBody?.GetCharacterInLine() ?? Body.NullChar;
+                                if (lastChar != Body.NullChar)
+                                {
+                                    rc += DisplayEditAreaChar(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex), lastChar);
+                                    if (rc.IsSuccess(true))
+                                        rc.SetResult(true);
+                                }
+                                break;
+                            }
+                            case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
+                            case ChapterModel.ChangeHint.MsgLine:
+                            case ChapterModel.ChangeHint.HelpLine:
+                            {
+                                rc += SetEditAreaCursor(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex));
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
+                                break;
                             }
-                            break;
-                        }
-                        case ChapterModel.ChangeHint.Char:
-                        {
-                            var lastChar = model.Body?.GetCharacterInLine() ?? Body.NullChar;
-                            if (lastChar != Body.NullChar)
+                            // ReSharper disable once RedundantEmptySwitchSection
+                            default:
                             {
-                                rc += DisplayEditAreaChar(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex), lastChar);
-                                if (rc.IsSuccess(true))
-                                    rc.SetResult(true);
+                                rc.SetError(1140102, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", MxMsgs.MxErrInvalidCondition);
+                                break;
                             }
-                            break;
-                        }
-                        case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
-                        case ChapterModel.ChangeHint.MsgLine:
-                        case ChapterModel.ChangeHint.HelpLine:
-                        {
-                            rc += SetEditAreaCursor(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex));
-                            if (rc.IsSuccess(true))
-                                rc.SetResult(true);
-                            break;
-                        }
-                        // ReSharper disable once RedundantEmptySwitchSection
-                        default:
-                        {
-                            rc.SetError(1140102, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", "MxErrInvalidCondition");
-                            break;
                         }
                     }
                 }
             }
             if (rc.IsError(true))
-                DisplayMxErrorMsg(rc.GetErrorUserMsg());
+                DisplayErrorMsg(rc);
         }
     }
 }

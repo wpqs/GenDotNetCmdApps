@@ -3,11 +3,11 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests
 {
-    public class CmdsHelpViewTest : IClassFixture<ModelCmdsHelpViewFixture>
+    public class EditorHelpLineViewTest : IClassFixture<ModelCmdsHelpViewFixture>
     {
         private readonly ModelCmdsHelpViewFixture _fixture;
 
-        public CmdsHelpViewTest(ModelCmdsHelpViewFixture fixture)
+        public EditorHelpLineViewTest(ModelCmdsHelpViewFixture fixture)
         {
             _fixture = fixture;
         }
@@ -20,6 +20,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.View.Ready);
 
             _fixture.Model.SetEditorHelpLine("test cmd");
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("test cmd", _fixture.View.LastTerminalOutput);
         }
     }

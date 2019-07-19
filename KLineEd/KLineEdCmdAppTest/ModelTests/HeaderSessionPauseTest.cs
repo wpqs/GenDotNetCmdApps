@@ -85,7 +85,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(rc.GetResult());
             Assert.StartsWith("error 1080101-param: toString is null", rc.GetErrorTechMsg());
             Assert.True(info.IsError());
-            Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
+            Assert.Equal("", info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
             Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
@@ -101,7 +101,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.StartsWith("error 1080202-data: value=,120; is invalid", rc.GetErrorTechMsg());
 
             Assert.True(info.IsError());
-            Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
+            Assert.Equal("", info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
             Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
@@ -116,7 +116,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(rc.GetResult());
             Assert.StartsWith("error 1080203-data: value=12:30:45,; is invalid", rc.GetErrorTechMsg());
             Assert.True(info.IsError());
-            Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
+            Assert.Equal("", info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
             Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
@@ -129,7 +129,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var info = new HeaderSessionPause();
             Assert.False(info.InitialiseFromString(data).GetResult());
             Assert.True(info.IsError());
-            Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
+            Assert.Equal("", info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
             Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
@@ -142,7 +142,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var info = new HeaderSessionPause();
             Assert.False(info.InitialiseFromString(data).GetResult());
             Assert.True(info.IsError());
-            Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
+            Assert.Equal("", info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
             Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }
@@ -155,7 +155,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var info = new HeaderSessionPause();
             Assert.False(info.InitialiseFromString(data).GetResult());
             Assert.True(info.IsError());
-            Assert.Equal(HeaderBase.ValueNotSet, info.ToString());
+            Assert.Equal("", info.ToString());
             Assert.Null(info.PauseTime?.ToString(MxStdFrmt.Time));
             Assert.Equal(Program.PosIntegerNotSet, info.Duration);
         }

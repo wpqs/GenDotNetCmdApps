@@ -1,4 +1,5 @@
-﻿using KLineEdCmdApp.View;
+﻿using KLineEdCmdApp.Utils;
+using KLineEdCmdApp.View;
 using KLineEdCmdAppTest.TestSupport.Base;
 
 namespace KLineEdCmdAppTest.TestSupport
@@ -13,7 +14,9 @@ namespace KLineEdCmdAppTest.TestSupport
             if (Error == TestConst.UnitTestNone)
             {
                 Error = TestConst.UnitTestNotSet;
-                View = new EditorHelpLineView(new MockTerminal());
+                var terminal = new MockTerminal();
+                terminal.Setup(new TerminalProperties());
+                View = new EditorHelpLineView(terminal);
                 var rcTerm = View.Setup(AppCmdLineParams);
                 if (rcTerm.IsError())
                     Error = rcTerm.GetErrorTechMsg();

@@ -20,7 +20,7 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("EditAreaView.Setup");
 
             if (param == null)
-                rc.SetError(1140101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
+                rc.SetError(1140101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var rcBase = base.Setup(param);
@@ -44,8 +44,12 @@ namespace KLineEdCmdApp.View.Base
 
         public override void OnUpdate(NotificationItem notificationItem)
         {
-            if (Terminal.SetColour(EditAreaForeGndColour, EditAreaBackGndColour) == false)
-                DisplayErrorMsg(1140201, ErrorType.program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}. Please quit and report this problem.");
+            base.OnUpdate(notificationItem);
+            if (IsError() == false)
+            {
+                if (Terminal.SetColour(EditAreaForeGndColour, EditAreaBackGndColour) == false)
+                    SetMxError(1140202, Terminal.GetErrorSource(), $"Terminal: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+            }
         }
 
         public MxReturnCode<bool> ClearEditAreaText()
@@ -53,7 +57,7 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("TextEditView.ClearTextArea");
 
             if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
-                rc.SetError(1140301, MxError.Source.Program, $"TextEditView: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                rc.SetError(1140301, Terminal.GetErrorSource(), $"EditAreaView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
             else
             {
                 for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
@@ -79,11 +83,11 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("TextEditView.SetCursor");
 
             if ((editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= EditAreaWidth))
-                rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editRowIndex} (max={EditAreaHeight}), col={editColIndex} (max={EditAreaWidth})", "MxErrBadMethodParam");
+                rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editRowIndex} (max={EditAreaHeight}), col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editRowIndex, KLineEditor.EditAreaMarginLeft + editColIndex) == false)
-                    rc.SetError(1140402, MxError.Source.Program, $"SetCursor={editRowIndex} {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    rc.SetError(1110402, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
                 else
                     rc.SetResult(true);
             }
@@ -95,7 +99,7 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("TextEditView.DisplayEditAreaLine");
 
             if ((line == null) || (editRowIndex < 0) || (editRowIndex >= EditAreaHeight))
-                rc.SetError(1140601, MxError.Source.Param, $"line is null or row={editRowIndex} (max={EditAreaHeight})", "MxErrBadMethodParam");
+                rc.SetError(1140601, MxError.Source.Param, $"line is null or row={editRowIndex} (max={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 rc += DisplayLine(KLineEditor.EditAreaTopRowIndex+editRowIndex, KLineEditor.EditAreaMarginLeft, line, clear);
@@ -112,14 +116,14 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("TextEditView.DisplayEditAreaWord");
 
             if ((word == null) || (editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= EditAreaWidth))
-                rc.SetError(1140701, MxError.Source.Param, $"word is null or row={editRowIndex} (max={EditAreaHeight}) or col={editColIndex} (max={EditAreaWidth})", "MxErrBadMethodParam");
+                rc.SetError(1140701, MxError.Source.Param, $"word is null or row={editRowIndex} (max={EditAreaHeight}) or col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 rc += SetEditAreaCursor(editRowIndex, editColIndex);
                 if (rc.IsSuccess(true))
                 {
                     if ((LastTerminalOutput = Terminal.Write(word)) == null)
-                        rc.SetError(1140702, MxError.Source.Program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}.", "MxErrInvalidCondition");
+                        rc.SetError(1140702, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
                     else
                     {
                         rc.SetResult(true);

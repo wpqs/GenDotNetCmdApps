@@ -31,34 +31,6 @@ namespace KLineEdCmdAppTest.ViewTests
 
 
         [Fact]
-        public void FormatMxErrorTest()
-        {
-            Assert.Equal("error 1010102-user: msg", BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.user, "msg"));
-            Assert.Equal("error 1010102-param: msg", BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.param, "msg"));
-            Assert.Equal("error 1010102-program: msg", BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.program, "msg"));
-            Assert.Equal("error 1010102-data: msg", BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.data, "msg"));
-            Assert.Equal("error 1010102-exception: msg", BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.exception, "msg"));
-        }
-
-        [Fact]
-        public void IsCriticalErrorTest()
-        {
-            Assert.False(BaseView.IsCriticalError(BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.user, "msg")));
-            Assert.False(BaseView.IsCriticalError(null));   //null error msg means no error
-
-            Assert.True(BaseView.IsCriticalError(BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.param, "msg")));
-            Assert.True(BaseView.IsCriticalError(BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.program, "msg")));
-            Assert.True(BaseView.IsCriticalError(BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.data, "msg")));
-            Assert.True(BaseView.IsCriticalError(BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.exception, "msg")));
-
-            Assert.False(BaseView.IsCriticalError("error 1010102-user: msg"));
-            Assert.True(BaseView.IsCriticalError("error 1010102user: msg"));
-            Assert.True(BaseView.IsCriticalError("error 1010102-user msg"));
-            Assert.False(BaseView.IsCriticalError("warn 1010102-user: msg"));
-
-        }
-
-        [Fact]
         public void DisplayMsgTest()
         {
             Assert.True(_fixture.View.Ready);
@@ -83,21 +55,21 @@ namespace KLineEdCmdAppTest.ViewTests
         }
 
 
-        [Fact]
-        public void DisplayMxErrorTest()
-        {
-            Assert.True(_fixture.View.Ready);
+        //[Fact]
+        //public void DisplayMxErrorTest()
+        //{
+        //    Assert.True(_fixture.View.Ready);
 
-            var errMsg = BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.user, "msg");
-            _fixture.View.DisplayMxErrorMsg(errMsg);
-            Assert.Equal($"error 1010102-user: msg", _fixture.View.LastTerminalOutput);
+        //    var errMsg = BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.user, "msg");
+        //    _fixture.View.DisplayMxErrorMsg(errMsg);
+        //    Assert.Equal($"error 1010102-user: msg", _fixture.View.LastTerminalOutput);
 
-            _fixture.View.DisplayMxErrorMsg(null);
-            Assert.Equal($"error 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+        //    _fixture.View.DisplayMxErrorMsg(null);
+        //    Assert.Equal($"error 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
 
-            _fixture.View.DisplayMxErrorMsg("xyz"); //typical use is DisplayMxErrorMsg(rc.GetErrorUserMsg()) so MxReturnCode is responsible for formatting the message string; no checks made in this regard 
-            Assert.Equal($"{BaseView.ErrorMsgPrecursor} xyz", _fixture.View.LastTerminalOutput);
+        //    _fixture.View.DisplayMxErrorMsg("xyz"); //typical use is DisplayMxErrorMsg(rc.GetErrorUserMsg()) so MxReturnCode is responsible for formatting the message string; no checks made in this regard 
+        //    Assert.Equal($"{BaseView.ErrorMsgPrecursor} xyz", _fixture.View.LastTerminalOutput);
 
-        }
+        //}
     }
 }

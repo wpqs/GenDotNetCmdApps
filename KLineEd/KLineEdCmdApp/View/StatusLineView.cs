@@ -28,7 +28,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("StatusLineView.Setup");
 
             if (param == null)
-                rc.SetError(1200101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
+                rc.SetError(1200101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var rcBase = base.Setup(param);
@@ -40,7 +40,7 @@ namespace KLineEdCmdApp.View
                     StatusLineRow = WindowHeight - KLineEditor.StatusLineRowCount - 1;
 
                     if (Terminal.SetColour(StatusLineForeGndColour, StatusLineBackGndColour) == false)
-                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", "MxErrInvalidCondition");
+                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         var rcClear = ClearLine(StatusLineRow, KLineEditor.StatusLineLeftCol);
@@ -61,31 +61,37 @@ namespace KLineEdCmdApp.View
         {
             var rc = new MxReturnCode<bool>("EditorHelpView.OnUpdate");
 
-            ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
-            if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.StatusLine))
-                rc.SetResult(true);
+            base.OnUpdate(notificationItem);
+            if (IsError())
+                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
-                ChapterModel model = notificationItem.Data as ChapterModel;
-                if (model == null)
-                    rc.SetError(1200101, MxError.Source.Program, "model is null", "MxErrInvalidCondition");
+                ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
+                if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.StatusLine))
+                    rc.SetResult(true);
                 else
                 {
-                    if (Terminal.SetColour(StatusLineForeGndColour, StatusLineBackGndColour) == false)
-                        rc.SetError(1200102, MxError.Source.Program, $"Details: {Terminal.ErrorMsg ?? Program.ValueNotSet}", "MxErrInvalidCondition");
+                    ChapterModel model = notificationItem.Data as ChapterModel;
+                    if (model == null)
+                        rc.SetError(1200101, MxError.Source.Program, "model is null", MxMsgs.MxErrInvalidCondition);
                     else
                     {
-                        var statusText = model.StatusLine ?? Program.ValueNotSet;
-                        rc += DisplayLine(StatusLineRow, KLineEditor.StatusLineLeftCol, statusText, true);
-                        if (rc.IsSuccess(true))
+                        if (Terminal.SetColour(StatusLineForeGndColour, StatusLineBackGndColour) == false)
+                            rc.SetError(1200102, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
+                        else
                         {
-                            rc.SetResult(true);
+                            var statusText = model.StatusLine ?? Program.ValueNotSet;
+                            rc += DisplayLine(StatusLineRow, KLineEditor.StatusLineLeftCol, statusText, true);
+                            if (rc.IsSuccess(true))
+                            {
+                                rc.SetResult(true);
+                            }
                         }
                     }
                 }
             }
             if (rc.IsError(true))
-                DisplayMxErrorMsg(rc.GetErrorUserMsg());
+                DisplayErrorMsg(rc);
         }
     }
 }

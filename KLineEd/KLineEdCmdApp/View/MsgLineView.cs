@@ -18,7 +18,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("MsgLineView.Setup");
 
             if (param == null)
-                rc.SetError(1130101, MxError.Source.Param, $"param is null", "MxErrBadMethodParam");
+                rc.SetError(1130101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var rcBase = base.Setup(param);
@@ -26,7 +26,7 @@ namespace KLineEdCmdApp.View
                 if (rcBase.IsSuccess(true))
                 {
                     if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
-                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", "MxErrInvalidCondition");
+                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         var rcClear = ClearLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
@@ -46,28 +46,34 @@ namespace KLineEdCmdApp.View
         {
             var rc = new MxReturnCode<bool>("MsgLineView.OnUpdate");
 
-            ChapterModel.ChangeHint change = (ChapterModel.ChangeHint)notificationItem.Change;
-            if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.MsgLine))
-                rc.SetResult(true);
+            base.OnUpdate(notificationItem);
+            if (IsError())
+                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
-                ChapterModel model = notificationItem.Data as ChapterModel;
-                if (model == null)
-                    rc.SetError(1130201, MxError.Source.Program, "model is null", "MxErrInvalidCondition");
+                ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
+                if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.MsgLine))
+                    rc.SetResult(true);
                 else
                 {
-                    if (model.MsgLine.StartsWith(BaseView.ErrorMsgPrecursor))
-                        DisplayMsg(MsgType.Error, model.MsgLine);
-                    else if (model.MsgLine.StartsWith(BaseView.WarnMsgPrecursor))
-                        DisplayMsg(MsgType.Warning, model.MsgLine);
+                    ChapterModel model = notificationItem.Data as ChapterModel;
+                    if (model == null)
+                        rc.SetError(1130201, MxError.Source.Program, "model is null", MxMsgs.MxErrInvalidCondition);
                     else
-                        DisplayMsg(MsgType.Info, model.MsgLine);
+                    {
+                        if (model.MsgLine.StartsWith(BaseView.ErrorMsgPrecursor))
+                            DisplayMsg(MsgType.Error, model.MsgLine);
+                        else if (model.MsgLine.StartsWith(BaseView.WarnMsgPrecursor))
+                            DisplayMsg(MsgType.Warning, model.MsgLine);
+                        else
+                            DisplayMsg(MsgType.Info, model.MsgLine);
 
-                    rc.SetResult(true);
+                        rc.SetResult(true);
+                    }
                 }
             }
             if (rc.IsError(true))
-                DisplayMxErrorMsg(rc.GetErrorUserMsg());
+                DisplayErrorMsg(rc);
         }
     }
 }

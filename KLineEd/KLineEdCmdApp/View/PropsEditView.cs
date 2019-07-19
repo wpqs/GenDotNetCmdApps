@@ -23,62 +23,66 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("PropsEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-
-            ChapterModel model = notificationItem.Data as ChapterModel;
-            if (model == null)
-                rc.SetError(1150101, MxError.Source.Param, $"model is null", "MxErrBadMethodParam");
+            if (IsError())
+                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
-                if ((model.EditorHelpLine?.StartsWith(PropsEditView.PropsEditorMode) ?? false) == false)
-                    rc.SetResult(true);
+                ChapterModel model = notificationItem.Data as ChapterModel;
+                if (model == null)
+                    rc.SetError(1150101, MxError.Source.Param, $"model is null", MxMsgs.MxErrBadMethodParam);
                 else
                 {
-                    var authorLine = $"1.{model.GetTabSpaces()}{HeaderChapter.AuthorLabel} {model.Header?.Chapter.Author ?? Program.ValueNotSet}";
-                    var projectLine = $"2.{model.GetTabSpaces()}{HeaderChapter.ProjectLabel} {model.Header?.Chapter.Project ?? Program.ValueNotSet}";
-                    var titleLine = $"3.{model.GetTabSpaces()}{HeaderChapter.TitleLabel} {model.Header?.Chapter.Title ?? Program.ValueNotSet}";
-                    var filenameLine = $"{HeaderChapter.PathFileNameLabel} {model.Header?.Chapter.PathFileName ?? Program.ValueNotSet}";
-
-                    ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
-                    switch (change)
+                    if ((model.EditorHelpLine?.StartsWith(PropsEditView.PropsEditorMode) ?? false) == false)
+                        rc.SetResult(true);
+                    else
                     {
-                        case ChapterModel.ChangeHint.Props:
-                        case ChapterModel.ChangeHint.All:
+                        var authorLine = $"1.{model.GetTabSpaces()}{HeaderProps.AuthorLabel} {model.ChapterHeader?.Properties.Author ?? Program.ValueNotSet}";
+                        var projectLine = $"2.{model.GetTabSpaces()}{HeaderProps.ProjectLabel} {model.ChapterHeader?.Properties.Project ?? Program.ValueNotSet}";
+                        var titleLine = $"3.{model.GetTabSpaces()}{HeaderProps.TitleLabel} {model.ChapterHeader?.Properties.Title ?? Program.ValueNotSet}";
+                        var filenameLine = $"{HeaderProps.PathFileNameLabel} {model.ChapterHeader?.Properties.PathFileName ?? Program.ValueNotSet}";
+
+                        ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
+                        switch (change)
                         {
-                            rc += ClearEditAreaText();
-                            if (rc.IsSuccess(true))
-                                rc += DisplayEditAreaLine(AuthorLineNo, authorLine, false);
-                            if (rc.IsSuccess(true))
-                                rc += DisplayEditAreaLine(ProjectLineNo, projectLine, false);
-                            if (rc.IsSuccess(true))
-                                rc += DisplayEditAreaLine(TitleLineNo, titleLine, false);
-                            if (rc.IsSuccess(true))
-                                rc += DisplayEditAreaLine(FilenameLineLineNo, filenameLine, false);
-                            if (rc.IsSuccess(true))
+                            case ChapterModel.ChangeHint.Props:
+                            case ChapterModel.ChangeHint.All:
+                            {
+                                rc += ClearEditAreaText();
+                                if (rc.IsSuccess(true))
+                                    rc += DisplayEditAreaLine(AuthorLineNo, authorLine, false);
+                                if (rc.IsSuccess(true))
+                                    rc += DisplayEditAreaLine(ProjectLineNo, projectLine, false);
+                                if (rc.IsSuccess(true))
+                                    rc += DisplayEditAreaLine(TitleLineNo, titleLine, false);
+                                if (rc.IsSuccess(true))
+                                    rc += DisplayEditAreaLine(FilenameLineLineNo, filenameLine, false);
+                                if (rc.IsSuccess(true))
+                                    rc += SetEditAreaCursor(AuthorLineNo, authorLine.Length); //Model.PropsEdit.Row, Model.PropsEdit.Col
+                                if (rc.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
+                            case ChapterModel.ChangeHint.MsgLine:
+                            case ChapterModel.ChangeHint.HelpLine:
+                            { //get from Model ActivePropLine and ActivePropColumn and set line accordingly
                                 rc += SetEditAreaCursor(AuthorLineNo, authorLine.Length); //Model.PropsEdit.Row, Model.PropsEdit.Col
                                 if (rc.IsSuccess(true))
-                                rc.SetResult(true);
-                            break;
-                        }
-                        case ChapterModel.ChangeHint.StatusLine:   //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
-                        case ChapterModel.ChangeHint.MsgLine:
-                        case ChapterModel.ChangeHint.HelpLine:
-                        {           //get from Model ActivePropLine and ActivePropColumn and set line accordingly
-                            rc += SetEditAreaCursor(AuthorLineNo, authorLine.Length); //Model.PropsEdit.Row, Model.PropsEdit.Col
-                                if (rc.IsSuccess(true))
-                                rc.SetResult(true);
-                            break;
-                        }
-                        // ReSharper disable once RedundantEmptySwitchSection
-                        default:
-                        {
-                            rc.SetError(1150101, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", "MxErrInvalidCondition");
-                            break;
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            // ReSharper disable once RedundantEmptySwitchSection
+                            default:
+                            {
+                                rc.SetError(1150101, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", MxMsgs.MxErrInvalidCondition);
+                                break;
+                            }
                         }
                     }
                 }
             }
             if (rc.IsError(true))
-                DisplayMxErrorMsg(rc.GetErrorUserMsg());
+                DisplayErrorMsg(rc);
         }
     }
 }

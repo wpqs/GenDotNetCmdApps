@@ -20,6 +20,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.View.Ready);
 
             _fixture.Model.SetStatusLine();
+            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Contains("Total words:", _fixture.View.LastTerminalOutput);
 
         }

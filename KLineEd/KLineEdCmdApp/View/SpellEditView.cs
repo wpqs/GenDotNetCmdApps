@@ -17,47 +17,51 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("SpellEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-
-            ChapterModel model = notificationItem.Data as ChapterModel;
-            if (model == null)
-                rc.SetError(1160101, MxError.Source.Param, $"model is null", "MxErrBadMethodParam");
+            if (IsError())
+                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
-                if ((model.EditorHelpLine?.StartsWith(SpellEditView.SpellEditorMode) ?? false) == false)
-                    rc.SetResult(true);
+                ChapterModel model = notificationItem.Data as ChapterModel;
+                if (model == null)
+                    rc.SetError(1160101, MxError.Source.Param, $"model is null", MxMsgs.MxErrBadMethodParam);
                 else
                 {
-                    ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
-                    switch (change)
+                    if ((model.EditorHelpLine?.StartsWith(SpellEditView.SpellEditorMode) ?? false) == false)
+                        rc.SetResult(true);
+                    else
                     {
-                        case ChapterModel.ChangeHint.Props:
-                        case ChapterModel.ChangeHint.All:
+                        ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
+                        switch (change)
                         {
-                            rc += ClearEditAreaText();
-                            if (rc.IsSuccess(true))
-                                rc.SetResult(true);
-                            break;
-                        }
-                        case ChapterModel.ChangeHint.StatusLine:   //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
-                        case ChapterModel.ChangeHint.MsgLine:
-                        case ChapterModel.ChangeHint.HelpLine:
-                        {           
-                            rc += SetEditAreaCursor();
-                            if (rc.IsSuccess(true))
-                                rc.SetResult(true);
-                            break;
-                        }
-                        // ReSharper disable once RedundantEmptySwitchSection
-                        default:
-                        {
-                            rc.SetError(1160101, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", "MxErrInvalidCondition");
-                            break;
+                            case ChapterModel.ChangeHint.Props:
+                            case ChapterModel.ChangeHint.All:
+                            {
+                                rc += ClearEditAreaText();
+                                if (rc.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
+                            case ChapterModel.ChangeHint.MsgLine:
+                            case ChapterModel.ChangeHint.HelpLine:
+                            {
+                                rc += SetEditAreaCursor();
+                                if (rc.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            // ReSharper disable once RedundantEmptySwitchSection
+                            default:
+                            {
+                                rc.SetError(1160101, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", MxMsgs.MxErrInvalidCondition);
+                                break;
+                            }
                         }
                     }
                 }
             }
             if (rc.IsError(true))
-                DisplayMxErrorMsg(rc.GetErrorUserMsg());
+                DisplayErrorMsg(rc);
         }
     }
 }

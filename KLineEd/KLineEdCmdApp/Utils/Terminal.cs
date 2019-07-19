@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.View.Base;
+using MxReturnCode;
 
 namespace KLineEdCmdApp.Utils
 {
@@ -16,24 +17,43 @@ namespace KLineEdCmdApp.Utils
     public class Terminal : ITerminal
     {
         public static readonly ConsoleKey InvalidKey = ConsoleKey.F24;
-  
-        public string ErrorMsg { private set; get; }
 
-        public bool IsError() { return (ErrorMsg ==null) ? false : true; }
-
-        private void SetError(int errorNo, BaseView.ErrorType errType, string errMsg)
-        {
-            ErrorMsg = BaseView.FormatMxErrorMsg(errorNo, errType, errMsg);
-        }
+        private readonly MxReturnCode<bool> _mxErrorCode;
 
         public Terminal()
         {
-            SetError(1210101, BaseView.ErrorType.program, "Terminal not setup");
+            _mxErrorCode = new MxReturnCode<bool>($"Terminal.Ctor", false); //SetResult(true) on error
+            _mxErrorCode.SetError(1210201, MxError.Source.Program, "Terminal.Setup not called");
         }
+
+        public bool IsError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
+        public MxError.Source GetErrorSource() { return _mxErrorCode?.GetErrorType() ?? MxError.Source.Program; }
+        public int GetErrorNo() { return _mxErrorCode?.GetErrorCode() ?? Program.PosIntegerNotSet; }
+        public string GetErrorTechMsg() { return _mxErrorCode?.GetErrorTechMsg() ?? Program.ValueNotSet; }
+        public string GetErrorUserMsg() { return _mxErrorCode?.GetErrorUserMsg() ?? Program.ValueNotSet; }
+
+        public MxReturnCode<MxReturnCode<bool>> GetMxError()
+        {
+            var rc = new MxReturnCode<MxReturnCode<bool>>($"Terminal.GetMxError");
+
+            rc += _mxErrorCode;
+
+            return rc;
+        }
+        public MxReturnCode<bool> Close()
+        {
+            var rc = new MxReturnCode<bool>($"Terminal.Close");
+
+            if (_mxErrorCode.IsError())
+                rc += _mxErrorCode;
+
+            return rc;
+        }
+
         public bool Setup(TerminalProperties props)
         {
             if ((props == null) || (props.IsError()))
-                SetError(1210201, BaseView.ErrorType.data, props?.GetValidationError() ?? Program.ValueNotSet);
+                _mxErrorCode.SetError(1210201, MxError.Source.Data, props?.GetValidationError() ?? Program.ValueNotSet, MxMsgs.MxErrInvalidSettingsFile);
             else
             {
                 try
@@ -51,11 +71,16 @@ namespace KLineEdCmdApp.Utils
                     Console.ForegroundColor = props.ForegroundColor;
                     Console.BackgroundColor = props.BackgroundColor;
 
-                    ErrorMsg = null;
+                    if (Clear() == false)
+                        _mxErrorCode.SetError(1210202, MxError.Source.Sys, "Terminal.Clear() failed", MxMsgs.MxErrSystemFailure);
+                    else
+                    {
+                        _mxErrorCode.SetResult(true);
+                    }
                 }
                 catch (Exception e)
                 {
-                    SetError(1210202, BaseView.ErrorType.exception, e.Message);
+                    _mxErrorCode.SetError(1210203, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return (IsError()) ? false : true;
@@ -81,11 +106,11 @@ namespace KLineEdCmdApp.Utils
                 BackgroundColor = Console.BackgroundColor
             };
             if (props.Validate() == false)
-                SetError(1210301, BaseView.ErrorType.program, props.GetValidationError());
+                _mxErrorCode.SetError(1210301, MxError.Source.Sys, $"Console's existing props are invalid: {props.GetValidationError()}", MxMsgs.MxErrSystemFailure);
             else
             {
                 rc = props;
-                ErrorMsg = null;
+                _mxErrorCode.SetResult(true);
             }
             return rc;
         }
@@ -101,29 +126,29 @@ namespace KLineEdCmdApp.Utils
             {
                 Console.ForegroundColor = msgLineErrorForeGndColour;
                 Console.BackgroundColor = msgLineErrorBackGndColour;
-                ErrorMsg = null;
+                _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                SetError(1210401, BaseView.ErrorType.exception, e.Message);
+                _mxErrorCode.SetError(1210401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return (IsError()) ? false : true;
         }
         public bool SetCursorPosition(int line, int column)
         {
             if ((line < 0) || (line >= Console.BufferHeight) || (column < 0) || (column >= Console.BufferWidth))
-                SetError(1210501, BaseView.ErrorType.param, $"Invalid cursor position: line={line}, column={column}");
+                _mxErrorCode.SetError(1210501, MxError.Source.Param, $"Invalid cursor position: line={line}, column={column}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     Console.CursorLeft = column;
                     Console.CursorTop = line;
-                    ErrorMsg = null;
+                    _mxErrorCode.SetResult(true);
                 }
                 catch (Exception e)
                 {
-                    SetError(1210502, BaseView.ErrorType.exception, e.Message);
+                    _mxErrorCode.SetError(1210502, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return (IsError()) ? false : true;
@@ -135,11 +160,11 @@ namespace KLineEdCmdApp.Utils
             try
             {
                 rc = Console.CursorLeft;
-                ErrorMsg = null;
+                _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                SetError(1210601, BaseView.ErrorType.exception, e.Message);
+                _mxErrorCode.SetError(1210601, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -149,11 +174,11 @@ namespace KLineEdCmdApp.Utils
             try
             {
                 rc = Console.CursorTop;
-                ErrorMsg = null;
+                _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                SetError(1210701, BaseView.ErrorType.exception, e.Message);
+                _mxErrorCode.SetError(1210701, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -162,11 +187,11 @@ namespace KLineEdCmdApp.Utils
             try
             {
                 Console.Clear();
-                ErrorMsg = null;
+                _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                SetError(1210801, BaseView.ErrorType.exception, e.Message);
+                _mxErrorCode.SetError(1210801, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return (IsError()) ? false : true;
         }
@@ -175,18 +200,18 @@ namespace KLineEdCmdApp.Utils
         {
             string rc = null;
             if (line == null)
-                SetError(1210901, BaseView.ErrorType.exception, "line is null");
+                _mxErrorCode.SetError(1210901, MxError.Source.Param, $"line is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     Console.WriteLine(line, args);
                     rc = string.Format(line, args);
-                    ErrorMsg = null;
+                    _mxErrorCode.SetResult(true);
                 }
                 catch (Exception e)
                 {
-                    SetError(1210902, BaseView.ErrorType.exception, e.Message);
+                    _mxErrorCode.SetError(1210902, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -195,18 +220,18 @@ namespace KLineEdCmdApp.Utils
         {
             string rc = null;
             if (msg == null)
-                SetError(1211001, BaseView.ErrorType.param, "msg is null");
+                _mxErrorCode.SetError(1210001, MxError.Source.Param, $"msg is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     Console.Write(msg, args);
                     rc = string.Format(msg, args);
-                    ErrorMsg = null;
+                    _mxErrorCode.SetResult(true);
                 }
                 catch (Exception e)
                 {
-                    SetError(1211002, BaseView.ErrorType.exception, e.Message);
+                    _mxErrorCode.SetError(1210002, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -217,11 +242,11 @@ namespace KLineEdCmdApp.Utils
             try
             {
                 rc = Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
-                ErrorMsg = null;
+                _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                SetError(1211101, BaseView.ErrorType.exception, e.Message);
+                _mxErrorCode.SetError(1211001, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -232,10 +257,11 @@ namespace KLineEdCmdApp.Utils
             try
             {
                 rc = Console.ReadKey(hide).Key; //defaultVal is helpful in testing
+                _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                SetError(1211201, BaseView.ErrorType.exception, e.Message);
+                _mxErrorCode.SetError(1212001, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -246,13 +272,13 @@ namespace KLineEdCmdApp.Utils
             try
             {
                 rc = Console.ReadKey();
+                _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                SetError(1211301, BaseView.ErrorType.exception, e.Message);
+                _mxErrorCode.SetError(1212101, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
-
     }
 }

@@ -106,15 +106,15 @@ namespace KLineEdCmdApp.Model
             {
                 var pages = linesInChapter / Body.TextLinesPerPage;
                 rc += Environment.NewLine;
-                rc += $"Pages {pages}, lines {linesInChapter} (lines typed {TotalLinesTyped}, mean {MeanLinesTyped}), words {wordsInChapter} (words typed {TotalWordsTyped}, mean WPM {MeanWpm})"; // , total corrections {TotalCorrectionsCount} mean per session {MeanWpc}, total spelling errors {TotalSpellCheckCount}, mean per session {MeanWps})
+                rc += $"Pages {pages}, lines {linesInChapter} (lines typed {TotalLinesTyped}, mean {MeanLinesTyped}), words {wordsInChapter} (words typed {TotalWordsTyped}, mean WPM {MeanWpm:F1})"; // , total corrections {TotalCorrectionsCount} mean per session {MeanWpc}, total spelling errors {TotalSpellCheckCount}, mean per session {MeanWps})
                 rc += Environment.NewLine;
-                rc += $"Days worked {TotalDaysWorked} (mean hours worked {(HoursWorkedPerDay?.TotalHours)})";
+                rc += $"Days worked {TotalDaysWorked} (mean hours worked {(HoursWorkedPerDay?.TotalHours ?? 0.0).ToString(Header.MxStdFrmtDouble3)})";
                 rc += Environment.NewLine;
-                rc += $"Editing time {TotalDuration?.TotalDays} days, {TotalDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan)} (mean per session {MeanDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan)})";
+                rc += $"Editing time {(TotalDuration?.TotalDays ?? 0.0).ToString(Header.MxStdFrmtDouble0)} days, {TotalDuration?.ToString(Header.MxStdFrmtTimeSpan) ?? "0.0"} (mean per session {MeanDuration?.ToString(Header.MxStdFrmtTimeSpan) ?? "0.0"})";
                 rc += Environment.NewLine;
-                rc += $"Typing time {TotalTypingTime?.TotalDays} days, {TotalTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan)} (mean per session {MeanTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan)})";
+                rc += $"Typing time {(TotalTypingTime?.TotalDays ?? 0.0).ToString(Header.MxStdFrmtDouble0)} days, {TotalTypingTime?.ToString(Header.MxStdFrmtTimeSpan) ?? "0.0"} (mean per session {MeanTypingTime?.ToString(Header.MxStdFrmtTimeSpan) ?? "0.0"})";
                 rc += Environment.NewLine;
-                rc += $"Number of pauses {TotalTypingPauseCount} (mean count {MeanTypingPauseCount}, duration {MeanTypingPauseMinutes} minutes)";
+                rc += $"Number of pauses {TotalTypingPauseCount} (mean count {MeanTypingPauseCount.ToString(Header.MxStdFrmtDouble2)}, duration {MeanTypingPauseMinutes} minutes)";
             }
             rc += $"{KLineEditor.ReportSectionDottedLine}";
 

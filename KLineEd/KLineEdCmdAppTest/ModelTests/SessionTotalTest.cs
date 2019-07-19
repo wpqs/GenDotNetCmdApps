@@ -29,11 +29,11 @@ namespace KLineEdCmdAppTest.ModelTests
             var list = new List<HeaderSession> {session};
             Assert.True(SessionsTotal.RefreshValues(list));
 
-            Assert.Equal("02:13:34", SessionsTotal.TotalDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:13:34", SessionsTotal.MeanDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:01:04", SessionsTotal.TotalTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:01:04", SessionsTotal.MeanTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:13:34", SessionsTotal.HoursWorkedPerDay?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", SessionsTotal.TotalDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", SessionsTotal.MeanDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:01:04", SessionsTotal.TotalTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:01:04", SessionsTotal.MeanTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:13:34", SessionsTotal.HoursWorkedPerDay?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(1, SessionsTotal.TotalDaysWorked);
             Assert.Equal(140, SessionsTotal.TotalLinesTyped);
@@ -60,11 +60,11 @@ namespace KLineEdCmdAppTest.ModelTests
             var list = new List<HeaderSession> {session2};
             Assert.True(SessionsTotal.RefreshValues(list));
 
-            Assert.Equal("04:30:30", SessionsTotal.TotalDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("04:30:30", SessionsTotal.MeanDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:30:30", SessionsTotal.TotalTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:30:30", SessionsTotal.MeanTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("04:30:30", SessionsTotal.HoursWorkedPerDay?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("04:30:30", SessionsTotal.TotalDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("04:30:30", SessionsTotal.MeanDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:30:30", SessionsTotal.TotalTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:30:30", SessionsTotal.MeanTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("04:30:30", SessionsTotal.HoursWorkedPerDay?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(1, SessionsTotal.TotalDaysWorked);
             Assert.Equal(100, SessionsTotal.TotalLinesTyped);
@@ -93,11 +93,11 @@ namespace KLineEdCmdAppTest.ModelTests
             var list = new List<HeaderSession> {session2};
             Assert.True(SessionsTotal.RefreshValues(list));
 
-            Assert.Equal("06:00:00", SessionsTotal.TotalDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("06:00:00", SessionsTotal.MeanDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("04:15:00", SessionsTotal.TotalTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("04:15:00", SessionsTotal.MeanTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("06:00:00", SessionsTotal.HoursWorkedPerDay?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("06:00:00", SessionsTotal.TotalDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("06:00:00", SessionsTotal.MeanDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("04:15:00", SessionsTotal.TotalTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("04:15:00", SessionsTotal.MeanTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("06:00:00", SessionsTotal.HoursWorkedPerDay?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(1, SessionsTotal.TotalDaysWorked);
             Assert.Equal(175, SessionsTotal.TotalLinesTyped);
@@ -129,11 +129,11 @@ namespace KLineEdCmdAppTest.ModelTests
             var list = new List<HeaderSession> {session1, session2};
             Assert.True(SessionsTotal.RefreshValues(list));
 
-            Assert.Equal("06:44:04", SessionsTotal.TotalDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("03:22:02", SessionsTotal.MeanDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("04:31:34", SessionsTotal.TotalTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:15:47", SessionsTotal.MeanTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("03:22:02", SessionsTotal.HoursWorkedPerDay?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("06:44:04", SessionsTotal.TotalDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("03:22:02", SessionsTotal.MeanDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("04:31:34", SessionsTotal.TotalTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:15:47", SessionsTotal.MeanTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("03:22:02", SessionsTotal.HoursWorkedPerDay?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(2, SessionsTotal.TotalDaysWorked);
             Assert.Equal(240, SessionsTotal.TotalLinesTyped);
@@ -170,11 +170,11 @@ namespace KLineEdCmdAppTest.ModelTests
             var list = new List<HeaderSession> {session1, session2, session3 };
             Assert.True(SessionsTotal.RefreshValues(list));
 
-            Assert.Equal("12:44:04", SessionsTotal.TotalDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("04:14:41", SessionsTotal.MeanDuration?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("08:46:34", SessionsTotal.TotalTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("02:55:31", SessionsTotal.MeanTypingTime?.ToString(HeaderSession.MxStdFrmtTimeSpan));
-            Assert.Equal("06:22:02", SessionsTotal.HoursWorkedPerDay?.ToString(HeaderSession.MxStdFrmtTimeSpan));
+            Assert.Equal("12:44:04", SessionsTotal.TotalDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("04:14:41", SessionsTotal.MeanDuration?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("08:46:34", SessionsTotal.TotalTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("02:55:31", SessionsTotal.MeanTypingTime?.ToString(Header.MxStdFrmtTimeSpan));
+            Assert.Equal("06:22:02", SessionsTotal.HoursWorkedPerDay?.ToString(Header.MxStdFrmtTimeSpan));
 
             Assert.Equal(2, SessionsTotal.TotalDaysWorked);
             Assert.Equal(415, SessionsTotal.TotalLinesTyped);

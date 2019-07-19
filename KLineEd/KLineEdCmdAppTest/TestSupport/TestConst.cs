@@ -9,5 +9,7 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public static readonly string UnitTestNotSet = KLineEdCmdApp.Program.ValueNotSet;
         public static readonly string UnitTestNone = "[none]";
+
+        public const string MxNoError = "[no error]";
     }
 }
