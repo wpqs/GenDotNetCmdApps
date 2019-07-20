@@ -34,6 +34,8 @@ namespace KLineEdCmdApp.Utils
         public ConsoleColor ForegroundColor  { set; get; }
         public ConsoleColor BackgroundColor  { set; get; }
 
+        public bool TreateCtrlCAsInput { set; get; }
+
         private bool Error { set; get; }
 
         public bool IsError(){ return Error;}
@@ -57,6 +59,7 @@ namespace KLineEdCmdApp.Utils
             CursorLeft = DefaultCursorLeft;
             ForegroundColor = DefaultForegroundColor;
             BackgroundColor = DefaultBackgroundColor;
+            TreateCtrlCAsInput = true;
 
             return Validate();
         }

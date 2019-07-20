@@ -1,23 +1,23 @@
 ﻿using System;
 using KLineEdCmdApp.Controller.Base;
+using KLineEdCmdApp.Model;
 using KLineEdCmdApp.View;
 
 namespace KLineEdCmdApp.Controller
 {
     public class TextEditingController : EditingBaseController
     {
-        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Esc=Refresh F1=Help  Ctrl+Q=Quit";
-        protected override EditingBaseController ProcessKey(ConsoleKey key)
+        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Ctrl+Q=Quit Esc=Refresh F1=Help F2=Props F3=Spelling";
+        public override EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
             EditingBaseController controller = this;
-            if (base.ProcessKey(key) != null)   //should never be null
+            if ((base.ProcessKey(model, keyInfo) != null) && (IsError() == false))
             {
                 //do stuff related to TextEditing, updating the model as needed
-                if (key == ConsoleKey.F1)
+                if (keyInfo.Key == ConsoleKey.F2)
                     controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController);
-                if (key == ConsoleKey.F2)
+                if (keyInfo.Key == ConsoleKey.F3)
                     controller = ControllerFactory.Make(Chapter, ControllerFactory.SpellEditingController);
-
             }
             return controller;
         }

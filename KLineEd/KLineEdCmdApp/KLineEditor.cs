@@ -294,6 +294,8 @@ namespace KLineEdCmdApp
             {
                 if (Ready)  //report error
                 {
+                    var terminalSettings = Terminal.GetSettings();
+                    //error if settings bad
                     Model.SetStatusLine(); 
                     Controller = ControllerFactory.Make(Model, ControllerFactory.TextEditingController); //create PropsEditingController if mode is new
 
@@ -319,40 +321,31 @@ namespace KLineEdCmdApp
                             if (Model.ChapterHeader.PauseProcessing(tim, lastKeyPress, true) == false)
                                 break; //todo error
 
-                            var key = Terminal.ReadKey(true);
+                            var keyInfo = Terminal.ReadKey(true);
 
-                            var op = key.Key; //Terminal.GetKey(true);
-
-                            Controller = EditingBaseController.ProcessKey(Controller, Model, op);
-                            //if (Controller?.IsCritialError() ?? true)
-                            //{
-                            //    rc.SetError(1010601, MxError.Source.Program, $"Controller null or critical error {Controller?.DisplayMsg ?? Program.ValueNotSet}", MxMsgs.MxErrInvalidCondition);
-                            //    break;
-                            //}
-
-                            //if (Controller.IsDisplayMsg())
-                            //    Model.SetMsgLine(Controller.DisplayMsg);
+                            Controller = Controller.ProcessKey(Model, keyInfo);
 
                             var rcErr = GetAnyCriticalError(ViewList, Controller); //may move to main loop
                             if (rcErr.IsError())
+                                 rc += rcErr;                //todo report error like any other failure outside this loop - not clear and print error
+                            if (Controller.IsError())
                             {
-                                rc += rcErr;
-                                Terminal.GetKey(true); //wait for error to display
+                                Model.SetMxErrorMsg(Controller.GetErrorTechDetails()); //todo wait for next release of MxReturnCode to get resource string
+                                Controller.ResetError();
                             }
-
-                            if (op == ConsoleKey.Escape)
-                                break;
                         }
 
+                        if (Controller?.IsRefresh() ?? true)
+                        {
+                            Terminal.Setup(terminalSettings);
+                            Model.Refresh();
+                        }
+
+                        if (Controller?.IsQuit() ?? true)
+                            break;
+
                         Thread.Sleep(0);
-
-
-                        //ConsoleKeyInfo op = Terminal.ReadKey();
-                        //if ((op.Key == ConsoleKey.A) && (op.Modifiers == ConsoleModifiers.Control))
-                        //    break;
                     }
-
-
 
                     Model.ChapterHeader.PauseProcessing(tim, lastKeyPress, true);
                     Model.ChapterHeader.GetLastSession()?.SetDuration(DateTime.UtcNow); //todo check for error EndOfSession()??
@@ -400,8 +393,8 @@ namespace KLineEdCmdApp
                 rc.SetError(1010801, MxError.Source.Param, $"ViewList or controller is null", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (controller.IsError())
-                    rc.SetError(controller.GetErrorNo(), controller.GetErrorSource(), controller.GetErrorTechMsg(), controller.GetErrorUserMsg());
+                if (controller.IsError(true))
+                    rc.SetError(controller.GetErrorNo(), controller.GetErrorSource(), controller.GetErrorTechDetails()); //; controller.GetErrorUserMsg()); wait for next MxReturnCode release
                 else
                 {
                     foreach (var view in viewList)
@@ -410,7 +403,6 @@ namespace KLineEdCmdApp
                         if (rcViewErr.IsError() && (rcViewErr.GetErrorType() != MxError.Source.User))
                             rc += rcViewErr;
                     }
-
                     if (rc.IsSuccess())
                         rc.SetResult(true);
                 }

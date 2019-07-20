@@ -261,7 +261,7 @@ namespace KLineEdCmdApp.View.Base
                     {
                         if (setCursor)
                         {
-                            var nextColIndex = ((colIndex + LastTerminalOutput.Length + 1) <= WindowWidth - 1) ? (colIndex + LastTerminalOutput.Length + 1) : WindowWidth - 1;
+                            var nextColIndex = ((colIndex + word.Length) <= WindowWidth - 1) ? (colIndex + word.Length) : WindowWidth - 1;
                             rc += SetCursorPosition(rowIndex, nextColIndex);
                         }
                         if (rc.IsSuccess())

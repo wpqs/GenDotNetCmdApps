@@ -70,6 +70,7 @@ namespace KLineEdCmdApp.Utils
                     Console.CursorLeft = props.CursorLeft;
                     Console.ForegroundColor = props.ForegroundColor;
                     Console.BackgroundColor = props.BackgroundColor;
+                    Console.TreatControlCAsInput = props.TreateCtrlCAsInput;
 
                     if (Clear() == false)
                         _mxErrorCode.SetError(1210202, MxError.Source.Sys, "Terminal.Clear() failed", MxMsgs.MxErrSystemFailure);
@@ -103,8 +104,9 @@ namespace KLineEdCmdApp.Utils
                 CursorTop = Console.CursorTop,
                 CursorLeft = Console.CursorLeft,
                 ForegroundColor = Console.ForegroundColor,
-                BackgroundColor = Console.BackgroundColor
-            };
+                BackgroundColor = Console.BackgroundColor,
+                TreateCtrlCAsInput = Console.TreatControlCAsInput
+        };
             if (props.Validate() == false)
                 _mxErrorCode.SetError(1210301, MxError.Source.Sys, $"Console's existing props are invalid: {props.GetValidationError()}", MxMsgs.MxErrSystemFailure);
             else

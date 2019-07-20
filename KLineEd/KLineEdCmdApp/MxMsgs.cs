@@ -23,6 +23,7 @@ namespace KLineEdCmdApp
         public const string MxErrInvalidChapterFile = "MxErrInvalidChapterFile"; //Error: chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again 
         public const string MxErrException = "MxErrException"; //Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed.
         public const string MxErrSystemFailure = "MxErrSystemFailure"; //Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
+        public const string MxErrBrowserFailed = "MxErrBrowserFailed"; //Error: cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
 
     }
 

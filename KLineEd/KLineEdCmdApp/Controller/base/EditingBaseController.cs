@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.View.Base;
 using MxReturnCode;
@@ -9,20 +10,50 @@ namespace KLineEdCmdApp.Controller.Base
     {
         public ChapterModel Chapter { private set; get; }
  
-        private readonly MxReturnCode<bool> _mxErrorCode;
-
+        private MxReturnCode<bool> _mxErrorCode;
+        private bool _ctrlQ;
+        private bool _refresh;
         // ReSharper disable once SimplifyConditionalTernaryExpression
-        public bool IsError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
-        public MxError.Source GetErrorSource() { return _mxErrorCode?.GetErrorType() ?? MxError.Source.Program; }
-        public int GetErrorNo() { return _mxErrorCode?.GetErrorCode() ?? Program.PosIntegerNotSet; }
-        public string GetErrorTechMsg() { return _mxErrorCode?.GetErrorTechMsg() ?? Program.ValueNotSet; }
-        public string GetErrorUserMsg() { return _mxErrorCode?.GetErrorUserMsg() ?? Program.ValueNotSet; }
 
-        public EditingBaseController()
+        protected EditingBaseController()
         {
+            _ctrlQ = false;
+            _refresh = false;
             _mxErrorCode = new MxReturnCode<bool>($"{this.GetType().Name}.Ctor", false); //SetResult(true) on error
             Chapter = null;
-   
+        }
+
+        // ReSharper disable once SimplifyConditionalTernaryExpression
+        public bool IsQuit() { return _ctrlQ; }
+
+        public MxError.Source GetErrorSource() { return _mxErrorCode?.GetErrorType() ?? MxError.Source.Program; }
+        public int GetErrorNo() { return _mxErrorCode?.GetErrorCode() ?? Program.PosIntegerNotSet; }
+        public string GetErrorTechDetails() { return _mxErrorCode?.GetErrorTechMsg(MxError.UserMsgPart.Details) ?? Program.ValueNotSet; }
+       // public string GetErrorUserMsg() { return _mxErrorCode?.GetType() ?? Program.ValueNotSet; }
+        public bool IsError(bool criticalOnly=false)
+        {
+            var rc = false;
+            if ((criticalOnly == false) && (_mxErrorCode?.IsError() ?? true))
+                rc = true;
+            else
+            {
+                if ((_mxErrorCode?.IsError() ?? true) && ((_mxErrorCode?.GetErrorType() ?? MxError.Source.Program) != MxError.Source.User))
+                    rc = true;
+            }
+            return rc;
+        }
+
+        public void ResetError()
+        {
+            _mxErrorCode = new MxReturnCode<bool>($"{this.GetType().Name}.ProcessKey", true);
+            _mxErrorCode?.SetResult(true);
+        }
+
+        public bool IsRefresh()
+        {
+            var rc = _refresh;
+            _refresh = false;
+            return rc;
         }
 
         public virtual MxReturnCode<bool> Initialise(ChapterModel model)
@@ -33,6 +64,8 @@ namespace KLineEdCmdApp.Controller.Base
                 rc.SetError(1030101, MxError.Source.Param, $"param is null or editModel null, not ready", MxMsgs.MxErrBadMethodParam);
             else
             {
+                _ctrlQ = false;
+                _refresh = false;
                 Chapter = model;
                 _mxErrorCode?.SetResult(true);
                 rc.SetResult(true);
@@ -71,13 +104,41 @@ namespace KLineEdCmdApp.Controller.Base
             return rc;
         }
 
-        public static EditingBaseController ProcessKey(EditingBaseController controller, ChapterModel model, ConsoleKey key)
+        public virtual EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
-            // ReSharper disable once ConstantNullCoalescingCondition
-            return controller?.ProcessKey(key) ?? null; 
+            EditingBaseController rc = null;
+
+            if ((model == null) || (keyInfo == null))
+                _mxErrorCode.SetError(1030201, MxError.Source.Param, $"model is null or keyInfo null", MxMsgs.MxErrBadMethodParam);
+            else
+            {
+                if ((keyInfo.Modifiers == ConsoleModifiers.Control) && (keyInfo.Key == ConsoleKey.Q))
+                    _ctrlQ = true;
+                else if (keyInfo.Key == ConsoleKey.F1)
+                {
+                    try
+                    {
+                        Process.Start("chrome.exe", "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1-1");
+                    }
+                    catch (Exception e)
+                    {
+                        _mxErrorCode?.SetError(1030202, MxError.Source.User, e.Message); //, MxMsgs.MxErrBrowserFailed);
+                    }
+                }
+                else if (keyInfo.Key == ConsoleKey.Escape)
+                {
+                    ResetError();
+                    _refresh = true;
+                }
+                else
+                {
+                    rc = this;
+                }
+            }
+            return rc; 
         }
 
-        protected virtual EditingBaseController ProcessKey(ConsoleKey key)
+        protected virtual EditingBaseController ProcessKey(ConsoleKeyInfo key)
         {
             //do common stuff with key - let override in derived class do the rest 
             return this;  

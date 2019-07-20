@@ -96,7 +96,7 @@ namespace KLineEdCmdApp.View
                                 var lastWord = model.ChapterBody?.GetWordInLine() ?? null;
                                 if (lastWord != null)
                                 {
-                                    rc += DisplayEditAreaWord(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex), lastWord);
+                                    rc += DisplayEditAreaWord(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex-1), lastWord);
                                     if (rc.IsSuccess(true))
                                         rc.SetResult(true);
                                 }
@@ -107,7 +107,7 @@ namespace KLineEdCmdApp.View
                                 var lastChar = model.ChapterBody?.GetCharacterInLine() ?? Body.NullChar;
                                 if (lastChar != Body.NullChar)
                                 {
-                                    rc += DisplayEditAreaChar(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex), lastChar);
+                                    rc += DisplayEditAreaChar(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex-1), lastChar);
                                     if (rc.IsSuccess(true))
                                         rc.SetResult(true);
                                 }

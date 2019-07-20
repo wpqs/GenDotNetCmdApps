@@ -84,8 +84,8 @@ namespace KLineEdCmdApp.View.Base
         {
             var rc = new MxReturnCode<bool>("EditAreaView.SetCursor");
 
-            if ((editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= EditAreaWidth))
-                rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editRowIndex} (max={EditAreaHeight}), col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
+            if ((editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= WindowWidth-1))
+                rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editRowIndex} (max={EditAreaHeight}), col={editColIndex} (max={WindowWidth-1})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editRowIndex, KLineEditor.EditAreaMarginLeft + editColIndex) == false)
@@ -104,7 +104,7 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1140601, MxError.Source.Param, $"line is null or row={editRowIndex} (max={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
             else
             {
-                rc += DisplayLine(KLineEditor.EditAreaTopRowIndex+editRowIndex, KLineEditor.EditAreaMarginLeft, line, clear);
+                rc += DisplayLine(KLineEditor.EditAreaTopRowIndex + editRowIndex, KLineEditor.EditAreaMarginLeft, line, clear);
                 if (rc.IsSuccess(true))
                 {
                     rc.SetResult(true);
@@ -121,7 +121,7 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1140701, MxError.Source.Param, $"word is null or row={editRowIndex} (max={EditAreaHeight}) or col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
             else
             {
-                rc += DisplayWord(editRowIndex, editColIndex, word);
+                rc += DisplayWord(KLineEditor.EditAreaTopRowIndex + editRowIndex, KLineEditor.EditAreaMarginLeft + editColIndex, word, true);
                 if (rc.IsSuccess())
                     rc.SetResult(true);
             }

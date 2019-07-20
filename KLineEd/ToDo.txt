@@ -15,7 +15,10 @@ Development work
 
 1. done - Import MxDotNetUtilsLib package (with MxReturnCode)
 2. Implement command line parameters/args and settings
-     --Reporting on | off
+     --BrowserName "explorer.exe"
+	    --Help 
+		--Search https://www.google.com/
+		--Thesaurus  https://www.thesaurus.com/ args /browse/{word}     --Reporting on | off
 	 --EditFile 'mytext.txt'
 	     --CursorSize 20
 		 --TypingPauseSecs 60

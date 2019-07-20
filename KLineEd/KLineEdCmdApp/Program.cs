@@ -142,7 +142,7 @@ namespace KLineEdCmdApp
                     {
                         var originalSettings = terminal.GetSettings();
                         if (originalSettings?.IsError() ?? false)
-                            rc.SetError(1010202, MxError.Source.Data, $"Terminal originalSettings not saved", MxMsgs.MxErrInvalidCondition);
+                            rc.SetError(1010202, MxError.Source.Data, $"Terminal original settings not saved", MxMsgs.MxErrInvalidCondition);
                         else
                         {
                             var editor = new KLineEditor();

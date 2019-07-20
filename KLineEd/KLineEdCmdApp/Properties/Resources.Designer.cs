@@ -70,6 +70,15 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
+        /// </summary>
+        internal static string MxErrBrowserFailed {
+            get {
+                return ResourceManager.GetString("MxErrBrowserFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed..
         /// </summary>
         internal static string MxErrException {
