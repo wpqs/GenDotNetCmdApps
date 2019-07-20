@@ -14,7 +14,7 @@ namespace KLineEdCmdAppTest.TestSupport
             {
                 Error = TestConst.UnitTestNotSet;
                 var terminal = new MockTerminal();
-               terminal.Setup(new TerminalProperties());
+                terminal.Setup(new TerminalProperties());
                 View = new TextEditView(terminal);
                 var rcTerm = View.Setup(AppCmdLineParams);
                 if (rcTerm.IsError())

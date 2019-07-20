@@ -27,8 +27,8 @@ namespace KLineEdCmdApp.View.Base
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {       //todo apply ResetResult()
-                    EditAreaForeGndColour = param.ForeGndTextColour; //todo rename param.EditAreaForeGndColour  
-                    EditAreaBackGndColour = param.BackGndTextColour; //todo rename param.EditAreaBackGndColour 
+                    EditAreaForeGndColour = ConsoleColor.Green; // param.ForeGndTextColour; //todo rename param.EditAreaForeGndColour  
+                    EditAreaBackGndColour = ConsoleColor.Black; // param.BackGndTextColour; //todo rename param.EditAreaBackGndColour 
 
                     var rcClear = ClearEditAreaText();
                     rc += rcClear;
@@ -54,12 +54,13 @@ namespace KLineEdCmdApp.View.Base
 
         public MxReturnCode<bool> ClearEditAreaText()
         {
-            var rc = new MxReturnCode<bool>("TextEditView.ClearTextArea");
+            var rc = new MxReturnCode<bool>("EditAreaView.ClearTextArea");
 
-            if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
+            if (Terminal.SetColour(EditAreaForeGndColour, EditAreaBackGndColour) == false)
                 rc.SetError(1140301, Terminal.GetErrorSource(), $"EditAreaView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
             else
             {
+                Terminal.SetCursorVisible(false);
                 for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
                 {
                     //var blank = $"{editRowIndex}";         ////see also BaseView.Setup()
@@ -72,6 +73,7 @@ namespace KLineEdCmdApp.View.Base
                     if (rcClear.IsError(true))
                         break;
                 }
+                Terminal.SetCursorVisible(CursorOn);
                 if (rc.IsSuccess())
                     rc.SetResult(true);
             }
@@ -80,7 +82,7 @@ namespace KLineEdCmdApp.View.Base
 
         public MxReturnCode<bool>SetEditAreaCursor(int editRowIndex = 0, int editColIndex = 0)
         {
-            var rc = new MxReturnCode<bool>("TextEditView.SetCursor");
+            var rc = new MxReturnCode<bool>("EditAreaView.SetCursor");
 
             if ((editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= EditAreaWidth))
                 rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editRowIndex} (max={EditAreaHeight}), col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
@@ -96,7 +98,7 @@ namespace KLineEdCmdApp.View.Base
 
         public MxReturnCode<bool> DisplayEditAreaLine(int editRowIndex, string line, bool clear=true)
         {
-            var rc = new MxReturnCode<bool>("TextEditView.DisplayEditAreaLine");
+            var rc = new MxReturnCode<bool>("EditAreaView.DisplayEditAreaLine");
 
             if ((line == null) || (editRowIndex < 0) || (editRowIndex >= EditAreaHeight))
                 rc.SetError(1140601, MxError.Source.Param, $"line is null or row={editRowIndex} (max={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
@@ -113,29 +115,22 @@ namespace KLineEdCmdApp.View.Base
 
         public MxReturnCode<bool> DisplayEditAreaWord(int editRowIndex, int editColIndex, string word)
         {
-            var rc = new MxReturnCode<bool>("TextEditView.DisplayEditAreaWord");
+            var rc = new MxReturnCode<bool>("EditAreaView.DisplayEditAreaWord");
 
             if ((word == null) || (editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= EditAreaWidth))
                 rc.SetError(1140701, MxError.Source.Param, $"word is null or row={editRowIndex} (max={EditAreaHeight}) or col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
             else
             {
-                rc += SetEditAreaCursor(editRowIndex, editColIndex);
-                if (rc.IsSuccess(true))
-                {
-                    if ((LastTerminalOutput = Terminal.Write(word)) == null)
-                        rc.SetError(1140702, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
-                    else
-                    {
-                        rc.SetResult(true);
-                    }
-                }
+                rc += DisplayWord(editRowIndex, editColIndex, word);
+                if (rc.IsSuccess())
+                    rc.SetResult(true);
             }
             return rc;
         }
 
         public MxReturnCode<bool> DisplayEditAreaChar(int editRowIndex, int editColIndex, char c)
         {
-            var rc = new MxReturnCode<bool>("TextEditView.DisplayEditAreaChar");
+            var rc = new MxReturnCode<bool>("EditAreaView.DisplayEditAreaChar");
 
             rc += DisplayEditAreaWord(editRowIndex, editColIndex, c.ToString());
             if (rc.IsSuccess(true))

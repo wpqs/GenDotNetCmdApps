@@ -23,7 +23,7 @@ namespace KLineEdCmdApp.Utils
         public Terminal()
         {
             _mxErrorCode = new MxReturnCode<bool>($"Terminal.Ctor", false); //SetResult(true) on error
-            _mxErrorCode.SetError(1210201, MxError.Source.Program, "Terminal.Setup not called");
+            _mxErrorCode.SetError(1210101, MxError.Source.Program, "Terminal.Setup not called");
         }
 
         public bool IsError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
@@ -120,12 +120,12 @@ namespace KLineEdCmdApp.Utils
             return Console.KeyAvailable;
         }
 
-        public bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour)
+        public bool SetColour(ConsoleColor foreGndColour, ConsoleColor backGndColour)
         {
             try
             {
-                Console.ForegroundColor = msgLineErrorForeGndColour;
-                Console.BackgroundColor = msgLineErrorBackGndColour;
+                Console.ForegroundColor = foreGndColour;
+                Console.BackgroundColor = backGndColour;
                 _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
@@ -137,7 +137,7 @@ namespace KLineEdCmdApp.Utils
         public bool SetCursorPosition(int line, int column)
         {
             if ((line < 0) || (line >= Console.BufferHeight) || (column < 0) || (column >= Console.BufferWidth))
-                _mxErrorCode.SetError(1210501, MxError.Source.Param, $"Invalid cursor position: line={line}, column={column}", MxMsgs.MxErrBadMethodParam);
+                _mxErrorCode.SetError(1210402, MxError.Source.Param, $"Invalid cursor position: line={line}, column={column}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -148,7 +148,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    _mxErrorCode.SetError(1210502, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    _mxErrorCode.SetError(1210403, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return (IsError()) ? false : true;
@@ -164,7 +164,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1210601, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1210501, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -178,9 +178,21 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1210701, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1210601, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
+        }
+
+        public void SetCursorVisible(bool show=true)
+        {
+            try
+            {
+                Console.CursorVisible = show;
+            }
+            catch (Exception e)
+            {
+                _mxErrorCode.SetError(1210701, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+            }
         }
         public bool Clear()
         {
@@ -220,7 +232,7 @@ namespace KLineEdCmdApp.Utils
         {
             string rc = null;
             if (msg == null)
-                _mxErrorCode.SetError(1210001, MxError.Source.Param, $"msg is null", MxMsgs.MxErrBadMethodParam);
+                _mxErrorCode.SetError(1211001, MxError.Source.Param, $"msg is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -231,7 +243,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    _mxErrorCode.SetError(1210002, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    _mxErrorCode.SetError(1211002, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -246,7 +258,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1211001, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211101, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -261,22 +273,22 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1212001, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211201, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
 
-        public ConsoleKeyInfo ReadKey()
+        public ConsoleKeyInfo ReadKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
             var rc = new ConsoleKeyInfo('\0', ConsoleKey.Clear, false, false, false);
             try
             {
-                rc = Console.ReadKey();
+                rc = Console.ReadKey(hide);
                 _mxErrorCode.SetResult(true);
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1212101, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211301, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }

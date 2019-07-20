@@ -21,18 +21,20 @@ namespace KLineEdCmdApp.Utils
 
         bool Clear();
 
-        bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour);
+        bool SetColour(ConsoleColor foreGndColour, ConsoleColor msgLineErrorBackGndColour);
 
         bool SetCursorPosition(int line, int column);
         int GetCursorColumn();
         int GetCursorLine();
+        void SetCursorVisible(bool hide=false);
 
         string WriteLine(string line, params object[] args);
         string Write(string line, params object[] args);
 
         char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar);
         ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);
-        ConsoleKeyInfo ReadKey();
+        ConsoleKeyInfo ReadKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);
         bool IsKeyAvailable();
+
     }
 }

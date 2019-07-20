@@ -85,14 +85,19 @@ namespace KLineEdCmdAppTest.TestSupport
             return CursorLine;
         }
 
+        public void SetCursorVisible(bool hide=false)
+        {
+
+        }
+
         public bool IsKeyAvailable()
         {
             return true;
         }
 
-        public bool SetColour(ConsoleColor msgLineErrorForeGndColour, ConsoleColor msgLineErrorBackGndColour)
+        public bool SetColour(ConsoleColor foreGndColour, ConsoleColor msgLineErrorBackGndColour)
         {
-            ForeGndColour = msgLineErrorForeGndColour;
+            ForeGndColour = foreGndColour;
             BackGndColour = msgLineErrorBackGndColour;
             return true;
         }
@@ -127,9 +132,9 @@ namespace KLineEdCmdAppTest.TestSupport
             return defaultVal;
         }
 
-        public ConsoleKeyInfo ReadKey()
+        public ConsoleKeyInfo ReadKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
-            return new ConsoleKeyInfo('X', ConsoleKey.X, false, false, true);
+            return new ConsoleKeyInfo('X', defaultVal, false, false, true);
         }
     }
 }

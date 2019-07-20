@@ -90,8 +90,7 @@ namespace KLineEdCmdApp.View
                     }
                 }
             }
-            if (rc.IsError(true))
-                DisplayErrorMsg(rc);
+            OnUpdateDone(rc, false);
         }
     }
 }

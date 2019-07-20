@@ -42,13 +42,14 @@ namespace KLineEdCmdApp.View
                     else
                     {
                         var lastDisplayRowIndex = model.ChapterBody?.GetLineCount() - 1 ?? Program.PosIntegerNotSet;
-                        var lastDisplayColIndex = model.ChapterBody?.GetCharacterCountInLine() - 1 ?? Program.PosIntegerNotSet;
+                        var lastDisplayColIndex = model.ChapterBody?.GetCharacterCountInLine() ?? Program.PosIntegerNotSet;
 
                         ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
                         switch (change)
                         {
                             case ChapterModel.ChangeHint.All:
                             {
+                                Terminal.SetCursorVisible(false);
                                 rc += ClearEditAreaText();
                                 if (rc.IsSuccess(true))
                                 {
@@ -62,7 +63,7 @@ namespace KLineEdCmdApp.View
                                         {
                                             if (line != null)
                                                 rc += DisplayEditAreaLine(row, line, false);
-                                            if (rc.IsError(true) || Terminal.IsError())
+                                            if (rc.IsError(true))
                                                 break;
                                             row++;
                                         }
@@ -70,6 +71,7 @@ namespace KLineEdCmdApp.View
                                             rc.SetResult(true);
                                     }
                                 }
+                                Terminal.SetCursorVisible(CursorOn);
                                 break;
                             }
                             case ChapterModel.ChangeHint.Line:
@@ -130,8 +132,7 @@ namespace KLineEdCmdApp.View
                     }
                 }
             }
-            if (rc.IsError(true))
-                DisplayErrorMsg(rc);
+            OnUpdateDone(rc, true);
         }
     }
 }

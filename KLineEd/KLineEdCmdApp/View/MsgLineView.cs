@@ -25,7 +25,7 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    if (Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour) == false)
+                    if (Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour) == false)
                         rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
@@ -72,8 +72,7 @@ namespace KLineEdCmdApp.View
                     }
                 }
             }
-            if (rc.IsError(true))
-                DisplayErrorMsg(rc);
+            OnUpdateDone(rc, false);
         }
     }
 }

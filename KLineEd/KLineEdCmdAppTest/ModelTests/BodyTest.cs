@@ -175,7 +175,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.RefreshWordCount());
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[9]);
+            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
 
             Assert.True(body.AppendLine("two").GetResult());  //don't inc WordCount
             Assert.Equal(2, body.GetLineCount());
@@ -183,8 +183,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.RefreshWordCount());       //refreshes WordCount from actual words in Body
             Assert.Equal(2, body.WordCount);            //
 
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[8]);
-            Assert.Equal("two", body.GetLastLinesForDisplay(10).GetResult()[9]);
+            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
+            Assert.Equal("two", body.GetLastLinesForDisplay(10).GetResult()[1]);
 
         }
         [Fact]
@@ -753,12 +753,12 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.True(body.AppendLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[9]);
+            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
 
             Assert.True(body.AppendLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[8]);
-            Assert.Equal("two", body.GetLastLinesForDisplay(10).GetResult()[9]);
+            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
+            Assert.Equal("two", body.GetLastLinesForDisplay(10).GetResult()[1]);
         }
 
         [Fact]
@@ -826,8 +826,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
 
-            Assert.Equal("one", body.GetLastLinesForDisplay(CmdLineParamsApp.ArgDisplayLastLinesCntMax).GetResult()[CmdLineParamsApp.ArgDisplayLastLinesCntMax-2]);
-            Assert.Equal("two", body.GetLastLinesForDisplay(CmdLineParamsApp.ArgDisplayLastLinesCntMax).GetResult()[CmdLineParamsApp.ArgDisplayLastLinesCntMax-1]);
+            Assert.Equal("one", body.GetLastLinesForDisplay(CmdLineParamsApp.ArgDisplayLastLinesCntMax).GetResult()[0]);
+            Assert.Equal("two", body.GetLastLinesForDisplay(CmdLineParamsApp.ArgDisplayLastLinesCntMax).GetResult()[1]);
         }
 
         [Fact]

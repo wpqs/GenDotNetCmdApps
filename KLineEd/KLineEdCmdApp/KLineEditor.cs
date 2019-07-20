@@ -319,7 +319,9 @@ namespace KLineEdCmdApp
                             if (Model.ChapterHeader.PauseProcessing(tim, lastKeyPress, true) == false)
                                 break; //todo error
 
-                            var op = Terminal.GetKey(true);
+                            var key = Terminal.ReadKey(true);
+
+                            var op = key.Key; //Terminal.GetKey(true);
 
                             Controller = EditingBaseController.ProcessKey(Controller, Model, op);
                             //if (Controller?.IsCritialError() ?? true)

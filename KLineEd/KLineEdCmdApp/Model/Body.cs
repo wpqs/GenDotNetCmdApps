@@ -321,8 +321,8 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<string[]>("Body.GetLastLinesForDisplay", null);
 
-            if (count > CmdLineParamsApp.ArgDisplayLastLinesCntMax)
-                rc.SetError(1100801, MxError.Source.Param, $"count={count} > {CmdLineParamsApp.ArgDisplayLastLinesCntMax}", MxMsgs.MxErrBadMethodParam);
+            if ((count > CmdLineParamsApp.ArgDisplayLastLinesCntMax) && (TextLines != null))
+                rc.SetError(1100801, MxError.Source.Param, $"TextLines is null, or count={count} > {CmdLineParamsApp.ArgDisplayLastLinesCntMax}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError())
@@ -330,15 +330,16 @@ namespace KLineEdCmdApp.Model
                 else
                 {
                     var lastLines = new string[count];
-                    var buffCount = count - 1;
-                    var fileLineCount = TextLines.Count;
-                    // ReSharper disable once UnusedVariable
-                    foreach (var line in lastLines)
+                    if (TextLines.Count > 0)
                     {
-                        if (fileLineCount > 0)
-                            lastLines[buffCount--] = TextLines[(fileLineCount--) - 1];
-                        else
-                            lastLines[buffCount--] = null;
+                        var lineIndex = ((TextLines.Count - count) >= 0) ? TextLines.Count - count : 0;
+                        for (int bufferIndex = 0; bufferIndex < count; bufferIndex++)
+                        {
+                            if (lineIndex < TextLines.Count)
+                                lastLines[bufferIndex] = TextLines[lineIndex++];
+                            else
+                                break;
+                        }
                     }
                     rc.SetResult(lastLines);
                 }
