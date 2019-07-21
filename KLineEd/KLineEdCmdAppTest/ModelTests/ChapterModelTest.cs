@@ -172,7 +172,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscript.AppendLine("test two").GetResult());
             Assert.True(manuscript.AppendLine("test three").GetResult());
 
-            Assert.StartsWith($"Author: [author not set]{Environment.NewLine}Project: [project not set]", manuscript.GetReport());
+            Assert.StartsWith($"{Environment.NewLine}Author: [author not set]{Environment.NewLine}Project: [project not set]", manuscript.GetReport());
             Assert.Contains("Chapter stats:", manuscript.GetReport());
 
             Assert.True(manuscript.Close(false).GetResult());

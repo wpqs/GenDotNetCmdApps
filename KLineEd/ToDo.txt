@@ -17,8 +17,9 @@ Development work
 2. Implement command line parameters/args and settings
      --BrowserName "explorer.exe"
 	    --Help 
-		--Search https://www.google.com/
-		--Thesaurus  https://www.thesaurus.com/ args /browse/{word}     --Reporting on | off
+		--Search https://www.google.com/ args search {word}
+		--Thesaurus  https://www.thesaurus.com/ args /browse/{word}
+     --Reporting on | off
 	 --EditFile 'mytext.txt'
 	     --CursorSize 20
 		 --TypingPauseSecs 60

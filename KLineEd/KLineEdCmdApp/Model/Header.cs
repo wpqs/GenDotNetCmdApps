@@ -282,17 +282,18 @@ namespace KLineEdCmdApp.Model
         }
         public string GetChapterReport(int linesInChapter=0, int wordsInChapter=0)
         {
-            var rc = Properties?.GetReport() ?? HeaderBase.ValueNotSet;
-            if (rc != HeaderBase.ValueNotSet)
-            {
-                rc += SessionsTotal.GetReport(Sessions, linesInChapter, wordsInChapter);
-            }
+            var rc = Properties?.GetReport() ?? (Environment.NewLine + HeaderBase.ValueNotSet); //reports always start with newline, but don't end with one 
+            rc += KLineEditor.ReportSectionDottedLine;
+            rc += SessionsTotal.GetReport(Sessions, linesInChapter, wordsInChapter);
+
             return rc;
         }
 
         public string GetLastSessionReport()
         {
-            return GetLastSession()?.GetReport() ?? HeaderBase.ValueNotSet; 
+            var rc = GetLastSession()?.GetReport() ?? (Environment.NewLine + HeaderBase.ValueNotSet); //reports always start with newline, but don't end with one 
+            rc += KLineEditor.ReportSectionDottedLine;
+            return rc;
         }
     }
 }

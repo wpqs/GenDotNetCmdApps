@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View.Base;
 using MxReturnCode;
 
@@ -9,7 +10,7 @@ namespace KLineEdCmdApp.Controller.Base
     public abstract class EditingBaseController
     {
         public ChapterModel Chapter { private set; get; }
- 
+        public string BrowserExe { private set; get; }
         private MxReturnCode<bool> _mxErrorCode;
         private bool _ctrlQ;
         private bool _refresh;
@@ -21,6 +22,7 @@ namespace KLineEdCmdApp.Controller.Base
             _refresh = false;
             _mxErrorCode = new MxReturnCode<bool>($"{this.GetType().Name}.Ctor", false); //SetResult(true) on error
             Chapter = null;
+            BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
         }
 
         // ReSharper disable once SimplifyConditionalTernaryExpression
@@ -56,17 +58,19 @@ namespace KLineEdCmdApp.Controller.Base
             return rc;
         }
 
-        public virtual MxReturnCode<bool> Initialise(ChapterModel model)
+        public virtual MxReturnCode<bool> Initialise(ChapterModel model, string browserExe)
         {
             var rc = new MxReturnCode<bool>("EditingBaseController.Initialise");
 
             if ((model?.Ready ?? false) == false)
-                rc.SetError(1030101, MxError.Source.Param, $"param is null or editModel null, not ready", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1030101, MxError.Source.Param, $"model null, not ready, or browserExe null", MxMsgs.MxErrBadMethodParam);
             else
             {
+
                 _ctrlQ = false;
                 _refresh = false;
                 Chapter = model;
+                BrowserExe = browserExe;
                 _mxErrorCode?.SetResult(true);
                 rc.SetResult(true);
             }
@@ -118,7 +122,7 @@ namespace KLineEdCmdApp.Controller.Base
                 {
                     try
                     {
-                        Process.Start("chrome.exe", "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1-1");
+                        Process.Start(BrowserExe, Program.CmdAppHelpUrl);
                     }
                     catch (Exception e)
                     {

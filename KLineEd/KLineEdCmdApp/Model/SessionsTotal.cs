@@ -98,7 +98,8 @@ namespace KLineEdCmdApp.Model
 
         public static string GetReport(List<HeaderSession> sessions, int linesInChapter, int wordsInChapter)
         {
-            string rc = $"Chapter stats:{Environment.NewLine}";
+            var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
+            rc += $"Chapter stats:{Environment.NewLine}";
 
             if (RefreshValues(sessions) == false)
                 rc += Error;

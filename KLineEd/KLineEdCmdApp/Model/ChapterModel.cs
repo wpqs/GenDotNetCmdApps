@@ -385,36 +385,27 @@ namespace KLineEdCmdApp.Model
         }
         public string GetReport()
         {
-            var rc = "";
-            if (Ready == false)
-                rc += "[not initialized]";
-            else
+            string rc = $"{Environment.NewLine}[not initialized]";   //reports always start with newline, but don't end with one
+            if (Ready)
             {
-                rc += GetChapterReport();
+                rc = GetChapterReport();
                 rc += GetLastSessionReport();
             }
             return rc;
         }
         public string GetChapterReport()
         {
-            var rc = "";
-            if (Ready == false)
-                rc += "[not initialized]";
-            else
-            {
-                rc += ChapterHeader?.GetChapterReport(ChapterBody.GetLineCount(), ChapterBody.WordCount) ?? "[chapter info not available]";
-            }
+            string rc = $"{Environment.NewLine}[not initialized]";   //reports always start with newline, but don't end with one
+            if (Ready)
+                rc = ChapterHeader?.GetChapterReport(ChapterBody.GetLineCount(), ChapterBody.WordCount) ?? "[chapter info not available]";
+
             return rc;
         }
         public string GetLastSessionReport()
         {
-            var rc = "";
-            if (Ready == false)
-                rc += "[not initialized]";
-            else
-            {
-                rc += ChapterHeader?.GetLastSessionReport() ?? "[chapter info not available]";
-            }
+            string rc = $"{Environment.NewLine}[not initialized]";   //reports always start with newline, but don't end with one
+            if (Ready)
+                rc = ChapterHeader?.GetLastSessionReport() ?? "[chapter info not available]";
             return rc;
         }
         public int GetTextLineCount()

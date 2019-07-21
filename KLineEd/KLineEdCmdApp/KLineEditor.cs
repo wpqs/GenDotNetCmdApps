@@ -46,8 +46,7 @@ namespace KLineEdCmdApp
         public const int MsgLineLeftCol = 3;        //width -= MsgLineLeftCol;      
         public const int StatusLineLeftCol = 1;     //width -= StatusLineLeftCol;   
 
-
-        public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................{Environment.NewLine}";
+        public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................";
 
         private EditingBaseController Controller { set; get; }
         public ITerminal Terminal { set; get; }
@@ -57,6 +56,8 @@ namespace KLineEdCmdApp
         public int Height { private set; get; }
         public int LineWidth { private set; get; }
 
+        public string Report { private set; get; }
+        public string BrowserExe { private set; get; }
         public bool Ready { private set; get; }
 
         private List<BaseView> ViewList { set; get; }
@@ -69,10 +70,13 @@ namespace KLineEdCmdApp
             Width = Program.PosIntegerNotSet;
             Height = Program.PosIntegerNotSet;
             LineWidth = Program.PosIntegerNotSet;
+            Report = Program.ValueNotSet;
+            BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
+            Ready = false;
+
 
             ViewList = new List<BaseView>();
 
-            Ready = false;
         }
 
         public MxReturnCode<string> Run(CmdLineParamsApp cmdLineParams, ChapterModel editModel, ITerminal terminal)
@@ -80,7 +84,7 @@ namespace KLineEdCmdApp
             var rc = new MxReturnCode<string>("KLineEditor.Run");
 
             if ((cmdLineParams == null) || (editModel == null) || (editModel.Ready == false) || (terminal == null) || (terminal.IsError()))
-                rc.SetError(1010101, MxError.Source.Param, $"cmdLineParams is null, editModel is null or not read, or terminal is null or error", MxMsgs.MxErrInvalidParamArg);
+                rc.SetError(1030101, MxError.Source.Param, $"cmdLineParams is null, editModel is null or not read, or terminal is null or error", MxMsgs.MxErrInvalidParamArg);
             else
             {
                 var rcInit = Initialise(cmdLineParams, editModel, terminal);
@@ -91,26 +95,24 @@ namespace KLineEdCmdApp
                     rc += rcSetup;
                     if (rcSetup.IsSuccess(true))
                     {                                              
-                        var rcStart = Start(editModel); //start
+                        var rcStart = Start(editModel);     //start
                         rc += rcStart;
                         if (rcStart.IsSuccess(true))
                         {
-                            var rcProcess = Process(); //process
+                            var rcProcess = Process();      //process
                             rc += rcProcess;
-                            if (rcProcess.IsSuccess(true))
-                            {
-                                var report = GetReport();
+                            Report = GetReport();
 
-                                var rcFinish = Finish(); //finish
-                                rc += rcFinish;
-                                if (rcFinish.IsSuccess(true))
-                                {
-                                    rc.SetResult(report);
-                                }
+                            var rcFinish = Finish();        //finish irrespective of any error in Process - i.e. save file at all costs
+                            if (rcProcess.IsSuccess())
+                                rc += rcFinish;                 //keep any prior error set by rc += rcProcess
+                            if (rc.IsSuccess() && rcFinish.IsSuccess(true))
+                            {
+                                rc.SetResult("succeeded");          //no error completion of Run()
                             }
                         }
                         var rcClose = TerminateViews(editModel, terminal);
-                        if (rc.IsSuccess(true))  //keep any prior error, otherwise get any errors held in View.MxErrorCode
+                        if (rc.IsSuccess(true))         //keep any prior error, otherwise get any errors held in View.MxErrorCode
                             rc += rcClose;  
                     }
                 }
@@ -118,105 +120,12 @@ namespace KLineEdCmdApp
             return rc;
         }
 
-        private MxReturnCode<bool> CreateViews(CmdLineParamsApp cmdLineParams, ITerminal terminal, ChapterModel model )
+        public string GetReport()
         {
-            var rc = new MxReturnCode<bool>("KLineEditor.CreateViews");
-
-            if ((cmdLineParams == null) || (ViewList == null) || (terminal == null) || (terminal.IsError()) || (model == null) || (model.Ready == false))
-                rc.SetError(1010201, MxError.Source.Param, $"cmdLineParams= is null, or ViewList is null, or terminal is null or error, or model is null or not ready", MxMsgs.MxErrInvalidParamArg);
-            else
-            {
-                try
-                {                    //subscription order determines order in which views are notified
-                    var editorHelpView = new EditorHelpLineView(terminal);
-                    var rcCmds = editorHelpView.Setup(cmdLineParams);
-                    rc += rcCmds;
-                    if (rcCmds.IsSuccess(true))
-                    {
-                        model.Subscribe(editorHelpView);                        //editorHelpLine
-                        ViewList.Add(editorHelpView);
-
-                        var msgLineView = new MsgLineView(terminal);
-                        var rcMsg = msgLineView.Setup(cmdLineParams);
-                        rc += rcMsg;
-                        if (rcMsg.IsSuccess(true))
-                        {
-                            model.Subscribe(msgLineView);                       //MsgLine
-                            ViewList.Add(msgLineView);
-
-                            var statusLineView = new StatusLineView(terminal);
-                            var rcStatus = statusLineView.Setup(cmdLineParams);
-                            rc += rcStatus;
-                            if (rcStatus.IsSuccess(true))
-                            {
-                                model.Subscribe(statusLineView);                //StatusLine
-                                ViewList.Add(statusLineView);
-                                
-                                //make sure the EditAreaViews are notified after editHelp, msg, status so the cursor to set back to EditArea
-
-                                var textEditView = new TextEditView(terminal);  
-                                var rcTxt = textEditView.Setup(cmdLineParams);
-                                rc += rcTxt;
-                                if (rcTxt.IsSuccess(true))
-                                {
-                                    model.Subscribe(textEditView);              //textEditView
-                                    ViewList.Add(textEditView);
-
-                                    var propsEditView = new PropsEditView(terminal);
-                                    var rcProps = propsEditView.Setup(cmdLineParams);
-                                    rc += rcProps;
-                                    if (rcProps.IsSuccess(true))
-                                    {
-                                        model.Subscribe(propsEditView);         //PropsEditView
-                                        ViewList.Add(propsEditView);
-
-                                        var spellEditView = new SpellEditView(terminal);
-                                        var rcSpell = spellEditView.Setup(cmdLineParams);
-                                        rc += rcSpell;
-                                        if (rcSpell.IsSuccess(true))
-                                        {
-                                            model.Subscribe(spellEditView);     //SpellEditView
-                                            ViewList.Add(spellEditView);
-
-                                            rc.SetResult(true);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    rc.SetError(1010202, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
-                }
-                if (rc.IsError(true))
-                    TerminateViews(model, terminal);
-            }
-            return rc;
-        }
-
-        private MxReturnCode<bool> TerminateViews(ChapterModel model, ITerminal terminal)
-        {
-            var rc = new MxReturnCode<bool>("KLineEditor.TerminateViews");
-
-            if ((model == null) || (ViewList == null) || (terminal == null))
-                rc.SetError(1010301, MxError.Source.Param, $"ViewList is null, or terminal is null, or model is null", MxMsgs.MxErrInvalidParamArg);
-            else
-            {
-                //model.DisconnectAllViews();      //not needed as Finish() calls Model.Close() which in turn calls DisconnectAllViews() irrespective of save or not
-
-                if (model.GetSubscriberCount() > 0)
-                    rc.SetError(1010302, MxError.Source.Program, $"Views still subscribing to model; count={model.GetSubscriberCount()}", MxMsgs.MxErrInvalidCondition);
-
-                foreach (var view in ViewList)
-                    rc += view.Close();         //add any error held in View.MxErrorCode
-
-                rc += terminal.Close();         //get any lingering _mxErrorCode
-
-                if (rc.IsSuccess())
-                    rc.SetResult(true);
-            }
+            var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
+            rc += $"Report for editing session {Model?.ChapterHeader?.GetLastSession()?.SessionNo ?? Program.PosIntegerNotSet} of chapter {Model?.ChapterHeader?.Properties?.Title ?? "[null]"}:";
+            rc += Environment.NewLine;
+            rc += Model?.GetReport() ?? HeaderBase.ValueNotSet;
             return rc;
         }
 
@@ -225,11 +134,12 @@ namespace KLineEdCmdApp
             var rc = new MxReturnCode<bool>("KLineEditor. Initialise");
 
             if ((param == null) || ((model?.Ready ?? false ) == false) || (terminal?.IsError() ?? true)) 
-                rc.SetError(1010401, MxError.Source.Param, $"param is null or editModel null, not ready", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1030201, MxError.Source.Param, $"param is null or editModel null, not ready", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
+                    //BrowserExe = param.BrowserExe;
                     LineWidth = param.DisplayLineWidth;
                     Width = EditAreaMarginLeft + LineWidth + EditAreaMarginRight;  //there is actually an addition column, but writing to it creates a new line
                     Height = ModeHelpLineRowCount + EditAreaMarginTopRowCount + param.DisplayLastLinesCnt + EditAreaMarginBottomRowCount + StatusLineRowCount;
@@ -243,11 +153,11 @@ namespace KLineEdCmdApp
                         WindowWidth = Width
                     };
                     if (settings.Validate() == false) 
-                        rc.SetError(1010402, MxError.Source.User, $"settings.Validate() failed; {settings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
+                        rc.SetError(1030202, MxError.Source.User, $"settings.Validate() failed; {settings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
                     else
                     {
                         if (terminal.Setup(settings) == false)
-                            rc.SetError(1010403, terminal.GetErrorSource(), terminal.GetErrorTechMsg(), terminal.GetErrorUserMsg());
+                            rc.SetError(1030203, terminal.GetErrorSource(), terminal.GetErrorTechMsg(), terminal.GetErrorUserMsg());
                         else
                         {
                             Terminal = terminal;
@@ -259,7 +169,7 @@ namespace KLineEdCmdApp
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1010403, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    rc.SetError(1030204, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -270,7 +180,7 @@ namespace KLineEdCmdApp
             var rc = new MxReturnCode<bool>("Edit.Setup");
 
             if ((model == null) || (model.Ready == false)  )
-                rc.SetError(1010501, MxError.Source.Param, $"model is {((model == null) ? "[null]" : "[not ready]")}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1030301, MxError.Source.Param, $"model is {((model == null) ? "[null]" : "[not ready]")}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 Model = model;
@@ -297,7 +207,7 @@ namespace KLineEdCmdApp
                     var terminalSettings = Terminal.GetSettings();
                     //error if settings bad
                     Model.SetStatusLine(); 
-                    Controller = ControllerFactory.Make(Model, ControllerFactory.TextEditingController); //create PropsEditingController if mode is new
+                    Controller = ControllerFactory.Make(Model, ControllerFactory.TextEditingController, BrowserExe); //create PropsEditingController if mode is new
 
                     var tim = DateTime.UtcNow;
                     var lastKeyPress = tim;
@@ -359,7 +269,7 @@ namespace KLineEdCmdApp
             }
             catch (Exception e)
             {
-                rc.SetError(1010602, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                rc.SetError(1030401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -380,7 +290,109 @@ namespace KLineEdCmdApp
             }
             catch (Exception e)
             {
-                rc.SetError(1010701, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                rc.SetError(1030501, MxError.Source.User, e.Message, MxMsgs.MxErrException);
+            }
+            return rc;
+        }
+
+        private MxReturnCode<bool> CreateViews(CmdLineParamsApp cmdLineParams, ITerminal terminal, ChapterModel model)
+        {
+            var rc = new MxReturnCode<bool>("KLineEditor.CreateViews");
+
+            if ((cmdLineParams == null) || (ViewList == null) || (terminal == null) || (terminal.IsError()) || (model == null) || (model.Ready == false))
+                rc.SetError(1030601, MxError.Source.Param, $"cmdLineParams= is null, or ViewList is null, or terminal is null or error, or model is null or not ready", MxMsgs.MxErrInvalidParamArg);
+            else
+            {
+                try
+                {                    //subscription order determines order in which views are notified
+                    var editorHelpView = new EditorHelpLineView(terminal);
+                    var rcCmds = editorHelpView.Setup(cmdLineParams);
+                    rc += rcCmds;
+                    if (rcCmds.IsSuccess(true))
+                    {
+                        model.Subscribe(editorHelpView);                        //editorHelpLine
+                        ViewList.Add(editorHelpView);
+
+                        var msgLineView = new MsgLineView(terminal);
+                        var rcMsg = msgLineView.Setup(cmdLineParams);
+                        rc += rcMsg;
+                        if (rcMsg.IsSuccess(true))
+                        {
+                            model.Subscribe(msgLineView);                       //MsgLine
+                            ViewList.Add(msgLineView);
+
+                            var statusLineView = new StatusLineView(terminal);
+                            var rcStatus = statusLineView.Setup(cmdLineParams);
+                            rc += rcStatus;
+                            if (rcStatus.IsSuccess(true))
+                            {
+                                model.Subscribe(statusLineView);                //StatusLine
+                                ViewList.Add(statusLineView);
+
+                                //make sure the EditAreaViews are notified after editHelp, msg, status so the cursor to set back to EditArea
+
+                                var textEditView = new TextEditView(terminal);
+                                var rcTxt = textEditView.Setup(cmdLineParams);
+                                rc += rcTxt;
+                                if (rcTxt.IsSuccess(true))
+                                {
+                                    model.Subscribe(textEditView);              //textEditView
+                                    ViewList.Add(textEditView);
+
+                                    var propsEditView = new PropsEditView(terminal);
+                                    var rcProps = propsEditView.Setup(cmdLineParams);
+                                    rc += rcProps;
+                                    if (rcProps.IsSuccess(true))
+                                    {
+                                        model.Subscribe(propsEditView);         //PropsEditView
+                                        ViewList.Add(propsEditView);
+
+                                        var spellEditView = new SpellEditView(terminal);
+                                        var rcSpell = spellEditView.Setup(cmdLineParams);
+                                        rc += rcSpell;
+                                        if (rcSpell.IsSuccess(true))
+                                        {
+                                            model.Subscribe(spellEditView);     //SpellEditView
+                                            ViewList.Add(spellEditView);
+
+                                            rc.SetResult(true);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    rc.SetError(1030602, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                }
+                if (rc.IsError(true))
+                    TerminateViews(model, terminal);
+            }
+            return rc;
+        }
+
+        private MxReturnCode<bool> TerminateViews(ChapterModel model, ITerminal terminal)
+        {
+            var rc = new MxReturnCode<bool>("KLineEditor.TerminateViews");
+
+            if ((model == null) || (ViewList == null) || (terminal == null))
+                rc.SetError(1030701, MxError.Source.Param, $"ViewList is null, or terminal is null, or model is null", MxMsgs.MxErrInvalidParamArg);
+            else
+            {
+                //model.DisconnectAllViews();      //not needed as Finish() calls Model.Close() which in turn calls DisconnectAllViews() irrespective of save or not
+
+                if (model.GetSubscriberCount() > 0)
+                    rc.SetError(1030702, MxError.Source.Program, $"Views still subscribing to model; count={model.GetSubscriberCount()}", MxMsgs.MxErrInvalidCondition);
+
+                foreach (var view in ViewList)
+                    rc += view.Close();         //add any error held in View.MxErrorCode
+
+                rc += terminal.Close();         //get any lingering _mxErrorCode
+
+                if (rc.IsSuccess())
+                    rc.SetResult(true);
             }
             return rc;
         }
@@ -390,7 +402,7 @@ namespace KLineEdCmdApp
             var rc = new MxReturnCode<bool>("KLineEditor.GetAnyCriticalError");
 
             if ((viewList == null) || (controller == null))
-                rc.SetError(1010801, MxError.Source.Param, $"ViewList or controller is null", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1030801, MxError.Source.Param, $"ViewList or controller is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (controller.IsError(true))
@@ -407,17 +419,6 @@ namespace KLineEdCmdApp
                         rc.SetResult(true);
                 }
             }
-            return rc;
-        }
-
-        private string GetReport()
-        {
-            var rc = String.Format(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
-            rc += Environment.NewLine;
-            rc += $"Report for editing session {Model?.ChapterHeader?.GetLastSession()?.SessionNo ?? Program.PosIntegerNotSet} of chapter {Model?.ChapterHeader?.Properties?.Title ?? "[null]"}:";
-            rc += Environment.NewLine;
-            rc += Environment.NewLine;
-            rc += Model?.GetReport() ??HeaderBase.ValueNotSet;
             return rc;
         }
     }

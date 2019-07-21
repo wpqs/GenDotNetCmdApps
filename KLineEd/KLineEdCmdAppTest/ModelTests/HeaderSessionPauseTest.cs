@@ -1,4 +1,5 @@
-﻿using KLineEdCmdApp;
+﻿using System;
+using KLineEdCmdApp;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
 using MxDotNetUtilsLib;
@@ -25,7 +26,7 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetReportTest()
         {
-            var data = $"12:30:45,120;";
+            var data = $"{Environment.NewLine}12:30:45,120;";
 
             var info = new HeaderSessionPause();
             Assert.True(info.InitialiseFromString(data).GetResult());

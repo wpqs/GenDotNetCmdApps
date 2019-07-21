@@ -59,7 +59,9 @@ namespace KLineEdCmdApp.Model
         }
         public override string GetReport()
         {
-            return ToString();
+            var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
+            rc += ToString();
+            return rc;
         }
 
         public override bool IsLabelFound(string name)

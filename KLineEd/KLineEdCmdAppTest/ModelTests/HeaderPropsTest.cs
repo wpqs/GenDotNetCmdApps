@@ -28,7 +28,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var info = new HeaderProps();
             Assert.True(info.InitialiseFromString(data).GetResult());
             Assert.False(info.IsError());
-            Assert.StartsWith(data, info.GetReport());
+            Assert.StartsWith($"{Environment.NewLine}{data}", info.GetReport());
         }
 
         [Fact]

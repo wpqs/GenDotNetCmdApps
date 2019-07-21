@@ -60,6 +60,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamScrollReviewMode = "--scrollreview"; // on | off
         public static readonly string ParamEditLineMode = "--editline"; // on | off
         public static readonly string ParamSpellCheckMode = "--spellcheck"; // on | off
+        public static readonly string ParamBrowser = "--browser"; // exe='Explorer'
 
         public static readonly int ArgPauseWaitSecsDefault = 60;
         public static readonly int ArgPauseWaitSecsMin = 0;
@@ -72,6 +73,9 @@ namespace KLineEdCmdApp.Utils
         public static readonly int ArgDisplayLineWidthDefault = 68;   //counted from Jack Kerouac's book 'On the Road';
         public static readonly int ArgDisplayLineWidthMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
         public static readonly int ArgDisplayLineWidthMin = 5;
+
+        public static readonly string ArgBrowserExeDefault = "explorer.exe";
+
 
         public static readonly int ArgVolDefault = 3;
         public static readonly int ArgVolMax = 10;

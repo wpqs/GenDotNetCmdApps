@@ -209,7 +209,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var session = new HeaderSession();
 
-            Assert.Equal("Great progress - keep on writing!", session.GetAssessment());
+            Assert.Equal($"{Environment.NewLine}Great progress - keep on writing!", session.GetAssessmentReport());
         }
     }
 }

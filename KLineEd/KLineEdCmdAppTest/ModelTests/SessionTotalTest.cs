@@ -210,7 +210,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(session3.IsError());
 
             var list = new List<HeaderSession> {session1, session2, session3};
-            Assert.StartsWith($"Chapter stats:{Environment.NewLine}{Environment.NewLine}Pages 9, lines 350 (lines typed 415", SessionsTotal.GetReport(list, 350, 6503));
+            Assert.StartsWith($"{Environment.NewLine}Chapter stats:{Environment.NewLine}{Environment.NewLine}Pages 9, lines 350 (lines typed 415", SessionsTotal.GetReport(list, 350, 6503));
         }
     }
 }

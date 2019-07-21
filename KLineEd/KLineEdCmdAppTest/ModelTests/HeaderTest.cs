@@ -1,4 +1,5 @@
-﻿using KLineEdCmdApp.Model;
+﻿using System;
+using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
@@ -13,14 +14,14 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             Header header = new Header();
             Assert.True(header.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName));
-            Assert.StartsWith("Author: [author not set]", header.GetChapterReport());
+            Assert.StartsWith($"{Environment.NewLine}Author: [author not set]", header.GetChapterReport());
         }
 
         [Fact]
         public void GetChapterReportNotSetTest()
         {
             Header header = new Header();
-            Assert.StartsWith(HeaderBase.ValueNotSet, header.GetChapterReport());
+            Assert.StartsWith($"{Environment.NewLine}{HeaderBase.ValueNotSet}", header.GetChapterReport());
         }
 
         [Fact]

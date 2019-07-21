@@ -145,10 +145,11 @@ namespace KLineEdCmdApp.Model
         }
         public override string GetReport()
         {
-            var rc = HeaderBase.ValueNotSet;
-            if (IsError() == false)     
-                rc = $"{AuthorLabel} {Author}{Environment.NewLine}{ProjectLabel} {Project}{Environment.NewLine}{TitleLabel} {Title}{Environment.NewLine}{PathFileNameLabel} {PathFileName}";
-            rc += KLineEditor.ReportSectionDottedLine;
+            var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
+            if (IsError())
+                rc += HeaderBase.ValueNotSet;
+            else
+                rc += $"{AuthorLabel} {Author}{Environment.NewLine}{ProjectLabel} {Project}{Environment.NewLine}{TitleLabel} {Title}{Environment.NewLine}{PathFileNameLabel} {PathFileName}";
             return rc;
         }
         public override string ToString()

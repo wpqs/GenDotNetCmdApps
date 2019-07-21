@@ -7,11 +7,11 @@ namespace KLineEdCmdApp.Controller.Base
         public static readonly string TextEditingController = "TextEditingController";
         public static readonly string PropsEditingController = "PropsEditingController";
         public static readonly string SpellEditingController = "SpellEditingController";
-        public static EditingBaseController Make(ChapterModel model, string className)
+        public static EditingBaseController Make(ChapterModel model, string className, string browserExe)
         {
             EditingBaseController rc = null;
 
-            if (model?.Ready ?? false)
+            if ((model?.Ready ?? false) && (className != null) && (browserExe != null))
             {
                 EditingBaseController controller = null;
                 if (className == TextEditingController)
@@ -34,7 +34,7 @@ namespace KLineEdCmdApp.Controller.Base
                     model.SetErrorMsg(1220101, $"Program defect. {className} is unsupported. Please report this problem.");
                 else
                 {
-                    var rcInit = controller.Initialise(model);
+                    var rcInit = controller.Initialise(model, browserExe);
                     if (rcInit.IsError(true))
                         model.SetMxErrorMsg(rcInit.GetErrorUserMsg());
                     else

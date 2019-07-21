@@ -300,10 +300,12 @@ namespace KLineEdCmdApp.Model
 
         public override string GetReport()
         {
-            var rc = HeaderBase.ValueNotSet;
-            if ((IsError() == false) && (GetTypingPausesString() != null))
+            var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
+            if ((IsError()) || (GetTypingPausesString() == null))
+                rc += HeaderBase.ValueNotSet;
+            else
             {                                       //ToString(MxStdFrmt.DateTime) appends a space, but ToString(MxStdFrmtTimeSpan) doesn't
-                rc = "Last session stats:";
+                rc += "Last session stats:";
                 rc += Environment.NewLine;
                 rc += Environment.NewLine;
                 rc += $"{SessionNoLabel} {SessionNo} {StartLineLabel} {StartLine} {EndLineLabel} {EndLine} {LinesTypedLabel} {LinesTyped}";
@@ -317,8 +319,7 @@ namespace KLineEdCmdApp.Model
                 //rc += Environment.NewLine;
                 //rc += $"{SpellCheckCountLabel} {SpellCheckCount} {WpsLabel} {Wps:F1}";
                 rc += $"{KLineEditor.ReportSectionDottedLine}";
-                rc += GetAssessment();
-                rc += Environment.NewLine;
+                rc += GetAssessmentReport();
             }
             return rc;
         }
@@ -405,9 +406,11 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public string GetAssessment()
+        public string GetAssessmentReport()
         {
-            return "Great progress - keep on writing!";
+            var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
+            rc += "Great progress - keep on writing!";
+            return rc;
         }
 
         public bool SetSessionNo(int num)
