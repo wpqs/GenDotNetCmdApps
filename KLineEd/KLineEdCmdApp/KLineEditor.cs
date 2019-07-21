@@ -19,6 +19,8 @@ namespace KLineEdCmdApp
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class KLineEditor
     {
+        public static readonly int StatusLineUpdateMilliSecs = 100;
+
         public static readonly int MaxWindowHeight = Console.LargestWindowHeight;  
         public static readonly int MaxWindowWidth = Console.LargestWindowWidth;
         public static readonly int MinWindowHeight = 4; //ModeHelp, Msg, Text, Status
@@ -200,76 +202,79 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<bool>("Edit.Process");
 
-            try
+            if (Ready == false)
+                rc.SetError(1030401, MxError.Source.Param, $"Ready false", MxMsgs.MxErrBadMethodParam);
+            else
             {
-                if (Ready)  //report error
+                var terminalSettings = Terminal.GetSettings();
+                if (terminalSettings.Validate() == false)
+                    rc.SetError(1030402, MxError.Source.User, $"settings.Validate() failed; {terminalSettings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
+                else
                 {
-                    var terminalSettings = Terminal.GetSettings();
-                    //error if settings bad
-                    Model.SetStatusLine(); 
-                    Controller = ControllerFactory.Make(Model, ControllerFactory.TextEditingController, BrowserExe); //create PropsEditingController if mode is new
-
-                    var tim = DateTime.UtcNow;
-                    var lastKeyPress = tim;
-
-                    while (rc.IsError() == false)
+                    if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserExe)) == null) || Controller.IsError())
+                        rc.SetError(1030403, MxError.Source.Program, $"ControllerFactory.Make failed", MxMsgs.MxErrInvalidCondition);
+                    else
                     {
-                        //within this loop report all non-critical errors using BaseView.DisplayErrorMsg(no, type, msg)
-                        //or BaseView.DisplayMxErrorMsg(msg) - in both cases error message is formatted as "error 1010102-exception: msg"
-
-                        if ((DateTime.UtcNow - tim).TotalMilliseconds > 100)
+                        try
                         {
-                            tim = DateTime.UtcNow;
                             Model.SetStatusLine();
-                            if (Model.ChapterHeader.PauseProcessing(tim, lastKeyPress, false) == false)
-                                break; //todo error
-                        }
-  
-                        if (Terminal.IsKeyAvailable())
-                        {
-                            lastKeyPress = DateTime.UtcNow;
-                            if (Model.ChapterHeader.PauseProcessing(tim, lastKeyPress, true) == false)
-                                break; //todo error
+                            var nowUtc = DateTime.UtcNow;
+                            var lastKeyPress = nowUtc;
 
-                            var keyInfo = Terminal.ReadKey(true);
-
-                            Controller = Controller.ProcessKey(Model, keyInfo);
-
-                            var rcErr = GetAnyCriticalError(ViewList, Controller); //may move to main loop
-                            if (rcErr.IsError())
-                                 rc += rcErr;                //todo report error like any other failure outside this loop - not clear and print error
-                            if (Controller.IsError())
+                            while (rc.IsError() == false)
                             {
-                                Model.SetMxErrorMsg(Controller.GetErrorTechDetails()); //todo wait for next release of MxReturnCode to get resource string
-                                Controller.ResetError();
+                                if ((DateTime.UtcNow - nowUtc).TotalMilliseconds > StatusLineUpdateMilliSecs)
+                                {
+                                    nowUtc = DateTime.UtcNow;
+                                    Model.SetStatusLine();
+                                    if (Model.ChapterHeader.PauseProcessing(nowUtc, lastKeyPress, false) == false)
+                                    {
+                                        rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
+                                        break; 
+                                    }
+                                }
+                                if (Terminal.IsKeyAvailable())
+                                {
+                                    lastKeyPress = DateTime.UtcNow;
+                                    if (Model.ChapterHeader.PauseProcessing(nowUtc, lastKeyPress, true) == false)
+                                    {
+                                        rc.SetError(1030405, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
+                                        break; 
+                                    }
+                                    Controller = Controller.ProcessKey(Model, Terminal.ReadKey(true));
+                                    if (Controller.IsError())
+                                    {
+                                        Model.SetMxErrorMsg(Controller.GetErrorTechDetails()); //todo wait for next release of MxReturnCode to get resource string
+                                        Controller.ResetError();
+                                    }
+                                }
+                                if (Controller?.IsRefresh() ?? true)
+                                {
+                                    Terminal.Setup(terminalSettings);
+                                    Model.Refresh();
+                                }
+                                if (Controller?.IsQuit() ?? true)
+                                    break;
+
+                                var rcErr = GetAnyCriticalError(ViewList, Controller); 
+                                if (rcErr.IsError())
+                                    rc += rcErr; 
+                                else
+                                    Thread.Sleep(0);
+                            }
+                            var rcDoneProc = Model.ChapterHeader.KLineEditorProcessDone(nowUtc, lastKeyPress);
+                            if (rc.IsSuccess())
+                            {
+                                rc += rcDoneProc;       //keep any existing error
+                                rc.SetResult(true);
                             }
                         }
-
-                        if (Controller?.IsRefresh() ?? true)
+                        catch (Exception e)
                         {
-                            Terminal.Setup(terminalSettings);
-                            Model.Refresh();
+                            rc.SetError(1030406, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                         }
-
-                        if (Controller?.IsQuit() ?? true)
-                            break;
-
-                        Thread.Sleep(0);
-                    }
-
-                    Model.ChapterHeader.PauseProcessing(tim, lastKeyPress, true);
-                    Model.ChapterHeader.GetLastSession()?.SetDuration(DateTime.UtcNow); //todo check for error EndOfSession()??
-                    Model.ChapterHeader.GetLastSession()?.SetTypingPausesTypingTime();
-
-                    if (rc.IsSuccess())
-                    {
-                            rc.SetResult(true);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                rc.SetError(1030401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }

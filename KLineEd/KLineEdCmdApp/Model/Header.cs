@@ -78,6 +78,33 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public MxReturnCode<bool> KLineEditorProcessDone(DateTime nowUtc, DateTime lastKeyPress)
+        {
+            var rc = new MxReturnCode<bool>("Header.KLineEditorProcessDone");
+
+            if (PauseProcessing(nowUtc, lastKeyPress, true) == false)
+                rc.SetError(1090101, MxError.Source.Program, "PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+                var session = GetLastSession();
+                if ((session == null) || (session.IsError()))
+                    rc.SetError(1090102, MxError.Source.Program, "GetLastSession() returned null", MxMsgs.MxErrInvalidCondition);
+                else
+                {
+                    if (session.SetDuration(DateTime.UtcNow) == false)
+                        rc.SetError(1090103, MxError.Source.Program, "SetDuration failed", MxMsgs.MxErrInvalidCondition);
+                    else
+                    {
+                        var rcTyping = session.SetTypingPausesTypingTime();
+                        rc += rcTyping;
+                        if (rcTyping.IsSuccess())
+                            rc.SetResult(true);
+                    }
+                }
+            }
+            return rc;
+        }
+
         public bool PauseProcessing(DateTime nowUtc, DateTime lastKeyPress, bool keyAvailable)
         {
             var rc = false;
@@ -107,11 +134,11 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Header.Validate");
 
             if (Properties.Validate() == false)
-                rc.SetError(1090101, MxError.Source.Data, $"Chapter is invalid={Properties}");
+                rc.SetError(1090201, MxError.Source.Data, $"Chapter is invalid={Properties}", MxMsgs.MxErrInvalidCondition);
             else
             {
                 if ((PauseWaitSeconds < CmdLineParamsApp.ArgPauseWaitSecsMin) || (PauseWaitSeconds > CmdLineParamsApp.ArgPauseWaitSecsMax))
-                    rc.SetError(1090102, MxError.Source.Data, $"PauseWaitSeconds={PauseWaitSeconds} is invalid");
+                    rc.SetError(1090202, MxError.Source.Data, $"PauseWaitSeconds={PauseWaitSeconds} is invalid", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     var sessionNo = 1;
@@ -119,13 +146,12 @@ namespace KLineEdCmdApp.Model
                     {
                         if (session.Validate() == false)
                         {
-                            rc.SetError(1090103, MxError.Source.Data, $"Session {sessionNo} is invalid");
+                            rc.SetError(1090203, MxError.Source.Data, $"Session {sessionNo} is invalid", MxMsgs.MxErrInvalidCondition);
                             break;
                         }
-
                         if (session.SessionNo != sessionNo)
                         {
-                            rc.SetError(1090104, MxError.Source.Data, $"Session {session.SessionNo} is not in sequence, expected {sessionNo}");
+                            rc.SetError(1090204, MxError.Source.Data, $"Session {session.SessionNo} is not in sequence, expected {sessionNo}", MxMsgs.MxErrInvalidCondition);
                             break;
                         }
                         sessionNo++;
@@ -142,7 +168,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Header.Write");
 
             if (file == null)
-                rc.SetError(1090201, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1090301, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -165,7 +191,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1090202, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    rc.SetError(1090302, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -175,14 +201,14 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Header.Read");
 
             if (file == null)
-                rc.SetError(1090301, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1090401, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     var firstLine = file.ReadLine();
                     if (firstLine != OpeningElement)
-                        rc.SetError(1090302, MxError.Source.User, $"Header opening line is {firstLine} not {OpeningElement}", MxMsgs.MxErrInvalidChapterFile);
+                        rc.SetError(1090402, MxError.Source.User, $"Header opening line is {firstLine} not {OpeningElement}", MxMsgs.MxErrInvalidChapterFile);
                     else
                     {
                         var rcChapter = Properties.Read(file);
@@ -192,7 +218,7 @@ namespace KLineEdCmdApp.Model
 
                             var line = file.ReadLine();
                             if (line != SessionsOpeningElement)
-                                rc.SetError(1090303, MxError.Source.User, $"Sessions opening line is {line} not {SessionsOpeningElement}", MxMsgs.MxErrInvalidChapterFile);
+                                rc.SetError(1090403, MxError.Source.User, $"Sessions opening line is {line} not {SessionsOpeningElement}", MxMsgs.MxErrInvalidChapterFile);
                             else
                             {
                                 HeaderSession session = null;
@@ -219,7 +245,7 @@ namespace KLineEdCmdApp.Model
                                 {
                                     line = file.ReadLine();
                                     if (line != ClosingElement)
-                                        rc.SetError(1090304, MxError.Source.User, $"Header closing line is {line} not {ClosingElement}", MxMsgs.MxErrInvalidChapterFile);
+                                        rc.SetError(1090404, MxError.Source.User, $"Header closing line is {line} not {ClosingElement}", MxMsgs.MxErrInvalidChapterFile);
                                     else
                                     {
                                         var rcValid = Validate();
@@ -234,7 +260,7 @@ namespace KLineEdCmdApp.Model
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1090305, MxError.Source.Exception, e.Message, MxMsgs.MxErrInvalidChapterFile);
+                    rc.SetError(1090405, MxError.Source.Exception, e.Message, MxMsgs.MxErrInvalidChapterFile);
                 }
             }
             return rc;
@@ -245,7 +271,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Header.CreateNewSession");
 
             if (startLineNo < 0 )
-                rc.SetError(1090401, MxError.Source.Param, $"invalid StartLineNo={startLineNo}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1090501, MxError.Source.Param, $"invalid StartLineNo={startLineNo}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var session = new HeaderSession();
@@ -255,7 +281,7 @@ namespace KLineEdCmdApp.Model
                     lastSessionNo = Sessions[Sessions.Count - 1]?.SessionNo ?? Program.PosIntegerNotSet;
 
                 if (session.SetDefaults(lastSessionNo + 1, startLineNo) == false)
-                    rc.SetError(1090402, MxError.Source.Data, $"SetDefaults failed; lastSessionNo={lastSessionNo}+1, startLineNo={startLineNo}", MxMsgs.MxErrInvalidCondition);
+                    rc.SetError(1090502, MxError.Source.Data, $"SetDefaults failed; lastSessionNo={lastSessionNo}+1, startLineNo={startLineNo}", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     Sessions.Add(session);
