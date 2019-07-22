@@ -3,9 +3,9 @@ using MxReturnCode;
 
 namespace KLineEdCmdApp.Model.Base
 {
-    public abstract class HeaderBase
+    public abstract class HeaderElementBase
     {
-        public static readonly string PropertyNotSet = "";
+        public static readonly string PropertyNotSet = "";  //must be empty as Validate checks the property is nit null or empty
         public static readonly string ValueNotSet = Program.ValueNotSet;
 
         public abstract override string ToString();
@@ -17,7 +17,7 @@ namespace KLineEdCmdApp.Model.Base
 
         protected bool Error;
 
-        protected HeaderBase()
+        protected HeaderElementBase()
         {
             Error = true;
         }

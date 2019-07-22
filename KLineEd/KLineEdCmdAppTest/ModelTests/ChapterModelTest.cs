@@ -22,7 +22,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void InitialiseTest()
         {
             var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(65, _instancePathFileName);
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
@@ -30,7 +30,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Close().GetResult());
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(65,  _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
@@ -42,10 +42,10 @@ namespace KLineEdCmdAppTest.ModelTests
         public void InitialiseNullTest()
         {
             var manuscript = new ChapterModel();
-            var rc = manuscript.Initialise(65, null);
+            var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, null);
 
             Assert.False(rc.GetResult());
-            Assert.Equal("error 1050101-param: LineWidth=65 is invalid or pathFilename=[null]", rc.GetErrorTechMsg());
+            Assert.Equal($"error 1050101-param: editAreaLinesCount={TestConst.UnitTestEditAreaLines}, editAreaLineWidth={TestConst.UnitTestEditAreaWidth} is invalid or pathFilename=[null]", rc.GetErrorTechMsg());
             Assert.False(manuscript.Ready);
         }
 
@@ -54,10 +54,21 @@ namespace KLineEdCmdAppTest.ModelTests
         public void InitialiseLineWidthNotSetTest()
         {
             var manuscript = new ChapterModel();
-            var rc = manuscript.Initialise(Program.PosIntegerNotSet,  _instancePathFileName);
+            var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, Program.PosIntegerNotSet,  _instancePathFileName);
 
             Assert.False(rc.GetResult());
-            Assert.StartsWith("error 1050101-param: LineWidth=-1 is invalid", rc.GetErrorTechMsg());
+            Assert.StartsWith($"error 1050101-param: editAreaLinesCount={TestConst.UnitTestEditAreaLines}, editAreaLineWidth={Program.PosIntegerNotSet} is invalid", rc.GetErrorTechMsg());
+            Assert.False(manuscript.Ready);
+        }
+
+        [Fact]
+        public void InitialiseLineCountNotSetTest()
+        {
+            var manuscript = new ChapterModel();
+            var rc = manuscript.Initialise(Program.PosIntegerNotSet, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
+
+            Assert.False(rc.GetResult());
+            Assert.StartsWith($"error 1050101-param: editAreaLinesCount={Program.PosIntegerNotSet}, editAreaLineWidth={TestConst.UnitTestEditAreaWidth} is invalid", rc.GetErrorTechMsg());
             Assert.False(manuscript.Ready);
         }
 
@@ -65,7 +76,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void InitialiseInvalidDirectoryTest()
         {
             var manuscript = new ChapterModel();
-            var rc = manuscript.Initialise(65, TestConst.UnitTestInvalidPathFileName);
+            var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, TestConst.UnitTestInvalidPathFileName);
 
             Assert.False(rc.GetResult());
             Assert.StartsWith("error 1050102-user: folder for edit file", rc.GetErrorUserMsg());
@@ -76,7 +87,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void AppendLineTest()
         {
             var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(65,  _instancePathFileName);
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
@@ -88,7 +99,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Close(false).GetResult());
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(65, _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
@@ -105,7 +116,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void AppendWordTest()
         {
             var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(65, _instancePathFileName);
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
@@ -117,7 +128,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Close(false).GetResult());
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(65, _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
@@ -132,7 +143,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void AppendCharTest()
         {
             var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(65, _instancePathFileName);
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
@@ -145,7 +156,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Close(false).GetResult());
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(65, _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
@@ -161,7 +172,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetReportTest()
         {
             var manuscript = new ChapterModel();
-            var rc = manuscript.Initialise(65, _instancePathFileName);
+            var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(manuscript.CreateNewSession().GetResult());
 
@@ -182,7 +193,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetLastLinesTest()
         {
             var manuscript = new ChapterModel();
-            var rc = manuscript.Initialise(65,  _instancePathFileName);
+            var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);
@@ -202,7 +213,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void SaveTest()
         {
             var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(65,  _instancePathFileName);
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
@@ -216,7 +227,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Close(false).GetResult());
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(65,  _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
@@ -233,7 +244,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void CloseTest()
         {
             var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(65,  _instancePathFileName);
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
@@ -244,7 +255,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Close().GetResult()); //default parameter closes and saves
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(65,  _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
@@ -259,7 +270,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void CreateNewSessionTest()
         {
             var manuscript = new ChapterModel();
-            var rc = manuscript.Initialise(65,  _instancePathFileName);
+            var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);
@@ -279,7 +290,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void RemoveAllLinesTest()
         {
             var manuscript = new ChapterModel();
-            var rc = manuscript.Initialise(65, _instancePathFileName);
+            var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);

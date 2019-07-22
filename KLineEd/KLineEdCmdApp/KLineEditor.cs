@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Net.Cache;
 using System.Threading;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
-using KLineEdCmdApp.Properties;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View;
 using KLineEdCmdApp.View.Base;
@@ -56,7 +54,7 @@ namespace KLineEdCmdApp
 
         public int Width { private set; get; }
         public int Height { private set; get; }
-        public int LineWidth { private set; get; }
+        public int EditAreaLineWidth { private set; get; }
 
         public string Report { private set; get; }
         public string BrowserExe { private set; get; }
@@ -71,7 +69,7 @@ namespace KLineEdCmdApp
             Model = null;
             Width = Program.PosIntegerNotSet;
             Height = Program.PosIntegerNotSet;
-            LineWidth = Program.PosIntegerNotSet;
+            EditAreaLineWidth = Program.PosIntegerNotSet;
             Report = Program.ValueNotSet;
             BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
             Ready = false;
@@ -127,7 +125,7 @@ namespace KLineEdCmdApp
             var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
             rc += $"Report for editing session {Model?.ChapterHeader?.GetLastSession()?.SessionNo ?? Program.PosIntegerNotSet} of chapter {Model?.ChapterHeader?.Properties?.Title ?? "[null]"}:";
             rc += Environment.NewLine;
-            rc += Model?.GetReport() ?? HeaderBase.ValueNotSet;
+            rc += Model?.GetReport() ?? HeaderElementBase.ValueNotSet;
             return rc;
         }
 
@@ -142,9 +140,9 @@ namespace KLineEdCmdApp
                 try
                 {
                     //BrowserExe = param.BrowserExe;
-                    LineWidth = param.DisplayLineWidth;
-                    Width = EditAreaMarginLeft + LineWidth + EditAreaMarginRight;  //there is actually an addition column, but writing to it creates a new line
-                    Height = ModeHelpLineRowCount + EditAreaMarginTopRowCount + param.DisplayLastLinesCnt + EditAreaMarginBottomRowCount + StatusLineRowCount;
+                    EditAreaLineWidth = param.EditAreaLineWidth;
+                    Width = EditAreaMarginLeft + EditAreaLineWidth + EditAreaMarginRight;  //there is actually an addition column, but writing to it creates a new line
+                    Height = ModeHelpLineRowCount + EditAreaMarginTopRowCount + param.EditAreaLinesCount + EditAreaMarginBottomRowCount + StatusLineRowCount;
 
                     var settings = new TerminalProperties
                     {

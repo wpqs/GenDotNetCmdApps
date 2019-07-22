@@ -14,7 +14,7 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class HeaderSession : HeaderBase
+    public class HeaderSession : HeaderElementBase
     {
         //Session: 8
         //Start: 23-06-19 12:10:00 Duration: 02:13:34 Typing time: 02.01.00
@@ -86,7 +86,9 @@ namespace KLineEdCmdApp.Model
         public double Wps { get; private set; }
         private List<HeaderSessionPause> TypingPauses { get; set; }
         public int TypingPauseCount { get; private set; }
-        public HeaderSession()
+
+        // ReSharper disable once RedundantBaseConstructorCall
+        public HeaderSession() : base()
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             Reset();
@@ -286,7 +288,7 @@ namespace KLineEdCmdApp.Model
             if (pause.Validate())
             {
                 TypingPauses.Add(pause);
-                rc = true;
+                rc = ! Error;
             }
             return rc;
         }
@@ -302,7 +304,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
             if ((IsError()) || (GetTypingPausesString() == null))
-                rc += HeaderBase.ValueNotSet;
+                rc += HeaderElementBase.ValueNotSet;
             else
             {                                       //ToString(MxStdFrmt.DateTime) appends a space, but ToString(MxStdFrmtTimeSpan) doesn't
                 rc += "Last session stats:";
@@ -329,7 +331,7 @@ namespace KLineEdCmdApp.Model
 
         public override string ToString()
         {
-            var rc = HeaderBase.ValueNotSet;
+            var rc = HeaderElementBase.ValueNotSet;
             if (IsError() == false)
             {            //order must be same as InitialiseFromString()
                          // //ToString(MxStdFrmt.DateTime) appends a space, but ToString(MxStdFrmtTimeSpan) doesn't

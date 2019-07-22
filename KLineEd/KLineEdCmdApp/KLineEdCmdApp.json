@@ -1,1 +1,19 @@
-{"EditFile":"mytest.txt","ExportFile":null,"DisplayLastLinesCnt":10,"DisplayLineWidth":68,"AudioCRFile":null,"AudioKeyFile":null,"ForeGndTextColour":15,"ForeGndDetailsColour":15,"ForeGndCmdsColour":0,"ForeGndSpellColour":15,"BackGndTextColour":0,"BackGndDetailsColour":0,"BackGndCmdsColour":0,"BackGndSpellColour":0,"ScrollReview":0,"EditLine":0,"SpellCheck":0}
+{
+  "EditFile": "mytest.txt",
+  "ExportFile": null,
+  "EditAreaLinesCount": 10,
+  "EditAreaLineWidth": 68,
+  "AudioCRFile": null,
+  "AudioKeyFile": null,
+  "ForeGndTextColour": 15,
+  "ForeGndDetailsColour": 15,
+  "ForeGndCmdsColour": 0,
+  "ForeGndSpellColour": 15,
+  "BackGndTextColour": 0,
+  "BackGndDetailsColour": 0,
+  "BackGndCmdsColour": 0,
+  "BackGndSpellColour": 0,
+  "ScrollReview": 0,
+  "EditLine": 0,
+  "SpellCheck": 0
+}

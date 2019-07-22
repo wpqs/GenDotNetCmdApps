@@ -5,8 +5,8 @@ using System.IO;
 using System.Runtime.Serialization;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
+using KLineEdCmdApp.View;
 using KLineEdCmdApp.View.Base;
-using MxDotNetUtilsLib;
 
 namespace KLineEdCmdApp.Model
 {
@@ -15,9 +15,15 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-
+    [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
     public class ChapterModel : NotifierModel
     {
+        public enum RowState
+        {
+            Current,
+            Next,
+            Previous,
+        }
         public enum ChangeHint
         {
             [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
@@ -36,7 +42,6 @@ namespace KLineEdCmdApp.Model
         public bool Ready { private set; get; }
         public Header ChapterHeader { get; } 
         public Body ChapterBody { get; }
-
 
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }
@@ -109,17 +114,18 @@ namespace KLineEdCmdApp.Model
             return ChapterBody?.TabSpaces ?? Program.ValueNotSet;
         }
 
-        public MxReturnCode<bool>Initialise(int lineWidth, string pathFilename)
+        public MxReturnCode<bool>Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Setup");
 
-            if ((string.IsNullOrEmpty(pathFilename)) || (lineWidth == Program.PosIntegerNotSet))
-                rc.SetError(1050101, MxError.Source.Param, $"LineWidth={lineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", MxMsgs.MxErrBadMethodParam);
+            if ((string.IsNullOrEmpty(pathFilename)) || (editAreaLinesCount == Program.PosIntegerNotSet) || (editAreaLineWidth == Program.PosIntegerNotSet))
+                rc.SetError(1050101, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount}, editAreaLineWidth={editAreaLineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
-                    var rcInit = ChapterBody.Initialise(lineWidth);
+                    ChapterHeader.Properties.SetMaxPropertyLength(editAreaLineWidth-PropsEditView.LongestLabelLength);
+                    var rcInit = ChapterBody.Initialise(editAreaLinesCount, editAreaLineWidth);
                     rc += rcInit;
                     if (rcInit.IsSuccess(true))
                     {

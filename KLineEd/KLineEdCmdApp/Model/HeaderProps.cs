@@ -5,6 +5,8 @@ using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
 using MxReturnCode;
 
+using Extensions = KLineEdCmdApp.Utils.Extensions;
+
 
 namespace KLineEdCmdApp.Model
 {
@@ -13,12 +15,12 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class HeaderProps : HeaderBase
+    public class HeaderProps : HeaderElementBase
     {
         public static readonly string OpeningElement = "<props>";
         public static readonly string ClosingElement = "</props>";
 
-        public static readonly string AuthorLabel = "Author:";
+        public static readonly string AuthorLabel = "Author:";  //labels for file
         public static readonly string ProjectLabel = "Project:";
         public static readonly string TitleLabel = "Title:";
         public static readonly string PathFileNameLabel = "File:";
@@ -28,10 +30,43 @@ namespace KLineEdCmdApp.Model
         public string Title { get; private set; }
         public string PathFileName { get; private set; }
 
-        public HeaderProps()
+        public CursorPosition Cursor { get; private set; }
+        public int MaxPropertyLength { get; private set; }
+        public void SetMaxPropertyLength(int length) { if (length >= 0) MaxPropertyLength = length; }
+
+        public enum CursorRow //see PropsEditView.XlatHeaderPropsRow(CursorRow row)
+        {
+            Author = 0,
+            Project = 1,
+            Title = 2,
+            PathFileName = 3
+        }
+
+        // ReSharper disable once RedundantBaseConstructorCall
+        public HeaderProps() : base()
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             Reset();
+            MaxPropertyLength = Program.PosIntegerNotSet; //updated by Model.Initialise
+        }
+
+        public HeaderProps(int maxPropertyLength) : this()
+        {
+            if (maxPropertyLength >= 0)
+                MaxPropertyLength = maxPropertyLength; //updated by Model.Initialise
+        }
+
+        public override void Reset()
+        {
+            Author = HeaderElementBase.PropertyNotSet;
+            Project = HeaderElementBase.PropertyNotSet;
+            Title = HeaderElementBase.PropertyNotSet;
+            PathFileName = HeaderElementBase.PropertyNotSet;
+
+            Cursor = new CursorPosition((int)CursorRow.Author, 0);
+
+            Error = true;
+            //don't change MaxEditAreaColumnIndex as it is set during Model.Initialise()
         }
 
         public bool SetDefaults(string pathFilename)   //typically called when starting a new session
@@ -41,8 +76,121 @@ namespace KLineEdCmdApp.Model
 
             if (pathFilename != null)
             {
+                Error = true;
+                SetMaxPropertyLength(CmdLineParamsApp.ArgEditAreaLineWidthDefault);
                 if (SetAuthor("[author not set]") && SetProject("[project not set]") && SetTitle("[title not set]") && SetPathFileName(pathFilename))
-                    rc = true;
+                    rc = !Error;
+            }
+            return rc;
+        }
+
+        public bool SetCursor(CursorRow row, int colIndex)
+        {
+            var rc = false;
+            if ((colIndex >= 0) && (colIndex <= MaxPropertyLength-1))
+            {
+                Cursor.RowIndex = (int) row;  //0 is top row of EditArea
+                Cursor.ColIndex = colIndex;   //0 is left column of EditArea + PropsEditView.LongestLabelLength
+                rc = true;
+            }
+            return rc;
+        }
+
+        public CursorRow GetPropsRowIndex(ChapterModel.RowState state = ChapterModel.RowState.Current)
+        {
+            var rc = CursorRow.Author;
+
+            switch (state)
+            {
+                case ChapterModel.RowState.Current:
+                {
+                    rc = (CursorRow)Cursor.RowIndex;
+                    break;
+                }
+                case ChapterModel.RowState.Next:
+                {
+                    var current = (CursorRow)Cursor.RowIndex;
+                    if (current == CursorRow.Author)
+                        rc = CursorRow.Project;
+                    else if (current == CursorRow.Project)
+                        rc = CursorRow.Title;
+                    else if (current == CursorRow.Title)
+                        rc = CursorRow.Author;
+                    else
+                        rc = CursorRow.Author;
+                    break;
+                }
+                case ChapterModel.RowState.Previous:
+                {
+                    var current = (CursorRow)Cursor.RowIndex;
+                    if (current == CursorRow.Author)
+                        rc = CursorRow.Title;
+                    else if (current == CursorRow.Project)
+                        rc = CursorRow.Author;
+                    else if (current == CursorRow.Title)
+                        rc = CursorRow.Project;
+                    else
+                        rc = CursorRow.Author;
+                    break;
+                }
+                default:
+                {
+                    rc = (CursorRow)Cursor.RowIndex;
+                    break;
+                }
+            }
+            return rc;
+        }
+
+        public bool SetPropsChar(char c, bool insert = false)
+        {
+            return SetPropsWord(c.ToString(), insert, false, false);
+        }
+
+        public bool SetPropsWord(string word, bool insert=false, bool addSpaceBefore=true, bool addSpaceAfter=true)
+        {
+            var rc = false;
+            if (word != null)
+            {
+                var text = $"{((addSpaceBefore) ? " " : "")}{word}{((addSpaceAfter) ? " " : "")}";
+                switch ((CursorRow) Cursor.RowIndex)
+                {
+                    case CursorRow.Author:
+                    {
+                        var result = GetPropertyUpdate(Author, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        if (result != null)
+                        {
+                            Author = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    case CursorRow.Project:
+                    {
+                        var result = GetPropertyUpdate(Project, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        if (result != null)
+                        {
+                            Project = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    case CursorRow.Title:
+                    {
+                        var result = GetPropertyUpdate(Title, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        if (result != null)
+                        {
+                            Title = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        rc = false;
+                        break;
+                    }
+                }
             }
             return rc;
         }
@@ -114,22 +262,17 @@ namespace KLineEdCmdApp.Model
         {
             bool rc = false;
 
-            if (string.IsNullOrEmpty(HeaderBase.PropertyNotSet))   //don't test _error as calling IsValid() 
+            if (string.IsNullOrEmpty(HeaderElementBase.PropertyNotSet))   //don't test _error as calling IsValid() 
             {
                 rc =  (string.IsNullOrEmpty(PathFileName) == false) && (string.IsNullOrEmpty(Title) == false)
-                        && (string.IsNullOrEmpty(Project) == false) && (string.IsNullOrEmpty(Author) == false);
+                        && (string.IsNullOrEmpty(Project) == false) && (string.IsNullOrEmpty(Author) == false)
+                        && (MaxPropertyLength != Program.PosIntegerNotSet)
+                        && (Cursor.ColIndex >= 0) && ((Cursor.ColIndex <= MaxPropertyLength-1));
                 Error = !rc; //set Error = false if all properties are now valid, else Error = true;
             }
             return rc;
         }
-        public override void Reset()
-        {
-            Author = HeaderBase.PropertyNotSet;
-            Project = HeaderBase.PropertyNotSet; 
-            Title = HeaderBase.PropertyNotSet;
-            PathFileName = HeaderBase.PropertyNotSet;
-            Error = true;
-        }
+
         public override bool IsLabelFound(string name)
         {
             // ReSharper disable once ReplaceWithSingleAssignment.False
@@ -147,14 +290,14 @@ namespace KLineEdCmdApp.Model
         {
             var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
             if (IsError())
-                rc += HeaderBase.ValueNotSet;
+                rc += HeaderElementBase.ValueNotSet;
             else
                 rc += $"{AuthorLabel} {Author}{Environment.NewLine}{ProjectLabel} {Project}{Environment.NewLine}{TitleLabel} {Title}{Environment.NewLine}{PathFileNameLabel} {PathFileName}";
             return rc;
         }
         public override string ToString()
         {
-            var rc = HeaderBase.ValueNotSet; 
+            var rc = HeaderElementBase.ValueNotSet; 
             if (IsError() == false)     //order must be same as InitialiseFromString()
                 rc = $"{AuthorLabel} {Author} {ProjectLabel} {Project} {TitleLabel} {Title} {PathFileNameLabel} {PathFileName}";
             return rc;
@@ -215,6 +358,30 @@ namespace KLineEdCmdApp.Model
         {
             PathFileName = GetString(name, PathFileName, out var rc);
             Validate();    
+            return rc;
+        }
+
+        public static string GetPropertyUpdate(string property, string text, int index, int maxLength, bool insert)
+        {
+            string rc = null;
+            if ((text != null) && (property != null) && (index >= 0) && (index < maxLength))
+            {
+                if (insert)
+                {       //move all text at index text.length spaces right and insert at index
+                    if ((property.Length + text.Length) <= maxLength) 
+                        rc = property.Insert(index, text);
+                }
+                else
+                {       //overwrite from startindex = index to endIndex=index+word.Length-1
+                    if (((index + text.Length) <= property.Length) && (property.Length <= maxLength))
+                    {
+                        var start = property.Snip(0, index - 1);
+                        var end = property.Substring(index + text.Length);
+                        if (((start?.Length ?? 0) + text.Length + ((end?.Length ?? 0)) <= maxLength))
+                            rc = (start ?? "") + text + (end ?? "");
+                    }
+                }
+            }
             return rc;
         }
     }

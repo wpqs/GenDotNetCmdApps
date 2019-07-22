@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Utils;
 using MxReturnCode;
 
 namespace KLineEdCmdApp.View.Base
 {
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public abstract class EditAreaView : BaseView
     {
         public ConsoleColor EditAreaForeGndColour { private set; get; }

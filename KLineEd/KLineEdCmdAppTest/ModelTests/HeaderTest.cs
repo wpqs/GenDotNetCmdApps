@@ -21,7 +21,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetChapterReportNotSetTest()
         {
             Header header = new Header();
-            Assert.StartsWith($"{Environment.NewLine}{HeaderBase.ValueNotSet}", header.GetChapterReport());
+            Assert.StartsWith($"{Environment.NewLine}{HeaderElementBase.ValueNotSet}", header.GetChapterReport());
         }
 
         [Fact]

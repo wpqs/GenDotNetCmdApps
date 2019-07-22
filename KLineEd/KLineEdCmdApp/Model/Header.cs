@@ -308,7 +308,7 @@ namespace KLineEdCmdApp.Model
         }
         public string GetChapterReport(int linesInChapter=0, int wordsInChapter=0)
         {
-            var rc = Properties?.GetReport() ?? (Environment.NewLine + HeaderBase.ValueNotSet); //reports always start with newline, but don't end with one 
+            var rc = Properties?.GetReport() ?? (Environment.NewLine + HeaderElementBase.ValueNotSet); //reports always start with newline, but don't end with one 
             rc += KLineEditor.ReportSectionDottedLine;
             rc += SessionsTotal.GetReport(Sessions, linesInChapter, wordsInChapter);
 
@@ -317,7 +317,7 @@ namespace KLineEdCmdApp.Model
 
         public string GetLastSessionReport()
         {
-            var rc = GetLastSession()?.GetReport() ?? (Environment.NewLine + HeaderBase.ValueNotSet); //reports always start with newline, but don't end with one 
+            var rc = GetLastSession()?.GetReport() ?? (Environment.NewLine + HeaderElementBase.ValueNotSet); //reports always start with newline, but don't end with one 
             rc += KLineEditor.ReportSectionDottedLine;
             return rc;
         }

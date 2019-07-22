@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 using MxDotNetUtilsLib;
 using MxReturnCode;
@@ -137,7 +136,7 @@ namespace KLineEdCmdApp
                 try
                 {
                     var editModel = new ChapterModel();
-                    var rcInitModel = editModel.Initialise(cmdLineParams.DisplayLineWidth, cmdLineParams.EditFile);
+                    var rcInitModel = editModel.Initialise(cmdLineParams.EditAreaLinesCount, cmdLineParams.EditAreaLineWidth, cmdLineParams.EditFile);
                     rc += rcInitModel;
                     if (rcInitModel.IsSuccess(true))
                     {

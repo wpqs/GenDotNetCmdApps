@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
-using KLineEdCmdApp.View.Base;
 using MxReturnCode;
 
 namespace KLineEdCmdApp.Controller.Base
 {
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public abstract class EditingBaseController
     {
         public ChapterModel Chapter { private set; get; }
@@ -20,7 +21,7 @@ namespace KLineEdCmdApp.Controller.Base
         {
             _ctrlQ = false;
             _refresh = false;
-            _mxErrorCode = new MxReturnCode<bool>($"{this.GetType().Name}.Ctor", false); //SetResult(true) on error
+            _mxErrorCode = new MxReturnCode<bool>($"{GetType().Name}.Ctor", false); //SetResult(true) on error
             Chapter = null;
             BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
         }
@@ -47,7 +48,7 @@ namespace KLineEdCmdApp.Controller.Base
 
         public void ResetError()
         {
-            _mxErrorCode = new MxReturnCode<bool>($"{this.GetType().Name}.ProcessKey", true);
+            _mxErrorCode = new MxReturnCode<bool>($"{GetType().Name}.ProcessKey", true);
             _mxErrorCode?.SetResult(true);
         }
 
@@ -79,7 +80,7 @@ namespace KLineEdCmdApp.Controller.Base
 
         public MxReturnCode<bool> Close()
         {
-            var rc = new MxReturnCode<bool>($"{this.GetType().Name}.Close");
+            var rc = new MxReturnCode<bool>($"{GetType().Name}.Close");
 
             if (_mxErrorCode.IsError())
                 rc += _mxErrorCode;
@@ -89,7 +90,7 @@ namespace KLineEdCmdApp.Controller.Base
 
         public MxReturnCode<MxReturnCode<bool>> GetMxError()
         {
-            var rc = new MxReturnCode<MxReturnCode<bool>>($"{this.GetType().Name}.GetMxError");
+            var rc = new MxReturnCode<MxReturnCode<bool>>($"{GetType().Name}.GetMxError");
 
             rc += _mxErrorCode;
 
@@ -112,6 +113,7 @@ namespace KLineEdCmdApp.Controller.Base
         {
             EditingBaseController rc = null;
 
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if ((model == null) || (keyInfo == null))
                 _mxErrorCode.SetError(1030201, MxError.Source.Param, $"model is null or keyInfo null", MxMsgs.MxErrBadMethodParam);
             else

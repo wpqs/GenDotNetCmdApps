@@ -1,7 +1,5 @@
 ﻿using KLineEdCmdApp.Controller;
 using KLineEdCmdAppTest.TestSupport;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using MxReturnCode;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests

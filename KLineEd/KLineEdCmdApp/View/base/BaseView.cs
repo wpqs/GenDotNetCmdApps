@@ -99,7 +99,7 @@ namespace KLineEdCmdApp.View.Base
 
         public override void OnUpdate(NotificationItem notificationItem)
         {
-            _mxErrorCode = new MxReturnCode<bool>($"{this.GetType().Name}.OnUpdate", false); //SetResult(true) on error
+            _mxErrorCode = new MxReturnCode<bool>($"{GetType().Name}.OnUpdate", false); //SetResult(true) on error
 
             CursorOn = false;
             Terminal.SetCursorVisible(CursorOn);
@@ -118,8 +118,8 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
-                EditAreaWidth = param.DisplayLineWidth;                    //todo rename param.DisplayLineWidth 
-                EditAreaHeight = param.DisplayLastLinesCnt;                //todo rename param.DisplayLastLinesCnt  
+                EditAreaWidth = param.EditAreaLineWidth;                    //todo rename param.DisplayLineWidth 
+                EditAreaHeight = param.EditAreaLinesCount;                //todo rename param.DisplayLastLinesCnt  
 
                 //MsgLineErrorForeGndColour = param.ForeGndSpellColour;     //todo rename param.MsgLineErrorForeGndColour   
                 //MsgLineErrorBackGndColour = param.BackGndSpellColour;     //todo rename param.MsgLineErrorForeGndColour 
@@ -132,7 +132,7 @@ namespace KLineEdCmdApp.View.Base
                 WindowWidth = KLineEditor.EditAreaMarginLeft + EditAreaWidth + KLineEditor.EditAreaMarginRight;
 
                 if ((WindowWidth < KLineEditor.MinWindowWidth) || (WindowWidth > KLineEditor.MaxWindowWidth) || (WindowHeight > KLineEditor.MaxWindowHeight) || (WindowHeight < KLineEditor.MinWindowHeight))
-                    rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.DisplayLineWidth} (min={KLineEditor.MinWindowWidth}, max={KLineEditor.MaxWindowWidth}), param.DisplayLastLinesCnt{param.DisplayLastLinesCnt} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", MxMsgs.MxErrInvalidSettingsFile);
+                    rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.EditAreaLineWidth} (min={KLineEditor.MinWindowWidth}, max={KLineEditor.MaxWindowWidth}), param.DisplayLastLinesCnt{param.EditAreaLinesCount} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", MxMsgs.MxErrInvalidSettingsFile);
                 else
                 {
                     //BlankLine = "0";  //see also EditAreaView.ClearEditAreaText()
@@ -146,7 +146,7 @@ namespace KLineEdCmdApp.View.Base
 
         public MxReturnCode<bool> Close()
         {
-            var rc = new MxReturnCode<bool>($"{this.GetType().Name}.Close");
+            var rc = new MxReturnCode<bool>($"{GetType().Name}.Close");
 
             if (_mxErrorCode.IsError())
                 rc += _mxErrorCode;
@@ -156,7 +156,7 @@ namespace KLineEdCmdApp.View.Base
 
         public MxReturnCode<MxReturnCode<bool>> GetMxError()
         {
-            var rc = new MxReturnCode<MxReturnCode<bool>>($"{this.GetType().Name}.GetMxError");
+            var rc = new MxReturnCode<MxReturnCode<bool>>($"{GetType().Name}.GetMxError");
 
             rc += _mxErrorCode;
 

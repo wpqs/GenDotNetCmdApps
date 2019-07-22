@@ -15,6 +15,7 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "ConvertIfToOrExpression")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "RedundantEmptySwitchSection")]
     public class Body
     {
         public static readonly string OpeningElement = "<body>";
@@ -32,35 +33,97 @@ namespace KLineEdCmdApp.Model
         public static readonly int TextLinesPerPage = 36;                   //counted from Jack Kerouac's book 'On the Road'
         public static readonly int MaxTextLines = TextLinesPerPage * 2500;  //twice the number of pages in Tolstoy's 'War and Peace'
 
+
+        public List<string> TextLines { private set; get; }
+        public int WordCount { private set; get; }
+        public string TabSpaces { private set; get; }
+
+        public CursorPosition TextEditViewCursor { get; private set; }
+        public CursorPosition MaxEditAreaViewCursor { get; private set; }
+
+        private bool Error { set; get; }
+        public bool IsError(){ return Error; }
+
         public Body()
         {
             TextLines = new List<string>();
             WordCount = 0;
-            LineWidth = Program.PosIntegerNotSet;
             SetTabSpaces(DefaultTabSpaceCount);
+            TextEditViewCursor = new CursorPosition(0, 0);
+            MaxEditAreaViewCursor = new CursorPosition(CmdLineParamsApp.ArgEditAreaLinesCountDefault, CmdLineParamsApp.ArgEditAreaLineWidthDefault); //updated by Model.Initialise
+
             Error = true;
         }
 
-        public List<string> TextLines { private set; get; }
-        public int WordCount { private set; get; }
-        public int LineWidth { private set; get; }
-        public string TabSpaces { private set; get; }
-        private bool Error { set; get; }
+        public bool SetTextEditViewCursor(int rowEditAreaIndex, int colEditAreaIndex)
+        {
+            var rc = false;
+            if (  (colEditAreaIndex >= 0) && (colEditAreaIndex <= (MaxEditAreaViewCursor?.ColIndex ?? Program.PosIntegerNotSet)) 
+              && (rowEditAreaIndex >= 0) && (rowEditAreaIndex <= (MaxEditAreaViewCursor?.RowIndex ?? Program.PosIntegerNotSet)))
+            {
+                TextEditViewCursor.RowIndex = rowEditAreaIndex;
+                TextEditViewCursor.ColIndex = colEditAreaIndex;
+                rc = true;
+            }
+            return rc;
+        }
 
-        public bool IsError(){ return Error; }
+        public int GetTextEditViewRowIndex(ChapterModel.RowState state = ChapterModel.RowState.Current)
+        {
+            var rc = Program.PosIntegerNotSet;
 
-        public MxReturnCode<bool> Initialise(int lineWidth) //add TabSpaceCount as param
+            var lastLineNo = GetLineCount();
+            if (lastLineNo != Program.PosIntegerNotSet)
+            {
+                var lastLineIndex = (lastLineNo > 0) ? lastLineNo - 1 : 0;
+                switch (state)
+                {
+                    case ChapterModel.RowState.Current:
+                    {
+                        if (TextEditViewCursor.RowIndex <= lastLineIndex)
+                            rc = TextEditViewCursor.RowIndex;
+                        break;
+                    }
+                    case ChapterModel.RowState.Next:
+                    {
+                        if (TextEditViewCursor.RowIndex+1 <= lastLineIndex)
+                            rc = TextEditViewCursor.RowIndex-1;
+                        break;
+                    }
+                    case ChapterModel.RowState.Previous:
+                    {
+                        if (TextEditViewCursor.RowIndex <= lastLineIndex)
+                            rc = TextEditViewCursor.RowIndex;
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth) //add TabSpaceCount as param
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if (lineWidth == Program.PosIntegerNotSet)
-                rc.SetError(1100101, MxError.Source.Param, $"lineWidth={lineWidth} not set", MxMsgs.MxErrBadMethodParam);
+            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet))
+                rc.SetError(1100101, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount} not set, editAreaLineWidth={editAreaLineWidth} not set", MxMsgs.MxErrBadMethodParam);
             else
             {
-                LineWidth = lineWidth;
-                SetTabSpaces(3);    //TabSpaceCount
-                Error = false;
-                rc.SetResult(true);
+                MaxEditAreaViewCursor.RowIndex = editAreaLinesCount-1;
+                MaxEditAreaViewCursor.ColIndex = editAreaLineWidth-1;
+
+                if(SetTextEditViewCursor(0, 0) == false)
+                    rc.SetError(1100102, MxError.Source.Program, $"editAreaLinesCount={editAreaLinesCount} < 0, editAreaLineWidth={editAreaLineWidth} < 0", MxMsgs.MxErrInvalidCondition);
+                else
+                {
+                    SetTabSpaces(3);    //TabSpaceCount
+                    Error = false;
+                    rc.SetResult(true);
+                }
             }
             return rc;
         }
@@ -159,8 +222,8 @@ namespace KLineEdCmdApp.Model
                 else
                 {
                     var lineLen = line.Length;
-                    if (lineLen > LineWidth)
-                        rc.SetError(1100403, MxError.Source.User, $"text.Length={lineLen} > LineWidth={LineWidth}", MxMsgs.MxErrLineTooLong);
+                    if (lineLen > MaxEditAreaViewCursor.ColIndex+1)
+                        rc.SetError(1100403, MxError.Source.User, $"text.Length={lineLen} > LineWidth={MaxEditAreaViewCursor.ColIndex}", MxMsgs.MxErrLineTooLong);
                     else
                     {
                         if (Body.GetErrorsInEnteredText(line) != null)
@@ -194,16 +257,16 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100502, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    var lineLen = word.Length;
-                    if (lineLen > LineWidth)
-                        rc.SetError(110503, MxError.Source.User, $"word.Length={lineLen} > LineWidth={LineWidth}", MxMsgs.MxErrLineTooLong);
+                    var wordLength = word.Length;
+                    if (wordLength > MaxEditAreaViewCursor.ColIndex+1)
+                        rc.SetError(110503, MxError.Source.User, $"word.Length={wordLength} > LineWidth={MaxEditAreaViewCursor.ColIndex}", MxMsgs.MxErrLineTooLong);
                     else
                     {
                         if (Body.GetErrorsInEnteredText(word, "word") != null)
                             rc.SetError(1100504, MxError.Source.User, Body.GetErrorsInEnteredText(word));
                         else
                         {
-                            if ((TextLines.Count == 0) || (TextLines[TextLines.Count - 1].Length + word.Length > LineWidth))
+                            if ((TextLines.Count == 0) || (TextLines[TextLines.Count - 1].Length + word.Length > MaxEditAreaViewCursor.ColIndex))
                             {                                              //word makes line too long, so append it to a new line
                                 var wordsInLine = AddLine(word);
                                 if (wordsInLine == Program.PosIntegerNotSet)
@@ -255,7 +318,7 @@ namespace KLineEdCmdApp.Model
                     }
                     else
                     {
-                        if (TextLines[lineIndex].Length >= (LineWidth - appendChar.Length))
+                        if (TextLines[lineIndex].Length >= (MaxEditAreaViewCursor.ColIndex - appendChar.Length))
                         {
                             var rcAuto = AutoLineBreak(lineIndex, appendChar);
                             rc += rcAuto;
@@ -297,7 +360,7 @@ namespace KLineEdCmdApp.Model
             {
                 var breakIndex = GetLineBreakIndex(lineIndex, appendChar.Length);
                 if (breakIndex == Program.PosIntegerNotSet)
-                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharacterCountInLine()} when LineWidth={LineWidth}", MxMsgs.MxErrLineTooLong);
+                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharacterCountInLine()} when LineWidth={MaxEditAreaViewCursor.ColIndex}", MxMsgs.MxErrLineTooLong);
                 else
                 {
                     var newLine = SplitLine(lineIndex, breakIndex);
@@ -321,8 +384,8 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<string[]>("Body.GetLastLinesForDisplay", null);
 
-            if ((count > CmdLineParamsApp.ArgDisplayLastLinesCntMax) && (TextLines != null))
-                rc.SetError(1100801, MxError.Source.Param, $"TextLines is null, or count={count} > {CmdLineParamsApp.ArgDisplayLastLinesCntMax}", MxMsgs.MxErrBadMethodParam);
+            if ((count > CmdLineParamsApp.ArgEditAreaLinesCountMax) && (TextLines != null))
+                rc.SetError(1100801, MxError.Source.Param, $"TextLines is null, or count={count} > {CmdLineParamsApp.ArgEditAreaLinesCountMax}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError())
@@ -355,8 +418,8 @@ namespace KLineEdCmdApp.Model
                 rc = $"unexpected {textType}; it is null. This is a program error. Please save your work and restart the program.";
             else
             {
-                if (text.Length > CmdLineParamsApp.ArgDisplayLineWidthMax)
-                    rc = $"invalid {textType}. It has {text.Length} characters, but only {CmdLineParamsApp.ArgDisplayLineWidthMax} allowed. Delete some characters and try again.";
+                if (text.Length > CmdLineParamsApp.ArgEditAreaLineWidthMax)
+                    rc = $"invalid {textType}. It has {text.Length} characters, but only {CmdLineParamsApp.ArgEditAreaLineWidthMax} allowed. Delete some characters and try again.";
                 else
                 {
                     var index = -1;
@@ -428,7 +491,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = Program.PosIntegerNotSet;
 
-            if ((lineIndex < TextLines.Count) && (spaceNeeded > 0) && (spaceNeeded + 1 < LineWidth)) //allow for space
+            if ((lineIndex < TextLines.Count) && (spaceNeeded > 0) && (spaceNeeded + 1 < MaxEditAreaViewCursor.ColIndex)) //allow for space
             {
                 var lineLen = TextLines[lineIndex].Length;
                 var splitIndex = lineLen;
@@ -598,7 +661,7 @@ namespace KLineEdCmdApp.Model
             var rc = Program.PosIntegerNotSet;
             if (line != null)
             {
-                var lineCount = GetLineCount() + ((line.Length > LineWidth) ? 1 : 0);
+                var lineCount = GetLineCount() + ((line.Length > (MaxEditAreaViewCursor.ColIndex+1)) ? 1 : 0);
                 if ((lineCount != Program.PosIntegerNotSet) && (lineCount < Body.MaxTextLines))
                 {
                     TextLines.Add(line); //add line to end of list

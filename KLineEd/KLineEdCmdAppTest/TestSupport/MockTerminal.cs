@@ -8,6 +8,7 @@ namespace KLineEdCmdAppTest.TestSupport
 {
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "SimplifyConditionalTernaryExpression")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class MockTerminal : ITerminal
     {
         private readonly MxReturnCode<bool> _mxErrorCode;

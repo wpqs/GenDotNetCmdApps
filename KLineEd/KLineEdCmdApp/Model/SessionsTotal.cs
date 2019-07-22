@@ -30,7 +30,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = false;
 
-            Error = HeaderBase.ValueNotSet;
+            Error = HeaderElementBase.ValueNotSet;
 
             if (sessions == null)
                 Error = "sessions is null";

@@ -10,6 +10,9 @@ namespace KLineEdCmdAppTest.TestSupport
         public static readonly string UnitTestNotSet = KLineEdCmdApp.Program.ValueNotSet;
         public static readonly string UnitTestNone = "[none]";
 
+        public static readonly int UnitTestEditAreaWidth = 65;
+        public static readonly int UnitTestEditAreaLines = 20;
+
         public const string MxNoError = "[no error]";
     }
 }

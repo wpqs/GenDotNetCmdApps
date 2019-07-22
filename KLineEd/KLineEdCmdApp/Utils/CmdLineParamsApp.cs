@@ -66,13 +66,13 @@ namespace KLineEdCmdApp.Utils
         public static readonly int ArgPauseWaitSecsMin = 0;
         public static readonly int ArgPauseWaitSecsMax = 86400; //24 * 60 * 60 - 24 hours
 
-        public static readonly int ArgDisplayLastLinesCntDefault = 10;
-        public static readonly int ArgDisplayLastLinesCntMin = 0;
-        public static readonly int ArgDisplayLastLinesCntMax = 50;
+        public static readonly int ArgEditAreaLinesCountDefault = 10; //todo rename
+        public static readonly int ArgEditAreaLinesCountMin = 0;
+        public static readonly int ArgEditAreaLinesCountMax = 50;
 
-        public static readonly int ArgDisplayLineWidthDefault = 68;   //counted from Jack Kerouac's book 'On the Road';
-        public static readonly int ArgDisplayLineWidthMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
-        public static readonly int ArgDisplayLineWidthMin = 5;
+        public static readonly int ArgEditAreaLineWidthDefault = 68;   //todo rename counted from Jack Kerouac's book 'On the Road';
+        public static readonly int ArgEditAreaLineWidthMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
+        public static readonly int ArgEditAreaLineWidthMin = 5;
 
         public static readonly string ArgBrowserExeDefault = "explorer.exe";
 
@@ -117,8 +117,8 @@ namespace KLineEdCmdApp.Utils
 
         public string EditFile { set; get; }
         public string ExportFile { set; get; }
-        public int DisplayLastLinesCnt { set; get; }
-        public int DisplayLineWidth { set; get; }
+        public int EditAreaLinesCount { set; get; }
+        public int EditAreaLineWidth { set; get; }
         public string AudioCRFile { set; get; }
         public string AudioKeyFile { set; get; }
 
@@ -198,8 +198,8 @@ namespace KLineEdCmdApp.Utils
             rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
             rc += "ExportFile=" + (ExportFile ?? "[null]") + Environment.NewLine;
 
-            rc += "DisplayLastLines=" + DisplayLastLinesCnt + Environment.NewLine;
-            rc += "DisplayLineWidth=" + DisplayLineWidth + Environment.NewLine;
+            rc += "DisplayLastLines=" + EditAreaLinesCount + Environment.NewLine;  //todo rename
+            rc += "DisplayLineWidth=" + EditAreaLineWidth + Environment.NewLine;    //todo rename
 
             rc += "AudioCRFile=" + (AudioCRFile ?? "[null]") + Environment.NewLine;
             rc += "AudioKeyFile=" + (AudioKeyFile ?? "[null]") + Environment.NewLine;
@@ -306,8 +306,8 @@ namespace KLineEdCmdApp.Utils
 
             EditFile = null;
             ExportFile = null;
-            DisplayLastLinesCnt = Program.PosIntegerNotSet;
-            DisplayLineWidth = Program.PosIntegerNotSet;
+            EditAreaLinesCount = Program.PosIntegerNotSet;
+            EditAreaLineWidth = Program.PosIntegerNotSet;
             AudioCRFile = null;
             AudioKeyFile = null;
 
@@ -815,10 +815,10 @@ namespace KLineEdCmdApp.Utils
             if (ExportFile == null)
                 ExportFile = savedSettings.ExportFile;
 
-            if (DisplayLastLinesCnt == Program.PosIntegerNotSet)   
-                DisplayLastLinesCnt = savedSettings.DisplayLastLinesCnt;
-            if (DisplayLineWidth == Program.PosIntegerNotSet)
-                DisplayLineWidth = savedSettings.DisplayLineWidth;
+            if (EditAreaLinesCount == Program.PosIntegerNotSet)   
+                EditAreaLinesCount = savedSettings.EditAreaLinesCount;
+            if (EditAreaLineWidth == Program.PosIntegerNotSet)
+                EditAreaLineWidth = savedSettings.EditAreaLineWidth;
 
             if (AudioCRFile == null)
                 AudioCRFile = savedSettings.AudioCRFile;
@@ -855,10 +855,10 @@ namespace KLineEdCmdApp.Utils
         {
             if (mode == ResetMode.FactoryDefaults)
             {
-                if ((DisplayLastLinesCnt == Program.PosIntegerNotSet) || (unsetOnly == false))
-                    DisplayLastLinesCnt = ArgDisplayLastLinesCntDefault;
-                if ((DisplayLineWidth == Program.PosIntegerNotSet) || (unsetOnly == false))
-                    DisplayLineWidth = ArgDisplayLineWidthDefault;
+                if ((EditAreaLinesCount == Program.PosIntegerNotSet) || (unsetOnly == false))
+                    EditAreaLinesCount = ArgEditAreaLinesCountDefault;
+                if ((EditAreaLineWidth == Program.PosIntegerNotSet) || (unsetOnly == false))
+                    EditAreaLineWidth = ArgEditAreaLineWidthDefault;
 
                 if ((ScrollReview == BoolValue.Unset) || (unsetOnly == false))
                     ScrollReview = BoolValue.Yes;

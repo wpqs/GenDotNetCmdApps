@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
-using KLineEdCmdApp.View.Base;
 using MxReturnCode;
 
 namespace KLineEdCmdApp.Utils

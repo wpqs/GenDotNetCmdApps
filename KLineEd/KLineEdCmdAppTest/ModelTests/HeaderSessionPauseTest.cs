@@ -1,7 +1,6 @@
 ﻿using System;
 using KLineEdCmdApp;
 using KLineEdCmdApp.Model;
-using KLineEdCmdApp.Model.Base;
 using MxDotNetUtilsLib;
 using Xunit;
 

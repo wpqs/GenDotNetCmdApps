@@ -24,7 +24,7 @@ namespace KLineEdCmdAppTest.TestSupport.Base
                 File.Delete(TestConst.UnitTestSharedTestsPathFileName);
 
             Model = new ChapterModel();
-            var rcModel = Model.Initialise(65, TestConst.UnitTestSharedTestsPathFileName);
+            var rcModel = Model.Initialise(20, 65, TestConst.UnitTestSharedTestsPathFileName);
             if (rcModel.IsError(true))
                 Error = rcModel.GetErrorTechMsg();
             else

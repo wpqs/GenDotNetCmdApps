@@ -12,7 +12,7 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class HeaderSessionPause : HeaderBase
+    public class HeaderSessionPause : HeaderElementBase
     {
         public static readonly char Separator = ',';
         public static readonly char Terminator = ';';
@@ -22,7 +22,8 @@ namespace KLineEdCmdApp.Model
         public DateTime? PauseTime { get; private set; }
         public int Duration { get; private set; }   //seconds
 
-        public HeaderSessionPause()
+        // ReSharper disable once RedundantBaseConstructorCall
+        public HeaderSessionPause() : base()
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             Reset();    
@@ -55,6 +56,7 @@ namespace KLineEdCmdApp.Model
         {
             PauseTime = null;
             Duration = Program.PosIntegerNotSet;
+
             Error = true;
         }
         public override string GetReport()

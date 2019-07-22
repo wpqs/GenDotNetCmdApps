@@ -8,13 +8,29 @@ using KLineEdCmdApp.View.Base;
 namespace KLineEdCmdApp.View
 {
     [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
     public class PropsEditView : EditAreaView
     {
         public static readonly string PropsEditorMode = "Properties Editing:";
+
+        public static readonly string AuthorLabel =       $"Author:  ";     //labels for view - {HeaderProps.AuthorLabel}
+        public static readonly string ProjectLabel =      $"Project: ";     //labels for view - {HeaderProps.ProjectLabel
+        public static readonly string TitleLabel =        $"Title:   ";     //labels for view - {HeaderProps.TitleLabel}
+        public static readonly string PathFileNameLabel = $"File:    ";      //labels for view - {HeaderProps.PathFileNameLabel}
+
+        public static readonly int LongestLabelLength = ProjectLabel.Length;
         public static readonly int AuthorLineNo = 1;
         public static readonly int ProjectLineNo = 3;
         public static readonly int TitleLineNo = 5;
         public static readonly int FilenameLineLineNo = 8;
+
+        public enum PropsEditViewCursorRow
+        {
+            Author = 1,
+            Project = 3,
+            Title = 5,
+            PathFileName = 8
+        }
 
         public PropsEditView(ITerminal terminal) : base(terminal) { }
 
@@ -36,12 +52,16 @@ namespace KLineEdCmdApp.View
                         rc.SetResult(true);
                     else
                     {
-                        var authorLine = $"1.{model.GetTabSpaces()}{HeaderProps.AuthorLabel} {model.ChapterHeader?.Properties.Author ?? Program.ValueNotSet}";
-                        var projectLine = $"2.{model.GetTabSpaces()}{HeaderProps.ProjectLabel} {model.ChapterHeader?.Properties.Project ?? Program.ValueNotSet}";
-                        var titleLine = $"3.{model.GetTabSpaces()}{HeaderProps.TitleLabel} {model.ChapterHeader?.Properties.Title ?? Program.ValueNotSet}";
-                        var filenameLine = $"{HeaderProps.PathFileNameLabel} {model.ChapterHeader?.Properties.PathFileName ?? Program.ValueNotSet}";
+                        var authorLine = $"{AuthorLabel} {model.ChapterHeader?.Properties.Author ?? Program.ValueNotSet}";
+                        var projectLine = $"{ProjectLabel} {model.ChapterHeader?.Properties.Project ?? Program.ValueNotSet}";
+                        var titleLine = $"{TitleLabel} {model.ChapterHeader?.Properties.Title ?? Program.ValueNotSet}";
+                        var filenameLine = $"{PathFileNameLabel} {model.ChapterHeader?.Properties.PathFileName ?? Program.ValueNotSet}";
+
+                        var currentCursorRow = XlatHeaderPropsRow((HeaderProps.CursorRow)(model.ChapterHeader?.Properties?.Cursor?.RowIndex ?? 0));
+                        var currentCursorCol = GetLabelLength(currentCursorRow) + 1 + model.ChapterHeader?.Properties?.Cursor?.ColIndex ?? 0;
 
                         ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
+
                         switch (change)
                         {
                             case ChapterModel.ChangeHint.Props:
@@ -49,15 +69,15 @@ namespace KLineEdCmdApp.View
                             {
                                 rc += ClearEditAreaText();
                                 if (rc.IsSuccess(true))
-                                    rc += DisplayEditAreaLine(AuthorLineNo, authorLine, false);
+                                    rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.Author, authorLine, false);
                                 if (rc.IsSuccess(true))
-                                    rc += DisplayEditAreaLine(ProjectLineNo, projectLine, false);
+                                    rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.Project, projectLine, false);
                                 if (rc.IsSuccess(true))
-                                    rc += DisplayEditAreaLine(TitleLineNo, titleLine, false);
+                                    rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.Title, titleLine, false);
                                 if (rc.IsSuccess(true))
-                                    rc += DisplayEditAreaLine(FilenameLineLineNo, filenameLine, false);
+                                    rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.PathFileName, filenameLine, false);
                                 if (rc.IsSuccess(true))
-                                    rc += SetEditAreaCursor(AuthorLineNo, authorLine.Length); //Model.PropsEdit.Row, Model.PropsEdit.Col
+                                    rc += SetEditAreaCursor((int)currentCursorRow, currentCursorCol); 
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
                                 break;
@@ -66,7 +86,7 @@ namespace KLineEdCmdApp.View
                             case ChapterModel.ChangeHint.MsgLine:
                             case ChapterModel.ChangeHint.HelpLine:
                             { //get from Model ActivePropLine and ActivePropColumn and set line accordingly
-                                rc += SetEditAreaCursor(AuthorLineNo, authorLine.Length); //Model.PropsEdit.Row, Model.PropsEdit.Col
+                                rc += SetEditAreaCursor((int)currentCursorRow, currentCursorCol); 
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
                                 break;
@@ -82,6 +102,44 @@ namespace KLineEdCmdApp.View
                 }
             }
             OnUpdateDone(rc, true);
+        }
+
+        private int GetLabelLength(PropsEditViewCursorRow row)
+        {
+            var rc = Program.PosIntegerNotSet; 
+
+            if (row == PropsEditViewCursorRow.Author)
+                rc = AuthorLabel.Length;
+            else if (row == PropsEditViewCursorRow.Project)
+                rc = ProjectLabel.Length;
+            else if (row == PropsEditViewCursorRow.Title)
+                rc = TitleLabel.Length;
+            else if (row == PropsEditViewCursorRow.PathFileName)
+                rc = PathFileNameLabel.Length;
+            else
+            {
+                rc = 0;
+            }
+            return rc;
+        }
+
+        private PropsEditViewCursorRow XlatHeaderPropsRow(HeaderProps.CursorRow row)
+        {
+            PropsEditViewCursorRow rc = PropsEditViewCursorRow.Author;
+
+            if (row == HeaderProps.CursorRow.Author)
+                rc = PropsEditViewCursorRow.Author;
+            else if (row == HeaderProps.CursorRow.Project)
+                rc = PropsEditViewCursorRow.Project;
+            else if (row == HeaderProps.CursorRow.Title)
+                rc = PropsEditViewCursorRow.Title;
+            else if (row == HeaderProps.CursorRow.PathFileName)
+                rc = PropsEditViewCursorRow.PathFileName;
+            else
+            {
+                rc = PropsEditViewCursorRow.Author;
+            }
+            return rc;
         }
     }
 }
