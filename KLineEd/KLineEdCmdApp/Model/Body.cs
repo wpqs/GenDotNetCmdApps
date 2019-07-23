@@ -656,6 +656,43 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public static string GetLineUpdateDeleteChar(string existingText, int charIndex)
+        {
+            string rc = null;
+
+            if ((existingText != null) && (charIndex >= 0) && (charIndex < existingText.Length))
+            {
+                var start = existingText.Snip(0, charIndex - 1);
+                var end = existingText.Snip(charIndex + 1, existingText.Length - 1);
+                rc = (start ?? "") + (end ?? "");
+            }
+            return rc;
+        }
+
+        public static string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert)
+        {
+            string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters
+            if ((updateText != null) && (existingText != null) && (updateIndex >= 0) && (updateIndex < maxLength) && (Body.GetErrorsInEnteredText(updateText) == null))
+            {
+                if (insert)
+                {       //move all text at index text.length spaces right and insert at index
+                    if ((existingText.Length + updateText.Length) <= maxLength)
+                        rc = existingText.Insert(updateIndex, updateText);
+                }
+                else
+                {       //overwrite from startindex = index to endIndex=index+word.Length-1
+                    if (((updateIndex + updateText.Length) <= existingText.Length) && (existingText.Length <= maxLength))
+                    {
+                        var start = existingText.Snip(0, updateIndex - 1);
+                        var end = existingText.Substring(updateIndex + updateText.Length);
+                        if (((start?.Length ?? 0) + updateText.Length + ((end?.Length ?? 0)) <= maxLength))
+                            rc = (start ?? "") + updateText + (end ?? "");
+                    }
+                }
+            }
+            return rc;
+        }
+
         private int AddLine(string line)
         {
             var rc = Program.PosIntegerNotSet;

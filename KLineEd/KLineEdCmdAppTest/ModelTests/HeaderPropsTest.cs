@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
+using Microsoft.Azure.Services.AppAuthentication;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests
@@ -97,6 +98,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(HeaderElementBase.PropertyNotSet, info.PathFileName);
         }
 
+
         [Fact]
         public void MissingFilePropertyTest()
         {
@@ -114,59 +116,16 @@ namespace KLineEdCmdAppTest.ModelTests
 
 
         [Fact]
-        public void GetPropertyUpdateOverwriteTest()
-        {
-            var property = "hello world";
-            Assert.Equal("helloXworld", HeaderProps.GetPropertyUpdate(property, "X", 5, property.Length, false));
-
-            Assert.Equal("Xello world", HeaderProps.GetPropertyUpdate(property, "X", 0, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", -1, property.Length, false));
-
-            Assert.Equal("hello worlX", HeaderProps.GetPropertyUpdate(property, "X", property.Length - 1, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", property.Length, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", -1, property.Length - 1, false));
-
-            Assert.Equal("hello moond", HeaderProps.GetPropertyUpdate(property, "moon", 6, property.Length, false));
-            Assert.Equal("hello moons", HeaderProps.GetPropertyUpdate(property, "moons", 6, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "moonsx", 6, property.Length, false));
-        }
-
-        [Fact]
-        public void GetPropertyUpdateInsertTest()
-        {
-            var property = "hello world";  //index 0-10  insert before index
-
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", 5, property.Length, true));
-
-            Assert.Equal("helloX world", HeaderProps.GetPropertyUpdate(property, "X", 5, property.Length + 1, true));
-
-            Assert.Equal("Xhello world", HeaderProps.GetPropertyUpdate(property, "X", 0, property.Length + 1, true));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", -1, property.Length + 1, true));
-
-            Assert.Equal("hello worXld", HeaderProps.GetPropertyUpdate(property, "X", 9, property.Length + 1, true));
-            Assert.Equal("hello worlXd", HeaderProps.GetPropertyUpdate(property, "X", 10, property.Length + 1, true));
-            Assert.Equal("hello worldX", HeaderProps.GetPropertyUpdate(property, "X", 11, property.Length + 1, true));
-
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", 12, property.Length + 1, true));
-
-            var insertText = " wonderful";
-            Assert.Equal($"hello wonderful world", HeaderProps.GetPropertyUpdate(property, insertText, 5, property.Length + insertText.Length, true));
-            Assert.Equal($" wonderfulhello world", HeaderProps.GetPropertyUpdate(property, insertText, 0, property.Length + insertText.Length, true));
-            Assert.Equal($"hello world wonderful", HeaderProps.GetPropertyUpdate(property, insertText, property.Length, property.Length + insertText.Length, true));
-
-        }
-
-        [Fact]
         public void GetPropertyUpdateBadParamTest()
         {
             var property = "hello world";
 
-            Assert.Null(HeaderProps.GetPropertyUpdate(null, "X", 5, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, null, 5, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", -1, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", property.Length + 1, property.Length, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", 5, 0, false));
-            Assert.Null(HeaderProps.GetPropertyUpdate(property, "X", 5, -1, false));
+            Assert.Null(Body.GetLineUpdateText(null, "X", 5, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, null, 5, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, "X", -1, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, "X", property.Length + 1, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, "X", 5, 0, false));
+            Assert.Null(Body.GetLineUpdateText(property, "X", 5, -1, false));
         }
 
         [Fact]
@@ -194,8 +153,12 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void SetPropsEditViewCursorColTest()
         {
+            var data = $"Author: 012345 Project: B1 Title: C12 File: D123";
             var props = new HeaderProps(6);
-  
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
+
+
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 0));
             Assert.Equal(0, props.Cursor.ColIndex);
             Assert.Equal(0, props.Cursor.RowIndex);
@@ -216,8 +179,10 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void SetMaxPropertyLengthTest()
         {
-            var props = new HeaderProps();
-            props.SetMaxPropertyLength(5);
+            var data = $"Author: 01234 Project: B1 Title: C12 File: D123";
+            var props = new HeaderProps(5);
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 0));
             Assert.Equal(0, props.Cursor.ColIndex);
@@ -231,9 +196,26 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
+        public void GetPropertyLengthTest()
+        {
+            var data = $"Author: A Project: B1 Title: C12 File: D123";
+            var props = new HeaderProps(4);
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
+
+            Assert.Equal(1, props.GetPropertyLength(HeaderProps.CursorRow.Author));
+            Assert.Equal(2, props.GetPropertyLength(HeaderProps.CursorRow.Project));
+            Assert.Equal(3, props.GetPropertyLength(HeaderProps.CursorRow.Title));
+            Assert.Equal(4, props.GetPropertyLength(HeaderProps.CursorRow.PathFileName));
+        }
+
+        [Fact]
         public void GetPropsEditViewRowIndexTest()
         {
-            var props = new HeaderProps(15);
+            var data = $"Author: A Project: B1 Title: C12 File: D123";
+            var props = new HeaderProps(4);
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
 
             Assert.Equal(0, props.Cursor.ColIndex);
             Assert.Equal(0, props.Cursor.RowIndex);
@@ -242,16 +224,16 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(HeaderProps.CursorRow.Project, props.GetPropsRowIndex(ChapterModel.RowState.Next));
             Assert.Equal(HeaderProps.CursorRow.Title, props.GetPropsRowIndex(ChapterModel.RowState.Previous));
 
-            Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 6));
-            Assert.Equal(6, props.Cursor.ColIndex);
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 0));
+            Assert.Equal(0, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
 
             Assert.Equal(HeaderProps.CursorRow.Project, props.GetPropsRowIndex(ChapterModel.RowState.Current));
             Assert.Equal(HeaderProps.CursorRow.Title, props.GetPropsRowIndex(ChapterModel.RowState.Next));
             Assert.Equal(HeaderProps.CursorRow.Author, props.GetPropsRowIndex(ChapterModel.RowState.Previous));
 
-            Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 10));
-            Assert.Equal(10, props.Cursor.ColIndex);
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 2));
+            Assert.Equal(2, props.Cursor.ColIndex);
             Assert.Equal(2, props.Cursor.RowIndex);
 
             Assert.Equal(HeaderProps.CursorRow.Title, props.GetPropsRowIndex(ChapterModel.RowState.Current));
@@ -260,10 +242,10 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void SetPropsEditViewWordTest()
+        public void SetPropsWordInsertTest()
         {
-            var data = $"Author: W. Stott Project: A23 Title: B23 File: C23";
-            var props = new HeaderProps(15);
+            var data = $"Author: Z23 Project: A23 Title: B23 File: C23";
+            var props = new HeaderProps(7);
 
         //    Assert.True(props.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName)); //[author not set]
             Assert.True(props.InitialiseFromString(data).GetResult());
@@ -272,12 +254,202 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, props.Cursor.ColIndex);
             Assert.Equal(0, props.Cursor.RowIndex);
 
+            Assert.Equal("Z23", props.Author);
+            Assert.Equal("A23", props.Project);
+            Assert.Equal("B23", props.Title);
+            Assert.Equal("C23", props.PathFileName);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
+            Assert.True(props.SetPropsWord("PQ", true, false, false));
+            Assert.Equal("Z2PQ3", props.Author);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(1, props.Cursor.RowIndex);
+            Assert.True(props.SetPropsWord("01", true, true, false));
+            Assert.Equal("A 0123", props.Project);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(2, props.Cursor.RowIndex);
+            Assert.True(props.SetPropsWord("01", true, false, true));
+            Assert.Equal("B01 23", props.Title);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(3, props.Cursor.RowIndex);
+            Assert.True(props.SetPropsWord("01", true, true, true));
+            Assert.Equal("C 01 23", props.PathFileName);
+        }
+
+        [Fact]
+        public void SetPropsWordOverwriteTest()
+        {
+            var data = $"Author: Z0123 Project: A0123 Title: B0123 File: C0123";
+            var props = new HeaderProps(5);
+
+            //    Assert.True(props.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName)); //[author not set]
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
+
+            Assert.Equal(0, props.Cursor.ColIndex);
+            Assert.Equal(0, props.Cursor.RowIndex);
+
+            Assert.Equal("Z0123", props.Author);
+            Assert.Equal("A0123", props.Project);
+            Assert.Equal("B0123", props.Title);
+            Assert.Equal("C0123", props.PathFileName);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
+            Assert.True(props.SetPropsWord("PQ", false, false, false));
+            Assert.Equal("Z0PQ3", props.Author);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(1, props.Cursor.RowIndex);
+            Assert.True(props.SetPropsWord("45", false, true, false));
+            Assert.Equal("A 453", props.Project);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(2, props.Cursor.RowIndex);
+            Assert.True(props.SetPropsWord("45", false, false, true));
+            Assert.Equal("B45 3", props.Title);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(3, props.Cursor.RowIndex);
+            Assert.True(props.SetPropsWord("45", false, true, true));
+            Assert.Equal("C 45 ", props.PathFileName);
+        }
+
+        [Fact]
+        public void SetPropsWordMaxLengthTest()
+        {
+            var data = $"Author: Z23 Project: A23 Title: B23 File: C23";
+            var props = new HeaderProps(4);
+
+            //    Assert.True(props.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName)); //[author not set]
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
+
+            Assert.Equal(0, props.Cursor.ColIndex);
+            Assert.Equal(0, props.Cursor.RowIndex);
+
+            Assert.Equal("Z23", props.Author);
+            Assert.Equal("A23", props.Project);
+            Assert.Equal("B23", props.Title);
+            Assert.Equal("C23", props.PathFileName);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(1, props.Cursor.RowIndex);
+            Assert.True(props.SetPropsWord("0", true, false,false));
+            Assert.Equal("A023", props.Project);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
+            Assert.Equal(1, props.Cursor.ColIndex);
+            Assert.Equal(1, props.Cursor.RowIndex);
+            Assert.False(props.SetPropsWord("01", true, false, false));
+            Assert.Equal("A023", props.Project);
+        }
+
+        [Fact]
+        public void SetPropsCharTest()
+        {
+            var data = $"Author: W. Stott Project: A23 Title: B23 File: C23";
+            var props = new HeaderProps(15);
+
+            //    Assert.True(props.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName)); //[author not set]
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
+
+            Assert.Equal(0, props.Cursor.ColIndex);
+            Assert.Equal(0, props.Cursor.RowIndex);
             Assert.Equal("W. Stott", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
-            Assert.True(props.SetPropsWord("P.Q.", true, false, false));
-            Assert.Equal("W.P.Q. Stott", props.Author);
+            Assert.True(props.SetPropsChar('P', true));
+            Assert.Equal("W.P Stott", props.Author);
+        }
 
+        [Fact]
+        public void SetPropsDelCharTest()
+        {
+            var data = $"Author: Z23 Project: A23 Title: B23 File: C234";
+            var props = new HeaderProps(5);
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
+
+            Assert.Equal(0, props.Cursor.ColIndex);
+            Assert.Equal(0, props.Cursor.RowIndex);
+            Assert.Equal("Z23", props.Author);
+            Assert.Equal("A23", props.Project);
+            Assert.Equal("B23", props.Title);
+            Assert.Equal("C234", props.PathFileName);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 1));
+            Assert.True(props.SetPropsDelChar());
+            Assert.Equal("Z3", props.Author);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 0));
+            Assert.True(props.SetPropsDelChar());
+            Assert.Equal("23", props.Title);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 2));
+            Assert.True(props.SetPropsDelChar());
+            Assert.Equal("A2", props.Project);
+
+            Assert.False(props.SetCursor(HeaderProps.CursorRow.PathFileName, -1));
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 4)); //allow one char after end of prop
+            Assert.False(props.SetCursor(HeaderProps.CursorRow.PathFileName, 5)); //... but no more
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 0));
+            Assert.True(props.SetPropsDelChar());
+            Assert.Equal("234", props.PathFileName);
+            Assert.True(props.SetPropsDelChar());
+            Assert.Equal("34", props.PathFileName);
+            Assert.True(props.SetPropsDelChar());
+            Assert.Equal("4", props.PathFileName);
+            Assert.True(props.SetPropsDelChar());
+            Assert.Equal("", props.PathFileName);
+
+            Assert.False(props.SetPropsDelChar());
+            Assert.Equal("", props.PathFileName);
+        }
+
+        [Fact]
+        public void SetPropsDelCharBackspaceTest()
+        {
+            var data = $"Author: Z23 Project: A23 Title: B23 File: C234";
+            var props = new HeaderProps(5);
+            Assert.True(props.InitialiseFromString(data).GetResult());
+            Assert.False(props.IsError());
+
+            Assert.Equal(0, props.Cursor.ColIndex);
+            Assert.Equal(0, props.Cursor.RowIndex);
+            Assert.Equal("Z23", props.Author);
+            Assert.Equal("A23", props.Project);
+            Assert.Equal("B23", props.Title);
+            Assert.Equal("C234", props.PathFileName);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 2));
+            Assert.True(props.SetPropsDelChar(true));
+            Assert.Equal("B3", props.Title);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 0));
+            Assert.False(props.SetPropsDelChar(true));
+            Assert.Equal("Z23", props.Author);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 3));
+            Assert.True(props.SetPropsDelChar(true));
+            Assert.Equal("Z2", props.Author);
+            Assert.True(props.SetPropsDelChar(true));
+            Assert.Equal("Z", props.Author);
+            Assert.True(props.SetPropsDelChar(true));
+            Assert.Equal("", props.Author);
+            Assert.False(props.SetPropsDelChar(true));
+            Assert.Equal("", props.Author);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace KLineEdCmdApp.Utils
         public static string Snip(this string source, int start, int end)
         {
             string rc = null;
-            if ((start >= 0) && (end > 0) && (end >= start) && (end < source.Length))
+            if ((start >= 0) && (end >= 0) && (end >= start) && (end < source.Length))
             {
                 rc = source.Substring(start, end - start + 1); // Return Substring of length
             }

@@ -1,4 +1,5 @@
 ﻿using System;
+using KLineEdCmdApp;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.Model;
 using KLineEdCmdAppTest.TestSupport;
@@ -120,6 +121,75 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(-1, Body.GetIndexOfWord(text, -1));
             Assert.Equal(-1, Body.GetIndexOfWord(text, -1, false));
 
+        }
+
+        [Fact]
+        public void GetLineUpdateDeleteCharTest()
+        {
+            var property = "hello world";
+            Assert.Equal("helloworld", Body.GetLineUpdateDeleteChar(property, 5));
+            Assert.Equal("ello world", Body.GetLineUpdateDeleteChar(property, 0));
+            Assert.Equal("hello worl", Body.GetLineUpdateDeleteChar(property, property.Length - 1));
+
+            Assert.Null(Body.GetLineUpdateDeleteChar("", 0));
+            Assert.Null(Body.GetLineUpdateDeleteChar(property, -1));
+            Assert.Null(Body.GetLineUpdateDeleteChar(property, property.Length));
+            Assert.Null(Body.GetLineUpdateDeleteChar(null, property.Length - 1));
+        }
+
+
+        [Fact]
+        public void GetLineUpdateTextOverwriteTest()
+        {
+            var property = "hello world";
+            Assert.Equal("helloXworld", Body.GetLineUpdateText(property, "X", 5, property.Length, false));
+
+            Assert.Equal("Xello world", Body.GetLineUpdateText(property, "X", 0, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, "X", -1, property.Length, false));
+
+            Assert.Equal("hello worlX", Body.GetLineUpdateText(property, "X", property.Length - 1, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, "X", property.Length, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, "X", -1, property.Length - 1, false));
+
+            Assert.Equal("hello moond", Body.GetLineUpdateText(property, "moon", 6, property.Length, false));
+            Assert.Equal("hello moons", Body.GetLineUpdateText(property, "moons", 6, property.Length, false));
+            Assert.Null(Body.GetLineUpdateText(property, "moonsx", 6, property.Length, false));
+        }
+
+        [Fact]
+        public void GetLineUpdateTextInsertTest()
+        {
+            var property = "hello world";  //index 0-10  insert before index
+
+            Assert.Equal("helloX world", Body.GetLineUpdateText(property, "X", 5, property.Length + 1, true));
+            Assert.Equal("Xhello world", Body.GetLineUpdateText(property, "X", 0, property.Length + 1, true));
+            Assert.Equal("hello worXld", Body.GetLineUpdateText(property, "X", 9, property.Length + 1, true));
+            Assert.Equal("hello worlXd", Body.GetLineUpdateText(property, "X", 10, property.Length + 1, true));
+            Assert.Equal("hello worldX", Body.GetLineUpdateText(property, "X", 11, property.Length + 1, true));
+
+            var insertText = " wonderful";
+            Assert.Equal($"hello wonderful world", Body.GetLineUpdateText(property, insertText, 5, property.Length + insertText.Length, true));
+            Assert.Equal($" wonderfulhello world", Body.GetLineUpdateText(property, insertText, 0, property.Length + insertText.Length, true));
+            Assert.Equal($"hello world wonderful", Body.GetLineUpdateText(property, insertText, property.Length, property.Length + insertText.Length, true));
+
+        }
+
+        [Fact]
+        public void GetLineUpdateTextInvalidTest()
+        {
+            var property = "hello world";  //index 0-10  insert before index
+
+            Assert.Equal("helloX world", Body.GetLineUpdateText(property, "X", 5, property.Length + 1, true));
+
+            Assert.Null(Body.GetLineUpdateText(property, "X", 5, property.Length, true));
+            Assert.Null(Body.GetLineUpdateText(property, "X", -1, property.Length + 1, true));
+            Assert.Null(Body.GetLineUpdateText(property, "X", 12, property.Length + 1, true));
+
+            Assert.Null(Body.GetLineUpdateText(property, "<", 5, property.Length + 1, true));
+            Assert.Null(Body.GetLineUpdateText(property, ">", 5, property.Length + 1, true));
+            Assert.Null(Body.GetLineUpdateText(property, Environment.NewLine, 5, property.Length + 1, true));
+            var c = (char) 0;
+            Assert.Null(Body.GetLineUpdateText(property, c.ToString(), 5, property.Length + 1, true));
         }
 
         [Fact]

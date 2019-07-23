@@ -84,10 +84,29 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public int GetPropertyLength(CursorRow row)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if (row == CursorRow.Author)
+                rc = Author?.Length ?? Program.PosIntegerNotSet;
+            else if (row == CursorRow.Project)
+                rc = Project?.Length ?? Program.PosIntegerNotSet;
+            else if (row == CursorRow.Title)
+                rc = Title?.Length ?? Program.PosIntegerNotSet;
+            else if (row == CursorRow.PathFileName)
+                rc = PathFileName?.Length ?? Program.PosIntegerNotSet;
+            else
+            {
+                rc = Program.PosIntegerNotSet;
+            }
+            return rc;
+        }
+
         public bool SetCursor(CursorRow row, int colIndex)
         {
             var rc = false;
-            if ((colIndex >= 0) && (colIndex <= MaxPropertyLength-1))
+            if ((colIndex >= 0) && (colIndex <= MaxPropertyLength-1) && (colIndex <= GetPropertyLength(row))) //allow colIndex to be set immediately after last char
             {
                 Cursor.RowIndex = (int) row;  //0 is top row of EditArea
                 Cursor.ColIndex = colIndex;   //0 is left column of EditArea + PropsEditView.LongestLabelLength
@@ -142,6 +161,66 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public bool SetPropsDelChar(bool backspace=false)
+        {
+            var rc = false;
+
+            if ((backspace == false) || (Cursor.ColIndex > 0))
+            {
+                if (backspace)
+                    Cursor.ColIndex--;
+                switch ((CursorRow) Cursor.RowIndex)
+                {
+                    case CursorRow.Author:
+                    {
+                        var result = Body.GetLineUpdateDeleteChar(Author, Cursor.ColIndex);
+                        if (result != null)
+                        {
+                            Author = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    case CursorRow.Project:
+                    {
+                        var result = Body.GetLineUpdateDeleteChar(Project, Cursor.ColIndex);
+                        if (result != null)
+                        {
+                            Project = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    case CursorRow.Title:
+                    {
+                        var result = Body.GetLineUpdateDeleteChar(Title, Cursor.ColIndex);
+                        if (result != null)
+                        {
+                            Title = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    case CursorRow.PathFileName:
+                    {
+                        var result = Body.GetLineUpdateDeleteChar(PathFileName, Cursor.ColIndex);
+                        if (result != null)
+                        {
+                            PathFileName = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        rc = false;
+                        break;
+                    }
+                }
+            }
+            return rc;
+        }
+
         public bool SetPropsChar(char c, bool insert = false)
         {
             return SetPropsWord(c.ToString(), insert, false, false);
@@ -157,7 +236,7 @@ namespace KLineEdCmdApp.Model
                 {
                     case CursorRow.Author:
                     {
-                        var result = GetPropertyUpdate(Author, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        var result = Body.GetLineUpdateText(Author, text, Cursor.ColIndex, MaxPropertyLength, insert);
                         if (result != null)
                         {
                             Author = result;
@@ -167,7 +246,7 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.Project:
                     {
-                        var result = GetPropertyUpdate(Project, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        var result = Body.GetLineUpdateText(Project, text, Cursor.ColIndex, MaxPropertyLength, insert);
                         if (result != null)
                         {
                             Project = result;
@@ -177,10 +256,20 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.Title:
                     {
-                        var result = GetPropertyUpdate(Title, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        var result = Body.GetLineUpdateText(Title, text, Cursor.ColIndex, MaxPropertyLength, insert);
                         if (result != null)
                         {
                             Title = result;
+                            rc = true;
+                        }
+                        break;
+                    }
+                    case CursorRow.PathFileName:
+                    {
+                        var result = Body.GetLineUpdateText(PathFileName, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        if (result != null)
+                        {
+                           PathFileName = result;
                             rc = true;
                         }
                         break;
@@ -358,30 +447,6 @@ namespace KLineEdCmdApp.Model
         {
             PathFileName = GetString(name, PathFileName, out var rc);
             Validate();    
-            return rc;
-        }
-
-        public static string GetPropertyUpdate(string property, string text, int index, int maxLength, bool insert)
-        {
-            string rc = null;
-            if ((text != null) && (property != null) && (index >= 0) && (index < maxLength))
-            {
-                if (insert)
-                {       //move all text at index text.length spaces right and insert at index
-                    if ((property.Length + text.Length) <= maxLength) 
-                        rc = property.Insert(index, text);
-                }
-                else
-                {       //overwrite from startindex = index to endIndex=index+word.Length-1
-                    if (((index + text.Length) <= property.Length) && (property.Length <= maxLength))
-                    {
-                        var start = property.Snip(0, index - 1);
-                        var end = property.Substring(index + text.Length);
-                        if (((start?.Length ?? 0) + text.Length + ((end?.Length ?? 0)) <= maxLength))
-                            rc = (start ?? "") + text + (end ?? "");
-                    }
-                }
-            }
             return rc;
         }
     }
