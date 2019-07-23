@@ -103,16 +103,9 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public bool SetCursor(CursorRow row, int colIndex)
+        public bool IsCursorBeyondEndOfLine(CursorRow row)
         {
-            var rc = false;
-            if ((colIndex >= 0) && (colIndex <= MaxPropertyLength-1) && (colIndex <= GetPropertyLength(row))) //allow colIndex to be set immediately after last char
-            {
-                Cursor.RowIndex = (int) row;  //0 is top row of EditArea
-                Cursor.ColIndex = colIndex;   //0 is left column of EditArea + PropsEditView.LongestLabelLength
-                rc = true;
-            }
-            return rc;
+            return Cursor.ColIndex > GetPropertyLength(row) - 1;
         }
 
         public CursorRow GetPropsRowIndex(ChapterModel.RowState state = ChapterModel.RowState.Current)
@@ -161,7 +154,20 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public bool SetPropsDelChar(bool backspace=false)
+        public bool SetCursor(CursorRow row, int colIndex)
+        {
+            var rc = false;
+            if ((colIndex >= 0) && (colIndex <= MaxPropertyLength - 1) && (colIndex <= GetPropertyLength(row))) //allow colIndex to be set immediately after last char
+            {
+                Cursor.RowIndex = (int)row;  //0 is top row of EditArea
+                Cursor.ColIndex = colIndex;   //0 is left column of EditArea + PropsEditView.LongestLabelLength
+                //UpdateAllViews((int)ChapterModel.ChangeHint.Props);
+                rc = true;
+            }
+            return rc;
+        }
+
+        public bool SetDelChar(bool backspace=false)
         {
             var rc = false;
 
@@ -221,12 +227,16 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public bool SetPropsChar(char c, bool insert = false)
+        public bool SetChar(char c, bool insert = false)
         {
-            return SetPropsWord(c.ToString(), insert, false, false);
+            var rc = false;
+            
+            rc = SetWord(c.ToString(), insert, false, false);
+
+            return rc;
         }
 
-        public bool SetPropsWord(string word, bool insert=false, bool addSpaceBefore=true, bool addSpaceAfter=true)
+        public bool SetWord(string word, bool insert=false, bool addSpaceBefore=true, bool addSpaceAfter=true)
         {
             var rc = false;
             if (word != null)
@@ -240,6 +250,7 @@ namespace KLineEdCmdApp.Model
                         if (result != null)
                         {
                             Author = result;
+                            Cursor.ColIndex += text.Length;
                             rc = true;
                         }
                         break;
@@ -250,6 +261,7 @@ namespace KLineEdCmdApp.Model
                         if (result != null)
                         {
                             Project = result;
+                            Cursor.ColIndex += text.Length;
                             rc = true;
                         }
                         break;
@@ -260,6 +272,7 @@ namespace KLineEdCmdApp.Model
                         if (result != null)
                         {
                             Title = result;
+                            Cursor.ColIndex += text.Length;
                             rc = true;
                         }
                         break;
@@ -270,7 +283,8 @@ namespace KLineEdCmdApp.Model
                         if (result != null)
                         {
                            PathFileName = result;
-                            rc = true;
+                           Cursor.ColIndex += text.Length;
+                           rc = true;
                         }
                         break;
                     }

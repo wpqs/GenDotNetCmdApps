@@ -228,8 +228,11 @@ namespace KLineEdCmdApp
                                     if (Model.ChapterHeader.PauseProcessing(nowUtc, lastKeyPress, false) == false)
                                     {
                                         rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
-                                        break; 
+                                        break;
                                     }
+                                    if (Controller.IsError() == false)
+                                        Model.SetMsgLine("");
+                                    Terminal.SetCursorInsertMode((Controller.IsInsertMode()));
                                 }
                                 if (Terminal.IsKeyAvailable())
                                 {
@@ -242,8 +245,8 @@ namespace KLineEdCmdApp
                                     Controller = Controller.ProcessKey(Model, Terminal.ReadKey(true));
                                     if (Controller.IsError())
                                     {
-                                        Model.SetMxErrorMsg(Controller.GetErrorTechDetails()); //todo wait for next release of MxReturnCode to get resource string
-                                        Controller.ResetError();
+                                        Model.SetMsgLine(Controller.GetErrorTechDetails());
+                                        //Model.SetMxErrorMsg(Controller.GetErrorTechDetails()); //todo wait for next release of MxReturnCode to get resource string
                                     }
                                 }
                                 if (Controller?.IsRefresh() ?? true)
@@ -415,7 +418,7 @@ namespace KLineEdCmdApp
                     foreach (var view in viewList)
                     {
                         var rcViewErr = view.GetMxError();
-                        if (rcViewErr.IsError() && (rcViewErr.GetErrorType() != MxError.Source.User))
+                        if (rcViewErr.IsError() && (rcViewErr.GetErrorType() != MxError.Source.User)) //or MxError.Source.Data
                             rc += rcViewErr;
                     }
                     if (rc.IsSuccess())

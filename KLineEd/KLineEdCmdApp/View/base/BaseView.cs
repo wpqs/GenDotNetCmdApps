@@ -316,7 +316,7 @@ namespace KLineEdCmdApp.View.Base
                 case MsgType.Error:
                 {
                     Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
-                    if ((msg.StartsWith(BaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(BaseView.ErrorMsgPrecursor.ToLower()) == false))
+                    if ((msg.Length > 0) && (msg.StartsWith(BaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(BaseView.ErrorMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.ErrorMsgPrecursor} {msg}";
                     else
                         rc = msg;
@@ -325,7 +325,7 @@ namespace KLineEdCmdApp.View.Base
                 case MsgType.Warning:
                 {
                     Terminal.SetColour(MsgLineWarnForeGndColour, MsgLineWarnBackGndColour);
-                    if ((msg.StartsWith(BaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(BaseView.WarnMsgPrecursor.ToLower()) == false))
+                    if ((msg.Length > 0) && (msg.StartsWith(BaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(BaseView.WarnMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.WarnMsgPrecursor} {msg}";
                     else
                         rc = msg;
@@ -335,7 +335,7 @@ namespace KLineEdCmdApp.View.Base
                 default:
                 {
                     Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
-                    if ((msg.StartsWith(BaseView.InfoMsgPrecursor) == false) && (msg.StartsWith(BaseView.InfoMsgPrecursor.ToLower()) == false))
+                    if ((msg.Length > 0) && (msg.StartsWith(BaseView.InfoMsgPrecursor) == false) && (msg.StartsWith(BaseView.InfoMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.InfoMsgPrecursor} {msg}";
                     else
                         rc = msg;

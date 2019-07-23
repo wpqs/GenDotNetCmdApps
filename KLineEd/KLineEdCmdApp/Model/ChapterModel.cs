@@ -109,6 +109,38 @@ namespace KLineEdCmdApp.Model
             UpdateAllViews((int)ChangeHint.All);
         }
 
+        public bool SetPropsCursor(HeaderProps.CursorRow row, int colIndex)
+        {
+            var rc = ChapterHeader?.Properties?.SetCursor(row, colIndex) ?? false;
+            if (rc == true)
+                UpdateAllViews((int)ChangeHint.Props);
+            return rc;
+        }
+
+        public bool SetPropsDelChar(bool backspace = false)
+        {
+            var rc = ChapterHeader?.Properties?.SetDelChar(backspace) ?? false;
+            if (rc == true)
+                UpdateAllViews((int)ChangeHint.Props);
+            return rc;
+        }
+
+        public bool SetPropsChar(char c, bool insert = false)
+        {
+            var rc = ChapterHeader?.Properties?.SetChar(c, insert) ?? false;
+            if (rc == true)
+                UpdateAllViews((int)ChangeHint.Props);
+            return rc;
+        }
+
+        public bool SetPropsWord(string word, bool insert = false)
+        {
+            var rc = ChapterHeader?.Properties?.SetWord(word, insert) ?? false;
+            if (rc == true)
+                UpdateAllViews((int)ChangeHint.Props);
+            return rc;
+        }
+
         public string GetTabSpaces()
         {
             return ChapterBody?.TabSpaces ?? Program.ValueNotSet;

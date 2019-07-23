@@ -12,6 +12,8 @@ namespace KLineEdCmdApp.Controller.Base
     {
         public ChapterModel Chapter { private set; get; }
         public string BrowserExe { private set; get; }
+
+        private bool _insertMode;
         private MxReturnCode<bool> _mxErrorCode;
         private bool _ctrlQ;
         private bool _refresh;
@@ -23,9 +25,11 @@ namespace KLineEdCmdApp.Controller.Base
             _refresh = false;
             _mxErrorCode = new MxReturnCode<bool>($"{GetType().Name}.Ctor", false); //SetResult(true) on error
             Chapter = null;
+            _insertMode = false;
             BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
         }
 
+        public bool IsInsertMode() { return _insertMode; }
         // ReSharper disable once SimplifyConditionalTernaryExpression
         public bool IsQuit() { return _ctrlQ; }
 
@@ -70,6 +74,7 @@ namespace KLineEdCmdApp.Controller.Base
 
                 _ctrlQ = false;
                 _refresh = false;
+                _insertMode = false;
                 Chapter = model;
                 BrowserExe = browserExe;
                 _mxErrorCode?.SetResult(true);
@@ -113,6 +118,7 @@ namespace KLineEdCmdApp.Controller.Base
         {
             EditingBaseController rc = null;
 
+            ResetError();
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if ((model == null) || (keyInfo == null))
                 _mxErrorCode.SetError(1030201, MxError.Source.Param, $"model is null or keyInfo null", MxMsgs.MxErrBadMethodParam);
@@ -133,8 +139,12 @@ namespace KLineEdCmdApp.Controller.Base
                 }
                 else if (keyInfo.Key == ConsoleKey.Escape)
                 {
-                    ResetError();
+                   // ResetError();
                     _refresh = true;
+                }
+                else if (keyInfo.Key == ConsoleKey.Insert)
+                {
+                    _insertMode = !_insertMode;
                 }
                 else
                 {

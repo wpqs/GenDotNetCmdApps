@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
-using Microsoft.Azure.Services.AppAuthentication;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests
@@ -260,25 +259,25 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("C23", props.PathFileName);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
-            Assert.True(props.SetPropsWord("PQ", true, false, false));
+            Assert.True(props.SetWord("PQ", true, false, false));
             Assert.Equal("Z2PQ3", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.True(props.SetPropsWord("01", true, true, false));
+            Assert.True(props.SetWord("01", true, true, false));
             Assert.Equal("A 0123", props.Project);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(2, props.Cursor.RowIndex);
-            Assert.True(props.SetPropsWord("01", true, false, true));
+            Assert.True(props.SetWord("01", true, false, true));
             Assert.Equal("B01 23", props.Title);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(3, props.Cursor.RowIndex);
-            Assert.True(props.SetPropsWord("01", true, true, true));
+            Assert.True(props.SetWord("01", true, true, true));
             Assert.Equal("C 01 23", props.PathFileName);
         }
 
@@ -301,25 +300,25 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("C0123", props.PathFileName);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
-            Assert.True(props.SetPropsWord("PQ", false, false, false));
+            Assert.True(props.SetWord("PQ", false, false, false));
             Assert.Equal("Z0PQ3", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.True(props.SetPropsWord("45", false, true, false));
+            Assert.True(props.SetWord("45", false, true, false));
             Assert.Equal("A 453", props.Project);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(2, props.Cursor.RowIndex);
-            Assert.True(props.SetPropsWord("45", false, false, true));
+            Assert.True(props.SetWord("45", false, false, true));
             Assert.Equal("B45 3", props.Title);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(3, props.Cursor.RowIndex);
-            Assert.True(props.SetPropsWord("45", false, true, true));
+            Assert.True(props.SetWord("45", false, true, true));
             Assert.Equal("C 45 ", props.PathFileName);
         }
 
@@ -344,13 +343,13 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.True(props.SetPropsWord("0", true, false,false));
+            Assert.True(props.SetWord("0", true, false,false));
             Assert.Equal("A023", props.Project);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.False(props.SetPropsWord("01", true, false, false));
+            Assert.False(props.SetWord("01", true, false, false));
             Assert.Equal("A023", props.Project);
         }
 
@@ -369,8 +368,12 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("W. Stott", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
-            Assert.True(props.SetPropsChar('P', true));
+            Assert.True(props.SetChar('P', true));
             Assert.Equal("W.P Stott", props.Author);
+
+            Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 9));
+            Assert.True(props.SetChar('?', true));
+            Assert.Equal("W.P Stott?", props.Author);
         }
 
         [Fact]
@@ -389,15 +392,15 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("C234", props.PathFileName);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 1));
-            Assert.True(props.SetPropsDelChar());
+            Assert.True(props.SetDelChar());
             Assert.Equal("Z3", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 0));
-            Assert.True(props.SetPropsDelChar());
+            Assert.True(props.SetDelChar());
             Assert.Equal("23", props.Title);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 2));
-            Assert.True(props.SetPropsDelChar());
+            Assert.True(props.SetDelChar());
             Assert.Equal("A2", props.Project);
 
             Assert.False(props.SetCursor(HeaderProps.CursorRow.PathFileName, -1));
@@ -405,16 +408,16 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(props.SetCursor(HeaderProps.CursorRow.PathFileName, 5)); //... but no more
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 0));
-            Assert.True(props.SetPropsDelChar());
+            Assert.True(props.SetDelChar());
             Assert.Equal("234", props.PathFileName);
-            Assert.True(props.SetPropsDelChar());
+            Assert.True(props.SetDelChar());
             Assert.Equal("34", props.PathFileName);
-            Assert.True(props.SetPropsDelChar());
+            Assert.True(props.SetDelChar());
             Assert.Equal("4", props.PathFileName);
-            Assert.True(props.SetPropsDelChar());
+            Assert.True(props.SetDelChar());
             Assert.Equal("", props.PathFileName);
 
-            Assert.False(props.SetPropsDelChar());
+            Assert.False(props.SetDelChar());
             Assert.Equal("", props.PathFileName);
         }
 
@@ -434,21 +437,21 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("C234", props.PathFileName);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 2));
-            Assert.True(props.SetPropsDelChar(true));
+            Assert.True(props.SetDelChar(true));
             Assert.Equal("B3", props.Title);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 0));
-            Assert.False(props.SetPropsDelChar(true));
+            Assert.False(props.SetDelChar(true));
             Assert.Equal("Z23", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 3));
-            Assert.True(props.SetPropsDelChar(true));
+            Assert.True(props.SetDelChar(true));
             Assert.Equal("Z2", props.Author);
-            Assert.True(props.SetPropsDelChar(true));
+            Assert.True(props.SetDelChar(true));
             Assert.Equal("Z", props.Author);
-            Assert.True(props.SetPropsDelChar(true));
+            Assert.True(props.SetDelChar(true));
             Assert.Equal("", props.Author);
-            Assert.False(props.SetPropsDelChar(true));
+            Assert.False(props.SetDelChar(true));
             Assert.Equal("", props.Author);
         }
     }

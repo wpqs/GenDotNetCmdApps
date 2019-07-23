@@ -28,6 +28,8 @@ namespace KLineEdCmdApp.Utils
         int GetCursorLine();
         void SetCursorVisible(bool hide=false);
 
+        void SetCursorInsertMode(bool insertMode = false);
+
         string WriteLine(string line, params object[] args);
         string Write(string line, params object[] args);
 

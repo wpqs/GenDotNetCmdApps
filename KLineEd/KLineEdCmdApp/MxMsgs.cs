@@ -25,6 +25,12 @@ namespace KLineEdCmdApp
         public const string MxErrSystemFailure = "MxErrSystemFailure"; //Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
         public const string MxErrBrowserFailed = "MxErrBrowserFailed"; //Error: cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
 
+        public const string MxWarnEndOfLine = "MxErrEndOfLine";     //Warning: you are at the end of the line. Press the left arrow key and try again.
+        public const string MxWarnStartOfLine = "MxErrStartOfLine"; //Warning: you are at the start of the line. Press the right arrow key or enter a character.
+        public const string MxWarnNoCharToDelete = "MxWarnNoCharToDelete"; //Warning: no characters remain to delete.
+        public const string MxWarnBackspaceAtStartOfLine = "MxWarnBackspaceAtStartOfLine"; //Warning: you cannot backspace at the start of a line.
+        public const string MxWarnInvalidChar = "MxWarnInvalidChar"; //Warning: you cannot enter this character.
+
     }
 
     //Whilst you should try to avoid duplicating error code values in your code base, doing so doesn't break anything. The following conventions may help:
@@ -58,7 +64,7 @@ namespace KLineEdCmdApp
         public const int StatusLineViewFirst =          1200101; //first error code in class StatusLineView.cs
         public const int TerminalFirst =                1210101; //first error code in class Terminal.cs
         public const int ControllerFactoryFirst =       1220101; //first error code in class ControllerFactory.cs
-
+        public const int PropsEditingControllerFirst =  1230101; //first error code in class PropsEditingController.cs
 
     }
 }

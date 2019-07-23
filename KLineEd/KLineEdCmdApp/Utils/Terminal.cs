@@ -16,6 +16,8 @@ namespace KLineEdCmdApp.Utils
     public class Terminal : ITerminal
     {
         public static readonly ConsoleKey InvalidKey = ConsoleKey.F24;
+        public static readonly int StdCursorSize = TerminalProperties.DefaultCursorSize;
+        public static readonly int InserModeCursorSize = 100;
 
         private readonly MxReturnCode<bool> _mxErrorCode;
 
@@ -195,6 +197,19 @@ namespace KLineEdCmdApp.Utils
                 _mxErrorCode.SetError(1210701, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
         }
+
+        public void SetCursorInsertMode(bool insertMode = false)
+        {
+            try
+            {
+                Console.CursorSize = ((insertMode) ? InserModeCursorSize : StdCursorSize);
+            }
+            catch (Exception e)
+            {
+                _mxErrorCode.SetError(1210801, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+            }
+        }
+
         public bool Clear()
         {
             try
@@ -204,7 +219,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1210801, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1210901, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return (IsError()) ? false : true;
         }
@@ -213,7 +228,7 @@ namespace KLineEdCmdApp.Utils
         {
             string rc = null;
             if (line == null)
-                _mxErrorCode.SetError(1210901, MxError.Source.Param, $"line is null", MxMsgs.MxErrBadMethodParam);
+                _mxErrorCode.SetError(1211001, MxError.Source.Param, $"line is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -224,7 +239,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    _mxErrorCode.SetError(1210902, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    _mxErrorCode.SetError(1211102, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -233,7 +248,7 @@ namespace KLineEdCmdApp.Utils
         {
             string rc = null;
             if (msg == null)
-                _mxErrorCode.SetError(1211001, MxError.Source.Param, $"msg is null", MxMsgs.MxErrBadMethodParam);
+                _mxErrorCode.SetError(1211201, MxError.Source.Param, $"msg is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -244,7 +259,7 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    _mxErrorCode.SetError(1211002, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    _mxErrorCode.SetError(1211202, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -259,7 +274,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1211101, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211301, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -274,7 +289,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1211201, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1213201, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -289,7 +304,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1211301, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }

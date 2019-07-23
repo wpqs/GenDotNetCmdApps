@@ -91,6 +91,11 @@ namespace KLineEdCmdAppTest.TestSupport
 
         }
 
+        public void SetCursorInsertMode(bool insertMode = false)
+        {
+
+        }
+
         public bool IsKeyAvailable()
         {
             return true;

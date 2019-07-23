@@ -13,7 +13,7 @@ namespace KLineEdCmdApp.Utils
         public const int DefaultBufferWidth = 120;
         public const int DefaultWindowHeight = 30;
         public const int DefaultWindowWidth = 120;
-        public const int DefaultCursorSize = 20;
+        public const int DefaultCursorSize = 25;
         public const int DefaultWindowTop = 0;
         public const int DefaultWindowLeft = 0;
         public const int DefaultCursorTop = 0;

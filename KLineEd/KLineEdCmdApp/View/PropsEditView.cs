@@ -65,6 +65,22 @@ namespace KLineEdCmdApp.View
                         switch (change)
                         {
                             case ChapterModel.ChangeHint.Props:
+                            {
+                                    if (currentCursorRow == PropsEditViewCursorRow.Author)
+                                        rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.Author, authorLine, true);
+                                    else if (currentCursorRow == PropsEditViewCursorRow.Project)
+                                        rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.Project, projectLine, true);
+                                    else if (currentCursorRow == PropsEditViewCursorRow.Title)
+                                        rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.Title, titleLine, true);
+                                    else
+                                        rc.SetError(1150102, MxError.Source.Program, $"currentCursorRow={currentCursorRow} not supported", MxMsgs.MxErrInvalidCondition);
+
+                                    if (rc.IsSuccess(true))
+                                        rc += SetEditAreaCursor((int)currentCursorRow, currentCursorCol);
+                                    if (rc.IsSuccess(true))
+                                        rc.SetResult(true);
+                                    break;
+                            }
                             case ChapterModel.ChangeHint.All:
                             {
                                 rc += ClearEditAreaText();

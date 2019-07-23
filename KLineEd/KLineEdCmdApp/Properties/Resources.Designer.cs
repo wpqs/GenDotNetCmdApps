@@ -169,6 +169,51 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: you cannot backspace at the start of a line..
+        /// </summary>
+        internal static string MxWarnBackspaceAtStartOfLine {
+            get {
+                return ResourceManager.GetString("MxWarnBackspaceAtStartOfLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: you are at the end of the line. Press the left arrow key and try again..
+        /// </summary>
+        internal static string MxWarnEndOfLine {
+            get {
+                return ResourceManager.GetString("MxWarnEndOfLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: you cannot enter this character..
+        /// </summary>
+        internal static string MxWarnInvalidChar {
+            get {
+                return ResourceManager.GetString("MxWarnInvalidChar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: no characters remain to delete..
+        /// </summary>
+        internal static string MxWarnNoCharToDelete {
+            get {
+                return ResourceManager.GetString("MxWarnNoCharToDelete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: you are at the start of the line. Press the right arrow key or enter a character..
+        /// </summary>
+        internal static string MxWarnStartOfLine {
+            get {
+                return ResourceManager.GetString("MxWarnStartOfLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} v{1}.{3}Copyright {2}.{3}Use subject to standard MIT License - see https://github.com/wpqs/AwsDotNetCmdUtils {3}.
         /// </summary>
         internal static string WelcomeNotice {

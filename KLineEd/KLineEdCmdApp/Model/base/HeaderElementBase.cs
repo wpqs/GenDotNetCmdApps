@@ -3,7 +3,7 @@ using MxReturnCode;
 
 namespace KLineEdCmdApp.Model.Base
 {
-    public abstract class HeaderElementBase
+    public abstract class HeaderElementBase 
     {
         public static readonly string PropertyNotSet = "";  //must be empty as Validate checks the property is nit null or empty
         public static readonly string ValueNotSet = Program.ValueNotSet;

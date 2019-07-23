@@ -1,5 +1,4 @@
 ﻿using System;
-using KLineEdCmdApp;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.Model;
 using KLineEdCmdAppTest.TestSupport;
