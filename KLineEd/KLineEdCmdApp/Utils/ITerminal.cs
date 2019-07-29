@@ -23,9 +23,9 @@ namespace KLineEdCmdApp.Utils
 
         bool SetColour(ConsoleColor foreGndColour, ConsoleColor msgLineErrorBackGndColour);
 
-        bool SetCursorPosition(int line, int column);
+        bool SetCursorPosition(int row, int column);
         int GetCursorColumn();
-        int GetCursorLine();
+        int GetCursorRow();
         void SetCursorVisible(bool hide=false);
 
         void SetCursorInsertMode(bool insertMode = false);

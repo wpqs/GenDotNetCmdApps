@@ -108,18 +108,18 @@ namespace KLineEdCmdApp.Model
             return Cursor.ColIndex > GetPropertyLength(row) - 1;
         }
 
-        public CursorRow GetPropsRowIndex(ChapterModel.RowState state = ChapterModel.RowState.Current)
+        public CursorRow GetRowIndex(ChapterModel.CursorState state = ChapterModel.CursorState.Current)
         {
             var rc = CursorRow.Author;
 
             switch (state)
             {
-                case ChapterModel.RowState.Current:
+                case ChapterModel.CursorState.Current:
                 {
                     rc = (CursorRow)Cursor.RowIndex;
                     break;
                 }
-                case ChapterModel.RowState.Next:
+                case ChapterModel.CursorState.Next:
                 {
                     var current = (CursorRow)Cursor.RowIndex;
                     if (current == CursorRow.Author)
@@ -132,7 +132,7 @@ namespace KLineEdCmdApp.Model
                         rc = CursorRow.Author;
                     break;
                 }
-                case ChapterModel.RowState.Previous:
+                case ChapterModel.CursorState.Previous:
                 {
                     var current = (CursorRow)Cursor.RowIndex;
                     if (current == CursorRow.Author)
@@ -159,9 +159,8 @@ namespace KLineEdCmdApp.Model
             var rc = false;
             if ((colIndex >= 0) && (colIndex <= MaxPropertyLength - 1) && (colIndex <= GetPropertyLength(row))) //allow colIndex to be set immediately after last char
             {
-                Cursor.RowIndex = (int)row;  //0 is top row of EditArea
+                Cursor.RowIndex = (int)row;   //0 is top row of EditArea
                 Cursor.ColIndex = colIndex;   //0 is left column of EditArea + PropsEditView.LongestLabelLength
-                //UpdateAllViews((int)ChapterModel.ChangeHint.Props);
                 rc = true;
             }
             return rc;
@@ -231,17 +230,17 @@ namespace KLineEdCmdApp.Model
         {
             var rc = false;
             
-            rc = SetWord(c.ToString(), insert, false, false);
+            rc = SetText(c.ToString(), insert, false, false);
 
             return rc;
         }
 
-        public bool SetWord(string word, bool insert=false, bool addSpaceBefore=true, bool addSpaceAfter=true)
+        public bool SetText(string str, bool insert=false, bool addSpaceBefore=true, bool addSpaceAfter=true)
         {
             var rc = false;
-            if (word != null)
+            if (str != null)
             {
-                var text = $"{((addSpaceBefore) ? " " : "")}{word}{((addSpaceAfter) ? " " : "")}";
+                var text = $"{((addSpaceBefore) ? " " : "")}{str}{((addSpaceAfter) ? " " : "")}";
                 switch ((CursorRow) Cursor.RowIndex)
                 {
                     case CursorRow.Author:

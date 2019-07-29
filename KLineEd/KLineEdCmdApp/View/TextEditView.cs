@@ -53,7 +53,7 @@ namespace KLineEdCmdApp.View
                                 rc += ClearEditAreaText();
                                 if (rc.IsSuccess(true))
                                 {
-                                    var rcRes = model.GetLastLinesForDisplay(EditAreaHeight);
+                                    var rcRes = model.GetLastLinesForDisplay();
                                     rc += rcRes;
                                     if (rcRes.IsSuccess(true))
                                     {

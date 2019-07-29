@@ -219,25 +219,25 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, props.Cursor.ColIndex);
             Assert.Equal(0, props.Cursor.RowIndex);
 
-            Assert.Equal(HeaderProps.CursorRow.Author, props.GetPropsRowIndex(ChapterModel.RowState.Current));
-            Assert.Equal(HeaderProps.CursorRow.Project, props.GetPropsRowIndex(ChapterModel.RowState.Next));
-            Assert.Equal(HeaderProps.CursorRow.Title, props.GetPropsRowIndex(ChapterModel.RowState.Previous));
+            Assert.Equal(HeaderProps.CursorRow.Author, props.GetRowIndex(ChapterModel.CursorState.Current));
+            Assert.Equal(HeaderProps.CursorRow.Project, props.GetRowIndex(ChapterModel.CursorState.Next));
+            Assert.Equal(HeaderProps.CursorRow.Title, props.GetRowIndex(ChapterModel.CursorState.Previous));
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 0));
             Assert.Equal(0, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
 
-            Assert.Equal(HeaderProps.CursorRow.Project, props.GetPropsRowIndex(ChapterModel.RowState.Current));
-            Assert.Equal(HeaderProps.CursorRow.Title, props.GetPropsRowIndex(ChapterModel.RowState.Next));
-            Assert.Equal(HeaderProps.CursorRow.Author, props.GetPropsRowIndex(ChapterModel.RowState.Previous));
+            Assert.Equal(HeaderProps.CursorRow.Project, props.GetRowIndex(ChapterModel.CursorState.Current));
+            Assert.Equal(HeaderProps.CursorRow.Title, props.GetRowIndex(ChapterModel.CursorState.Next));
+            Assert.Equal(HeaderProps.CursorRow.Author, props.GetRowIndex(ChapterModel.CursorState.Previous));
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 2));
             Assert.Equal(2, props.Cursor.ColIndex);
             Assert.Equal(2, props.Cursor.RowIndex);
 
-            Assert.Equal(HeaderProps.CursorRow.Title, props.GetPropsRowIndex(ChapterModel.RowState.Current));
-            Assert.Equal(HeaderProps.CursorRow.Author, props.GetPropsRowIndex(ChapterModel.RowState.Next));
-            Assert.Equal(HeaderProps.CursorRow.Project, props.GetPropsRowIndex(ChapterModel.RowState.Previous));
+            Assert.Equal(HeaderProps.CursorRow.Title, props.GetRowIndex(ChapterModel.CursorState.Current));
+            Assert.Equal(HeaderProps.CursorRow.Author, props.GetRowIndex(ChapterModel.CursorState.Next));
+            Assert.Equal(HeaderProps.CursorRow.Project, props.GetRowIndex(ChapterModel.CursorState.Previous));
         }
 
         [Fact]
@@ -259,25 +259,25 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("C23", props.PathFileName);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
-            Assert.True(props.SetWord("PQ", true, false, false));
+            Assert.True(props.SetText("PQ", true, false, false));
             Assert.Equal("Z2PQ3", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.True(props.SetWord("01", true, true, false));
+            Assert.True(props.SetText("01", true, true, false));
             Assert.Equal("A 0123", props.Project);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(2, props.Cursor.RowIndex);
-            Assert.True(props.SetWord("01", true, false, true));
+            Assert.True(props.SetText("01", true, false, true));
             Assert.Equal("B01 23", props.Title);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(3, props.Cursor.RowIndex);
-            Assert.True(props.SetWord("01", true, true, true));
+            Assert.True(props.SetText("01", true, true, true));
             Assert.Equal("C 01 23", props.PathFileName);
         }
 
@@ -300,25 +300,25 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("C0123", props.PathFileName);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Author, 2));
-            Assert.True(props.SetWord("PQ", false, false, false));
+            Assert.True(props.SetText("PQ", false, false, false));
             Assert.Equal("Z0PQ3", props.Author);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.True(props.SetWord("45", false, true, false));
+            Assert.True(props.SetText("45", false, true, false));
             Assert.Equal("A 453", props.Project);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Title, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(2, props.Cursor.RowIndex);
-            Assert.True(props.SetWord("45", false, false, true));
+            Assert.True(props.SetText("45", false, false, true));
             Assert.Equal("B45 3", props.Title);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.PathFileName, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(3, props.Cursor.RowIndex);
-            Assert.True(props.SetWord("45", false, true, true));
+            Assert.True(props.SetText("45", false, true, true));
             Assert.Equal("C 45 ", props.PathFileName);
         }
 
@@ -343,13 +343,13 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.True(props.SetWord("0", true, false,false));
+            Assert.True(props.SetText("0", true, false,false));
             Assert.Equal("A023", props.Project);
 
             Assert.True(props.SetCursor(HeaderProps.CursorRow.Project, 1));
             Assert.Equal(1, props.Cursor.ColIndex);
             Assert.Equal(1, props.Cursor.RowIndex);
-            Assert.False(props.SetWord("01", true, false, false));
+            Assert.False(props.SetText("01", true, false, false));
             Assert.Equal("A023", props.Project);
         }
 

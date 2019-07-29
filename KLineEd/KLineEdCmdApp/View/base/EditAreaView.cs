@@ -75,7 +75,7 @@ namespace KLineEdCmdApp.View.Base
                     if (rcClear.IsError(true))
                         break;
                 }
-                Terminal.SetCursorVisible(CursorOn);
+               Terminal.SetCursorVisible(CursorOn);
                 if (rc.IsSuccess())
                     rc.SetResult(true);
             }

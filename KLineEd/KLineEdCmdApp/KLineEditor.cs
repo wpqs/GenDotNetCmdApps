@@ -17,7 +17,7 @@ namespace KLineEdCmdApp
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class KLineEditor
     {
-        public static readonly int StatusLineUpdateMilliSecs = 100;
+        public static readonly int StatusLineUpdateMilliSecs = 200;
 
         public static readonly int MaxWindowHeight = Console.LargestWindowHeight;  
         public static readonly int MaxWindowWidth = Console.LargestWindowWidth;
@@ -259,7 +259,7 @@ namespace KLineEdCmdApp
 
                                 var rcErr = GetAnyCriticalError(ViewList, Controller); 
                                 if (rcErr.IsError())
-                                    rc += rcErr; 
+                                    rc += rcErr;
                                 else
                                     Thread.Sleep(0);
                             }

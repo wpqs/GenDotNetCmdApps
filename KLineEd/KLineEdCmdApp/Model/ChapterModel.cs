@@ -18,12 +18,13 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
     public class ChapterModel : NotifierModel
     {
-        public enum RowState
+        public enum CursorState
         {
             Current,
             Next,
             Previous,
         }
+
         public enum ChangeHint
         {
             [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
@@ -61,20 +62,25 @@ namespace KLineEdCmdApp.Model
         public void SetStatusLine(bool update=true)     //called from Time Thread so readonly model items
         {
             var elapsed = DateTime.UtcNow - ChapterHeader.GetLastSession()?.Start;
-
+            string line = null;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (elapsed?.TotalDays > 0.99)
-                StatusLine = $"{(elapsed?.TotalDays ?? 0.0).ToString(Header.MxStdFrmtDouble0)} days {elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
+                line = $"{(elapsed?.TotalDays ?? 0.0).ToString(Header.MxStdFrmtDouble0)} days {elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
             else
-                StatusLine = $"{elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
+                line = $"{elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
 
-            StatusLine += $"Line: {ChapterBody?.GetLineCount() ?? Program.PosIntegerNotSet} ";
-            StatusLine += $"Column: {ChapterBody?.GetCharacterCountInLine() + 1 ?? Program.PosIntegerNotSet} ";
-            StatusLine += $"Total words: {ChapterBody?.WordCount ?? Program.PosIntegerNotSet} ";
+            line += $"Line: {ChapterBody?.GetLineCount() ?? Program.PosIntegerNotSet} ";
+            line += $"Column: {ChapterBody?.GetCharacterCountInLine() + 1 ?? Program.PosIntegerNotSet} ";
+            line += $"Total words: {ChapterBody?.WordCount ?? Program.PosIntegerNotSet} ";
 
-            StatusLine += $"{(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)}";
-            
-            if (update)
-                UpdateAllViews((int)ChangeHint.StatusLine);
+            line += $"{(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)}";
+
+            if (StatusLine != line)
+            {
+                StatusLine = line;
+                if (update)
+                    UpdateAllViews((int)ChangeHint.StatusLine);
+            }
         }
         public void SetMsgLine(string msg, bool update = true)
         {
@@ -133,9 +139,9 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public bool SetPropsWord(string word, bool insert = false)
+        public bool SetPropsText(string text, bool insert = false)
         {
-            var rc = ChapterHeader?.Properties?.SetWord(word, insert) ?? false;
+            var rc = ChapterHeader?.Properties?.SetText(text, insert) ?? false;
             if (rc == true)
                 UpdateAllViews((int)ChangeHint.Props);
             return rc;
@@ -323,15 +329,16 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<string[]> GetLastLinesForDisplay(int count) //string[] returned is only for display - altering these strings will not change the document
+        public MxReturnCode<string[]> GetLastLinesForDisplay(int count = Program.PosIntegerNotSet) //string[] returned is only for display - altering these strings will not change the document
         {
             var rc = new MxReturnCode<string[]>("ChapterModel.GetLastLinesForDisplay", null);
 
-            if (Ready == false)
-                rc.SetError(1050701, MxError.Source.Program, "Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
+            if ((Ready == false) || (count < Program.PosIntegerNotSet))
+                rc.SetError(1050701, MxError.Source.Program, $"Initialise not called or not successful, or count < {Program.PosIntegerNotSet}", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var rcLastLines = ChapterBody.GetLastLinesForDisplay(count);
+                var lineCount = (count == Program.PosIntegerNotSet) ? ChapterBody.EditAreaViewCursorLimit.RowIndex : count;
+                var rcLastLines = ChapterBody.GetLinesForDisplay(lineCount);
                 rc += rcLastLines;
                 if (rcLastLines.IsSuccess(true))
                     rc.SetResult(rcLastLines.GetResult());

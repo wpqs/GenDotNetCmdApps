@@ -12,7 +12,7 @@ namespace KLineEdCmdAppTest.TestSupport
     public class MockTerminal : ITerminal
     {
         private readonly MxReturnCode<bool> _mxErrorCode;
-        public int CursorLine { get; private set; }
+        public int CursorRow { get; private set; }
         public int CursorColumn { get; private set; }
 
         public ConsoleColor ForeGndColour { get; private set; }
@@ -22,7 +22,7 @@ namespace KLineEdCmdAppTest.TestSupport
         {
             _mxErrorCode = new MxReturnCode<bool>($"MockTerminal.Ctor", false); //SetResult(true) on error
             _mxErrorCode.SetError(9210201, MxError.Source.Program, "Terminal.Setup not called");
-            CursorLine = 0;
+            CursorRow = 0;
             CursorColumn = 0;
             ForeGndColour = ConsoleColor.Gray;
             BackGndColour = ConsoleColor.Black;
@@ -69,10 +69,10 @@ namespace KLineEdCmdAppTest.TestSupport
             return new TerminalProperties();
         }
 
-        public bool SetCursorPosition(int line, int column)
+        public bool SetCursorPosition(int row, int column)
         {
             CursorColumn = column;
-            CursorLine = line;
+            CursorRow = row;
             return true;
         }
 
@@ -81,9 +81,9 @@ namespace KLineEdCmdAppTest.TestSupport
             return CursorColumn;
         }
 
-        public int GetCursorLine()
+        public int GetCursorRow()
         {
-            return CursorLine;
+            return CursorRow;
         }
 
         public void SetCursorVisible(bool hide=false)
@@ -128,6 +128,7 @@ namespace KLineEdCmdAppTest.TestSupport
             return rc;
 
         }
+
         public char GetKeyChar(bool hide = false, char defaultVal = ' ')
         {
             return defaultVal;

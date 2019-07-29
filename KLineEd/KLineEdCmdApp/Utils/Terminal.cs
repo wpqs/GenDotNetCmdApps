@@ -137,16 +137,16 @@ namespace KLineEdCmdApp.Utils
             }
             return (IsError()) ? false : true;
         }
-        public bool SetCursorPosition(int line, int column)
+        public bool SetCursorPosition(int row, int column)
         {
-            if ((line < 0) || (line >= Console.BufferHeight) || (column < 0) || (column >= Console.BufferWidth))
-                _mxErrorCode.SetError(1210402, MxError.Source.Param, $"Invalid cursor position: line={line}, column={column}", MxMsgs.MxErrBadMethodParam);
+            if ((row < 0) || (row >= Console.BufferHeight) || (column < 0) || (column >= Console.BufferWidth))
+                _mxErrorCode.SetError(1210402, MxError.Source.Param, $"Invalid cursor position: line={row}, column={column}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     Console.CursorLeft = column;
-                    Console.CursorTop = line;
+                    Console.CursorTop = row;
                     _mxErrorCode.SetResult(true);
                 }
                 catch (Exception e)
@@ -171,7 +171,7 @@ namespace KLineEdCmdApp.Utils
             }
             return rc;
         }
-        public int GetCursorLine()
+        public int GetCursorRow()
         {
             var rc = Program.PosIntegerNotSet;
             try
@@ -264,6 +264,7 @@ namespace KLineEdCmdApp.Utils
             }
             return rc;
         }
+
         public char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar)
         {
             var rc = (char) 0;
@@ -274,7 +275,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1211301, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -289,7 +290,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1213201, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211501, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }
@@ -304,7 +305,7 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                _mxErrorCode.SetError(1211401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                _mxErrorCode.SetError(1211601, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return rc;
         }

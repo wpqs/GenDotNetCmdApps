@@ -9,6 +9,7 @@ namespace KLineEdCmdApp.View
 {
     [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     [SuppressMessage("ReSharper", "RedundantAssignment")]
+    [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class PropsEditView : EditAreaView
     {
         public static readonly string PropsEditorMode = "Properties Editing:";

@@ -40,7 +40,6 @@ namespace KLineEdCmdApp.Controller.Base
                     else
                     {
                         model.SetEditorHelpLine(controller.GetEditorHelpLine(), false);
-                        model.SetMsgLine("hello wills...", false);
                         model.Refresh();
                         //model.SetTextAreaName(controller.GetEditorTextAreaName());
                         rc = controller;

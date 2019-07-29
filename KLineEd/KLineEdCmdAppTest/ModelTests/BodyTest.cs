@@ -50,24 +50,27 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetLineCountTest()
         {
             var body = new Body();
-            Assert.True(body.IsError());        //not initialised, but not necessary for GetLineCount()
-            Assert.Equal(0, body.GetLineCount() );
+            Assert.True(body.IsError()); //not initialised, but not necessary for GetLineCount()
+            Assert.Equal(0, body.GetLineCount());
         }
+
         [Fact]
         public void GetLastLinesTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
-            Assert.NotNull(body.GetLastLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountDefault).GetResult());
+            Assert.NotNull(body.GetLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountDefault).GetResult());
         }
+
         [Fact]
         public void GetLastLinesNotInitializedTest()
         {
             var body = new Body();
             Assert.True(body.IsError());
-            Assert.Null(body.GetLastLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountDefault).GetResult());
+            Assert.Null(body.GetLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountDefault).GetResult());
         }
+
         [Fact]
         public void AppendLineNotInitializedTest()
         {
@@ -158,7 +161,7 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetLineUpdateTextInsertTest()
         {
-            var property = "hello world";  //index 0-10  insert before index
+            var property = "hello world"; //index 0-10  insert before index
 
             Assert.Equal("helloX world", Body.GetLineUpdateText(property, "X", 5, property.Length + 1, true));
             Assert.Equal("Xhello world", Body.GetLineUpdateText(property, "X", 0, property.Length + 1, true));
@@ -176,7 +179,7 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetLineUpdateTextInvalidTest()
         {
-            var property = "hello world";  //index 0-10  insert before index
+            var property = "hello world"; //index 0-10  insert before index
 
             Assert.Equal("helloX world", Body.GetLineUpdateText(property, "X", 5, property.Length + 1, true));
 
@@ -204,7 +207,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(4, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(18, body.GetCharacterCountInLine());
-            Assert.Equal("one two three four", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("one two three four", body.GetLinesForDisplay(1).GetResult()[0]);
 
             Assert.Equal("one", body.GetWordInLine(Body.LastLine, 1));
             Assert.Equal("two", body.GetWordInLine(Body.LastLine, 2));
@@ -232,8 +235,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(3, body.GetCharacterCountInLine());
-            Assert.Equal("one", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("one", body.GetLinesForDisplay(1).GetResult()[0]);
         }
+
         [Fact]
         public void AppendTwoLineTest()
         {
@@ -245,18 +249,19 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.RefreshWordCount());
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
+            Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
 
-            Assert.True(body.AppendLine("two").GetResult());  //don't inc WordCount
+            Assert.True(body.AppendLine("two").GetResult()); //don't inc WordCount
             Assert.Equal(2, body.GetLineCount());
-            Assert.Equal(2, body.WordCount);            //
-            Assert.Equal(2, body.RefreshWordCount());       //refreshes WordCount from actual words in Body
-            Assert.Equal(2, body.WordCount);            //
+            Assert.Equal(2, body.WordCount); //
+            Assert.Equal(2, body.RefreshWordCount()); //refreshes WordCount from actual words in Body
+            Assert.Equal(2, body.WordCount); //
 
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
-            Assert.Equal("two", body.GetLastLinesForDisplay(10).GetResult()[1]);
+            Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
+            Assert.Equal("two", body.GetLinesForDisplay(10).GetResult()[1]);
 
         }
+
         [Fact]
         public void AppendLineNullTest()
         {
@@ -278,7 +283,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("").GetResult());           //lines can be empty - i.e. user types CR,CR
+            Assert.True(body.AppendLine("").GetResult()); //lines can be empty - i.e. user types CR,CR
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
         }
@@ -291,7 +296,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine(" ").GetResult());          //lines can start with space
+            Assert.True(body.AppendLine(" ").GetResult()); //lines can start with space
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
         }
@@ -310,7 +315,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendLine(line).GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(4, body.WordCount);
-            Assert.Equal(line, body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(line, body.GetLinesForDisplay(1).GetResult()[0]);
 
             var tooLong = line + "x";
             Assert.False(body.AppendLine(tooLong).GetResult());
@@ -393,7 +398,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendWord(word).GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(4, body.WordCount);
-            Assert.Equal(word, body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(word, body.GetLinesForDisplay(1).GetResult()[0]);
 
             var tooLong = word + "x";
             Assert.False(body.AppendWord(tooLong).GetResult());
@@ -411,8 +416,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.True(body.AppendWord("aaa").GetResult());
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal("aaa", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("aaa", body.GetLinesForDisplay(1).GetResult()[0]);
         }
+
         [Fact]
         public void AppendWordExistingLineTest()
         {
@@ -428,8 +434,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendWord("aaa").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
-            Assert.Equal("one aaa", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("one aaa", body.GetLinesForDisplay(1).GetResult()[0]);
         }
+
         [Fact]
         public void AppendWordAppendLineTest()
         {
@@ -445,20 +452,20 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendWord("bbbbb").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
-            Assert.Equal("aaaa bbbbb", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("aaaa bbbbb", body.GetLinesForDisplay(1).GetResult()[0]);
 
-            Assert.True(body.AppendWord("0123456789").GetResult());    //col 21
-            Assert.True(body.AppendWord("0123456789").GetResult());    //col 32
-            Assert.True(body.AppendWord("01").GetResult());            //col 35
+            Assert.True(body.AppendWord("0123456789").GetResult()); //col 21
+            Assert.True(body.AppendWord("0123456789").GetResult()); //col 32
+            Assert.True(body.AppendWord("01").GetResult()); //col 35
 
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(5, body.WordCount);
 
-            Assert.True(body.AppendWord("x").GetResult());            //col 36
+            Assert.True(body.AppendWord("x").GetResult()); //col 36
             Assert.Equal(2, body.GetLineCount());
 
-            Assert.Equal("aaaa bbbbb 0123456789 0123456789 01", body.GetLastLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("x", body.GetLastLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("aaaa bbbbb 0123456789 0123456789 01", body.GetLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("x", body.GetLinesForDisplay(2).GetResult()[1]);
         }
 
         [Fact]
@@ -485,7 +492,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.Equal("ab c", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("ab c", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
 
@@ -501,7 +508,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
 
-            Assert.Equal(" ", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(" ", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
         [Fact]
@@ -541,7 +548,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.Equal("ab   c", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("ab   c", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
         [Fact]
@@ -571,7 +578,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.Equal("ab    c", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("ab    c", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
         [Fact]
@@ -598,7 +605,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.Equal(" a b", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(" a b", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
         [Fact]
@@ -627,7 +634,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.Equal("   a b", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("   a b", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
         [Fact]
@@ -654,7 +661,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.Equal("   a   b", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("   a   b", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
 
@@ -714,7 +721,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
 
-                     //"0123456789 123456789 123456789 123456789 123456789 1234567 654321";
+            //"0123456789 123456789 123456789 123456789 123456789 1234567 654321";
             var line = "0123456789 123456789 123456789 123456789 123456789 1234567   1234";
             Assert.Equal(65, line.Length);
 
@@ -756,7 +763,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(60, splitIndex);
             Assert.Equal("1234", body.SplitLine(0, splitIndex));
-            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetLinesForDisplay(1).GetResult()[0]);
         }
 
 
@@ -780,8 +787,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendChar('a').GetResult());
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(7, body.WordCount);
-            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetLastLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("1234a", body.GetLastLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("1234a", body.GetLinesForDisplay(2).GetResult()[1]);
         }
 
         [Fact]
@@ -804,13 +811,13 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendChar(' ').GetResult());
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(7, body.WordCount);
-            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetLastLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("1234 ", body.GetLastLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("1234 ", body.GetLinesForDisplay(2).GetResult()[1]);
 
             Assert.True(body.AppendChar('x').GetResult());
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(8, body.WordCount);
-            Assert.Equal("1234 x", body.GetLastLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("1234 x", body.GetLinesForDisplay(2).GetResult()[1]);
         }
 
         [Fact]
@@ -823,12 +830,12 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.True(body.AppendLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
+            Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
 
             Assert.True(body.AppendLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
-            Assert.Equal("one", body.GetLastLinesForDisplay(10).GetResult()[0]);
-            Assert.Equal("two", body.GetLastLinesForDisplay(10).GetResult()[1]);
+            Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
+            Assert.Equal("two", body.GetLinesForDisplay(10).GetResult()[1]);
         }
 
         [Fact]
@@ -881,14 +888,14 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendLine("one").GetResult());
             Assert.True(body.AppendLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
-            Assert.Equal("two", body.GetLastLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("two", body.GetLinesForDisplay(2).GetResult()[1]);
         }
 
         [Fact]
         public void GetLastLinesMaxTest()
         {
             var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(CmdLineParamsApp.ArgEditAreaLinesCountMax, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -896,8 +903,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
 
-            Assert.Equal("one", body.GetLastLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax).GetResult()[0]);
-            Assert.Equal("two", body.GetLastLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax).GetResult()[1]);
+            Assert.Equal("one", body.GetLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax).GetResult()[0]);
+            Assert.Equal("two", body.GetLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax).GetResult()[1]);
         }
 
         [Fact]
@@ -911,10 +918,10 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.AppendLine("one").GetResult());
             Assert.True(body.AppendLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
-            Assert.Null(body.GetLastLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax+1).GetResult());
+            Assert.Null(body.GetLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax + 1).GetResult());
         }
 
-  [Fact]
+        [Fact]
         public void GetWordsInLineTest()
         {
             Assert.Equal(0, Body.GetWordCountInLine(null));
@@ -957,8 +964,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.StartsWith("disallowed character '>'.", Body.GetErrorsInEnteredCharacter('>'));
 
             Assert.StartsWith("invalid character; 0x0.", Body.GetErrorsInEnteredCharacter(Body.NullChar));
-            Assert.StartsWith("invalid character; 0xF.", Body.GetErrorsInEnteredCharacter((char)15));
-       }
+            Assert.StartsWith("invalid character; 0xF.", Body.GetErrorsInEnteredCharacter((char) 15));
+        }
 
         [Fact]
         public void GetCharInLineTest()
@@ -1022,13 +1029,13 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal('a', body.GetCharacterInLine(1));
             Assert.Equal('a', body.GetCharacterInLine(1, 7));
-            Assert.Equal('3', body.GetCharacterInLine(1,3));
+            Assert.Equal('3', body.GetCharacterInLine(1, 3));
             Assert.Equal('b', body.GetCharacterInLine(2));
             Assert.Equal('b', body.GetCharacterInLine(2, 7));
-            Assert.Equal('4', body.GetCharacterInLine(2,4));
+            Assert.Equal('4', body.GetCharacterInLine(2, 4));
             Assert.Equal('c', body.GetCharacterInLine(3));
             Assert.Equal('c', body.GetCharacterInLine(3, 7));
-            Assert.Equal('5', body.GetCharacterInLine(3,5));
+            Assert.Equal('5', body.GetCharacterInLine(3, 5));
 
             Assert.Equal(Body.NullChar, body.GetCharacterInLine(0));
             Assert.Equal(Body.NullChar, body.GetCharacterInLine(3, -2));
@@ -1037,5 +1044,31 @@ namespace KLineEdCmdAppTest.ModelTests
 
         }
 
+        [Fact]
+        public void SetCursorTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.True(body.SetCursor(0, 0));
+            Assert.Equal(0, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+        }
+
+        [Fact]
+        public void WordOverwriteTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.AppendLine("123456a").GetResult());
+
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+        }
     }
 }
