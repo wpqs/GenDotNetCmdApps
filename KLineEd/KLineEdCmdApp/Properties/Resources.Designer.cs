@@ -178,6 +178,15 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: you cannot move beyond the end of the chapter.
+        /// </summary>
+        internal static string MxWarnEndOfChapter {
+            get {
+                return ResourceManager.GetString("MxWarnEndOfChapter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warning: you are at the end of the line. Press the left arrow key and try again..
         /// </summary>
         internal static string MxWarnEndOfLine {
@@ -205,11 +214,29 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: you cannot move beyond the start of the chapter.
+        /// </summary>
+        internal static string MxWarnStartOfChapter {
+            get {
+                return ResourceManager.GetString("MxWarnStartOfChapter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warning: you are at the start of the line. Press the right arrow key or enter a character..
         /// </summary>
         internal static string MxWarnStartOfLine {
             get {
                 return ResourceManager.GetString("MxWarnStartOfLine", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning: Line limit reached. Please start a new chapter..
+        /// </summary>
+        internal static string MxWarnTooManyLines {
+            get {
+                return ResourceManager.GetString("MxWarnTooManyLines", resourceCulture);
             }
         }
         

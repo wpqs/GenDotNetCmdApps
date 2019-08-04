@@ -41,9 +41,7 @@ namespace KLineEdCmdApp.View
                         rc.SetResult(true);
                     else
                     {
-                        var lastDisplayRowIndex = model.ChapterBody?.GetLineCount() - 1 ?? Program.PosIntegerNotSet;
-                        var lastDisplayColIndex = model.ChapterBody?.GetCharacterCountInLine() ?? Program.PosIntegerNotSet;
-
+                        var editAreaCursor = model.ChapterBody?.GetCursorInEditArea();
                         ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
                         switch (change)
                         {
@@ -68,7 +66,11 @@ namespace KLineEdCmdApp.View
                                             row++;
                                         }
                                         if (rc.IsSuccess())
-                                            rc.SetResult(true);
+                                        { 
+                                            rc += SetEditAreaCursor(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0);
+                                            if (rc.IsSuccess(true))
+                                                rc.SetResult(true);
+                                        }
                                     }
                                 }
                                 Terminal.SetCursorVisible(CursorOn);
@@ -83,7 +85,7 @@ namespace KLineEdCmdApp.View
                                     var line = rcRes.GetResult()?[0] ?? null;
                                     if (line != null)
                                     {
-                                        rc += DisplayEditAreaLine((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex, line, true);
+                                        rc += DisplayEditAreaLine(editAreaCursor?.RowIndex ?? 0, line, true);
                                         if (rc.IsSuccess(true))
                                             rc.SetResult(true);
                                     }
@@ -96,7 +98,7 @@ namespace KLineEdCmdApp.View
                                 var lastWord = model.ChapterBody?.GetWordInLine() ?? null;
                                 if (lastWord != null)
                                 {
-                                    rc += DisplayEditAreaWord(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex-1), lastWord);
+                                    rc += DisplayEditAreaWord(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0, lastWord);
                                     if (rc.IsSuccess(true))
                                         rc.SetResult(true);
                                 }
@@ -107,22 +109,22 @@ namespace KLineEdCmdApp.View
                                 var lastChar = model.ChapterBody?.GetCharacterInLine() ?? Body.NullChar;
                                 if (lastChar != Body.NullChar)
                                 {
-                                    rc += DisplayEditAreaChar(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex-1), lastChar);
+                                    rc += DisplayEditAreaChar(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0, lastChar);
                                     if (rc.IsSuccess(true))
                                         rc.SetResult(true);
                                 }
                                 break;
                             }
+                            case ChapterModel.ChangeHint.Cursor:
                             case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
                             case ChapterModel.ChangeHint.MsgLine:
                             case ChapterModel.ChangeHint.HelpLine:
                             {
-                                rc += SetEditAreaCursor(((lastDisplayRowIndex < 0) ? 0 : lastDisplayRowIndex), ((lastDisplayColIndex < 0) ? 0 : lastDisplayColIndex));
+                                rc += SetEditAreaCursor(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0);
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
                                 break;
                             }
-                            // ReSharper disable once RedundantEmptySwitchSection
                             default:
                             {
                                 rc.SetError(1140102, MxError.Source.Program, $"hint={MxDotNetUtilsLib.EnumOps.XlatToString(change)} not handled", MxMsgs.MxErrInvalidCondition);

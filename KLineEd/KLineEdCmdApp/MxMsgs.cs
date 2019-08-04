@@ -30,6 +30,9 @@ namespace KLineEdCmdApp
         public const string MxWarnNoCharToDelete = "MxWarnNoCharToDelete"; //Warning: no characters remain to delete.
         public const string MxWarnBackspaceAtStartOfLine = "MxWarnBackspaceAtStartOfLine"; //Warning: you cannot backspace at the start of a line.
         public const string MxWarnInvalidChar = "MxWarnInvalidChar"; //Warning: you cannot enter this character.
+        public const string MxWarnStartOfChapter = "MxWarnStartOfChapter"; //Warning: you cannot move beyond the start of the chapter
+        public const string MxWarnEndOfChapter = "MxWarnEndOfChapter"; //Warning: you cannot move beyond the end of the chapter
+        public const string MxWarnTooManyLines = "MxWarnTooManyLines"; //Warning: Line limit reached. Please start a new chapter
 
     }
 
@@ -65,6 +68,6 @@ namespace KLineEdCmdApp
         public const int TerminalFirst =                1210101; //first error code in class Terminal.cs
         public const int ControllerFactoryFirst =       1220101; //first error code in class ControllerFactory.cs
         public const int PropsEditingControllerFirst =  1230101; //first error code in class PropsEditingController.cs
-
+        public const int TextEditingControllerFirst =   1240101; //first error code in class TextEditingController.cs
     }
 }

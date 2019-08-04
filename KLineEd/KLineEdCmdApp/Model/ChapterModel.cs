@@ -27,15 +27,16 @@ namespace KLineEdCmdApp.Model
 
         public enum ChangeHint
         {
-            [EnumMember(Value = "Char")] Char = 0,      //AppendChar()
-            [EnumMember(Value = "Line")] Line = 1,      //AppendLine()
-            [EnumMember(Value = "Word")] Word = 2,      //AppendWord()
-            [EnumMember(Value = "Props")] Props = 3,      //SetAuthor(), SetTitle(), SetProject() - change to char
-            [EnumMember(Value = "Spell")] Spell = 4,      //
-            [EnumMember(Value = "StatusLine")] StatusLine = 5,  //SetStatusLine()
-            [EnumMember(Value = "MsgLine")] MsgLine = 6,        //SetMsgLine()
-            [EnumMember(Value = "HelpLine")] HelpLine = 7,      //SetEditorHelpLine()
-            [EnumMember(Value = "All")] All = 8,        //RefreshDisplay()
+            [EnumMember(Value = "Cursor")] Cursor = 0,  //->, <-, ^, v, with no change to EditAreaBottomLineIndex 
+            [EnumMember(Value = "Char")] Char = 1,      //AppendChar()
+            [EnumMember(Value = "Line")] Line = 2,      //AppendLine()
+            [EnumMember(Value = "Word")] Word = 3,      //AppendWord()
+            [EnumMember(Value = "Props")] Props = 4,      //SetAuthor(), SetTitle(), SetProject() - change to char
+            [EnumMember(Value = "Spell")] Spell = 5,      //
+            [EnumMember(Value = "StatusLine")] StatusLine = 6,  //SetStatusLine()
+            [EnumMember(Value = "MsgLine")] MsgLine = 7,        //SetMsgLine()
+            [EnumMember(Value = "HelpLine")] HelpLine = 8,      //SetEditorHelpLine()
+            [EnumMember(Value = "All")] All = 9,        //RefreshDisplay()
             [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
         }
         public string FileName { private set; get; }
@@ -69,8 +70,8 @@ namespace KLineEdCmdApp.Model
             else
                 line = $"{elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
 
-            line += $"Line: {ChapterBody?.GetLineCount() ?? Program.PosIntegerNotSet} ";
-            line += $"Column: {ChapterBody?.GetCharacterCountInLine() + 1 ?? Program.PosIntegerNotSet} ";
+            line += $"Line: {ChapterBody?.Cursor?.RowIndex+1 ?? Program.PosIntegerNotSet} ";
+            line += $"Column: {ChapterBody?.Cursor?.ColIndex+1 ?? Program.PosIntegerNotSet} ";
             line += $"Total words: {ChapterBody?.WordCount ?? Program.PosIntegerNotSet} ";
 
             line += $"{(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)}";
@@ -113,6 +114,52 @@ namespace KLineEdCmdApp.Model
         public void Refresh()
         {
             UpdateAllViews((int)ChangeHint.All);
+        }
+
+        public bool MoveBodyCursor(Body.CursorMove move)
+        {
+            var rc = false;
+
+            var existingIndex = ChapterBody?.EditAreaBottomChapterIndex ?? Program.PosIntegerNotSet;
+            if (existingIndex != Program.PosIntegerNotSet)
+            {
+                if (ChapterBody?.MoveCursorInChapter(move) ?? false)
+                {
+                    if (existingIndex == ChapterBody?.EditAreaBottomChapterIndex)
+                        UpdateAllViews((int)ChangeHint.Cursor);
+                    else
+                        UpdateAllViews((int)ChangeHint.All);
+                    rc = true;
+                }
+            }
+            return rc;
+        }
+
+        public bool SetBodyDelChar(bool backspace = false)
+        {
+            var rc = ChapterBody?.SetDelChar(backspace) ?? false;
+            if (rc == true)
+                UpdateAllViews((int)ChangeHint.All);
+            return rc;
+        }
+
+        public bool SetBodyChar(char c, bool insert = false)
+        {
+            var rc = ChapterBody?.SetChar(c, insert) ?? false;
+            if (rc == true)
+                UpdateAllViews((int)ChangeHint.All);
+            return rc;
+        }
+
+        public bool SetBodyInsertLine(string line, bool atEndOfChapter=true)
+        {
+            var rc = false;
+            if ((ChapterBody?.InsertLine(line, atEndOfChapter)?.GetResult() ?? false)) 
+            {
+                UpdateAllViews((int) ChangeHint.All);
+                rc = true;
+            }
+            return rc;
         }
 
         public bool SetPropsCursor(HeaderProps.CursorRow row, int colIndex)
@@ -269,7 +316,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> AppendLine(string line, bool incWordCount=true)
+        public MxReturnCode<bool> InsertLine(string line, bool atEndOfChapter=true)   //only called by Tests
         {
             var rc = new MxReturnCode<bool>("ChapterModel.AppendLine");
 
@@ -277,7 +324,7 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1050401, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var rcAdd = ChapterBody.AppendLine(line);
+                var rcAdd = ChapterBody.InsertLine(line, atEndOfChapter);
                 if (rcAdd.IsError(true))
                     rc += rcAdd;        //may be called lots of times, so only log errors
                 else
@@ -289,7 +336,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> AppendWord(string word)
+        public MxReturnCode<bool> AppendWord(string word)   //called only from Tests
         {
             var rc = new MxReturnCode<bool>("ChapterModel.AppendWord");
 
@@ -309,7 +356,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> AppendChar(char c)
+        public MxReturnCode<bool> AppendChar(char c)        //called only from Tests
         {
             var rc = new MxReturnCode<bool>("ChapterModel.AppendChar");
 

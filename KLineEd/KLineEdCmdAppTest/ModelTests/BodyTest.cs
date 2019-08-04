@@ -77,7 +77,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var body = new Body();
             Assert.True(body.IsError());
             Assert.Equal(0, body.GetLineCount());
-            Assert.False(body.AppendLine("one").GetResult());
+            Assert.False(body.InsertLine("one").GetResult());
             Assert.Equal(0, body.GetLineCount());
         }
 
@@ -89,9 +89,12 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
-            Assert.True(body.AppendLine("two").GetResult());
-            Assert.True(body.AppendLine("three").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
+            Assert.True(body.InsertLine("two").GetResult());
+            Assert.True(body.InsertLine("three").GetResult());
+            Assert.Equal(4, body.Cursor.ColIndex);
+            Assert.Equal(2, body.Cursor.RowIndex);
+            Assert.Equal(2, body.EditAreaBottomChapterIndex);
             Assert.Equal(3, body.RefreshWordCount());
             Assert.Equal(3, body.GetLineCount());
 
@@ -100,6 +103,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.RefreshWordCount());
             Assert.Equal(0, body.WordCount);
             Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.Equal(0, body.Cursor.ColIndex);
+            Assert.Equal(0, body.EditAreaBottomChapterIndex);
         }
 
         [Fact]
@@ -202,7 +208,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one two three four").GetResult());
+            Assert.True(body.InsertLine("one two three four").GetResult());
             Assert.Equal(4, body.RefreshWordCount());
             Assert.Equal(4, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
@@ -223,14 +229,14 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void AppendOneLineTest()
+        public void InsertOneLineTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
             Assert.Equal(1, body.RefreshWordCount());
             Assert.Equal(1, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
@@ -239,19 +245,19 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void AppendTwoLineTest()
+        public void InsertTwoLineTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.RefreshWordCount());
             Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
 
-            Assert.True(body.AppendLine("two").GetResult()); //don't inc WordCount
+            Assert.True(body.InsertLine("two").GetResult()); //don't inc WordCount
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(2, body.WordCount); //
             Assert.Equal(2, body.RefreshWordCount()); //refreshes WordCount from actual words in Body
@@ -263,46 +269,46 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void AppendLineNullTest()
+        public void InsertLineNullTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.False(body.AppendLine(null).GetResult());
+            Assert.False(body.InsertLine(null).GetResult());
             Assert.Equal(0, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
         }
 
         [Fact]
-        public void AppendLineEmptyTest()
+        public void InsertLineEmptyTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("").GetResult()); //lines can be empty - i.e. user types CR,CR
+            Assert.False(body.InsertLine("").GetResult()); //lines cannot be empty 
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+        }
+
+        [Fact]
+        public void InsertLineSpaceTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine(" ").GetResult()); //lines can start with space
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
         }
 
         [Fact]
-        public void AppendLineSpaceTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine(" ").GetResult()); //lines can start with space
-            Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
-        }
-
-        [Fact]
-        public void AppendLineLongLineTest()
+        public void InsertLineLongLineTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, 35).GetResult());
@@ -312,13 +318,13 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(35, line.Length);
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine(line).GetResult());
+            Assert.True(body.InsertLine(line).GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(4, body.WordCount);
             Assert.Equal(line, body.GetLinesForDisplay(1).GetResult()[0]);
 
             var tooLong = line + "x";
-            Assert.False(body.AppendLine(tooLong).GetResult());
+            Assert.False(body.InsertLine(tooLong).GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(4, body.WordCount);
         }
@@ -427,7 +433,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.WordCount);
 
@@ -438,7 +444,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void AppendWordAppendLineTest()
+        public void AppendWordInsertLineTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, 35).GetResult());
@@ -695,7 +701,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var line = "0123456789 123456789 123456789 123456789 123456789 123456789 1234";
             Assert.Equal(65, line.Length);
 
-            Assert.True(body.AppendLine(line).GetResult());
+            Assert.True(body.InsertLine(line).GetResult());
             Assert.Equal(1, body.GetLineCount());
 
             Assert.Equal(-1, body.GetLineBreakIndex(0, 0));
@@ -725,7 +731,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var line = "0123456789 123456789 123456789 123456789 123456789 1234567   1234";
             Assert.Equal(65, line.Length);
 
-            Assert.True(body.AppendLine(line).GetResult());
+            Assert.True(body.InsertLine(line).GetResult());
             Assert.Equal(1, body.GetLineCount());
 
             Assert.Equal(-1, body.GetLineBreakIndex(0, 0));
@@ -756,7 +762,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var line = "0123456789 123456789 123456789 123456789 123456789 123456789 1234";
             Assert.Equal(65, line.Length);
 
-            Assert.True(body.AppendLine(line).GetResult());
+            Assert.True(body.InsertLine(line).GetResult());
             Assert.Equal(1, body.GetLineCount());
 
             var splitIndex = body.GetLineBreakIndex(0, 4);
@@ -779,7 +785,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             var line = "0123456789 123456789 123456789 123456789 123456789 123456789 1234";
             Assert.Equal(65, line.Length);
-            Assert.True(body.AppendLine(line).GetResult());
+            Assert.True(body.InsertLine(line).GetResult());
 
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(7, body.WordCount);
@@ -803,7 +809,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             var line = "0123456789 123456789 123456789 123456789 123456789 123456789 1234";
             Assert.Equal(65, line.Length);
-            Assert.True(body.AppendLine(line).GetResult());
+            Assert.True(body.InsertLine(line).GetResult());
 
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(7, body.WordCount);
@@ -828,11 +834,11 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
 
-            Assert.True(body.AppendLine("two").GetResult());
+            Assert.True(body.InsertLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
             Assert.Equal("two", body.GetLinesForDisplay(10).GetResult()[1]);
@@ -857,7 +863,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("123456a").GetResult());
+            Assert.True(body.InsertLine("123456a").GetResult());
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.WordCount);
         }
@@ -870,9 +876,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("123456a").GetResult());
-            Assert.True(body.AppendLine("123456b").GetResult());
-            Assert.True(body.AppendLine("123456c").GetResult());
+            Assert.True(body.InsertLine("123456a").GetResult());
+            Assert.True(body.InsertLine("123456b").GetResult());
+            Assert.True(body.InsertLine("123456c").GetResult());
             Assert.Equal(3, body.GetLineCount());
             Assert.Equal(3, body.WordCount);
         }
@@ -885,8 +891,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
-            Assert.True(body.AppendLine("two").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
+            Assert.True(body.InsertLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal("two", body.GetLinesForDisplay(2).GetResult()[1]);
         }
@@ -899,8 +905,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
-            Assert.True(body.AppendLine("two").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
+            Assert.True(body.InsertLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
 
             Assert.Equal("one", body.GetLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax).GetResult()[0]);
@@ -915,8 +921,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("one").GetResult());
-            Assert.True(body.AppendLine("two").GetResult());
+            Assert.True(body.InsertLine("one").GetResult());
+            Assert.True(body.InsertLine("two").GetResult());
             Assert.Equal(2, body.GetLineCount());
             Assert.Null(body.GetLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax + 1).GetResult());
         }
@@ -930,6 +936,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, Body.GetWordCountInLine("one two"));
             Assert.Equal(3, Body.GetWordCountInLine("one two\tthree"));
             Assert.Equal(3, Body.GetWordCountInLine($"one two{Environment.NewLine}three"));
+            Assert.Equal(0, Body.GetWordCountInLine($"{Environment.NewLine}"));
         }
 
         [Fact]
@@ -937,15 +944,16 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             Assert.Null(Body.GetErrorsInEnteredText(""));
             Assert.Null(Body.GetErrorsInEnteredText("this text is fine"));
-            Assert.StartsWith("unexpected line; it is null. This is a program error. Please save your work and restart the program.", Body.GetErrorsInEnteredText(null));
-            Assert.StartsWith("invalid line. It contains a new line at column 7", Body.GetErrorsInEnteredText($"hello {Environment.NewLine}"));
-            Assert.StartsWith("invalid line. It contains the disallowed character '<' at column 8", Body.GetErrorsInEnteredText($"hello .<hi"));
-            Assert.StartsWith("invalid line. It contains the disallowed character '>' at column 9", Body.GetErrorsInEnteredText($"hello hi>"));
+            Assert.Null(Body.GetErrorsInEnteredText(Environment.NewLine));  //new line in col 0 is fine too
+            Assert.StartsWith("line 0: unexpected line; it is null. This is a program error. Please save your work and restart the program.", Body.GetErrorsInEnteredText(null));
+            Assert.StartsWith("line 0: invalid line. It contains a new line at column 7",Body.GetErrorsInEnteredText($"hello {Environment.NewLine}"));
+            Assert.StartsWith("line 0: invalid line. It contains the disallowed character '<' at column 8", Body.GetErrorsInEnteredText($"hello .<hi"));
+            Assert.StartsWith("line 0: invalid line. It contains the disallowed character '>' at column 9", Body.GetErrorsInEnteredText($"hello hi>"));
 
             var line = "0123456789112345678921234567893123456789412345678951234567896123456789712345678981234567899123456789";
             line += "0123456789112345678921234567893123456789412345678951234567896123456789712345678981234567899123456789";
             line += "012345678911234567892123456789312345678941234567895";
-            Assert.StartsWith("invalid line. It has 251 characters, but only 250 allowed", Body.GetErrorsInEnteredText(line));
+            Assert.StartsWith("line 0: invalid line. It has 251 characters, but only 250 allowed", Body.GetErrorsInEnteredText(line));
 
         }
 
@@ -1006,8 +1014,6 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("").GetResult());
-            Assert.Equal(1, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
 
             Assert.Equal(Body.NullChar, body.GetCharacterInLine());
@@ -1021,9 +1027,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("123456a").GetResult());
-            Assert.True(body.AppendLine("123456b").GetResult());
-            Assert.True(body.AppendLine("123456c").GetResult());
+            Assert.True(body.InsertLine("123456a").GetResult());
+            Assert.True(body.InsertLine("123456b").GetResult());
+            Assert.True(body.InsertLine("123456c").GetResult());
             Assert.Equal(3, body.GetLineCount());
             Assert.Equal(3, body.WordCount);
 
@@ -1051,7 +1057,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
-            Assert.True(body.SetCursor(0, 0));
+            Assert.True(body.SetCursorInChapter(0, 0));
             Assert.Equal(0, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
         }
@@ -1064,11 +1070,184 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.AppendLine("123456a").GetResult());
+            Assert.True(body.InsertLine("123456a").GetResult());
 
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.WordCount);
+        }
+
+        [Fact]
+        public void SetEditAreaBottomChapterIndexFiveDisplayLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(5, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(4, body.EditAreaViewCursorLimit.RowIndex);
+
+            Assert.True(body.InsertLine("0aaaaaa").GetResult());
+            Assert.True(body.InsertLine("1bbbbbb").GetResult());
+            Assert.True(body.InsertLine("2cccccc").GetResult());
+            Assert.True(body.InsertLine("3dddddd").GetResult());
+            Assert.True(body.InsertLine("4eeeeee").GetResult());
+            Assert.True(body.InsertLine("5ffffff").GetResult());
+            Assert.True(body.InsertLine("6gggggg").GetResult());
+            Assert.True(body.InsertLine("7hhhhhh").GetResult());
+            Assert.True(body.InsertLine("8iiiiii").GetResult());
+            Assert.True(body.InsertLine("9jjjjjj").GetResult());
+            Assert.True(body.InsertLine("10kkkkk").GetResult());
+
+            Assert.Equal(11, body.GetLineCount());
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.Bottom));   //can't scroll further down
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Top));       //can scroll to top
+            Assert.Equal(4, body.EditAreaBottomChapterIndex);
+
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));   //can't scroll further up
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));  //can scroll down
+            Assert.Equal(5, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));    //can now scroll up
+            Assert.Equal(4, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));  //can scroll page down
+            Assert.Equal(8, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));    //can now scroll page up
+            Assert.Equal(4, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Bottom));    //can scroll to bottom
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));     //can scroll up three lines
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));
+            Assert.Equal(7, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));   //can scroll page down, though not entire page
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));     //can scroll up four lines
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));
+            Assert.Equal(6, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));   //can scroll page down (entire page)
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));  //can't scroll further down
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Top));       //can scroll to top
+            Assert.Equal(4, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));     //can scroll down three lines
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));
+            Assert.Equal(7, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));   //can scroll page up, though not entire page
+            Assert.Equal(4, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));     //can scroll down four lines
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));
+            Assert.Equal(8, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));   //can scroll page up (entire page)
+            Assert.Equal(4, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown)); //can scroll down one line
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));   //can scroll page up, though not entire page
+            Assert.Equal(4, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Bottom));   //can scroll bottom,
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));   //can scroll line up
+            Assert.Equal(9, body.EditAreaBottomChapterIndex);
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));  //can scroll page down, though not entire page
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+        }
+
+        [Fact]
+        public void SetEditAreaBottomChapterIndexOneDisplayLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(1, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.EditAreaViewCursorLimit.RowIndex);
+
+            Assert.True(body.InsertLine("0aaaaaa").GetResult());
+            Assert.True(body.InsertLine("1bbbbbb").GetResult());
+            Assert.True(body.InsertLine("2cccccc").GetResult());
+            Assert.True(body.InsertLine("3dddddd").GetResult());
+            Assert.True(body.InsertLine("4eeeeee").GetResult());
+            Assert.True(body.InsertLine("5ffffff").GetResult());
+            Assert.True(body.InsertLine("6gggggg").GetResult());
+            Assert.True(body.InsertLine("7hhhhhh").GetResult());
+            Assert.True(body.InsertLine("8iiiiii").GetResult());
+            Assert.True(body.InsertLine("9jjjjjj").GetResult());
+            Assert.True(body.InsertLine("10kkkkk").GetResult());
+
+            Assert.Equal(11, body.GetLineCount());
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.Bottom));   //can't scroll further down
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Top));       //can scroll to top
+            Assert.Equal(0, body.EditAreaBottomChapterIndex);
+
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));   //can't scroll further up
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));  //can scroll down
+            Assert.Equal(1, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));    //can now scroll up
+            Assert.Equal(0, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Bottom));    //can scroll to bottom
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));     //can scroll up three lines
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));
+            Assert.Equal(7, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));   //can scroll page down, though just one line
+            Assert.Equal(8, body.EditAreaBottomChapterIndex);
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));   //can scroll page down, though just one line
+            Assert.Equal(9, body.EditAreaBottomChapterIndex);
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));   //can scroll page down, though just one line
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));   //can't scroll page down any more
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Top));       //can scroll to top
+            Assert.Equal(0, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineDown));  //can scroll down one line
+            Assert.Equal(1, body.EditAreaBottomChapterIndex);
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));   //can scroll page up, though just one line
+            Assert.Equal(0, body.EditAreaBottomChapterIndex);
+            Assert.False(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageUp));   //can't scroll page up again
+
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.Bottom));   //can scroll bottom,
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.LineUp));   //can scroll line up
+            Assert.Equal(9, body.EditAreaBottomChapterIndex);
+            Assert.True(body.SetEditAreaBottomChapterIndex(Body.Scroll.PageDown));  //can scroll page down, though not entire page
+            Assert.Equal(10, body.EditAreaBottomChapterIndex);
 
         }
     }
-}
+    }

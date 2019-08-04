@@ -84,7 +84,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void AppendLineTest()
+        public void InsertLineTest()
         {
             var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
@@ -92,9 +92,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
-            Assert.True(manuscriptNew.AppendLine("test one").GetResult());
-            Assert.True(manuscriptNew.AppendLine("test two").GetResult());
-            Assert.True(manuscriptNew.AppendLine("test three").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test one").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test two").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test three").GetResult());
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
 
@@ -179,9 +179,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);
             Assert.Equal(0, manuscript.GetTextLineCount());
-            Assert.True(manuscript.AppendLine("test one").GetResult());
-            Assert.True(manuscript.AppendLine("test two").GetResult());
-            Assert.True(manuscript.AppendLine("test three").GetResult());
+            Assert.True(manuscript.InsertLine("test one").GetResult());
+            Assert.True(manuscript.InsertLine("test two").GetResult());
+            Assert.True(manuscript.InsertLine("test three").GetResult());
 
             Assert.StartsWith($"{Environment.NewLine}Author: [author not set]{Environment.NewLine}Project: [project not set]", manuscript.GetReport());
             Assert.Contains("Chapter stats:", manuscript.GetReport());
@@ -198,9 +198,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);
             Assert.Equal(0, manuscript.GetTextLineCount());
-            Assert.True(manuscript.AppendLine("test one").GetResult());
-            Assert.True(manuscript.AppendLine("test two").GetResult());
-            Assert.True(manuscript.AppendLine("test three").GetResult());
+            Assert.True(manuscript.InsertLine("test one").GetResult());
+            Assert.True(manuscript.InsertLine("test two").GetResult());
+            Assert.True(manuscript.InsertLine("test three").GetResult());
 
             Assert.Equal("test one", manuscript.GetLastLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("test two", manuscript.GetLastLinesForDisplay(3).GetResult()[1]);
@@ -219,9 +219,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
 
-            Assert.True(manuscriptNew.AppendLine("test one").GetResult());
-            Assert.True(manuscriptNew.AppendLine("test two").GetResult());
-            Assert.True(manuscriptNew.AppendLine("test three").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test one").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test two").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test three").GetResult());
 
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
@@ -249,9 +249,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
-            Assert.True(manuscriptNew.AppendLine("test oneX").GetResult());
-            Assert.True(manuscriptNew.AppendLine("test twoX").GetResult());
-            Assert.True(manuscriptNew.AppendLine("test threeX").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test oneX").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test twoX").GetResult());
+            Assert.True(manuscriptNew.InsertLine("test threeX").GetResult());
             Assert.True(manuscriptNew.Close().GetResult()); //default parameter closes and saves
 
             var manuscriptExisting = new ChapterModel();
@@ -279,9 +279,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, manuscript.GetLastSession().SessionNo);
 
             Assert.Equal(0, manuscript.GetTextLineCount());
-            Assert.True(manuscript.AppendLine("test oneX").GetResult());
-            Assert.True(manuscript.AppendLine("test twoX").GetResult());
-            Assert.True(manuscript.AppendLine("test threeX").GetResult());
+            Assert.True(manuscript.InsertLine("test oneX").GetResult());
+            Assert.True(manuscript.InsertLine("test twoX").GetResult());
+            Assert.True(manuscript.InsertLine("test threeX").GetResult());
 
             Assert.True(manuscript.Close().GetResult()); //default parameter closes and saves
         }
@@ -296,9 +296,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscript.Ready);
 
             Assert.Equal(0, manuscript.GetTextLineCount());
-            Assert.True(manuscript.AppendLine("test one").GetResult());
-            Assert.True(manuscript.AppendLine("test two").GetResult());
-            Assert.True(manuscript.AppendLine("test three").GetResult());
+            Assert.True(manuscript.InsertLine("test one").GetResult());
+            Assert.True(manuscript.InsertLine("test two").GetResult());
+            Assert.True(manuscript.InsertLine("test three").GetResult());
             Assert.Equal(3, manuscript.GetTextLineCount());
             Assert.Equal(6, manuscript.GetTextWordCount());
 

@@ -60,7 +60,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.Equal("a hello worlds", _fixture.View.LastTerminalOutput);
             Assert.Equal(1, _fixture.Model.GetTextLineCount());
 
-            _fixture.Model.AppendLine("hello 1234  byebye");
+            _fixture.Model.InsertLine("hello 1234  byebye");
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("hello 1234  byebye", _fixture.View.LastTerminalOutput);
             Assert.Equal(2, _fixture.Model.GetTextLineCount());
