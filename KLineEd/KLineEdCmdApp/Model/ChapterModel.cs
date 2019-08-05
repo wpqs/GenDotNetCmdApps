@@ -151,6 +151,14 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public bool SetBodyText(string text, bool insert = false)
+        {
+            var rc = ChapterBody?.SetText(text, insert, false, false) ?? false;
+            if (rc == true)
+                UpdateAllViews((int)ChangeHint.All);
+            return rc;
+        }
+
         public bool SetBodyInsertLine(string line, bool atEndOfChapter=true)
         {
             var rc = false;

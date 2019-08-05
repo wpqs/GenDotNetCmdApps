@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.Mime;
 using System.Net.WebSockets;
 using System.Runtime.InteropServices.ComTypes;
 using KLineEdCmdApp.Utils;
@@ -55,6 +56,8 @@ namespace KLineEdCmdApp.Model
             PreviousRow,
             NextCol,
             PreviousCol,
+            Home,
+            End
         }
 
         public List<string> TextLines { private set; get; }
@@ -123,7 +126,7 @@ namespace KLineEdCmdApp.Model
 
                         foreach (var line in TextLines)
                         {
-                            file.WriteLine(line);
+                            file.WriteLine((line == Environment.NewLine) ? "" : line);
                         }
 
                         file.WriteLine(ClosingElement);
@@ -180,7 +183,7 @@ namespace KLineEdCmdApp.Model
                                     rc.SetError(1100304, MxError.Source.User, $"last line is {lastLine}", MxMsgs.MxErrInvalidCondition);
                                 else
                                 {
-                                    var colIndex = (TextLines.Count > 0) ? TextLines[TextLines.Count - 1]?.Length ?? Program.PosIntegerNotSet : 0;
+                                    var colIndex = (TextLines.Count > 0) ? TextLines[TextLines.Count - 1].Length : 0;
                                     var rowIndex = (TextLines.Count > 0) ? TextLines.Count - 1 : 0;
                                     if (SetCursorInChapter(rowIndex, colIndex) == false)
                                         rc.SetError(1100305, MxError.Source.Program, $"SetCursorInChapter(rowIndex={rowIndex}, colIndex={colIndex}) failed", MxMsgs.MxErrInvalidCondition);
@@ -217,7 +220,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = false;
 
-            if ((TextLines != null) && (EditAreaViewCursorLimit != null))
+            if ((TextLines != null) && (Cursor != null) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
             {
                 switch (move)
                 {
@@ -225,13 +228,18 @@ namespace KLineEdCmdApp.Model
                     {
                         var rowIndex = Cursor.RowIndex;
                         var colIndex = Cursor.ColIndex + 1;
-                        var lastColIndex = TextLines[rowIndex]?.Length - 1 ?? Program.PosIntegerNotSet;
-                        if ((colIndex > lastColIndex) && (rowIndex+1 < TextLines.Count))
-                        {
-                            rowIndex++;
-                            colIndex = 0;
+                        if ((rowIndex == TextLines.Count - 1) && TextLines[rowIndex] == Environment.NewLine)
+                            rc = false;
+                        else
+                        { 
+                            var lastColIndex = (TextLines[rowIndex] == Environment.NewLine) ? 0 : TextLines[rowIndex].Length;
+                            if ((colIndex > lastColIndex) && (rowIndex + 1 < TextLines.Count))
+                            {
+                                rowIndex++;
+                                colIndex = 0;
+                            }
+                            rc = SetCursorInChapter(rowIndex, colIndex);
                         }
-                        rc = SetCursorInChapter(rowIndex, colIndex);
                         break;
                     }
                     case CursorMove.PreviousCol:
@@ -241,18 +249,18 @@ namespace KLineEdCmdApp.Model
                         if ((colIndex < 0) && (rowIndex - 1 >= 0))
                         {
                             rowIndex--;
-                            colIndex = TextLines[rowIndex]?.Length - 1 ?? Program.PosIntegerNotSet;
+                            colIndex = (TextLines[rowIndex] == Environment.NewLine) ? 0 : TextLines[rowIndex].Length;
                         }
                         rc = SetCursorInChapter(rowIndex, colIndex);
                         break;
                     }
                     case CursorMove.NextRow:
                     {
-                        var rowIndex = Cursor.RowIndex+1;
+                        var rowIndex = Cursor.RowIndex + 1;
                         if (rowIndex < TextLines.Count)
                         {
-                            var lastColIndex = TextLines[rowIndex]?.Length - 1 ?? Program.PosIntegerNotSet;
-                            rc = SetCursorInChapter(rowIndex, (Cursor.ColIndex > lastColIndex) ? lastColIndex : Cursor.ColIndex);
+                            var nextRowLastColIndex = (TextLines[rowIndex] == Environment.NewLine) ? 0 : TextLines[rowIndex].Length;
+                            rc = SetCursorInChapter(rowIndex, (Cursor.ColIndex > nextRowLastColIndex) ? nextRowLastColIndex : Cursor.ColIndex);
                         }
                         break;
                     }
@@ -261,9 +269,19 @@ namespace KLineEdCmdApp.Model
                         var rowIndex = Cursor.RowIndex - 1;
                         if (rowIndex >= 0)
                         {
-                            var lastColIndex = TextLines[rowIndex]?.Length - 1 ?? Program.PosIntegerNotSet;
-                            rc = SetCursorInChapter(rowIndex, (Cursor.ColIndex > lastColIndex) ? lastColIndex : Cursor.ColIndex);
+                            var previousRowLastColIndex = (TextLines[rowIndex] == Environment.NewLine) ? 0 : TextLines[rowIndex].Length;
+                            rc = SetCursorInChapter(rowIndex, (Cursor.ColIndex > previousRowLastColIndex) ? previousRowLastColIndex : Cursor.ColIndex);
                         }
+                        break;
+                    }
+                    case CursorMove.Home:
+                    {
+                        rc = SetCursorInChapter(0, 0);
+                        break;
+                    }
+                    case CursorMove.End:
+                    {
+                        rc = SetCursorInChapter(TextLines.Count - 1, TextLines[TextLines.Count - 1].Length);
                         break;
                     }
                     default:
@@ -281,96 +299,20 @@ namespace KLineEdCmdApp.Model
             var rc = false;
             if (   (TextLines != null) && (EditAreaViewCursorLimit != null)
                 && (colIndex >= 0) && (colIndex <= EditAreaViewCursorLimit.ColIndex)
-                && (rowIndex >= 0) && (rowIndex <= TextLines.Count))
+                && (rowIndex >= 0) && ((TextLines.Count == 0) || (rowIndex < TextLines.Count)))
             {
-                var lineLen = (TextLines.Count == 0) ? 0 : TextLines[rowIndex]?.Length ?? Program.PosIntegerNotSet;
+                var lineLen = (TextLines.Count == 0) ? 0 : TextLines[rowIndex].Length;
                 if (colIndex <= lineLen)
                 {
                     Cursor.RowIndex = rowIndex;
-                    Cursor.ColIndex = colIndex;
+                    Cursor.ColIndex = ((lineLen == 0) || (TextLines[rowIndex] == Environment.NewLine)) ? 0 : colIndex;  
                     rc = SetEditAreaBottomChapterIndex(Scroll.ToCursor); 
                 }
             }
             return rc;
         }
 
-        public int GetDisplayColIndex(ChapterModel.CursorState state = ChapterModel.CursorState.Current)
-        {
-            var rc = Program.PosIntegerNotSet;
-
-            if ((EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet) != Program.PosIntegerNotSet)
-            {
-                switch (state)
-                {
-                    case ChapterModel.CursorState.Current:
-                    {
-                        if (Cursor.ColIndex <= EditAreaViewCursorLimit?.ColIndex)
-                            rc = Cursor.ColIndex;
-                        break;
-                    }
-                    case ChapterModel.CursorState.Next:
-                    {
-                        if (Cursor.ColIndex + 1 <= EditAreaViewCursorLimit?.ColIndex)
-                            rc = Cursor.ColIndex + 1;
-                        break;
-                    }
-                    case ChapterModel.CursorState.Previous:
-                    {
-                        if (Cursor.ColIndex > 0)
-                            rc = Cursor.ColIndex - 1;
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-            }
-            return rc;
-        }
-
-        public int GetEditAreaRowIndex(ChapterModel.CursorState state = ChapterModel.CursorState.Current)
-        {
-            var rc = Program.PosIntegerNotSet; //return Program.PosIntegerNotSet if Cursor.RowIndex not in EditArea
-
-            var lastLineIndex = (TextLines?.Count > 0) ? TextLines?.Count - 1 : 0;
-            var rowMaxIndex = EditAreaViewCursorLimit?.RowIndex ?? Program.PosIntegerNotSet;
-            if ((rowMaxIndex != Program.PosIntegerNotSet) && (lastLineIndex <= rowMaxIndex))
-            {
-                if ((EditAreaBottomChapterIndex < 0) || (EditAreaBottomChapterIndex > lastLineIndex))
-                    SetEditAreaBottomChapterIndex(Scroll.Bottom);  //make sure BottomDisplayLineIndex is set
-
-                var displayRowIndex = EditAreaBottomChapterIndex - Cursor.RowIndex;
-                switch (state)
-                {
-                    case ChapterModel.CursorState.Current:
-                    {
-                        if ((displayRowIndex >= 0) && (displayRowIndex <= lastLineIndex) )
-                            rc = displayRowIndex;
-                        break;
-                    }
-                    case ChapterModel.CursorState.Next:
-                    {
-                        if ((displayRowIndex >= 0) && ((displayRowIndex + 1) <= lastLineIndex))
-                             rc = displayRowIndex + 1;
-                        break;
-                    }
-                    case ChapterModel.CursorState.Previous:
-                    {
-                        if ((displayRowIndex > 0) && ((displayRowIndex - 1) <= lastLineIndex))
-                            rc = displayRowIndex - 1;
-                        break;
-                    }
-                    default:
-                    {
-                        break;
-                    }
-                }
-            }
-            return rc;
-        }
-
-
+     
         public bool SetEditAreaBottomChapterIndex(Body.Scroll scroll = Body.Scroll.Bottom)
         {
             var rc = false;
@@ -476,7 +418,7 @@ namespace KLineEdCmdApp.Model
                         else
                         {
                             var columnIndex = (line == Environment.NewLine) ? 0 : line.Length - 1;
-                            var rowIndex = Cursor.RowIndex + 1;
+                            var rowIndex = Cursor.RowIndex+1;
                             if (atEndOfChapter == false)
                                 TextLines.Insert(rowIndex, line);
                             else
@@ -500,15 +442,39 @@ namespace KLineEdCmdApp.Model
         {
             var rc = false;
 
-            if ((TextLines != null) && ((backspace == false) || (Cursor.ColIndex > 0)))
+            if (((TextLines?.Count ?? 0) > 0) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
             {
-                if (backspace)
-                    Cursor.ColIndex--;
-                var result = Body.GetLineUpdateDeleteChar(TextLines[Cursor.RowIndex], Cursor.ColIndex);
-                if (result != null)
+                if (TextLines[Cursor.RowIndex] == Environment.NewLine)
                 {
-                    TextLines[Cursor.RowIndex] = result;
-                    rc = true;
+                    if (backspace && (Cursor.RowIndex == 0))
+                        rc = false;
+                    else
+                    {
+                        TextLines.RemoveAt(Cursor.RowIndex);
+                        var rowIndex = (Cursor.RowIndex > 0) ? (((backspace == true) || (Cursor.RowIndex == TextLines.Count)) ? Cursor.RowIndex - 1 : Cursor.RowIndex) : 0;
+                        var colIndex = (((backspace == true)) && (TextLines.Count > 0) && (rowIndex < TextLines.Count)) ? TextLines[rowIndex].Length : 0;
+
+                        rc = SetCursorInChapter(rowIndex, colIndex);
+                    }
+                }
+                else
+                {
+                    if ((backspace == false) || MoveCursorInChapter(CursorMove.PreviousCol))
+                    {
+                        if ((backspace == true) && (TextLines[Cursor.RowIndex].Length == Cursor.ColIndex))
+                            rc = true;
+                        else
+                        {
+                            var existWordCount = GetWordCountInLine(TextLines[Cursor.RowIndex]);
+                            var result = Body.GetLineUpdateDeleteChar(TextLines[Cursor.RowIndex], Cursor.ColIndex);
+                            if (result != null)
+                            {
+                                WordCount -= existWordCount - GetWordCountInLine(result);
+                                TextLines[Cursor.RowIndex] = (result.Length == 0) ? Environment.NewLine : result;
+                                rc = true;
+                            }
+                        }
+                    }
                 }
             }
             return rc;
@@ -517,6 +483,7 @@ namespace KLineEdCmdApp.Model
         public bool SetChar(char c, bool insert = false)
         {
             var rc = false;
+
 
             rc = SetText(c.ToString(), insert, false, false);
 
@@ -530,17 +497,18 @@ namespace KLineEdCmdApp.Model
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
             if ((str != null) && (TextLines != null) && (maxColIndex != Program.PosIntegerNotSet))
             {
-                if ((Cursor.RowIndex >= 0) && (Cursor.RowIndex < (TextLines?.Count ?? -1)))
+                if ((Cursor.RowIndex >= 0) && (Cursor.RowIndex < (TextLines?.Count ?? 0)))
                 {
                     var text = $"{((addSpaceBefore) ? " " : "")}{str}{((addSpaceAfter) ? " " : "")}";
-                    var line = TextLines[Cursor.RowIndex];
-                    var insertText = (Cursor.ColIndex == (line?.Length ?? Program.PosIntegerNotSet)) || insert;
+                    var line = (TextLines[Cursor.RowIndex] == Environment.NewLine) ? "" : TextLines[Cursor.RowIndex];
+                    var insertText = (Cursor.ColIndex == line.Length) || insert;
 
                     //check if text can fit into line and if not split line
-
+                    var existWordCount = GetWordCountInLine(line);
                     var result = Body.GetLineUpdateText(line, text, Cursor.ColIndex, maxColIndex, insertText);
                     if (result != null)
                     {
+                        WordCount += GetWordCountInLine(result) - existWordCount;
                         TextLines[Cursor.RowIndex] = result;
                         Cursor.ColIndex += text.Length;
                         rc = true;
@@ -962,7 +930,7 @@ namespace KLineEdCmdApp.Model
         {
             string rc = null;
 
-            if ((existingText != null) && (charIndex >= 0) && (charIndex < existingText.Length))
+            if ((existingText != null) && (charIndex >= 0) && (charIndex < existingText.Length)) 
             {
                 var start = existingText.Snip(0, charIndex - 1);
                 var end = existingText.Snip(charIndex + 1, existingText.Length - 1);
@@ -1027,5 +995,82 @@ namespace KLineEdCmdApp.Model
         {
             return AddWord(firstChar) == true; 
         }
+
+        public int GetDisplayColIndex(ChapterModel.CursorState state = ChapterModel.CursorState.Current)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if ((EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet) != Program.PosIntegerNotSet)
+            {
+                switch (state)
+                {
+                    case ChapterModel.CursorState.Current:
+                        {
+                            if (Cursor.ColIndex <= EditAreaViewCursorLimit?.ColIndex)
+                                rc = Cursor.ColIndex;
+                            break;
+                        }
+                    case ChapterModel.CursorState.Next:
+                        {
+                            if (Cursor.ColIndex + 1 <= EditAreaViewCursorLimit?.ColIndex)
+                                rc = Cursor.ColIndex + 1;
+                            break;
+                        }
+                    case ChapterModel.CursorState.Previous:
+                        {
+                            if (Cursor.ColIndex > 0)
+                                rc = Cursor.ColIndex - 1;
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+            }
+            return rc;
+        }
+
+        public int GetEditAreaRowIndex(ChapterModel.CursorState state = ChapterModel.CursorState.Current)
+        {
+            var rc = Program.PosIntegerNotSet; //return Program.PosIntegerNotSet if Cursor.RowIndex not in EditArea
+
+            var lastLineIndex = (TextLines?.Count > 0) ? TextLines?.Count - 1 : 0;
+            var rowMaxIndex = EditAreaViewCursorLimit?.RowIndex ?? Program.PosIntegerNotSet;
+            if ((rowMaxIndex != Program.PosIntegerNotSet) && (lastLineIndex <= rowMaxIndex))
+            {
+                if ((EditAreaBottomChapterIndex < 0) || (EditAreaBottomChapterIndex > lastLineIndex))
+                    SetEditAreaBottomChapterIndex(Scroll.Bottom);  //make sure BottomDisplayLineIndex is set
+
+                var displayRowIndex = EditAreaBottomChapterIndex - Cursor.RowIndex;
+                switch (state)
+                {
+                    case ChapterModel.CursorState.Current:
+                        {
+                            if ((displayRowIndex >= 0) && (displayRowIndex <= lastLineIndex))
+                                rc = displayRowIndex;
+                            break;
+                        }
+                    case ChapterModel.CursorState.Next:
+                        {
+                            if ((displayRowIndex >= 0) && ((displayRowIndex + 1) <= lastLineIndex))
+                                rc = displayRowIndex + 1;
+                            break;
+                        }
+                    case ChapterModel.CursorState.Previous:
+                        {
+                            if ((displayRowIndex > 0) && ((displayRowIndex - 1) <= lastLineIndex))
+                                rc = displayRowIndex - 1;
+                            break;
+                        }
+                    default:
+                        {
+                            break;
+                        }
+                }
+            }
+            return rc;
+        }
+
     }
 }

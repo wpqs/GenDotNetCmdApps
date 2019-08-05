@@ -45,26 +45,42 @@ namespace KLineEdCmdApp.Controller
                         if (model.MoveBodyCursor(Body.CursorMove.NextCol) == false)
                             SetMxError(1240105, MxError.Source.User, Resources.MxWarnEndOfChapter, MxMsgs.MxWarnEndOfChapter); //todo update when next release of MxReturnCode is available
                     }
+                    else if (keyInfo.Key == ConsoleKey.Home)
+                    {
+                        if (model.MoveBodyCursor(Body.CursorMove.Home) == false)
+                            SetMxError(1240106, MxError.Source.User, Resources.MxWarnStartOfChapter, MxMsgs.MxWarnStartOfChapter); //todo update when next release of MxReturnCode is available
+                    }
+                    else if (keyInfo.Key == ConsoleKey.End)
+                    {
+                        if (model.MoveBodyCursor(Body.CursorMove.End) == false)
+                            SetMxError(1240107, MxError.Source.User, Resources.MxWarnEndOfChapter, MxMsgs.MxWarnEndOfChapter); //todo update when next release of MxReturnCode is available
+                    }
                     else if (keyInfo.Key == ConsoleKey.Delete)
                     {
                         if (model.SetBodyDelChar(false) == false)
-                            SetMxError(1240106, MxError.Source.User, Resources.MxWarnNoCharToDelete, MxMsgs.MxWarnNoCharToDelete); //todo update when next release of MxReturnCode is available
+                            SetMxError(1240108, MxError.Source.User, Resources.MxWarnNoCharToDelete, MxMsgs.MxWarnNoCharToDelete); //todo update when next release of MxReturnCode is available
                     }
                     else if (keyInfo.Key == ConsoleKey.Backspace)
                     {
                         if (model.SetBodyDelChar(true) == false)
-                            SetMxError(1240107, MxError.Source.User, Resources.MxWarnStartOfChapter, MxMsgs.MxWarnStartOfChapter); //todo update when next release of MxReturnCode is available
+                            SetMxError(1240109, MxError.Source.User, Resources.MxWarnStartOfChapter, MxMsgs.MxWarnStartOfChapter); //todo update when next release of MxReturnCode is available
                     }
                     else if (keyInfo.Key == ConsoleKey.Enter)
                     {
-                        if (model.SetBodyInsertLine(new string(Environment.NewLine)) == false)
-                            SetMxError(1240108, MxError.Source.User, Resources.MxWarnTooManyLines, MxMsgs.MxWarnTooManyLines); //todo update when next release of MxReturnCode is available
+                        if (model.SetBodyInsertLine(new string(Environment.NewLine), false) == false)
+                            SetMxError(1240110, MxError.Source.User, Resources.MxWarnTooManyLines, MxMsgs.MxWarnTooManyLines); //todo update when next release of MxReturnCode is available
+                    }
+                    else if (keyInfo.Key == ConsoleKey.Tab)
+                    {
+                        var insert = IsInsertMode() ? true : false;
+                        if (model.SetBodyText(model.ChapterBody?.TabSpaces ?? "   ", insert) == false)
+                            SetMxError(1240111, MxError.Source.User, Resources.MxWarnInvalidChar, MxMsgs.MxWarnInvalidChar); //todo update when next release of MxReturnCode is available
                     }
                     else
                     {
                         var insert = IsInsertMode() ? true : false;
                         if (model.SetBodyChar(keyInfo.KeyChar, insert) == false)
-                            SetMxError(1240109, MxError.Source.User, Resources.MxWarnInvalidChar, MxMsgs.MxWarnInvalidChar); //todo update when next release of MxReturnCode is available
+                            SetMxError(1240112, MxError.Source.User, Resources.MxWarnInvalidChar, MxMsgs.MxWarnInvalidChar); //todo update when next release of MxReturnCode is available
                     }
                 }
             }

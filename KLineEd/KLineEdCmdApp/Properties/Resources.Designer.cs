@@ -196,7 +196,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Warning: you cannot enter this character..
+        ///   Looks up a localized string similar to Warning: invalid character. Please press another key..
         /// </summary>
         internal static string MxWarnInvalidChar {
             get {
@@ -205,7 +205,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Warning: no characters remain to delete..
+        ///   Looks up a localized string similar to Warning: no character to delete..
         /// </summary>
         internal static string MxWarnNoCharToDelete {
             get {

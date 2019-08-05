@@ -27,9 +27,9 @@ namespace KLineEdCmdApp
 
         public const string MxWarnEndOfLine = "MxErrEndOfLine";     //Warning: you are at the end of the line. Press the left arrow key and try again.
         public const string MxWarnStartOfLine = "MxErrStartOfLine"; //Warning: you are at the start of the line. Press the right arrow key or enter a character.
-        public const string MxWarnNoCharToDelete = "MxWarnNoCharToDelete"; //Warning: no characters remain to delete.
+        public const string MxWarnNoCharToDelete = "MxWarnNoCharToDelete"; //Warning: no character to delete.
         public const string MxWarnBackspaceAtStartOfLine = "MxWarnBackspaceAtStartOfLine"; //Warning: you cannot backspace at the start of a line.
-        public const string MxWarnInvalidChar = "MxWarnInvalidChar"; //Warning: you cannot enter this character.
+        public const string MxWarnInvalidChar = "MxWarnInvalidChar"; //Warning: invalid character. Please press another key.
         public const string MxWarnStartOfChapter = "MxWarnStartOfChapter"; //Warning: you cannot move beyond the start of the chapter
         public const string MxWarnEndOfChapter = "MxWarnEndOfChapter"; //Warning: you cannot move beyond the end of the chapter
         public const string MxWarnTooManyLines = "MxWarnTooManyLines"; //Warning: Line limit reached. Please start a new chapter
