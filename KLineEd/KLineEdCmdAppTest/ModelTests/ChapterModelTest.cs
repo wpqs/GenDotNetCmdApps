@@ -45,7 +45,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, null);
 
             Assert.False(rc.GetResult());
-            Assert.Equal($"error 1050101-param: editAreaLinesCount={TestConst.UnitTestEditAreaLines}, editAreaLineWidth={TestConst.UnitTestEditAreaWidth} is invalid or pathFilename=[null]", rc.GetErrorTechMsg());
+            Assert.Equal($"error 1050101-param: editAreaLinesCount={TestConst.UnitTestEditAreaLines}, editAreaLineWidth={TestConst.UnitTestEditAreaWidth} is invalid, pathFilename=[null], spacesForTab=3 (min=1)", rc.GetErrorTechMsg());
             Assert.False(manuscript.Ready);
         }
 
@@ -113,7 +113,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void AppendWordTest()
+        public void SetBodyInsertTextTest()
         {
             var manuscriptNew = new ChapterModel();
             var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
@@ -121,9 +121,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
-            Assert.True(manuscriptNew.AppendWord("one").GetResult());
-            Assert.True(manuscriptNew.AppendWord("two").GetResult());
-            Assert.True(manuscriptNew.AppendWord("three").GetResult());
+            Assert.True(manuscriptNew.SetBodyInsertText("one").GetResult());
+            Assert.True(manuscriptNew.SetBodyInsertText(" two").GetResult());
+            Assert.True(manuscriptNew.SetBodyInsertText(" three").GetResult());
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
 
@@ -148,10 +148,10 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.GetTextLineCount());
-            Assert.True(manuscriptNew.AppendChar('a').GetResult());
-            Assert.True(manuscriptNew.AppendChar('b').GetResult());
-            Assert.True(manuscriptNew.AppendChar(' ').GetResult());
-            Assert.True(manuscriptNew.AppendChar('c').GetResult());
+            Assert.True(manuscriptNew.SetBodyInsertText('a'.ToString()).GetResult());
+            Assert.True(manuscriptNew.SetBodyInsertText('b'.ToString()).GetResult());
+            Assert.True(manuscriptNew.SetBodyInsertText(' '.ToString()).GetResult());
+            Assert.True(manuscriptNew.SetBodyInsertText('c'.ToString()).GetResult());
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
 

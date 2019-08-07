@@ -119,12 +119,12 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var property = "hello world";
 
-            Assert.Null(Body.GetLineUpdateText(null, "X", 5, property.Length, false));
-            Assert.Null(Body.GetLineUpdateText(property, null, 5, property.Length, false));
-            Assert.Null(Body.GetLineUpdateText(property, "X", -1, property.Length, false));
-            Assert.Null(Body.GetLineUpdateText(property, "X", property.Length + 1, property.Length, false));
-            Assert.Null(Body.GetLineUpdateText(property, "X", 5, 0, false));
-            Assert.Null(Body.GetLineUpdateText(property, "X", 5, -1, false));
+            Assert.Null(HeaderProps.GetLineUpdateText(null, "X", 5, property.Length, false));
+            Assert.Null(HeaderProps.GetLineUpdateText(property, null, 5, property.Length, false));
+            Assert.Null(HeaderProps.GetLineUpdateText(property, "X", -1, property.Length, false));
+            Assert.Null(HeaderProps.GetLineUpdateText(property, "X", property.Length + 1, property.Length, false));
+            Assert.Null(HeaderProps.GetLineUpdateText(property, "X", 5, 0, false));
+            Assert.Null(HeaderProps.GetLineUpdateText(property, "X", 5, -1, false));
         }
 
         [Fact]

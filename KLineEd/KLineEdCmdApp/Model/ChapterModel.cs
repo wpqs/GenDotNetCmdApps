@@ -116,56 +116,113 @@ namespace KLineEdCmdApp.Model
             UpdateAllViews((int)ChangeHint.All);
         }
 
-        public bool MoveBodyCursor(Body.CursorMove move)
+        public MxReturnCode<bool> SetBodyMoveCursor(Body.CursorMove move)
         {
-            var rc = false;
+            var rc = new MxReturnCode<bool>("ChapterModel.SetBodyMoveCursor");
 
-            var existingIndex = ChapterBody?.EditAreaBottomChapterIndex ?? Program.PosIntegerNotSet;
-            if (existingIndex != Program.PosIntegerNotSet)
+            if (ChapterBody == null)
+                rc.SetError(1050101, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
+            else
             {
-                if (ChapterBody?.MoveCursorInChapter(move) ?? false)
+                var existingIndex = ChapterBody.EditAreaBottomChapterIndex;
+                var rcMove = ChapterBody.MoveCursorInChapter(move);
+                if (rcMove.IsSuccess(true))
                 {
-                    if (existingIndex == ChapterBody?.EditAreaBottomChapterIndex)
-                        UpdateAllViews((int)ChangeHint.Cursor);
+                    if (existingIndex == ChapterBody.EditAreaBottomChapterIndex)
+                        UpdateAllViews((int) ChangeHint.Cursor);
                     else
-                        UpdateAllViews((int)ChangeHint.All);
-                    rc = true;
+                        UpdateAllViews((int) ChangeHint.All);
+                    rc.SetResult(true);
                 }
             }
             return rc;
         }
 
-        public bool SetBodyDelChar(bool backspace = false)
+        public MxReturnCode<bool> SetBodyBackSpace()
         {
-            var rc = ChapterBody?.SetDelChar(backspace) ?? false;
-            if (rc == true)
-                UpdateAllViews((int)ChangeHint.All);
-            return rc;
-        }
+            var rc = new MxReturnCode<bool>("ChapterModel.SetBodyBackSpace");
 
-        public bool SetBodyChar(char c, bool insert = false)
-        {
-            var rc = ChapterBody?.SetChar(c, insert) ?? false;
-            if (rc == true)
-                UpdateAllViews((int)ChangeHint.All);
-            return rc;
-        }
-
-        public bool SetBodyText(string text, bool insert = false)
-        {
-            var rc = ChapterBody?.SetText(text, insert, false, false) ?? false;
-            if (rc == true)
-                UpdateAllViews((int)ChangeHint.All);
-            return rc;
-        }
-
-        public bool SetBodyInsertLine(string line, bool atEndOfChapter=true)
-        {
-            var rc = false;
-            if ((ChapterBody?.InsertLine(line, atEndOfChapter)?.GetResult() ?? false)) 
+            if (ChapterBody == null)
+                rc.SetError(1050101, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
+            else
             {
-                UpdateAllViews((int) ChangeHint.All);
-                rc = true;
+                if (ChapterBody.IsCursorAtEndOfParagraph())
+                {
+                    var rcDelete = ChapterBody.DeleteLine(ChapterBody.Cursor.RowIndex, true);
+                    rc += rcDelete;
+                    if (rcDelete.IsSuccess(true))
+                    {
+                        UpdateAllViews((int)ChangeHint.All);
+                        rc.SetResult(true);
+                    }
+                }
+                else    
+                {
+                    var rcMove = ChapterBody.MoveCursorInChapter(Body.CursorMove.PreviousCol);
+                    rc += rcMove;
+                    if (rcMove.IsSuccess(true))
+                    {
+                        var rcDelete = SetBodyDeleteCharacter();
+                        rc += rcDelete;
+                        if (rcDelete.IsSuccess(true))
+                        {
+                            UpdateAllViews((int)ChangeHint.All);
+                            rc.SetResult(true);
+                        }
+                    }
+                }
+            }
+            return rc;
+        }
+
+
+        public MxReturnCode<bool> SetBodyDeleteCharacter()
+        {
+            var rc = new MxReturnCode<bool>("ChapterModel.SetBodyDeleteCharacter");
+
+            if (ChapterBody == null)
+                rc.SetError(1050101, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+               var rcDelete = ChapterBody.DeleteCharacter();
+               rc += rcDelete;
+               if (rcDelete.IsSuccess(true))
+               {
+                   UpdateAllViews((int) ChangeHint.All);
+                   rc.SetResult(true);
+               }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> SetBodyInsertText(string text, bool insertMode = false)
+        {
+            var rc = new MxReturnCode<bool>("ChapterModel.SetBodyInsertText");
+
+            if (ChapterBody == null)
+                rc.SetError(1050101, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+                var rcInsertText = ChapterBody.InsertText(text, insertMode);
+                rc += rcInsertText;
+                if (rcInsertText.IsSuccess(true))
+                    UpdateAllViews((int)ChangeHint.All);
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> SetBodyInsertLine(string line, bool atEndOfChapter=true)
+        {
+            var rc = new MxReturnCode<bool>("ChapterModel.SetBodyInsertLine");
+
+            if (ChapterBody == null)
+                rc.SetError(1050101, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+                var rcInsertLine = ChapterBody.InsertLine(line, atEndOfChapter);
+                rc += rcInsertLine;
+                if (rcInsertLine.IsSuccess(true))
+                    UpdateAllViews((int)ChangeHint.All);
             }
             return rc;
         }
@@ -207,18 +264,18 @@ namespace KLineEdCmdApp.Model
             return ChapterBody?.TabSpaces ?? Program.ValueNotSet;
         }
 
-        public MxReturnCode<bool>Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename)
+        public MxReturnCode<bool>Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab=CmdLineParamsApp.ArgSpacesForTabDefault)
         {
-            var rc = new MxReturnCode<bool>("ChapterModel.Setup");
+            var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 
-            if ((string.IsNullOrEmpty(pathFilename)) || (editAreaLinesCount == Program.PosIntegerNotSet) || (editAreaLineWidth == Program.PosIntegerNotSet))
-                rc.SetError(1050101, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount}, editAreaLineWidth={editAreaLineWidth} is invalid or pathFilename={pathFilename ?? "[null]"}", MxMsgs.MxErrBadMethodParam);
+            if ((editAreaLinesCount == Program.PosIntegerNotSet) || (editAreaLineWidth == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgSpacesForTabMin))
+                rc.SetError(1050101, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount}, editAreaLineWidth={editAreaLineWidth} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} (min={CmdLineParamsApp.ArgSpacesForTabMin})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     ChapterHeader.Properties.SetMaxPropertyLength(editAreaLineWidth-PropsEditView.LongestLabelLength);
-                    var rcInit = ChapterBody.Initialise(editAreaLinesCount, editAreaLineWidth);
+                    var rcInit = ChapterBody.Initialise(editAreaLinesCount, editAreaLineWidth, spacesForTab);
                     rc += rcInit;
                     if (rcInit.IsSuccess(true))
                     {
@@ -243,7 +300,6 @@ namespace KLineEdCmdApp.Model
                                 rcDone = Read(pathFilename);
                                 rc += rcDone;
                             }
-
                             if (rcDone.IsSuccess(true))
                             {
                                 ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgPauseWaitSecsDefault); //todo set from value
@@ -324,7 +380,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> InsertLine(string line, bool atEndOfChapter=true)   //only called by Tests
+        public MxReturnCode<bool> InsertLine(string line, bool atEndOfChapter=true)   
         {
             var rc = new MxReturnCode<bool>("ChapterModel.AppendLine");
 
@@ -338,46 +394,6 @@ namespace KLineEdCmdApp.Model
                 else
                 {
                     UpdateAllViews((int)ChangeHint.Line);
-                    rc.SetResult(true);
-                }
-            }
-            return rc;
-        }
-
-        public MxReturnCode<bool> AppendWord(string word)   //called only from Tests
-        {
-            var rc = new MxReturnCode<bool>("ChapterModel.AppendWord");
-
-            if (Ready == false)
-                rc.SetError(1050501, MxError.Source.Program, "Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
-            else
-            {
-                var rcAdd = ChapterBody.AppendWord(word);
-                if (rcAdd.IsError(true))
-                    rc += rcAdd;        //may be called lots of times, so only log errors
-                else
-                {
-                    UpdateAllViews((int)ChangeHint.Word);
-                    rc.SetResult(true);
-                }
-            }
-            return rc;
-        }
-
-        public MxReturnCode<bool> AppendChar(char c)        //called only from Tests
-        {
-            var rc = new MxReturnCode<bool>("ChapterModel.AppendChar");
-
-            if (Ready == false)
-                rc.SetError(1050601, MxError.Source.Program, "Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
-            else
-            {
-                var rcAdd = ChapterBody.AppendChar(c);
-                if (rcAdd.IsError(true))
-                    rc += rcAdd;        //may be called lots of times, so only log errors
-                else
-                {
-                    UpdateAllViews((int)((Char.IsWhiteSpace(c)) ? ChangeHint.Word : ChangeHint.Char));
                     rc.SetResult(true);
                 }
             }

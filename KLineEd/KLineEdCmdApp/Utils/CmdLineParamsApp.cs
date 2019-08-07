@@ -62,6 +62,9 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamSpellCheckMode = "--spellcheck"; // on | off
         public static readonly string ParamBrowser = "--browser"; // exe='Explorer'
 
+        public const int ArgSpacesForTabDefault = 3;    //min 1 max?
+        public static readonly int ArgSpacesForTabMin = 1;
+
         public static readonly int ArgPauseWaitSecsDefault = 60;
         public static readonly int ArgPauseWaitSecsMin = 0;
         public static readonly int ArgPauseWaitSecsMax = 86400; //24 * 60 * 60 - 24 hours

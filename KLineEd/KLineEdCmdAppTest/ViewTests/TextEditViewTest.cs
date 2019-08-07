@@ -33,27 +33,27 @@ namespace KLineEdCmdAppTest.ViewTests
 
            _fixture.Model.SetEditorHelpLine(TextEditingController.EditorHelpText);
 
-            _fixture.Model.AppendChar('a');
+            _fixture.Model.SetBodyInsertText('a'.ToString());
             Assert.Equal("a", _fixture.View.LastTerminalOutput);
 
-            _fixture.Model.AppendWord("hello");
-            Assert.Equal("hello", _fixture.View.LastTerminalOutput);
+            _fixture.Model.SetBodyInsertText(" hello");
+            Assert.Equal("a hello", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.Refresh();
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello", _fixture.View.LastTerminalOutput);
 
-            _fixture.Model.AppendWord("world");
+            _fixture.Model.SetBodyInsertText(" world");
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
-            Assert.Equal("world", _fixture.View.LastTerminalOutput);
+            Assert.Equal("a hello world", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.Refresh();
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello world", _fixture.View.LastTerminalOutput);
 
-            _fixture.Model.AppendChar('s');
+            _fixture.Model.SetBodyInsertText('s'.ToString());
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
-            Assert.Equal("s", _fixture.View.LastTerminalOutput);
+            Assert.Equal("a hello worlds", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.Refresh();
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());

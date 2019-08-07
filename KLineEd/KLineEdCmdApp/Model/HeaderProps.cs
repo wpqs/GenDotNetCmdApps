@@ -245,7 +245,7 @@ namespace KLineEdCmdApp.Model
                 {
                     case CursorRow.Author:
                     {
-                        var result = Body.GetLineUpdateText(Author, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        var result = HeaderProps.GetLineUpdateText(Author, text, Cursor.ColIndex, MaxPropertyLength, insert);
                         if (result != null)
                         {
                             Author = result;
@@ -256,7 +256,7 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.Project:
                     {
-                        var result = Body.GetLineUpdateText(Project, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        var result = HeaderProps.GetLineUpdateText(Project, text, Cursor.ColIndex, MaxPropertyLength, insert);
                         if (result != null)
                         {
                             Project = result;
@@ -267,7 +267,7 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.Title:
                     {
-                        var result = Body.GetLineUpdateText(Title, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        var result = HeaderProps.GetLineUpdateText(Title, text, Cursor.ColIndex, MaxPropertyLength, insert);
                         if (result != null)
                         {
                             Title = result;
@@ -278,7 +278,7 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.PathFileName:
                     {
-                        var result = Body.GetLineUpdateText(PathFileName, text, Cursor.ColIndex, MaxPropertyLength, insert);
+                        var result = HeaderProps.GetLineUpdateText(PathFileName, text, Cursor.ColIndex, MaxPropertyLength, insert);
                         if (result != null)
                         {
                            PathFileName = result;
@@ -291,6 +291,31 @@ namespace KLineEdCmdApp.Model
                     {
                         rc = false;
                         break;
+                    }
+                }
+            }
+            return rc;
+        }
+
+
+        public static string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert)
+        {
+            string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters
+            if ((updateText != null) && (existingText != null) && (updateIndex >= 0) && (updateIndex < maxLength) && (Body.GetErrorsInText(updateText) == null))
+            {
+                if (insert)
+                {       //move all text at index text.length spaces right and insert at index
+                    if ((existingText.Length + updateText.Length) <= maxLength)
+                        rc = existingText.Insert(updateIndex, updateText);
+                }
+                else
+                {       //overwrite from startindex = index to endIndex=index+word.Length-1
+                    if (((updateIndex + updateText.Length) <= existingText.Length) && (existingText.Length <= maxLength))
+                    {
+                        var start = existingText.Snip(0, updateIndex - 1);
+                        var end = existingText.Substring(updateIndex + updateText.Length);
+                        if (((start?.Length ?? 0) + updateText.Length + ((end?.Length ?? 0)) <= maxLength))
+                            rc = (start ?? "") + updateText + (end ?? "");
                     }
                 }
             }

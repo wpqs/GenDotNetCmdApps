@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Properties;
 using KLineEdCmdApp.Utils;
 using MxReturnCode;
 
@@ -102,11 +103,22 @@ namespace KLineEdCmdApp.Controller.Base
             return rc;
         }
 
+        protected void SetupMxError(MxReturnCode<bool> rc)  //todo update when next release of MxReturnCode is available
+        {
+            var userMsg = (rc.GetErrorType() == MxError.Source.User) ? null : MxMsgs.MxWarnInvalidChar;
+            var techMsg = (rc.GetErrorType() == MxError.Source.User) ? rc.GetErrorTechMsg() : Resources.MxWarnInvalidChar;
+
+            var startIndex = techMsg.IndexOf(':');
+            if (startIndex + 2 > techMsg.Length + 1)
+                startIndex = -1;
+            SetMxError(rc.GetErrorCode(), rc.GetErrorType(), (startIndex!= -1) ? techMsg.Substring(startIndex+2) : techMsg, userMsg); 
+        }
+
         protected bool SetMxError(int errorCode, MxError.Source source, string errMsgTech, string errMsgUser)
         {       //use only in base classes, concrete derived classes use local MxResult variable like PropsEditingController, etc
             var rc = false;
 
-            if ((_mxErrorCode != null) && (errMsgTech != null) && (errMsgUser != null))
+            if ((_mxErrorCode != null) && (errMsgTech != null)) // && (errMsgUser != null))
             {
                 _mxErrorCode.SetError(errorCode, source, errMsgTech, errMsgUser);
                 rc = true;
