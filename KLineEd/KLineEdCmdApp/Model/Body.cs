@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Net.Mime;
-using System.Net.WebSockets;
-using System.Runtime.InteropServices.ComTypes;
 using KLineEdCmdApp.Properties;
 using KLineEdCmdApp.Utils;
 using MxReturnCode;
@@ -21,6 +17,7 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "ConvertIfToOrExpression")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "RedundantEmptySwitchSection")]
+    [SuppressMessage("ReSharper", "RedundantNameQualifier")]
     public class Body
     {
         public static readonly string OpeningElement = "<body>";
@@ -315,34 +312,27 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100602, MxError.Source.Program, $"Cursor or TextLines is null", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    try
+                    if (rowIndex == -1)
+                        rc.SetError(1100603, MxError.Source.User, Resources.MxWarnStartOfChapter);
+                    else
                     {
-                        if (rowIndex == -1)
-                            rc.SetError(1100603, MxError.Source.User, Resources.MxWarnStartOfChapter);
+                        if (rowIndex == TextLines.Count)
+                            rc.SetError(1100604, MxError.Source.User, Resources.MxWarnEndOfChapter);
                         else
                         {
-                            if (rowIndex == TextLines.Count)
-                                rc.SetError(1100604, MxError.Source.User, Resources.MxWarnEndOfChapter);
+                            var lastColIndex = GetLastColumnIndexForRow(rowIndex);
+                            if ((lastColIndex == Program.PosIntegerNotSet) || (colIndex > lastColIndex))
+                                rc.SetError(1100605, MxError.Source.Program, $"GetLastColumnIndexForRow({rowIndex}) failed or colIndex={colIndex} > lastColIndex={lastColIndex}", MxMsgs.MxErrInvalidCondition);
                             else
                             {
-                                var lastColIndex = GetLastColumnIndexForRow(rowIndex);
-                                if ((lastColIndex == Program.PosIntegerNotSet) || (colIndex > lastColIndex))
-                                    rc.SetError(1100605, MxError.Source.Program, $"GetLastColumnIndexForRow({rowIndex}) failed or colIndex={colIndex} > lastColIndex={lastColIndex}", MxMsgs.MxErrInvalidCondition);
-                                else
-                                {
-                                    Cursor.RowIndex = rowIndex;
-                                    Cursor.ColIndex = colIndex;
-                                    var rcScroll = SetEditAreaBottomIndex(Scroll.ToCursor);
-                                    rc += rcScroll;
-                                    if (rcScroll.IsSuccess(true))
-                                        rc.SetResult(true);
-                                }
+                                Cursor.RowIndex = rowIndex;
+                                Cursor.ColIndex = colIndex;
+                                var rcScroll = SetEditAreaBottomIndex(Scroll.ToCursor);
+                                rc += rcScroll;
+                                if (rcScroll.IsSuccess(true))
+                                    rc.SetResult(true);
                             }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        rc.SetError(1100602, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                     }
                 }
             }
@@ -501,7 +491,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.InsertText");
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(text) == true) || ((text?.Length ?? maxColIndex+1) > maxColIndex))
+            if ((string.IsNullOrEmpty(text) == true) || (text.Length > maxColIndex))
                 rc.SetError(1100901, MxError.Source.Param, $"text is null, or length={text?.Length ?? Program.PosIntegerNotSet} > maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -558,6 +548,30 @@ namespace KLineEdCmdApp.Model
                     catch (Exception e)
                     {
                         rc.SetError(1100905, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    }
+                }
+            }
+            return rc;
+        }
+
+        public string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert)
+        {
+            string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters
+            if ((updateText != null) && (existingText != null) && (updateIndex >= 0) && (updateIndex < maxLength) && (Body.GetErrorsInText(updateText) == null))
+            {
+                if (insert)
+                {       //move all text at index text.length spaces right and insert at index
+                    if ((existingText.Length + updateText.Length) <= maxLength)
+                        rc = existingText.Insert(updateIndex, updateText);
+                }
+                else
+                {       //overwrite from startindex = index to endIndex=index+word.Length-1
+                    if (((updateIndex + updateText.Length) <= existingText.Length) && (existingText.Length <= maxLength))
+                    {
+                        var start = existingText.Snip(0, updateIndex - 1);
+                        var end = existingText.Substring(updateIndex + updateText.Length);
+                        if (((start?.Length ?? 0) + updateText.Length + ((end?.Length ?? 0)) <= maxLength))
+                            rc = (start ?? "") + updateText + (end ?? "");
                     }
                 }
             }
@@ -663,122 +677,7 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
-        public MxReturnCode<string[]> GetLinesForDisplay(int count) 
-        {
-            var rc = new MxReturnCode<string[]>("Body.GetLinesForDisplay", null);
 
-            if ((TextLines == null) || (count < 0) || (count > (EditAreaViewCursorLimit.RowIndex+1)))
-                rc.SetError(1100801, MxError.Source.Param, $"TextLines.Count={TextLines?.Count ?? -1}; count={count} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                if (IsError() || (EditAreaBottomChapterIndex <= Program.PosIntegerNotSet))
-                    rc.SetError(1100802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
-                else
-                {
-                    var lines = new string[count];
-                    if (TextLines.Count > 0)
-                    {
-                        var lineIndex = ((EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex) > 0) ? EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex : 0;
-                        if (lineIndex + count < TextLines.Count)
-                            lineIndex += TextLines.Count - count;
-                        for (var bufferIndex = 0; bufferIndex < count; bufferIndex++)
-                        {
-                            if (lineIndex < TextLines.Count)
-                                lines[bufferIndex] = TextLines[lineIndex++];
-                            else
-                                break;
-                        }
-                    }
-                    rc.SetResult(lines);
-                }
-            }
-            return rc;
-        }
-
-        public static string GetErrorsInText(string text, int lineNo=-1, int colStartNo=1)
-        {
-            string rc = null;
-
-            var lineNoText = (lineNo == -1) ? "" : $"line {lineNo}: ";
-            if (text == null)
-                rc = $"{lineNoText}unexpected text (null). This is a program error. Please save your work and restart the program.";
-            else
-            {
-                if (text.Length > CmdLineParamsApp.ArgEditAreaLineWidthMax)
-                    rc = $"{lineNoText}attempt to enter {text.Length} characters, but only {CmdLineParamsApp.ArgEditAreaLineWidthMax} allowed.";
-                else
-                {
-                    var index = text.IndexOf(Environment.NewLine, StringComparison.Ordinal);
-                    if ((index != -1) && (index != 0))
-                        rc = $"{lineNoText}attempt to enter a new line at column {index + 1}.";
-                    else
-                    {
-                        string output = new string(text.Where(c => ((IsEnteredCharacterValid(c, index == 0) == true))).ToArray());
-                        if (output.Length != text.Length)
-                            rc = $"{lineNoText}attempt to enter {text.Length - output.Length} disallowed characters.";
-                        else
-                        {
-                            if ((index = text.IndexOf(DisallowedCharOpeningAngle)) != -1)
-                            {
-                                var colNoText = $"at column {colStartNo+index}.";
-                                rc = $"{lineNoText}attempt to enter the disallowed character '{DisallowedCharOpeningAngle}' {colNoText}";
-                            }
-                            else
-                            {
-                                if ((index = text.IndexOf(DisallowedCharClosingAngle)) != -1)
-                                {
-                                    var colNoText = $"at column {colStartNo+index}.";
-                                    rc = $"{lineNoText}attempt to enter the disallowed character '{DisallowedCharClosingAngle}' {colNoText}";
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return rc;
-        }
-        public static string GetErrorsInEnteredCharacter(char c)
-        {
-            string rc = null;
-
-            if (IsEnteredCharacterValid(c) == false)
-                rc = $"invalid character; 0x{(int) c:X}. This character cannot be typed into a chapter. Please delete it and try again.";
-            else
-            {
-                if ((c == DisallowedCharOpeningAngle) || ((c == DisallowedCharClosingAngle)))
-                    rc = $"disallowed character '{c}'. This character cannot be typed into a chapter. Please delete it and try again.";
-            }
-            return rc;
-        }
-
-        public static bool IsEnteredCharacterValid(char c, bool allowCR=false)
-        {
-            // ReSharper disable once ReplaceWithSingleAssignment.False
-            var rc = false;
-
-            if (allowCR && (c == 0xA) || (c == 0xD))
-                rc = true;
-            else
-            {
-                //only supports english
-                if ((c == '\t') || (c == ' ') || (Char.IsLetterOrDigit(c) || (Char.IsPunctuation(c)) || (Char.IsSymbol(c))))
-                {
-                    rc = true;
-                }
-            }
-
-            return rc;
-        }
-        public int SetTabSpaces(int count)
-        {
-            if (count > 0)
-            {
-                TabSpaces = "";
-                for (int x = 0; x < count; x++)
-                    TabSpaces += " ";
-            }
-            return TabSpaces.Length;   
-        }
         public int GetLineBreakIndex(int lineIndex, int spaceNeeded)
         {
             var rc = Program.PosIntegerNotSet;
@@ -821,88 +720,112 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public int RefreshWordCount()
+        public MxReturnCode<string[]> GetLinesForDisplay(int count) 
         {
-            var rc = 0;
-            foreach (var line in TextLines)
+            var rc = new MxReturnCode<string[]>("Body.GetLinesForDisplay", null);
+
+            if ((TextLines == null) || (count < 0) || (count > (EditAreaViewCursorLimit.RowIndex+1)))
+                rc.SetError(1100801, MxError.Source.Param, $"TextLines.Count={TextLines?.Count ?? -1}; count={count} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
+            else
             {
-                rc += GetWordCountInLine(line);
+                if (IsError() || (EditAreaBottomChapterIndex <= Program.PosIntegerNotSet))
+                    rc.SetError(1100802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
+                else
+                {
+                    var lines = new string[count];
+                    if (TextLines.Count > 0)
+                    {
+                        var lineIndex = ((EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex) > 0) ? EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex : 0;
+                        if (lineIndex + count < TextLines.Count)
+                            lineIndex += TextLines.Count - count;
+                        for (var bufferIndex = 0; bufferIndex < count; bufferIndex++)
+                        {
+                            if (lineIndex < TextLines.Count)
+                                lines[bufferIndex] = TextLines[lineIndex++];
+                            else
+                                break;
+                        }
+                    }
+                    rc.SetResult(lines);
+                }
             }
-            WordCount = rc;
             return rc;
         }
 
-        public string GetWordInLine(int lineNo = Body.LastLine, int wordNo = Program.PosIntegerNotSet)
+        public static string GetErrorsInText(string text, int lineNo=-1, int colStartNo=1) //todo update after next release of MxReturnCode
         {
             string rc = null;
 
-            var lineIndex = (lineNo != Body.LastLine) ? lineNo - 1 : TextLines.Count - 1;
-            if ((lineIndex >= 0) && (lineIndex < TextLines.Count))
+            var lineNoText = (lineNo == -1) ? "" : $"line {lineNo}: ";
+            if (text == null)
+                rc = $"{lineNoText}unexpected text (null). This is a program error. Please save your work and restart the program.";
+            else
             {
-                var line = TextLines[lineIndex];
-                var lineWordCount = GetWordCountInLine(line);
-                wordNo = (wordNo == Program.PosIntegerNotSet) ? lineWordCount : wordNo;
-                if ((wordNo > 0) && (wordNo <= lineWordCount))
+                if (text.Length > CmdLineParamsApp.ArgEditAreaLineWidthMax)
+                    rc = $"{lineNoText}attempt to enter {text.Length} characters, but only {CmdLineParamsApp.ArgEditAreaLineWidthMax} allowed.";
+                else
                 {
-                    rc = line.Snip(GetIndexOfWord(line, wordNo), GetIndexOfWord(line, wordNo, false)) ?? null;
+                    var index = text.IndexOf(Environment.NewLine, StringComparison.Ordinal);
+                    if ((index != -1) && (index != 0))
+                        rc = $"{lineNoText}attempt to enter a new line at column {index + 1}.";
+                    else
+                    {
+                        string output = new string(text.Where(c => ((IsEnteredCharacterValid(c, index == 0) == true))).ToArray());
+                        if (output.Length != text.Length)
+                            rc = $"{lineNoText}attempt to enter {text.Length - output.Length} disallowed characters.";
+                        else
+                        {
+                            if ((index = text.IndexOf(DisallowedCharOpeningAngle)) != -1)
+                            {
+                                var colNoText = $"at column {colStartNo+index}.";
+                                rc = $"{lineNoText}attempt to enter the disallowed character '{DisallowedCharOpeningAngle}' {colNoText}";
+                            }
+                            else
+                            {
+                                if ((index = text.IndexOf(DisallowedCharClosingAngle)) != -1)
+                                {
+                                    var colNoText = $"at column {colStartNo+index}.";
+                                    rc = $"{lineNoText}attempt to enter the disallowed character '{DisallowedCharClosingAngle}' {colNoText}";
+                                }
+                            }
+                        }
+                    }
                 }
             }
             return rc;
         }
-
-        public char GetCharacterInLine(int lineNo = Body.LastLine, int columnNo = Body.LastColumn)
+        public static string GetErrorsInEnteredCharacter(char c)  //todo update after next release of MxReturnCode
         {
-            var rc = Body.NullChar;
+            string rc = null;
 
-            var lineIndex = (lineNo != Body.LastLine) ? lineNo-1 : TextLines.Count-1;
-            if ((lineIndex >= 0) && (lineIndex < TextLines.Count))
+            if (IsEnteredCharacterValid(c) == false)
+                rc = $"invalid character; 0x{(int) c:X}. This character cannot be typed into a chapter. Please delete it and try again.";
+            else
             {
-                var colIndex = (columnNo != Body.LastColumn) ? columnNo-1: (TextLines[lineIndex]?.Length-1) ?? -1;
-                if ((colIndex >= 0) && (colIndex < TextLines[lineIndex]?.Length))
-                    rc = TextLines[lineIndex][colIndex];
+                if ((c == DisallowedCharOpeningAngle) || ((c == DisallowedCharClosingAngle)))
+                    rc = $"disallowed character '{c}'. This character cannot be typed into a chapter. Please delete it and try again.";
             }
             return rc;
         }
-        public int GetLineCount()
-        {
-            return TextLines?.Count ?? Program.PosIntegerNotSet;
-        }
 
-        public bool IsCursorAtEndOfParagraph()
+        public static bool IsEnteredCharacterValid(char c, bool allowCr=false)
         {
+            // ReSharper disable once ReplaceWithSingleAssignment.False
             var rc = false;
-            if ((TextLines != null) && (Cursor != null) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
-            {
-                if (TextLines[Cursor.RowIndex] == Environment.NewLine)
+
+            if (allowCr && (c == 0xA) || (c == 0xD))
+                rc = true;
+            else
+            {   //only supports english
+                if ( (c == ' ') || (Char.IsLetterOrDigit(c) || (Char.IsPunctuation(c)) || (Char.IsSymbol(c))))
+                {
                     rc = true;
-            }
-            return rc;
-        }
-
-        public bool IsCursorAtEndOfLine()
-        {
-            var rc = false;
-              //if cursor one character beyond last character in the line, or at EndOfParagraph mark?
-            if ((TextLines != null) && (Cursor != null) && (Cursor.ColIndex >= 0) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
-                rc = (IsCursorAtEndOfParagraph()) ? (Cursor.ColIndex == 0) : (TextLines[Cursor.RowIndex].Length == Cursor.ColIndex);
-
-            return rc;
-        }
-
-        public int GetCharacterCountInLine(int lineNo = Program.PosIntegerNotSet) //default to LastLine
-        {
-            var rc = Program.PosIntegerNotSet;
-
-            if (TextLines != null)
-            {
-                var lineIndex = (lineNo == Program.PosIntegerNotSet) ? TextLines.Count - 1 : lineNo - 1;
-                if ((lineIndex >= 0) && (lineIndex < TextLines.Count) && (TextLines[lineIndex] != null))
-                {
-                    rc = (TextLines[lineIndex] == Environment.NewLine) ? 0 : TextLines[lineIndex].Length;
                 }
             }
+
             return rc;
         }
+
         public static int GetWordCountInLine(string line)
         {
             var rc = 0;
@@ -928,7 +851,125 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public static int GetIndexOfWord(string text, int wordNo =1, bool startIndex=true)
+
+        public int GetLineCount()
+        {
+            return TextLines?.Count ?? Program.PosIntegerNotSet;
+        }
+
+        public bool IsCursorAtEndOfParagraph()
+        {
+            var rc = false;
+            if ((TextLines != null) && (Cursor != null) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
+            {
+                if (TextLines[Cursor.RowIndex] == Environment.NewLine)
+                    rc = true;
+            }
+            return rc;
+        }
+
+        public bool IsCursorAtEndOfLine()
+        {
+            var rc = false;
+            //if cursor one character beyond last character in the line, or at EndOfParagraph mark?
+            if ((TextLines != null) && (Cursor != null) && (Cursor.ColIndex >= 0) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
+                rc = (IsCursorAtEndOfParagraph()) ? (Cursor.ColIndex == 0) : (TextLines[Cursor.RowIndex].Length == Cursor.ColIndex);
+
+            return rc;
+        }
+
+        private int RefreshWordCount()
+        {
+            var rc = 0;
+            foreach (var line in TextLines)
+            {
+                rc += GetWordCountInLine(line);
+            }
+            WordCount = rc;
+            return rc;
+        }
+
+        private int GetLastColumnIndexForRow(int rowIndex)
+        {
+            var rc = Program.PosIntegerNotSet;
+            if ((TextLines != null) && (rowIndex >= 0) && (rowIndex < (TextLines?.Count ?? -1)))
+                rc = (TextLines[rowIndex] == Environment.NewLine) ? 0 : TextLines[rowIndex].Length; //allow for cursor after last char
+            return rc;
+        }
+
+        private int SetTabSpaces(int count)
+        {
+            if (count > 0)
+            {
+                TabSpaces = "";
+                for (int x = 0; x < count; x++)
+                    TabSpaces += " ";
+            }
+            return TabSpaces.Length;   
+        }
+
+        private bool ResetCursorInChapter()
+        {
+            var rc = false;
+            if (Cursor != null)
+            {
+                Cursor.RowIndex = 0;
+                Cursor.ColIndex = 0;
+                var rcBottom = SetEditAreaBottomIndex(Scroll.ToCursor);
+                if (rcBottom.IsSuccess(true))
+                    rc = true;
+            }
+            return rc;
+        }
+
+        public int GetCharacterCountInLine(int lineNo = Body.LastLine) //delete candidate
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if (TextLines != null)
+            {
+                var lineIndex = (lineNo == Body.LastLine) ? TextLines.Count - 1 : lineNo - 1;
+                if ((lineIndex >= 0) && (lineIndex < TextLines.Count) && (TextLines[lineIndex] != null))
+                {
+                    rc = (TextLines[lineIndex] == Environment.NewLine) ? 0 : TextLines[lineIndex].Length;
+                }
+            }
+            return rc;
+        }
+
+        public string GetWordInLine(int lineNo = Body.LastLine, int wordNo = Program.PosIntegerNotSet) //delete candidate
+        {
+            string rc = null;
+
+            var lineIndex = (lineNo != Body.LastLine) ? lineNo - 1 : TextLines.Count - 1;
+            if ((lineIndex >= 0) && (lineIndex < TextLines.Count))
+            {
+                var line = TextLines[lineIndex];
+                var lineWordCount = GetWordCountInLine(line);
+                wordNo = (wordNo == Program.PosIntegerNotSet) ? lineWordCount : wordNo;
+                if ((wordNo > 0) && (wordNo <= lineWordCount))
+                {
+                    rc = line.Snip(GetIndexOfWord(line, wordNo), GetIndexOfWord(line, wordNo, false)) ?? null;
+                }
+            }
+            return rc;
+        }
+
+        public char GetCharacterInLine(int lineNo = Body.LastLine, int columnNo = Body.LastColumn) //delete candidate
+        {
+            var rc = Body.NullChar;
+
+            var lineIndex = (lineNo != Body.LastLine) ? lineNo - 1 : TextLines.Count - 1;
+            if ((lineIndex >= 0) && (lineIndex < TextLines.Count))
+            {
+                var colIndex = (columnNo != Body.LastColumn) ? columnNo - 1 : (TextLines[lineIndex]?.Length - 1) ?? -1;
+                if ((colIndex >= 0) && (colIndex < TextLines[lineIndex]?.Length))
+                    rc = TextLines[lineIndex][colIndex];
+            }
+            return rc;
+        }
+
+        public static int GetIndexOfWord(string text, int wordNo =1, bool startIndex=true)      //delete candidate
         {
             var rc = Program.PosIntegerNotSet;
             if ((String.IsNullOrEmpty(text) == false) && (wordNo > 0))
@@ -962,74 +1003,13 @@ namespace KLineEdCmdApp.Model
                     }
                     charIndex++;
                 }
-
                 if ((rc == Program.PosIntegerNotSet) && (wordCount == wordNo) && (startIndex == false))
                     rc = text.Length - 1;
-
             }
             return rc;
         }
 
-        public static string GetLineUpdateDeleteChar(string existingText, int charIndex)
-        {
-            string rc = null;
-
-            if ((existingText != null) && (charIndex >= 0) && (charIndex < existingText.Length)) 
-            {
-                var start = existingText.Snip(0, charIndex - 1);
-                var end = existingText.Snip(charIndex + 1, existingText.Length - 1);
-                rc = (start ?? "") + (end ?? "");
-            }
-            return rc;
-        }
-
-        public string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert)
-        {
-            string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters
-            if ((updateText != null) && (existingText != null) && (updateIndex >= 0) && (updateIndex < maxLength) && (Body.GetErrorsInText(updateText) == null))
-            {
-                if (insert)
-                {       //move all text at index text.length spaces right and insert at index
-                    if ((existingText.Length + updateText.Length) <= maxLength)
-                        rc = existingText.Insert(updateIndex, updateText);
-                }
-                else
-                {       //overwrite from startindex = index to endIndex=index+word.Length-1
-                    if (((updateIndex + updateText.Length) <= existingText.Length) && (existingText.Length <= maxLength))
-                    {
-                        var start = existingText.Snip(0, updateIndex - 1);
-                        var end = existingText.Substring(updateIndex + updateText.Length);
-                        if (((start?.Length ?? 0) + updateText.Length + ((end?.Length ?? 0)) <= maxLength))
-                            rc = (start ?? "") + updateText + (end ?? "");
-                    }
-                }
-            }
-            return rc;
-        }
-
-        private bool ResetCursorInChapter()
-        {
-            var rc = false;
-            if (Cursor != null)
-            {
-                Cursor.RowIndex = 0;
-                Cursor.ColIndex = 0;
-                var rcBottom = SetEditAreaBottomIndex(Scroll.ToCursor);
-                if (rcBottom.IsSuccess(true))
-                    rc = true;
-            }
-            return rc;
-        }
-        private int GetLastColumnIndexForRow(int rowIndex)
-        {
-            var rc = Program.PosIntegerNotSet;
-            if ((TextLines != null) && (rowIndex >= 0) && (rowIndex < (TextLines?.Count ?? -1)))
-                rc = (TextLines[rowIndex] == Environment.NewLine) ? 0 : TextLines[rowIndex].Length; //allow for cursor after last char
-            return rc;
-        }
-
-
-    
+   
         //public int GetDisplayColIndex(ChapterModel.CursorState state = ChapterModel.CursorState.Current)
         //{
         //    var rc = Program.PosIntegerNotSet;

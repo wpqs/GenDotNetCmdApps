@@ -128,6 +128,20 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
+        public void GetLineUpdateDeleteCharTest()
+        {
+            var property = "hello world";
+            Assert.Equal("helloworld", HeaderProps.GetLineUpdateDeleteChar(property, 5));
+            Assert.Equal("ello world", HeaderProps.GetLineUpdateDeleteChar(property, 0));
+            Assert.Equal("hello worl", HeaderProps.GetLineUpdateDeleteChar(property, property.Length - 1));
+
+            Assert.Null(HeaderProps.GetLineUpdateDeleteChar("", 0));
+            Assert.Null(HeaderProps.GetLineUpdateDeleteChar(property, -1));
+            Assert.Null(HeaderProps.GetLineUpdateDeleteChar(property, property.Length));
+            Assert.Null(HeaderProps.GetLineUpdateDeleteChar(null, property.Length - 1));
+        }
+
+        [Fact]
         public void SetPropsEditViewCursorRowTest()
         {
             var props = new HeaderProps(45);

@@ -178,7 +178,7 @@ namespace KLineEdCmdApp.Model
                 {
                     case CursorRow.Author:
                     {
-                        var result = Body.GetLineUpdateDeleteChar(Author, Cursor.ColIndex);
+                        var result = HeaderProps.GetLineUpdateDeleteChar(Author, Cursor.ColIndex);
                         if (result != null)
                         {
                             Author = result;
@@ -188,7 +188,7 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.Project:
                     {
-                        var result = Body.GetLineUpdateDeleteChar(Project, Cursor.ColIndex);
+                        var result = HeaderProps.GetLineUpdateDeleteChar(Project, Cursor.ColIndex);
                         if (result != null)
                         {
                             Project = result;
@@ -198,7 +198,7 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.Title:
                     {
-                        var result = Body.GetLineUpdateDeleteChar(Title, Cursor.ColIndex);
+                        var result = HeaderProps.GetLineUpdateDeleteChar(Title, Cursor.ColIndex);
                         if (result != null)
                         {
                             Title = result;
@@ -208,7 +208,7 @@ namespace KLineEdCmdApp.Model
                     }
                     case CursorRow.PathFileName:
                     {
-                        var result = Body.GetLineUpdateDeleteChar(PathFileName, Cursor.ColIndex);
+                        var result = HeaderProps.GetLineUpdateDeleteChar(PathFileName, Cursor.ColIndex);
                         if (result != null)
                         {
                             PathFileName = result;
@@ -318,6 +318,19 @@ namespace KLineEdCmdApp.Model
                             rc = (start ?? "") + updateText + (end ?? "");
                     }
                 }
+            }
+            return rc;
+        }
+
+        public static string GetLineUpdateDeleteChar(string existingText, int charIndex)
+        {
+            string rc = null;
+
+            if ((existingText != null) && (charIndex >= 0) && (charIndex < existingText.Length))
+            {
+                var start = existingText.Snip(0, charIndex - 1);
+                var end = existingText.Snip(charIndex + 1, existingText.Length - 1);
+                rc = (start ?? "") + (end ?? "");
             }
             return rc;
         }

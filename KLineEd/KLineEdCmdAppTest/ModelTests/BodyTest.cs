@@ -21,29 +21,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(Body.IsEnteredCharacterValid('0'));
             Assert.True(Body.IsEnteredCharacterValid('9'));
             Assert.True(Body.IsEnteredCharacterValid(' '));
-            Assert.True(Body.IsEnteredCharacterValid('\t'));
             Assert.True(Body.IsEnteredCharacterValid('*'));
 
             Assert.False(Body.IsEnteredCharacterValid('\0'));
-        }
-
-        [Fact]
-        public void SetTabSpacesTest()
-        {
-            var body = new Body();
-
-            Assert.Equal(3, body.SetTabSpaces(3));
-            Assert.Equal("   ", body.TabSpaces);
-
-            Assert.Equal(3, body.SetTabSpaces(0));
-            Assert.Equal("   ", body.TabSpaces);
-
-            Assert.Equal(3, body.SetTabSpaces(-1));
-            Assert.Equal("   ", body.TabSpaces);
-
-            Assert.Equal(5, body.SetTabSpaces(5));
-            Assert.Equal("     ", body.TabSpaces);
-
         }
 
         [Fact]
@@ -95,7 +75,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(5, body.Cursor.ColIndex);  //cursor at end of line
             Assert.Equal(2, body.Cursor.RowIndex);
             Assert.Equal(2, body.EditAreaBottomChapterIndex);
-            Assert.Equal(3, body.RefreshWordCount());
+            Assert.Equal(3, body.WordCount);
             Assert.Equal(3, body.GetLineCount());
 
             body.RemoveAllLines();
@@ -129,20 +109,6 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(-1, Body.GetIndexOfWord(text, -1));
             Assert.Equal(-1, Body.GetIndexOfWord(text, -1, false));
 
-        }
-
-        [Fact]
-        public void GetLineUpdateDeleteCharTest()
-        {
-            var property = "hello world";
-            Assert.Equal("helloworld", Body.GetLineUpdateDeleteChar(property, 5));
-            Assert.Equal("ello world", Body.GetLineUpdateDeleteChar(property, 0));
-            Assert.Equal("hello worl", Body.GetLineUpdateDeleteChar(property, property.Length - 1));
-
-            Assert.Null(Body.GetLineUpdateDeleteChar("", 0));
-            Assert.Null(Body.GetLineUpdateDeleteChar(property, -1));
-            Assert.Null(Body.GetLineUpdateDeleteChar(property, property.Length));
-            Assert.Null(Body.GetLineUpdateDeleteChar(null, property.Length - 1));
         }
 
 
@@ -221,7 +187,6 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(0, body.GetLineCount());
             Assert.True(body.InsertLine("one two three four").GetResult());
-            Assert.Equal(4, body.RefreshWordCount());
             Assert.Equal(4, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(18, body.GetCharacterCountInLine());
@@ -249,7 +214,6 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(0, body.GetLineCount());
             Assert.True(body.InsertLine("one").GetResult());
-            Assert.Equal(1, body.RefreshWordCount());
             Assert.Equal(1, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(3, body.GetCharacterCountInLine());
@@ -266,13 +230,11 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.True(body.InsertLine("one").GetResult());
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(1, body.RefreshWordCount());
+            Assert.Equal(1, body.WordCount);
             Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
 
             Assert.True(body.InsertLine("two").GetResult()); //don't inc WordCount
             Assert.Equal(2, body.GetLineCount());
-            Assert.Equal(2, body.WordCount); //
-            Assert.Equal(2, body.RefreshWordCount()); //refreshes WordCount from actual words in Body
             Assert.Equal(2, body.WordCount); //
 
             Assert.Equal("one", body.GetLinesForDisplay(10).GetResult()[0]);
@@ -943,7 +905,6 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Null(Body.GetErrorsInEnteredCharacter('@'));
 
             Assert.Null(Body.GetErrorsInEnteredCharacter(' '));
-            Assert.Null(Body.GetErrorsInEnteredCharacter('\t'));
 
             Assert.StartsWith("disallowed character '<'.", Body.GetErrorsInEnteredCharacter('<'));
             Assert.StartsWith("disallowed character '>'.", Body.GetErrorsInEnteredCharacter('>'));

@@ -1,7 +1,6 @@
 ﻿using System;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
-using KLineEdCmdApp.Properties;
 using KLineEdCmdApp.View;
 using MxReturnCode;
 

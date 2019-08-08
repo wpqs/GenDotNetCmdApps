@@ -533,12 +533,12 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public int GetTextWordCount()
+        public int GetTextWordCount()  //delete candidate only called from tests
         {
             var rc = Program.PosIntegerNotSet;
 
             if (Ready)
-                rc = ChapterBody.RefreshWordCount();
+                rc = ChapterBody.WordCount;
             return rc;
         }
     }
