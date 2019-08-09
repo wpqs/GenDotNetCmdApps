@@ -732,6 +732,7 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
                 else
                 {
+                    char paraBreak = (char) '>'; //0xB6;
                     var lines = new string[count];
                     if (TextLines.Count > 0)
                     {
@@ -741,7 +742,10 @@ namespace KLineEdCmdApp.Model
                         for (var bufferIndex = 0; bufferIndex < count; bufferIndex++)
                         {
                             if (lineIndex < TextLines.Count)
-                                lines[bufferIndex] = TextLines[lineIndex++];
+                            {
+                                lines[bufferIndex] = (TextLines[lineIndex] == Environment.NewLine) ? paraBreak.ToString(): TextLines[lineIndex];
+                                lineIndex++;
+                            }
                             else
                                 break;
                         }
