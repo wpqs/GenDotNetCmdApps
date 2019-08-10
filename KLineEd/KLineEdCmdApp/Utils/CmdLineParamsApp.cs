@@ -61,6 +61,9 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamEditLineMode = "--editline"; // on | off
         public static readonly string ParamSpellCheckMode = "--spellcheck"; // on | off
         public static readonly string ParamBrowser = "--browser"; // exe='Explorer'
+        public static readonly string ParamParaBreak = "--parabreak"; // char=' '
+
+        public const char ArgParaBreakCharDefault = '>';
 
         public const int ArgSpacesForTabDefault = 3;    //min 1 max?
         public static readonly int ArgSpacesForTabMin = 1;

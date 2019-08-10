@@ -64,6 +64,7 @@ namespace KLineEdCmdApp.Model
         public int EditAreaBottomChapterIndex { private set; get; }        //TextLines[TopDisplayLineIndex] is displayed as first line in console
         public int WordCount { private set; get; }
         public string TabSpaces { private set; get; }
+        public char ParaBreakChar { private set; get; }
 
         private bool Error { set; get; }
         public bool IsError(){ return Error; }
@@ -77,6 +78,7 @@ namespace KLineEdCmdApp.Model
             EditAreaBottomChapterIndex = Program.PosIntegerNotSet;
             WordCount = Program.PosIntegerNotSet;
             SetTabSpaces(CmdLineParamsApp.ArgSpacesForTabDefault);
+            ParaBreakChar = CmdLineParamsApp.ArgParaBreakCharDefault;
 
             Error = true;
         }
@@ -97,12 +99,12 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgSpacesForTabDefault)
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgSpacesForTabDefault, char paraBreakChar = CmdLineParamsApp.ArgParaBreakCharDefault)
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgSpacesForTabMin))
-                rc.SetError(1100201, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount} not set, editAreaLineWidth={editAreaLineWidth} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgSpacesForTabMin}", MxMsgs.MxErrBadMethodParam);
+            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgSpacesForTabMin) || (paraBreakChar == NullChar))
+                rc.SetError(1100201, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount} not set, editAreaLineWidth={editAreaLineWidth} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgSpacesForTabMin}, paraBreak is 0", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if ((TextLines == null) || (Cursor == null) || (EditAreaViewCursorLimit == null))
@@ -113,6 +115,7 @@ namespace KLineEdCmdApp.Model
                     EditAreaViewCursorLimit.ColIndex = editAreaLineWidth - 1;
 
                     SetTabSpaces(spacesForTab);
+                    ParaBreakChar = paraBreakChar;
 
                     var rcRemove = RemoveAllLines();
                     rc += rcRemove;
@@ -732,7 +735,6 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    char paraBreak = (char) '>'; //0xB6;
                     var lines = new string[count];
                     if (TextLines.Count > 0)
                     {
@@ -743,7 +745,7 @@ namespace KLineEdCmdApp.Model
                         {
                             if (lineIndex < TextLines.Count)
                             {
-                                lines[bufferIndex] = (TextLines[lineIndex] == Environment.NewLine) ? paraBreak.ToString(): TextLines[lineIndex];
+                                lines[bufferIndex] = (TextLines[lineIndex] == Environment.NewLine) ? ParaBreakChar.ToString(): TextLines[lineIndex];
                                 lineIndex++;
                             }
                             else

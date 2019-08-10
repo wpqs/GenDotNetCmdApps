@@ -264,7 +264,7 @@ namespace KLineEdCmdApp.Model
             return ChapterBody?.TabSpaces ?? Program.ValueNotSet;
         }
 
-        public MxReturnCode<bool>Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab=CmdLineParamsApp.ArgSpacesForTabDefault)
+        public MxReturnCode<bool>Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab=CmdLineParamsApp.ArgSpacesForTabDefault, char paraBreakChar = CmdLineParamsApp.ArgParaBreakCharDefault)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 
@@ -275,7 +275,7 @@ namespace KLineEdCmdApp.Model
                 try
                 {
                     ChapterHeader.Properties.SetMaxPropertyLength(editAreaLineWidth-PropsEditView.LongestLabelLength);
-                    var rcInit = ChapterBody.Initialise(editAreaLinesCount, editAreaLineWidth, spacesForTab);
+                    var rcInit = ChapterBody.Initialise(editAreaLinesCount, editAreaLineWidth, spacesForTab, paraBreakChar);
                     rc += rcInit;
                     if (rcInit.IsSuccess(true))
                     {
