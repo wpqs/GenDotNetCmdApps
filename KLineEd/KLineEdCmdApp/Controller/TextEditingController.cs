@@ -26,67 +26,67 @@ namespace KLineEdCmdApp.Controller
                         controller = ControllerFactory.Make(Chapter, ControllerFactory.SpellEditingController, BrowserExe);
                     else if (keyInfo.Key == ConsoleKey.UpArrow)
                     {
-                        var rcMove = model.SetBodyMoveCursor(Body.CursorMove.PreviousRow);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.PreviousRow);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
                     else if (keyInfo.Key == ConsoleKey.DownArrow)
                     {
-                        var rcMove = model.SetBodyMoveCursor(Body.CursorMove.NextRow);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.NextRow);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
                     else if (keyInfo.Key == ConsoleKey.LeftArrow)
                     {
-                        var rcMove = model.SetBodyMoveCursor(Body.CursorMove.PreviousCol);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.PreviousCol);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
                     else if (keyInfo.Key == ConsoleKey.RightArrow)
                     {
-                        var rcMove = model.SetBodyMoveCursor(Body.CursorMove.NextCol);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.NextCol);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
                     else if (keyInfo.Key == ConsoleKey.Home)
                     {
-                        var rcMove = model.SetBodyMoveCursor(Body.CursorMove.Home);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.Home);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
                     else if (keyInfo.Key == ConsoleKey.End)
                     {
-                        var rcMove = model.SetBodyMoveCursor(Body.CursorMove.End);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.End);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
                     else if (keyInfo.Key == ConsoleKey.Delete)
                     {
-                        var rcDelChar = model.SetBodyDeleteCharacter();
+                        var rcDelChar = model.BodyDeleteCharacter();
                         if (rcDelChar.IsError(true))
                             SetupMxError(rcDelChar);
                     }
                     else if (keyInfo.Key == ConsoleKey.Backspace)
                     {
-                        var rcBack = model.SetBodyBackSpace();
+                        var rcBack = model.BodyBackSpace();
                         if (rcBack.IsError(true))
                             SetupMxError(rcBack);
                     }
                     else if (keyInfo.Key == ConsoleKey.Enter)
                     {
-                        var rcInsertLine = model.SetBodyInsertLine(new string(Environment.NewLine), false);
+                        var rcInsertLine = model.BodyInsertLine(new string(Environment.NewLine), false);
                         if (rcInsertLine.IsError(true))
                             SetupMxError(rcInsertLine);
                     }
                     else if (keyInfo.Key == ConsoleKey.Tab)
                     {
-                        var rcInsertText = model.SetBodyInsertText(model.ChapterBody?.TabSpaces ?? "   ", IsInsertMode());
+                        var rcInsertText = model.BodyInsertText(model.GetTabSpaces(), IsInsertMode());
                         if (rcInsertText.IsError(true))
                             SetupMxError(rcInsertText);
                     }
                     else
                     {
-                        var rcInsertText = model.SetBodyInsertText(keyInfo.KeyChar.ToString(), IsInsertMode());
+                        var rcInsertText = model.BodyInsertText(keyInfo.KeyChar.ToString(), IsInsertMode());
                         if (rcInsertText.IsError(true))
                             SetupMxError(rcInsertText);
                     }

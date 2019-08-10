@@ -51,7 +51,7 @@ namespace KLineEdCmdApp.View
                                 rc += ClearEditAreaText();
                                 if (rc.IsSuccess(true))
                                 {
-                                    var rcRes = model.GetLastLinesForDisplay();
+                                    var rcRes = model.BodyGetEditAreaLinesForDisplay();
                                     rc += rcRes;
                                     if (rcRes.IsSuccess(true))
                                     {
@@ -78,7 +78,7 @@ namespace KLineEdCmdApp.View
                             }
                             case ChapterModel.ChangeHint.Line:
                             {
-                                var rcRes = model.GetLastLinesForDisplay(1);
+                                var rcRes = model.BodyGetEditAreaLinesForDisplay(1);
                                 rc += rcRes;
                                 if (rcRes.IsSuccess(true))
                                 {

@@ -33,17 +33,17 @@ namespace KLineEdCmdAppTest.ViewTests
 
            _fixture.Model.SetEditorHelpLine(TextEditingController.EditorHelpText);
 
-            _fixture.Model.SetBodyInsertText('a'.ToString());
+            _fixture.Model.BodyInsertText('a'.ToString());
             Assert.Equal("a", _fixture.View.LastTerminalOutput);
 
-            _fixture.Model.SetBodyInsertText(" hello");
+            _fixture.Model.BodyInsertText(" hello");
             Assert.Equal("a hello", _fixture.View.LastTerminalOutput);
 
             _fixture.Model.Refresh();
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello", _fixture.View.LastTerminalOutput);
 
-            _fixture.Model.SetBodyInsertText(" world");
+            _fixture.Model.BodyInsertText(" world");
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello world", _fixture.View.LastTerminalOutput);
 
@@ -51,7 +51,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello world", _fixture.View.LastTerminalOutput);
 
-            _fixture.Model.SetBodyInsertText('s'.ToString());
+            _fixture.Model.BodyInsertText('s'.ToString());
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("a hello worlds", _fixture.View.LastTerminalOutput);
 
@@ -60,7 +60,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.Equal("a hello worlds", _fixture.View.LastTerminalOutput);
             Assert.Equal(1, _fixture.Model.GetTextLineCount());
 
-            _fixture.Model.InsertLine("hello 1234  byebye");
+            _fixture.Model.BodyInsertLine("hello 1234  byebye");
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
             Assert.Equal("hello 1234  byebye", _fixture.View.LastTerminalOutput);
             Assert.Equal(2, _fixture.Model.GetTextLineCount());

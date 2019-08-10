@@ -31,49 +31,49 @@ namespace KLineEdCmdApp.Controller
                     else if (keyInfo.Key == ConsoleKey.DownArrow)
                     {
                         var row = props.GetRowIndex(ChapterModel.CursorState.Next);
-                        if (model.SetPropsCursor(row, 0) == false)
+                        if (model.PropsSetCursor(row, 0) == false)
                             SetMxError(1230102, MxError.Source.Program, $"SetCursor({row}, {0}) failed", MxMsgs.MxErrInvalidCondition); 
                     }
                     else if (keyInfo.Key == ConsoleKey.UpArrow)
                     {
                         var row = props.GetRowIndex(ChapterModel.CursorState.Previous);
-                        if (model.SetPropsCursor(row, 0) == false)
+                        if (model.PropsSetCursor(row, 0) == false)
                             SetMxError(1230103, MxError.Source.Program, $"SetCursor({row}, {0}) failed", MxMsgs.MxErrInvalidCondition); 
                     }
                     else if (keyInfo.Key == ConsoleKey.LeftArrow)
                     {
                         var row = props.GetRowIndex();
                         var col = props.Cursor.ColIndex;
-                        if (model.SetPropsCursor(row, --col) == false)
+                        if (model.PropsSetCursor(row, --col) == false)
                             SetMxError(1230104, MxError.Source.User, Resources.MxWarnStartOfLine, MxMsgs.MxWarnStartOfLine); //todo update when next release of MxReturnCode is available
                     }
                     else if (keyInfo.Key == ConsoleKey.RightArrow)
                     {
                         var row = props.GetRowIndex();
                         var col = props.Cursor.ColIndex;
-                        if (model.SetPropsCursor(row, ++col) == false)
+                        if (model.PropsSetCursor(row, ++col) == false)
                             SetMxError(1230105, MxError.Source.User, Resources.MxWarnEndOfLine, MxMsgs.MxWarnEndOfLine); //todo update when next release of MxReturnCode is available
                     }
                     else if (keyInfo.Key == ConsoleKey.Delete)
                     {
-                        if (model.SetPropsDelChar(false) == false)
+                        if (model.PropsDelChar(false) == false)
                             SetMxError(1230106, MxError.Source.User, Resources.MxWarnNoCharToDelete, MxMsgs.MxWarnNoCharToDelete); //todo update when next release of MxReturnCode is available
                     }
                     else if (keyInfo.Key == ConsoleKey.Backspace)
                     {
-                        if (model.SetPropsDelChar(true) == false)
+                        if (model.PropsDelChar(true) == false)
                             SetMxError(1230107, MxError.Source.User, Resources.MxWarnBackspaceAtStartOfLine, MxMsgs.MxWarnBackspaceAtStartOfLine); //todo update when next release of MxReturnCode is available
                     }
                     else if (keyInfo.Key == ConsoleKey.Tab)
                     {
                         var insert = IsInsertMode() ? true : props.IsCursorBeyondEndOfLine(props.GetRowIndex());
-                        if (model.SetPropsText(model.ChapterBody?.TabSpaces ?? "   ", insert) == false)
+                        if (model.PropsSetText(model.ChapterBody?.TabSpaces ?? "   ", insert) == false)
                             SetMxError(1230108, MxError.Source.User, Resources.MxWarnBackspaceAtStartOfLine, MxMsgs.MxWarnBackspaceAtStartOfLine); //todo update when next release of MxReturnCode is available
                     }
                     else
                     {
                         var insert = IsInsertMode() ? true : props.IsCursorBeyondEndOfLine(props.GetRowIndex());
-                        if (model.SetPropsChar(keyInfo.KeyChar, insert ) == false)
+                        if (model.PropsSetChar(keyInfo.KeyChar, insert ) == false)
                             SetMxError(1230109, MxError.Source.User, Resources.MxWarnInvalidChar, MxMsgs.MxWarnInvalidChar); //todo update when next release of MxReturnCode is available
                     }
                 }

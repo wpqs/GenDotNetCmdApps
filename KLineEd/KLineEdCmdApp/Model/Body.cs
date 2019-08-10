@@ -723,25 +723,25 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<string[]> GetLinesForDisplay(int count) 
+        public MxReturnCode<string[]> GetEditAreaLinesForDisplay(int countFromBottom) 
         {
-            var rc = new MxReturnCode<string[]>("Body.GetLinesForDisplay", null);
+            var rc = new MxReturnCode<string[]>("Body.GetEditAreaLinesForDisplay", null);
 
-            if ((TextLines == null) || (count < 0) || (count > (EditAreaViewCursorLimit.RowIndex+1)))
-                rc.SetError(1100801, MxError.Source.Param, $"TextLines.Count={TextLines?.Count ?? -1}; count={count} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
+            if ((TextLines == null) || (countFromBottom <= 0) || (countFromBottom > (EditAreaViewCursorLimit.RowIndex+1)))
+                rc.SetError(1100801, MxError.Source.Param, $"TextLines.Count={TextLines?.Count ?? -1}; countFromBottom={countFromBottom} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError() || (EditAreaBottomChapterIndex <= Program.PosIntegerNotSet))
                     rc.SetError(1100802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    var lines = new string[count];
+                    var lines = new string[countFromBottom];
                     if (TextLines.Count > 0)
                     {
                         var lineIndex = ((EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex) > 0) ? EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex : 0;
-                        if (lineIndex + count < TextLines.Count)
-                            lineIndex += TextLines.Count - count;
-                        for (var bufferIndex = 0; bufferIndex < count; bufferIndex++)
+                        if (lineIndex + countFromBottom < TextLines.Count)
+                            lineIndex += TextLines.Count - countFromBottom;
+                        for (var bufferIndex = 0; bufferIndex < countFromBottom; bufferIndex++)
                         {
                             if (lineIndex < TextLines.Count)
                             {
