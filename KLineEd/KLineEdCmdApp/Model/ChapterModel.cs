@@ -72,7 +72,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab = CmdLineParamsApp.ArgSpacesForTabDefault, char paraBreakChar = CmdLineParamsApp.ArgParaBreakCharDefault)
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab = CmdLineParamsApp.ArgSpacesForTabDefault, char paraBreakChar = CmdLineParamsApp.ArgParaBreakDisplayCharDefault)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 
@@ -250,6 +250,7 @@ namespace KLineEdCmdApp.Model
             {
                 var existingIndex = ChapterBody.EditAreaBottomChapterIndex;
                 var rcMove = ChapterBody.MoveCursorInChapter(move);
+                rc += rcMove;
                 if (rcMove.IsSuccess(true))
                 {
                     if (existingIndex == ChapterBody.EditAreaBottomChapterIndex)
@@ -319,7 +320,26 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> BodyInsertLine(string line, bool atEndOfChapter = true)
+        public MxReturnCode<bool> BodyInsertParaBreak()
+        {
+            var rc = new MxReturnCode<bool>("ChapterModel.InsertParaBreak");
+
+            if (Ready == false)
+                rc.SetError(1050801, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+                var rcInsert = ChapterBody.InsertParaBreak();
+                rc += rcInsert;
+                if (rcInsert.IsSuccess(true))
+                {
+                    UpdateAllViews((int)ChangeHint.All);  //ChangeHint.Line or ChangeHint.Para
+                    rc.SetResult(true);
+                }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> BodyInsertLine(string line, bool atEndOfChapter = true) //delete candidate
         {
             var rc = new MxReturnCode<bool>("ChapterModel.BodyInsertLine");
 

@@ -74,7 +74,7 @@ namespace KLineEdCmdApp.Controller
                     }
                     else if (keyInfo.Key == ConsoleKey.Enter)
                     {
-                        var rcInsertLine = model.BodyInsertLine(new string(Environment.NewLine), false);
+                        var rcInsertLine = model.BodyInsertParaBreak(); //new string(Environment.NewLine), false);
                         if (rcInsertLine.IsError(true))
                             SetupMxError(rcInsertLine);
                     }

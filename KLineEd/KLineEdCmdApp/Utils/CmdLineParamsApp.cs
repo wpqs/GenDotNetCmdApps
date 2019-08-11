@@ -63,7 +63,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamBrowser = "--browser"; // exe='Explorer'
         public static readonly string ParamParaBreak = "--parabreak"; // char=' '
 
-        public const char ArgParaBreakCharDefault = '>';
+        public const char ArgParaBreakDisplayCharDefault = '>';
 
         public const int ArgSpacesForTabDefault = 3;    //min 1 max?
         public static readonly int ArgSpacesForTabMin = 1;

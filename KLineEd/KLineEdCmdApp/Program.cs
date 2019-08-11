@@ -135,6 +135,8 @@ namespace KLineEdCmdApp
             {
                 try
                 {
+                    terminal.WriteLine($"{Environment.NewLine}Opening file: {cmdLineParams?.EditFile ?? ValueNotSet}");
+
                     var editModel = new ChapterModel();
                     var rcInitModel = editModel.Initialise(cmdLineParams.EditAreaLinesCount, cmdLineParams.EditAreaLineWidth, cmdLineParams.EditFile); //todo CmdLineParams.SpacesForTab, CmdLineParamsParaBreakChar;
                     rc += rcInitModel;

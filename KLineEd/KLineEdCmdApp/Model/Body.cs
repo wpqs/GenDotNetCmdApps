@@ -26,6 +26,9 @@ namespace KLineEdCmdApp.Model
         public static readonly char DisallowedCharOpeningAngle = '<';
         public static readonly char DisallowedCharClosingAngle = '>';
 
+        public static readonly char ParaBreakChar = ((char)0x17); //ASCII ETB - end of block
+        public static readonly string ParaBreak = ParaBreakChar.ToString(); //ASCII ETB - end of block
+
         public const int LastLine = -1;         //used to provide parameter default values so cannot be readonly
         public const int LastColumn = -1;
         public const char NullChar = (char)0;
@@ -48,7 +51,6 @@ namespace KLineEdCmdApp.Model
 
         public enum CursorMove
         {
-            Current,
             NextRow,
             PreviousRow,
             NextCol,
@@ -64,7 +66,7 @@ namespace KLineEdCmdApp.Model
         public int EditAreaBottomChapterIndex { private set; get; }        //TextLines[TopDisplayLineIndex] is displayed as first line in console
         public int WordCount { private set; get; }
         public string TabSpaces { private set; get; }
-        public char ParaBreakChar { private set; get; }
+        public char ParaBreakDisplayChar { private set; get; }
 
         private bool Error { set; get; }
         public bool IsError(){ return Error; }
@@ -78,7 +80,7 @@ namespace KLineEdCmdApp.Model
             EditAreaBottomChapterIndex = Program.PosIntegerNotSet;
             WordCount = Program.PosIntegerNotSet;
             SetTabSpaces(CmdLineParamsApp.ArgSpacesForTabDefault);
-            ParaBreakChar = CmdLineParamsApp.ArgParaBreakCharDefault;
+            ParaBreakDisplayChar = CmdLineParamsApp.ArgParaBreakDisplayCharDefault;
 
             Error = true;
         }
@@ -99,11 +101,11 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgSpacesForTabDefault, char paraBreakChar = CmdLineParamsApp.ArgParaBreakCharDefault)
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgSpacesForTabDefault, char paraBreakDisplayChar = CmdLineParamsApp.ArgParaBreakDisplayCharDefault)
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgSpacesForTabMin) || (paraBreakChar == NullChar))
+            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgSpacesForTabMin) || (paraBreakDisplayChar == NullChar))
                 rc.SetError(1100201, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount} not set, editAreaLineWidth={editAreaLineWidth} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgSpacesForTabMin}, paraBreak is 0", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -115,7 +117,7 @@ namespace KLineEdCmdApp.Model
                     EditAreaViewCursorLimit.ColIndex = editAreaLineWidth - 1;
 
                     SetTabSpaces(spacesForTab);
-                    ParaBreakChar = paraBreakChar;
+                    ParaBreakDisplayChar = paraBreakDisplayChar;
 
                     var rcRemove = RemoveAllLines();
                     rc += rcRemove;
@@ -147,7 +149,7 @@ namespace KLineEdCmdApp.Model
 
                         foreach (var line in TextLines)
                         {
-                            file.WriteLine((line == Environment.NewLine) ? "" : line);
+                            file.WriteLine(line); // (line == Environment.NewLine) ? "" : line);
                         }
 
                         file.WriteLine(ClosingElement);
@@ -193,7 +195,7 @@ namespace KLineEdCmdApp.Model
                                     lastLine = line;
                                     if (lastLine == ClosingElement)
                                         break;
-                                    var rcLine = InsertLine((lastLine.Length == 0) ? Environment.NewLine : lastLine);
+                                    var rcLine = InsertLine(lastLine); //(lastLine.Length == 0) ? Environment.NewLine : lastLine);
                                     if (rcLine.IsError(true))
                                     {
                                         rc += rcLine;
@@ -258,7 +260,8 @@ namespace KLineEdCmdApp.Model
                             }
                         case CursorMove.NextRow:
                         {
-                            var rcCursor = SetCursorInChapter(Cursor.RowIndex + 1, GetLastColumnIndexForRow(Cursor.RowIndex + 1));
+                            var lastColIndex = GetLastColumnIndexForRow(Cursor.RowIndex + 1);
+                            var rcCursor = SetCursorInChapter(Cursor.RowIndex + 1, (Cursor.ColIndex < lastColIndex) ? Cursor.ColIndex : lastColIndex);
                             rc += rcCursor;
                             if (rcCursor.IsSuccess(true))
                                 rc.SetResult(true);
@@ -266,7 +269,8 @@ namespace KLineEdCmdApp.Model
                         }
                         case CursorMove.PreviousRow:
                         {
-                            var rcCursor = SetCursorInChapter(Cursor.RowIndex - 1, GetLastColumnIndexForRow(Cursor.RowIndex - 1));
+                            var lastColIndex = GetLastColumnIndexForRow(Cursor.RowIndex - 1);
+                            var rcCursor = SetCursorInChapter(Cursor.RowIndex - 1, (Cursor.ColIndex < lastColIndex) ? Cursor.ColIndex : lastColIndex);
                             rc += rcCursor;
                             if (rcCursor.IsSuccess(true))
                                 rc.SetResult(true);
@@ -282,7 +286,7 @@ namespace KLineEdCmdApp.Model
                         }
                         case CursorMove.End:
                         {
-                            var rcCursor = SetCursorInChapter(TextLines.Count - 1, TextLines[TextLines.Count - 1].Length);
+                            var rcCursor = SetCursorInChapter(TextLines.Count - 1, GetLastColumnIndexForRow(TextLines.Count - 1));
                             rc += rcCursor;
                             if (rcCursor.IsSuccess(true))
                                 rc.SetResult(true);
@@ -307,7 +311,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("Body.SetCursorInChapter");
                             //rowIndex == -1 or rowIndex == TextLines.Count are errors needing specific reporting
-            if ((rowIndex < -1) || (rowIndex > (TextLines?.Count ?? rowIndex-1)) || (colIndex < 0) || (colIndex > (EditAreaViewCursorLimit?.ColIndex ?? colIndex-1)))
+            if ((rowIndex < -1) || (rowIndex > (TextLines?.Count ?? rowIndex-1)) || (colIndex < -1) || (colIndex > (EditAreaViewCursorLimit?.ColIndex ?? colIndex-1)))
                 rc.SetError(1100601, MxError.Source.Param, $"rowIndex={rowIndex} > max({TextLines?.Count ?? rowIndex - 1}), colIndex={colIndex} > max({EditAreaViewCursorLimit?.ColIndex ?? colIndex-1}", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -315,27 +319,38 @@ namespace KLineEdCmdApp.Model
                     rc.SetError(1100602, MxError.Source.Program, $"Cursor or TextLines is null", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    if (rowIndex == -1)
-                        rc.SetError(1100603, MxError.Source.User, Resources.MxWarnStartOfChapter);
+                    if (TextLines.Count == 0)
+                    {
+                        Cursor.RowIndex = 0;
+                        Cursor.ColIndex = 0;
+                    }
                     else
                     {
-                        if (rowIndex == TextLines.Count)
-                            rc.SetError(1100604, MxError.Source.User, Resources.MxWarnEndOfChapter);
+                        if ((rowIndex == -1) || (colIndex == -1))
+                            rc.SetError(1100603, MxError.Source.User, Resources.MxWarnStartOfChapter);
                         else
                         {
-                            var lastColIndex = GetLastColumnIndexForRow(rowIndex);
-                            if ((lastColIndex == Program.PosIntegerNotSet) || (colIndex > lastColIndex))
-                                rc.SetError(1100605, MxError.Source.Program, $"GetLastColumnIndexForRow({rowIndex}) failed or colIndex={colIndex} > lastColIndex={lastColIndex}", MxMsgs.MxErrInvalidCondition);
+                            if (rowIndex == TextLines.Count)
+                                rc.SetError(1100604, MxError.Source.User, Resources.MxWarnEndOfChapter);
                             else
                             {
-                                Cursor.RowIndex = rowIndex;
-                                Cursor.ColIndex = colIndex;
-                                var rcScroll = SetEditAreaBottomIndex(Scroll.ToCursor);
-                                rc += rcScroll;
-                                if (rcScroll.IsSuccess(true))
-                                    rc.SetResult(true);
+                                var lastColIndex = GetLastColumnIndexForRow(rowIndex);
+                                if ((lastColIndex == Program.PosIntegerNotSet) || (colIndex > lastColIndex))
+                                    rc.SetError(1100605, MxError.Source.Program, $"GetLastColumnIndexForRow({rowIndex}) failed or colIndex={colIndex} > lastColIndex={lastColIndex}", MxMsgs.MxErrInvalidCondition);
+                                else
+                                {
+                                    Cursor.RowIndex = rowIndex;
+                                    Cursor.ColIndex = colIndex;
+                                }
                             }
                         }
+                    }
+                    if (rc.IsSuccess())
+                    {
+                        var rcScroll = SetEditAreaBottomIndex(Scroll.ToCursor);
+                        rc += rcScroll;
+                        if (rcScroll.IsSuccess(true))
+                            rc.SetResult(true);
                     }
                 }
             }
@@ -430,6 +445,18 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public MxReturnCode<bool> InsertInitialText(string text)
+        {
+            var rc = new MxReturnCode<bool>("Body.InsertInitialText");
+
+            var rcInsertLine = InsertLine(text);
+            rc += rcInsertLine;
+            if (rcInsertLine.IsSuccess(true))
+                rc.SetResult(true);
+
+            return rc;
+        }
+
         public CursorPosition GetCursorInEditArea()
         {
             CursorPosition rc = null;
@@ -443,12 +470,68 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public MxReturnCode<bool> InsertParaBreak()
+        {
+            var rc = new MxReturnCode<bool>("Body.InsertParaBreak");
+
+            if (IsError() || (TextLines == null) || (Cursor == null) || (Cursor.RowIndex < 0) || (Cursor.RowIndex > ((TextLines.Count == 0) ? 0 : TextLines.Count-1)))
+                rc.SetError(1100801, MxError.Source.Program, $"IsError() == true, or invalid Cursor.RowIndex={Cursor?.RowIndex ?? -1}", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+                try
+                {
+                    if (TextLines.Count >= Body.MaxTextLines)
+                        rc.SetError(1100802, MxError.Source.User, $"too many lines in chapter={TextLines.Count}", MxMsgs.MxWarnTooManyLines);
+                    else
+                    {
+                        if (TextLines.Count == 0)
+                        {
+                            var rcInitial = InsertInitialText(ParaBreak);
+                            rc += rcInitial;
+                            if (rcInitial.IsSuccess(true))
+                                rc.SetResult(true);
+                        }
+                        else
+                        {
+                            var currentLine = TextLines[Cursor.RowIndex]; //lines cannot be null or empty
+                            if (string.IsNullOrEmpty(currentLine))
+                                rc.SetError(1100803, MxError.Source.Program, $"Line {Cursor.RowIndex + 1} is null or empty", MxMsgs.MxErrInvalidCondition);
+                            else
+                            {
+                                if ((Cursor.ColIndex < 0) || (Cursor.ColIndex > currentLine.Length))
+                                    rc.SetError(1100804, MxError.Source.Program, $"Invalid Cursor.ColIndex={Cursor.ColIndex} for Cursor.RowIndex={Cursor.RowIndex} length={currentLine.Length}", MxMsgs.MxErrInvalidCondition);
+                                else
+                                {
+                                    var remainderWordCount = WordCount - GetWordCountInLine(currentLine);
+                                    var before = currentLine.Snip(0, Cursor.ColIndex - 1);
+                                    var after = currentLine.Snip(Cursor.ColIndex, currentLine.Length - 1);
+
+                                    TextLines[Cursor.RowIndex] = (before == null) ? ParaBreak : before + ParaBreak;
+                                    TextLines.Insert(Cursor.RowIndex + 1, after ?? ParaBreak);
+
+                                    WordCount = remainderWordCount + GetWordCountInLine(before) + GetWordCountInLine(after);
+                                    SetCursorInChapter(Cursor.RowIndex + 1, 0);
+                                    //adjust rest of paragraph lines
+                                    rc.SetResult(true);
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    rc.SetError(1100805, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                }
+            }
+            return rc;
+        }
+
         public MxReturnCode<bool> InsertLine(string line, bool atEndOfChapter = true)
         {
             var rc = new MxReturnCode<bool>("Body.InsertLine");
 
             if ((string.IsNullOrEmpty(line) ) || (line.Length+1 > EditAreaViewCursorLimit.ColIndex + 1)) //allow for cursor after end of line
-                rc.SetError(1100801, MxError.Source.Param, $"line is null, empty or too long at {line?.Length ?? -1} characters; limit={EditAreaViewCursorLimit.ColIndex + 1}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1100801, MxError.Source.User, $"line {(Cursor?.RowIndex ?? -3) + 2} has {line?.Length ?? -1} characters; permitted range more than 0 and less than {EditAreaViewCursorLimit.ColIndex + 2}");
             else
             {
                 if (IsError() || (TextLines == null))
@@ -472,11 +555,11 @@ namespace KLineEdCmdApp.Model
                                     var endLine = TextLines[Cursor.RowIndex].Substring(Cursor.ColIndex);
                                     TextLines[Cursor.RowIndex] = startLine;
 
-                                    TextLines.Insert(rowIndex, (line == Environment.NewLine) ? endLine : line + endLine);
+                                    TextLines.Insert(rowIndex, (line == ParaBreak) ? endLine : line + endLine); //(line == Environment.NewLine) ? endLine : line + endLine);
 
-                                   // AutoLineBreak(Cursor.RowIndex+1, (line == Environment.NewLine) ? endLine : line+endLine);
+                                    // AutoLineBreak(Cursor.RowIndex+1, (line == Environment.NewLine) ? endLine : line+endLine);
 
-                                   // 
+                                    // 
                                     //get line @ Cursor.RowIndex
                                     //split line @ Cursor.ColIndex - existing, newline
                                     //AutoLineBreak(Cursor.RowIndex, (line == Environment.NewLine) ? "" ? line);
@@ -492,7 +575,7 @@ namespace KLineEdCmdApp.Model
                                     rowIndex = TextLines.Count - 1;
                                 }
                                 WordCount += GetWordCountInLine(line);
-                                SetCursorInChapter(rowIndex, (line == Environment.NewLine) ? 0 : line.Length); //line added so assume SetCursor succeeds; worst case user needs to click 'end'
+                                SetCursorInChapter(rowIndex, (line == ParaBreak) ? 0 : line.Length);  // (line == Environment.NewLine) ? 0 : line.Length); //line added so assume SetCursor succeeds; worst case user needs to click 'end'
                                 rc.SetResult(true);
                             }
                         }
@@ -527,9 +610,9 @@ namespace KLineEdCmdApp.Model
                         {
                             if ((TextLines?.Count ?? Program.PosIntegerNotSet) <= 0)
                             {
-                                var rcStartChapter = InsertLine(text); //add first word in chapter, might be just a space char
-                                rc += rcStartChapter;
-                                if (rcStartChapter.IsSuccess(true))
+                                var rcInitial = InsertInitialText(text); 
+                                rc += rcInitial;
+                                if (rcInitial.IsSuccess(true))
                                     rc.SetResult(true);
                             }
                             else
@@ -658,7 +741,7 @@ namespace KLineEdCmdApp.Model
                         line = start + end;
 
                         WordCount -= existWordCount - GetWordCountInLine(line);
-                        TextLines[Cursor.RowIndex] = (line.Length == 0) ? Environment.NewLine : line;
+                        TextLines[Cursor.RowIndex] = line; // (line.Length == 0) ? Environment.NewLine : line;
                         rc.SetResult(true);
                     }
                 }
@@ -675,17 +758,17 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.AutoLineBreak");
 
             if ((rowIndex < 0) || (String.IsNullOrEmpty(insertText) == true) || (insertText.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
-                rc.SetError(1100701, MxError.Source.Param, $"lineIndex={rowIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={insertText?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1101201, MxError.Source.Param, $"lineIndex={rowIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={insertText?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var breakIndex = GetLineBreakIndex(rowIndex, insertText.Length);
                 if (breakIndex == Program.PosIntegerNotSet)
-                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={insertText.Length} > line length={GetCharacterCountInLine()} when LineWidth={EditAreaViewCursorLimit.ColIndex}", MxMsgs.MxErrLineTooLong);
+                    rc.SetError(1101202, MxError.Source.User, $"appendChar.Length={insertText.Length} > line length={GetCharacterCountInLine()} when LineWidth={EditAreaViewCursorLimit.ColIndex}", MxMsgs.MxErrLineTooLong);
                 else
                 {
                     var newLine = SplitLine(rowIndex, breakIndex);
                     if (newLine == null)
-                        rc.SetError(1100703, MxError.Source.User, $"SplitLine({rowIndex}, {breakIndex}) is null for TextLines.Count={TextLines.Count}", MxMsgs.MxErrLineTooLong);
+                        rc.SetError(1101203, MxError.Source.User, $"SplitLine({rowIndex}, {breakIndex}) is null for TextLines.Count={TextLines.Count}", MxMsgs.MxErrLineTooLong);
                     else
                     {
                         var rcInsert = InsertLine(newLine + insertText);  //todo cascade to end of para - take care as Loop here
@@ -745,11 +828,11 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<string[]>("Body.GetEditAreaLinesForDisplay", null);
 
             if ((TextLines == null) || (countFromBottom <= 0) || (countFromBottom > (EditAreaViewCursorLimit.RowIndex+1)))
-                rc.SetError(1100801, MxError.Source.Param, $"TextLines.Count={TextLines?.Count ?? -1}; countFromBottom={countFromBottom} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1101301, MxError.Source.Param, $"TextLines.Count={TextLines?.Count ?? -1}; countFromBottom={countFromBottom} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError() || (EditAreaBottomChapterIndex <= Program.PosIntegerNotSet))
-                    rc.SetError(1100802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
+                    rc.SetError(1101301, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     var lines = new string[countFromBottom];
@@ -762,7 +845,7 @@ namespace KLineEdCmdApp.Model
                         {
                             if (lineIndex < TextLines.Count)
                             {
-                                lines[bufferIndex] = (TextLines[lineIndex] == Environment.NewLine) ? ParaBreakChar.ToString(): TextLines[lineIndex];
+                                lines[bufferIndex] =  (TextLines[lineIndex].EndsWith(ParaBreakChar)) ? TextLines[lineIndex].Replace(ParaBreakChar, ParaBreakDisplayChar) : TextLines[lineIndex]; //(TextLines[lineIndex] == Environment.NewLine) ? ParaBreakDisplayChar.ToString(): TextLines[lineIndex];
                                 lineIndex++;
                             }
                             else
@@ -789,7 +872,7 @@ namespace KLineEdCmdApp.Model
                 else
                 {
                     var index = text.IndexOf(Environment.NewLine, StringComparison.Ordinal);
-                    if ((index != -1) && (index != 0))
+                    if ((index != -1)) // && (index != 0))
                         rc = $"{lineNoText}attempt to enter a new line at column {index + 1}.";
                     else
                     {
@@ -840,7 +923,7 @@ namespace KLineEdCmdApp.Model
                 rc = true;
             else
             {   //only supports english
-                if ( (c == ' ') || (Char.IsLetterOrDigit(c) || (Char.IsPunctuation(c)) || (Char.IsSymbol(c))))
+                if ((c == ParaBreakChar) || (c == ' ') || (Char.IsLetterOrDigit(c) || (Char.IsPunctuation(c)) || (Char.IsSymbol(c))))
                 {
                     rc = true;
                 }
@@ -860,7 +943,7 @@ namespace KLineEdCmdApp.Model
 
                 foreach (char c in text)
                 {
-                    if (Char.IsWhiteSpace(c))
+                    if (Char.IsWhiteSpace(c) || (c == ParaBreakChar))
                         wordItem = false;
                     else
                     {
@@ -885,7 +968,8 @@ namespace KLineEdCmdApp.Model
             var rc = false;
             if ((TextLines != null) && (Cursor != null) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
             {
-                if (TextLines[Cursor.RowIndex] == Environment.NewLine)
+                var line = TextLines[Cursor.RowIndex];
+                if (line.EndsWith(ParaBreakChar) && (Cursor.ColIndex == line.Length-1 )) //== Environment.NewLine)
                     rc = true;
             }
             return rc;
@@ -894,9 +978,9 @@ namespace KLineEdCmdApp.Model
         public bool IsCursorAtEndOfLine()
         {
             var rc = false;
-            //if cursor one character beyond last character in the line, or at EndOfParagraph mark?
+            //if cursor one character beyond last character in the line
             if ((TextLines != null) && (Cursor != null) && (Cursor.ColIndex >= 0) && (Cursor.RowIndex >= 0) && (Cursor.RowIndex < TextLines.Count))
-                rc = (IsCursorAtEndOfParagraph()) ? (Cursor.ColIndex == 0) : (TextLines[Cursor.RowIndex].Length == Cursor.ColIndex);
+                rc = (TextLines[Cursor.RowIndex].Length == Cursor.ColIndex);
 
             return rc;
         }
@@ -916,7 +1000,7 @@ namespace KLineEdCmdApp.Model
         {
             var rc = Program.PosIntegerNotSet;
             if ((TextLines != null) && (rowIndex >= 0) && (rowIndex < (TextLines?.Count ?? -1)))
-                rc = (TextLines[rowIndex] == Environment.NewLine) ? 0 : TextLines[rowIndex].Length; //allow for cursor after last char
+                rc = (TextLines[rowIndex].EndsWith(ParaBreakChar)) ? TextLines[rowIndex].Length-1 : TextLines[rowIndex].Length; // == Environment.NewLine) ? 0 : TextLines[rowIndex].Length; //allow for cursor after last char
             return rc;
         }
 
@@ -954,7 +1038,7 @@ namespace KLineEdCmdApp.Model
                 var lineIndex = (lineNo == Body.LastLine) ? TextLines.Count - 1 : lineNo - 1;
                 if ((lineIndex >= 0) && (lineIndex < TextLines.Count) && (TextLines[lineIndex] != null))
                 {
-                    rc = (TextLines[lineIndex] == Environment.NewLine) ? 0 : TextLines[lineIndex].Length;
+                    rc = (TextLines[lineIndex].EndsWith(ParaBreakChar)) ? 0 : TextLines[lineIndex].Length; // == Environment.NewLine) ? 0 : TextLines[lineIndex].Length;
                 }
             }
             return rc;
