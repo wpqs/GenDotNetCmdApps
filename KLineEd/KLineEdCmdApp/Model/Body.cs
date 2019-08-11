@@ -465,17 +465,34 @@ namespace KLineEdCmdApp.Model
                                 rc.SetError(1100804, MxError.Source.User, Body.GetErrorsInText(line, Cursor.RowIndex + 2));
                             else
                             {
-                                var columnIndex = (line == Environment.NewLine) ? 0 : line.Length;
                                 var rowIndex = Cursor.RowIndex + 1;
                                 if (atEndOfChapter == false)
-                                    TextLines.Insert(rowIndex, line);
+                                {
+                                    var startLine = TextLines[Cursor.RowIndex].Substring(0, Cursor.ColIndex);
+                                    var endLine = TextLines[Cursor.RowIndex].Substring(Cursor.ColIndex);
+                                    TextLines[Cursor.RowIndex] = startLine;
+
+                                    TextLines.Insert(rowIndex, (line == Environment.NewLine) ? endLine : line + endLine);
+
+                                   // AutoLineBreak(Cursor.RowIndex+1, (line == Environment.NewLine) ? endLine : line+endLine);
+
+                                   // 
+                                    //get line @ Cursor.RowIndex
+                                    //split line @ Cursor.ColIndex - existing, newline
+                                    //AutoLineBreak(Cursor.RowIndex, (line == Environment.NewLine) ? "" ? line);
+
+
+                                    //append split to line and further split if needed + cascade following lines
+
+
+                                }
                                 else
                                 {
                                     TextLines.Add(line);
                                     rowIndex = TextLines.Count - 1;
                                 }
                                 WordCount += GetWordCountInLine(line);
-                                SetCursorInChapter(rowIndex, columnIndex); //line added so assume SetCursor succeeds; worst case user needs to click 'end'
+                                SetCursorInChapter(rowIndex, (line == Environment.NewLine) ? 0 : line.Length); //line added so assume SetCursor succeeds; worst case user needs to click 'end'
                                 rc.SetResult(true);
                             }
                         }
@@ -653,25 +670,25 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> AutoLineBreak(int lineIndex, string appendChar)
+        public MxReturnCode<bool> AutoLineBreak(int rowIndex, string insertText)
         {
             var rc = new MxReturnCode<bool>("Body.AutoLineBreak");
 
-            if ((lineIndex < 0) || (String.IsNullOrEmpty(appendChar) == true) || (appendChar.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
-                rc.SetError(1100701, MxError.Source.Param, $"lineIndex={lineIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={appendChar?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
+            if ((rowIndex < 0) || (String.IsNullOrEmpty(insertText) == true) || (insertText.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
+                rc.SetError(1100701, MxError.Source.Param, $"lineIndex={rowIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={insertText?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
             else
             {
-                var breakIndex = GetLineBreakIndex(lineIndex, appendChar.Length);
+                var breakIndex = GetLineBreakIndex(rowIndex, insertText.Length);
                 if (breakIndex == Program.PosIntegerNotSet)
-                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={appendChar.Length} > line length={GetCharacterCountInLine()} when LineWidth={EditAreaViewCursorLimit.ColIndex}", MxMsgs.MxErrLineTooLong);
+                    rc.SetError(1100702, MxError.Source.User, $"appendChar.Length={insertText.Length} > line length={GetCharacterCountInLine()} when LineWidth={EditAreaViewCursorLimit.ColIndex}", MxMsgs.MxErrLineTooLong);
                 else
                 {
-                    var newLine = SplitLine(lineIndex, breakIndex);
+                    var newLine = SplitLine(rowIndex, breakIndex);
                     if (newLine == null)
-                        rc.SetError(1100703, MxError.Source.User, $"SplitLine({lineIndex}, {breakIndex}) is null for TextLines.Count={TextLines.Count}", MxMsgs.MxErrLineTooLong);
+                        rc.SetError(1100703, MxError.Source.User, $"SplitLine({rowIndex}, {breakIndex}) is null for TextLines.Count={TextLines.Count}", MxMsgs.MxErrLineTooLong);
                     else
                     {
-                        var rcInsert = InsertLine(newLine + appendChar);
+                        var rcInsert = InsertLine(newLine + insertText);  //todo cascade to end of para - take care as Loop here
                         rc += rcInsert;
                         if (rcInsert.IsSuccess(true))
                             rc.SetResult(true);
