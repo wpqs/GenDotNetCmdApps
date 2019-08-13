@@ -57,7 +57,7 @@ namespace KLineEdCmdApp.Controller
                     else if (keyInfo.Key == ConsoleKey.Delete)
                     {
                         if (model.PropsDelChar(false) == false)
-                            SetMxError(1230106, MxError.Source.User, Resources.MxWarnNoCharToDelete, MxMsgs.MxWarnNoCharToDelete); //todo update when next release of MxReturnCode is available
+                            SetMxError(1230106, MxError.Source.User, Resources.MxWarnChapterEmpty, MxMsgs.MxWarnNoCharToDelete); //todo update when next release of MxReturnCode is available
                     }
                     else if (keyInfo.Key == ConsoleKey.Backspace)
                     {

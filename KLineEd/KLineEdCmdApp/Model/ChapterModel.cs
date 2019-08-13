@@ -271,9 +271,9 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1050601, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
             else
             {
-                if (ChapterBody.IsCursorAtEndOfParagraph())
+                if (ChapterBody.GetCharacterCountInRow(ChapterBody.Cursor.RowIndex) == 1)
                 {
-                    var rcDelete = ChapterBody.DeleteLine(ChapterBody.Cursor.RowIndex, true);
+                    var rcDelete = ChapterBody.DeleteLine(ChapterBody.Cursor.RowIndex, ChapterBody.Cursor.RowIndex > 0);
                     rc += rcDelete;
                     if (rcDelete.IsSuccess(true))
                     {

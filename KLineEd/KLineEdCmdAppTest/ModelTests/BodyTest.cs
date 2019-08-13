@@ -189,7 +189,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.InsertLine("one two three four").GetResult());
             Assert.Equal(4, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(18, body.GetCharacterCountInLine());
+            Assert.Equal(18, body.GetCharacterCountInRow());
             Assert.Equal("one two three four", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.Equal("one", body.GetWordInLine(Body.LastLine, 1));
@@ -216,7 +216,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.InsertLine("one").GetResult());
             Assert.Equal(1, body.WordCount);
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(3, body.GetCharacterCountInLine());
+            Assert.Equal(3, body.GetCharacterCountInRow());
             Assert.Equal("one", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
         }
 

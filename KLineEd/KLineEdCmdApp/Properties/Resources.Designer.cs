@@ -178,6 +178,15 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: Chapter is empty. Please type a character and try again..
+        /// </summary>
+        internal static string MxWarnChapterEmpty {
+            get {
+                return ResourceManager.GetString("MxWarnChapterEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warning: you cannot move beyond the end of the chapter.
         /// </summary>
         internal static string MxWarnEndOfChapter {

@@ -33,6 +33,8 @@ namespace KLineEdCmdApp
         public const string MxWarnStartOfChapter = "MxWarnStartOfChapter"; //Warning: you cannot move beyond the start of the chapter
         public const string MxWarnEndOfChapter = "MxWarnEndOfChapter"; //Warning: you cannot move beyond the end of the chapter
         public const string MxWarnTooManyLines = "MxWarnTooManyLines"; //Warning: Line limit reached. Please start a new chapter
+        public const string MxWarnChapterEmpty = "MxWarnChapterEmpty"; //Warning: Chapter is empty. Please type a character and try again.
+
 
     }
 
