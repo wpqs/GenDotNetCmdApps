@@ -9,12 +9,12 @@ namespace KLineEdCmdApp.Utils
         ///     Snip (2, 2) - return string containing just the character at index 2
         ///     Snip (1, 2) - return string containing the three character between index 0 and index 2
         /// </summary>
-        public static string Snip(this string source, int start, int end)
+        public static string Snip(this string source, int startIndex, int endIndex)
         {
             string rc = null;
-            if ((start >= 0) && (end >= 0) && (end >= start) && (end < source.Length))
+            if ((startIndex >= 0) && (endIndex >= 0) && (endIndex >= startIndex) && (endIndex < source.Length))
             {
-                rc = source.Substring(start, end - start + 1); // Return Substring of length
+                rc = source.Substring(startIndex, endIndex - startIndex + 1); // Return Substring of length
             }
             return rc;
         }

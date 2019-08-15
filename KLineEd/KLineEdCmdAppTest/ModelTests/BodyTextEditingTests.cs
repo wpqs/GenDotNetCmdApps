@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
@@ -15,6 +16,14 @@ namespace KLineEdCmdAppTest.ModelTests
 {
     public class BodyTextEditingTests
     {
+        private readonly string _instancePathFileName;
+
+        public BodyTextEditingTests()
+        {
+            _instancePathFileName = TestConst.UnitTestInstanceTestsPathFileName;  //file deleted before each test
+            if (File.Exists(_instancePathFileName))
+                File.Delete(_instancePathFileName);
+        }
 
         [Fact]
         public void InsertParaBreakInEmptyChapterTest()
@@ -221,7 +230,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
 
         [Fact]
-        public void DeleteCharacterOneLineTest()
+        public void DeleteCharacterCursorStartOneLineTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
@@ -233,6 +242,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(body.SetCursorInChapter(0,0).GetResult());
+
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.Equal("werty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.True(body.DeleteCharacter().GetResult());
@@ -245,7 +255,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void BackspaceOneLineTest()
+        public void DeleteCharacterCursorEndOneLineTest()
         {
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
@@ -257,6 +267,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(body.SetCursorInChapter(0, 5).GetResult());
+
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.Equal("qwert", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.True(body.DeleteCharacter().GetResult());
@@ -265,8 +276,91 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
 
-        //    Assert.False(body.DeleteCharacter().GetResult());
+            Assert.Contains("Warning: Chapter is empty", body.DeleteCharacter().GetErrorUserMsg());
 
+        }
+
+        [Fact]
+        public void DeleteCharacterParaBreakTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+            Assert.Equal(0, body.GetLineCount());
+
+            var line1 = "qwerty";
+            Assert.True(body.InsertLine(line1).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            Assert.True(body.SetCursorInChapter(0, 2).GetResult());
+            Assert.True(body.InsertParaBreak().GetResult());
+
+            Assert.Equal(2, body.GetLineCount());
+            Assert.Equal(1, body.Cursor.RowIndex);
+            Assert.Equal(0, body.Cursor.ColIndex);
+            Assert.Equal("qw>", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("erty", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+
+            Assert.True(body.SetCursorInChapter(0, 2).GetResult());
+            Assert.True(body.DeleteCharacter().GetResult());
+            Assert.Equal("qw", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+        }
+
+        [Fact]
+        public void BackSpaceParaBreakTest()
+        {
+            var manuscriptNew = new ChapterModel();
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
+
+            Assert.True(rc.GetResult());
+            Assert.True(manuscriptNew.Ready);
+            Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
+
+            var line1 = "qwerty";
+            Assert.True(manuscriptNew.BodyInsertLine(line1).GetResult());
+
+            Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(0, 2).GetResult());
+            Assert.True(manuscriptNew.BodyInsertParaBreak().GetResult());
+
+            Assert.Equal(2, manuscriptNew.GetTextLineCount());
+            Assert.Equal(1, manuscriptNew.ChapterBody.Cursor.RowIndex);
+            Assert.Equal(0, manuscriptNew.ChapterBody.Cursor.ColIndex);
+
+            Assert.Equal("qw>", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("erty", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[1]);
+
+            Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(1, 0).GetResult());
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.Equal("qw", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[0]);
+        }
+
+        [Fact]
+        public void BackspaceOneLineTest()
+        {
+            var manuscriptNew = new ChapterModel();
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
+
+            Assert.True(rc.GetResult());
+            Assert.True(manuscriptNew.Ready);
+            Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
+
+            var line1 = "qwerty";
+            Assert.True(manuscriptNew.BodyInsertLine(line1).GetResult());
+            Assert.Equal("qwerty", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            Assert.True(manuscriptNew.BodyMoveCursor(Body.CursorMove.End).GetResult());
+
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.Equal("qwert", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+
+            Assert.Contains("Warning: Chapter is empty", manuscriptNew.BodyBackSpace().GetErrorUserMsg());
         }
 
 
