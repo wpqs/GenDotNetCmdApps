@@ -211,9 +211,16 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.Cursor.ColIndex);
 
+            Assert.Contains("Warning: you cannot move beyond the start of the chapter", body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetErrorUserMsg());
+            Assert.Contains("Warning: you cannot move beyond the start of the chapter", body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetErrorUserMsg());
+
             Assert.True(body.MoveCursorInChapter(Body.CursorMove.End).GetResult());
             Assert.Equal(2, body.Cursor.RowIndex);
             Assert.Equal(line3.Length, body.Cursor.ColIndex);
+
+            Assert.Contains("Warning: you cannot move beyond the end of the chapter", body.MoveCursorInChapter(Body.CursorMove.NextCol).GetErrorUserMsg());
+            Assert.Contains("Warning: you cannot move beyond the end of the chapter", body.MoveCursorInChapter(Body.CursorMove.NextRow).GetErrorUserMsg());
+
 
             Assert.True(body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
             Assert.Equal(2, body.Cursor.RowIndex);

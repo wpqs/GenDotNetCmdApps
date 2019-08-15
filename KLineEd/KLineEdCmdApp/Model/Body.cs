@@ -333,12 +333,12 @@ namespace KLineEdCmdApp.Model
                     }
                     else
                     {
-                        if ((rowIndex == -1) || (colIndex == -1))
-                            rc.SetError(1100603, MxError.Source.User, Resources.MxWarnStartOfChapter);
+                        if (rowIndex == linesCount)
+                            rc.SetError(1100603, MxError.Source.User, Resources.MxWarnEndOfChapter);
                         else
                         {
-                            if (rowIndex == linesCount)
-                                rc.SetError(1100604, MxError.Source.User, Resources.MxWarnEndOfChapter);
+                            if ((rowIndex == -1) || (colIndex == -1))
+                                rc.SetError(1100604, MxError.Source.User, Resources.MxWarnStartOfChapter);
                             else
                             {
                                 var lastColIndex = GetMaxColCursorIndexForRow(rowIndex);
