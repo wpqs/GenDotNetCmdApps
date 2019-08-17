@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using KLineEdCmdApp.Model;
-using KLineEdCmdApp.Utils;
 using KLineEdCmdAppTest.TestSupport;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using Xunit;
 using Program = KLineEdCmdApp.Program;
 
@@ -277,10 +272,15 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.Equal("qwert", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.True(body.SetCursorInChapter(0, 4).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
+            Assert.True(body.SetCursorInChapter(0, 3).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
+            Assert.True(body.SetCursorInChapter(0, 2).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
+            Assert.True(body.SetCursorInChapter(0, 1).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
+            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
 
             Assert.Contains("Warning: Chapter is empty", body.DeleteCharacter().GetErrorUserMsg());
@@ -357,8 +357,10 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("qwerty", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(manuscriptNew.BodyMoveCursor(Body.CursorMove.End).GetResult());
+            Assert.Equal(6, manuscriptNew.ChapterBody.Cursor.ColIndex);
 
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.Equal(5, manuscriptNew.ChapterBody.Cursor.ColIndex);
             Assert.Equal("qwert", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
@@ -369,6 +371,563 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Contains("Warning: Chapter is empty", manuscriptNew.BodyBackSpace().GetErrorUserMsg());
         }
+
+
+        [Fact]
+        public void InsertLineNullFailTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.False(body.InsertLine(null).GetResult());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+        }
+
+        [Fact]
+        public void InsertLineEmptyFailTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.False(body.InsertLine("").GetResult()); //lines cannot be empty 
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+        }
+
+        [Fact]
+        public void InsertTextInvalidCharFailTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.False(body.InsertText('>'.ToString()).GetResult());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.False(body.InsertText('<'.ToString()).GetResult());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.False(body.InsertText($"hello{Environment.NewLine}").GetResult());  //not in col=0
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.False(body.InsertText($"{Environment.NewLine}").GetResult());  //in col=0
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+        }
+
+
+        [Fact]
+        public void InsertTextInsertInitialTextTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText("aaa").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal("aaa", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextAppendLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(" aaa").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal("one aaa", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextOverwriteStartTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one two three").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            body.SetCursorInChapter(0, 0);
+
+            Assert.True(body.InsertText("xxx").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal("xxx two three", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextOverwriteMiddleTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one two three").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            body.SetCursorInChapter(0, 4);
+
+            Assert.True(body.InsertText("xxx").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal("one xxx three", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextOverwriteToEndTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one two three").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            body.SetCursorInChapter(0, 8);
+
+            Assert.True(body.InsertText("xxxxx").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal("one two xxxxx", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextOverwriteBeyondEndTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one two three").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            body.SetCursorInChapter(0, 13);
+
+            Assert.True(body.InsertText(" xxx").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal("one two three xxx", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextInsertStartTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one two three").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            body.SetCursorInChapter(0, 0);
+
+            Assert.True(body.InsertText("xxx ", true).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal("xxx one two three", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextInsertMiddleTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one two three").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            body.SetCursorInChapter(0, 4);
+
+            Assert.True(body.InsertText("xxx ", true).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal("one xxx two three", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextInsertEndTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine("one two three").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            body.SetCursorInChapter(0, 13);
+
+            Assert.True(body.InsertText(" xxx", true).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal("one two three xxx", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+
+        [Fact]
+        public void InsertTextLongWordTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, 36).GetResult());
+            Assert.False(body.IsError());
+
+            var word = "0123456789 123456789 123456789 1234";
+            Assert.Equal(35, word.Length);
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText(word).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(word, body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            var tooLong = word + "x";
+            Assert.False(body.InsertText(tooLong).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+        }
+
+        [Fact]
+        public void InsertLineLongLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, 36).GetResult());
+            Assert.False(body.IsError());
+
+            var line = "0123456789 123456789 123456789 1234";
+            Assert.Equal(35, line.Length);
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine(line).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(line, body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            var tooLong = line + "x";
+            Assert.False(body.InsertLine(tooLong).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+        }
+
+        [Fact]
+        public void InsertLineSpaceTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertLine(" ").GetResult()); //lines can start with space
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+        }
+
+        [Fact]
+        public void InsertTextCharacterTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText('a'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('b'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('c'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+
+            Assert.Equal("ab c", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextSpaceTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.Equal(" ", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextMultiSpaceTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText('a'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('b'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('c'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+
+            Assert.Equal("ab    c", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextStartSpaceTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.True(body.InsertText('a'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('b'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+
+            Assert.Equal(" a b", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextStartMultiSpaceTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.True(body.InsertText('a'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('b'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+
+            Assert.Equal("   a b", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextTabTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(3, body.TabSpaces.Length);
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText('a'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('b'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(body.TabSpaces).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('c'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+
+            Assert.Equal("ab   c", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+        [Fact]
+        public void InsertTextStartTabTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(3, body.TabSpaces.Length);
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText(body.TabSpaces).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.True(body.InsertText('a'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(body.TabSpaces).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText('b'.ToString()).GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+
+            Assert.Equal("   a   b", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+        }
+
+
+        [Fact]
+        public void InsertTextInsertSecondLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, 36).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.True(body.InsertText("aaaa").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(1, body.WordCount);
+
+            Assert.True(body.InsertText(" bbbbb").GetResult());
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal("aaaa bbbbb", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            Assert.True(body.InsertText(" 0123456789").GetResult()); //col 22
+            Assert.True(body.InsertText(" 0123456789").GetResult()); //col 33
+            Assert.True(body.InsertText(" 0").GetResult()); //col 35
+
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(5, body.WordCount);
+
+            Assert.True(body.InsertText("x").GetResult()); //col 36
+            Assert.Equal(2, body.GetLineCount());
+
+            Assert.Equal("aaaa bbbbb 0123456789 0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("0x", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+        }
+
+        [Fact]
+        public void InsertTextSplitLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            var line = "0123456789 123456789 123456789 123456789 123456789 123456789 1234";
+            Assert.Equal(65, line.Length);
+            Assert.True(body.InsertLine(line).GetResult());
+
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(7, body.WordCount);
+
+            Assert.True(body.InsertText('a'.ToString()).GetResult());
+            Assert.Equal(2, body.GetLineCount());
+            Assert.Equal(7, body.WordCount);
+            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("1234a", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+        }
+
+        [Fact]
+        public void InsertTextSpaceSplitLineTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            var line = "0123456789 123456789 123456789 123456789 123456789 123456789 1234";
+            Assert.Equal(65, line.Length);
+
+            Assert.True(body.InsertLine(line).GetResult());
+
+            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789 1234", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(65, body.Cursor.ColIndex); //one char after end
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(7, body.WordCount);
+
+            Assert.True(body.InsertText(' '.ToString()).GetResult());
+
+            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("1234 ", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(5, body.Cursor.ColIndex); //one char after end
+            Assert.Equal(1, body.Cursor.RowIndex);
+            Assert.Equal(2, body.GetLineCount());
+            Assert.Equal(7, body.WordCount);
+
+            Assert.True(body.InsertText('x'.ToString()).GetResult());
+
+            Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("1234 x", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+
+            Assert.Equal(2, body.GetLineCount());
+         //   Assert.Equal(8, body.WordCount);
+        }
+
 
 
         [Fact]

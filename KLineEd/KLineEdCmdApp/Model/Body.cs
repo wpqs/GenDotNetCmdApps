@@ -562,13 +562,20 @@ namespace KLineEdCmdApp.Model
                             else
                             {
                                 var rowIndex = Cursor.RowIndex + 1;
-                                if (atEndOfChapter == false)
+                                if ((atEndOfChapter == true) || (rowIndex >= linesCount))
+                                {
+                                    TextLines.Add(line);
+                                    rowIndex = TextLines.Count - 1;
+                                }
+                                else
                                 {
                                     var startLine = TextLines[Cursor.RowIndex].Substring(0, Cursor.ColIndex);
                                     var endLine = TextLines[Cursor.RowIndex].Substring(Cursor.ColIndex);
                                     TextLines[Cursor.RowIndex] = startLine;
 
                                     TextLines.Insert(rowIndex, line + endLine); // (line == ParaBreak) ? endLine : line + endLine); //(line == Environment.NewLine) ? endLine : line + endLine);
+
+                                    //adjust rest of paragraph lines
 
                                     // AutoLineBreak(Cursor.RowIndex+1, (line == Environment.NewLine) ? endLine : line+endLine);
 
@@ -581,11 +588,6 @@ namespace KLineEdCmdApp.Model
                                     //append split to line and further split if needed + cascade following lines
 
 
-                                }
-                                else
-                                {
-                                    TextLines.Add(line);
-                                    rowIndex = TextLines.Count - 1;
                                 }
                                 WordCount += GetWordCountInLine(line);
                                 var rcCursor = SetCursorInChapter(rowIndex, line.EndsWith(ParaBreakChar)? line.Length-1 : line.Length); // (line == ParaBreak) ? 0 : line.Length);  // line added so assume SetCursor succeeds; worst case user needs to click 'end'
@@ -633,33 +635,34 @@ namespace KLineEdCmdApp.Model
                             }
                             else
                             {
-                                if ((Cursor.RowIndex < 0) || (Cursor.RowIndex >= linesCount))
-                                    rc.SetError(1100904, MxError.Source.Program, $"Invalid Cursor.RowIndex={Cursor.RowIndex}, TextLines.Count={linesCount}", MxMsgs.MxErrInvalidCondition);
+                                if ((Cursor.RowIndex < 0) || (Cursor.RowIndex >= linesCount) || (Cursor.ColIndex < 0) || (Cursor.ColIndex > maxColIndex))
+                                    rc.SetError(1100904, MxError.Source.Program, $"Invalid Cursor: Cursor.ColIndex={Cursor.ColIndex} (max={maxColIndex}) Cursor.RowIndex={Cursor.RowIndex} (max={linesCount-1})", MxMsgs.MxErrInvalidCondition);
                                 else
                                 {
-                                    var line = (IsCursorAtEndOfParagraph()) ? "" : TextLines[Cursor.RowIndex];
-                                    var insertText = (Cursor.ColIndex == line.Length) || insert;
+                                    var line = TextLines[Cursor.RowIndex];
                                     var existWordCount = GetWordCountInLine(line);
 
-                                    //check if text can fit into line and if not split line
-                                    if (line.Length >= (EditAreaViewCursorLimit.ColIndex - text.Length))
-                                    {
-                                        var rcAuto = AutoLineBreak(Cursor.RowIndex, text); //todo insert not append
-                                        rc += rcAuto;
-                                        if (rcAuto.IsSuccess(true))
-                                            rc.SetResult(true);
-                                    }
+                                    if ((Cursor.ColIndex == line.Length) || insert)
+                                        TextLines[Cursor.RowIndex] = line.Insert(Cursor.ColIndex, text);
                                     else
-                                    {                                                   
-                                        var result = GetLineUpdateText(line, text, Cursor.ColIndex, maxColIndex, insertText);
-                                        if (result != null)
-                                        {
-                                            WordCount += GetWordCountInLine(result) - existWordCount;
-                                            TextLines[Cursor.RowIndex] = result;
-                                            Cursor.ColIndex += text.Length;
-                                            rc.SetResult(true);
-                                        }
+                                    {
+                                        var start = line.Snip(0, Cursor.ColIndex - 1); //null if Cursor.ColIndex=0
+                                        var end = line.Snip(Cursor.ColIndex + text.Length, line.Length-1); //null if text overwrites all text in line after Cursor.ColIndex
+                                        TextLines[Cursor.RowIndex] = (start ?? "") + text + (end ?? "");
                                     }
+                                    WordCount += GetWordCountInLine(TextLines[Cursor.RowIndex]) - existWordCount; //maybe less words now so += -3
+
+                                    //adjust lines to next ParaBreak 
+                                    LeftJustifyLinesInParagraph(Cursor.ColIndex + text.Length, maxColIndex, Cursor.RowIndex); 
+
+                                    //if (Cursor.ColIndex + text.Length <= maxColIndex)
+                                    //    Cursor.ColIndex = Cursor.ColIndex + text.Length;
+                                    //else
+                                    //{
+                                    //    Cursor.ColIndex = Cursor.ColIndex + text.Length - maxColIndex;
+                                    //    Cursor.RowIndex++;
+                                    //}
+                                    rc.SetResult(true);
                                 }
                             }
                         }
@@ -673,29 +676,6 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert)
-        {
-            string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters
-            if ((updateText != null) && (existingText != null) && (updateIndex >= 0) && (updateIndex < maxLength) && (Body.GetErrorsInText(updateText) == null))
-            {
-                if (insert)
-                {       //move all text at index text.length spaces right and insert at index
-                    if ((existingText.Length + updateText.Length) <= maxLength)
-                        rc = existingText.Insert(updateIndex, updateText);
-                }
-                else
-                {       //overwrite from startindex = index to endIndex=index+word.Length-1
-                    if (((updateIndex + updateText.Length) <= existingText.Length) && (existingText.Length <= maxLength))
-                    {
-                        var start = existingText.Snip(0, updateIndex - 1);
-                        var end = existingText.Substring(updateIndex + updateText.Length);
-                        if (((start?.Length ?? 0) + updateText.Length + ((end?.Length ?? 0)) <= maxLength))
-                            rc = (start ?? "") + updateText + (end ?? "");
-                    }
-                }
-            }
-            return rc;
-        }
 
         public MxReturnCode<bool> DeleteLine(int rowIndex, bool moveCursorBack = false)
         {
@@ -718,7 +698,7 @@ namespace KLineEdCmdApp.Model
                         //adjust lines to next ParaBreak
 
                         rowIndex = (((rowIndex > 0)) && ((moveCursorBack == true) || (rowIndex == TextLines.Count))) ? rowIndex - 1 : rowIndex;
-                        var colIndex = ((moveCursorBack == true) && (TextLines.Count > 0) && (rowIndex < TextLines.Count)) ? TextLines[rowIndex].Length : 0;
+                        var colIndex = ((moveCursorBack == true) && (TextLines.Count > 0) && (rowIndex < TextLines.Count)) ? GetMaxColCursorIndexForRow(rowIndex) : 0;
 
                         var rcCursor = SetCursorInChapter(rowIndex, colIndex);
                         rc += rcCursor;
@@ -774,12 +754,8 @@ namespace KLineEdCmdApp.Model
                                 {
                                     WordCount -= existWordCount - GetWordCountInLine(line);
                                     TextLines[Cursor.RowIndex] = line;
-
-                                    if (Cursor.ColIndex >= line.Length)
-                                        Cursor.ColIndex = line.Length - 1;
                                     
-                                    //adjust lines to next ParaBreak
-
+                                    //keep cursor position and adjust lines to next ParaBreak
 
                                     rc.SetResult(true);
                                 }
@@ -795,15 +771,16 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> AutoLineBreak(int rowIndex, string insertText)
+        public MxReturnCode<bool> AutoLineBreak(int rowIndex, string insertText)    //delete candidate
         {
             var rc = new MxReturnCode<bool>("Body.AutoLineBreak");
 
-            if ((rowIndex < 0) || (String.IsNullOrEmpty(insertText) == true) || (insertText.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
-                rc.SetError(1101201, MxError.Source.Param, $"lineIndex={rowIndex} is invalid, appendChar is NullorEmpty, or appendChar.Length={insertText?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
+            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((TextLines == null) || (lineCount == Program.PosIntegerNotSet) || (rowIndex < 0) || (rowIndex >= lineCount) || (String.IsNullOrEmpty(insertText) == true) || (insertText.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
+                rc.SetError(1101201, MxError.Source.Param, $"invalid: lineCount={lineCount} lineIndex={rowIndex}, insertText is NullorEmpty, or insertText.Length={insertText?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
             else
             {
-                var breakIndex = GetLineBreakIndex(rowIndex, insertText.Length);
+                var breakIndex = Body.GetSplitIndexFromEnd(TextLines[rowIndex], insertText.Length);
                 if (breakIndex == Program.PosIntegerNotSet)
                     rc.SetError(1101202, MxError.Source.User, $"appendChar.Length={insertText.Length} > line length={GetCharacterCountInRow()} when LineWidth={EditAreaViewCursorLimit.ColIndex}", MxMsgs.MxErrLineTooLong);
                 else
@@ -823,44 +800,71 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public int GetLineBreakIndex(int lineIndex, int spaceNeeded)
+        public bool LeftJustifyLinesInParagraph(int colIndex, int maxColWidth, int startRowIndex, int endRowIndex = Program.PosIntegerNotSet)
         {
-            var rc = Program.PosIntegerNotSet;
+            var rc = false;
 
-            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((linesCount != Program.PosIntegerNotSet) && (TextLines != null) && (lineIndex < linesCount) && (spaceNeeded > 0) && (spaceNeeded + 1 < EditAreaViewCursorLimit.ColIndex)) //allow for space
+            if ((colIndex >= 0) && (maxColWidth >= 0) && (maxColWidth <= (EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet)))
             {
-                var lineLen = TextLines[lineIndex].Length;
-                var splitIndex = lineLen;
-                var words = TextLines[lineIndex].Split(Body.SpaceChar);
-                for (int x = words.Length - 1; x >= 0; x--)
+                if (endRowIndex == Program.PosIntegerNotSet)
+                    endRowIndex = GetNextParaBreakRow(startRowIndex);
+                if (endRowIndex != Program.PosIntegerNotSet)
                 {
-                    if (words[x].Length == 0)
-                        splitIndex--;
-                    else
+                    var rowIndex = startRowIndex;
+                    while ((rc == false) && (rowIndex <= endRowIndex))
                     {
-                        splitIndex -= words[x].Length + 1;
-                        if ((lineLen - splitIndex) > spaceNeeded)
+                        var line = TextLines[rowIndex];
+                        if (line == null)
                             break;
+                        var lineLen = line.EndsWith(ParaBreakChar) ? line.Length-1 : line.Length;
+                        if (lineLen+1 > maxColWidth) 
+                        {           //line too long so split at last possible previous word and insert rest into next line, move cursor
+                            var splitIndex = Body.GetSplitIndexFromEnd(line, lineLen + 1 - maxColWidth);
+                            if (splitIndex == Program.PosIntegerNotSet)
+                                break;
+                            TextLines[rowIndex] = line.Snip(0, splitIndex-1);
+                            InsertLine(line.Snip(splitIndex + 1, line.Length - 1), false);
+
+                            rc = LeftJustifyLinesInParagraph(colIndex, maxColWidth, rowIndex, endRowIndex);
+                        }
+                        else
+                        {       
+                            if (rowIndex + 1 > endRowIndex)
+                                rc = true;  //done
+                            else
+                            {       //line too short so split next line and append its first part, no change to cursor
+                                var nextLine = TextLines[rowIndex + 1];
+                                var splitIndex = Body.GetSplitIndexFromStart(nextLine, maxColWidth - line.Length);
+                                if (splitIndex == Program.PosIntegerNotSet)
+                                    break;
+                                TextLines[rowIndex] += nextLine.Snip(0, splitIndex);
+                                TextLines[rowIndex + 1] = nextLine.Snip(splitIndex + 1, nextLine.Length - 1);
+                            }
+                            if (startRowIndex == rowIndex)
+                                SetCursorInChapter(rowIndex, colIndex);
+
+                        }
+                        rowIndex++;
                     }
                 }
-                if ((lineLen - splitIndex) > spaceNeeded)
-                    rc = splitIndex;
             }
+            if (rc == true)
+                WordCount = GetWordCountInChapter();
             return rc;
         }
-        public string SplitLine(int lineIndex, int splitIndex)
+
+        public string SplitLine(int rowIndex, int splitIndex)
         {
             string rc = null;
 
-            if (lineIndex < TextLines.Count) //todo check param and TextLines not null
+            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((splitIndex >= 0) && (TextLines != null) && (lineCount != Program.PosIntegerNotSet) && (rowIndex >= 0) && (rowIndex < lineCount)) 
             {
-                var lineEndIndex = TextLines[lineIndex].Length - 1;
+                var lineEndIndex = TextLines[rowIndex].Length - 1;
                 if (splitIndex < lineEndIndex)
                 {
-                    rc = TextLines[lineIndex].Substring(splitIndex + 1);
-                    WordCount -= GetWordCountInLine(rc);
-                    TextLines[lineIndex] = TextLines[lineIndex].Substring(0, splitIndex);
+                    rc = TextLines[rowIndex].Substring(splitIndex + 1);
+                    TextLines[rowIndex] = TextLines[rowIndex].Substring(0, splitIndex);
                 }
             }
             return rc;
@@ -898,6 +902,56 @@ namespace KLineEdCmdApp.Model
                     }
                     rc.SetResult(lines);
                 }
+            }
+            return rc;
+        }
+
+        public static int GetSplitIndexFromStart(string line, int spaceNeeded)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if ((spaceNeeded > 0) && (line != null) && (line.Length > spaceNeeded))
+            {
+                var splitIndex = 0;
+                var words = line.Split(Body.SpaceChar);
+
+                for (var x = 0; x < words.Length; x++)
+                {
+                    if (words[x].Length == 0)
+                        splitIndex++;
+                    else
+                    {
+                        splitIndex += words[x].Length; // + 1;
+                        if (splitIndex >= spaceNeeded)
+                            break;
+                    }
+                }
+                rc = splitIndex;
+            }
+            return rc;
+        }
+
+        public static int GetSplitIndexFromEnd(string line, int spaceNeeded)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if ((spaceNeeded > 0) && (line != null) && (line.Length > spaceNeeded))
+            {
+                var splitIndex = line.Length;
+                var words = line.Split(Body.SpaceChar);
+
+                for (var x = words.Length - 1; x >= 0; x--)
+                {
+                    if (words[x].Length == 0)
+                        splitIndex--;
+                    else
+                    {
+                        splitIndex -= words[x].Length + 1;
+                        if ((line.Length - splitIndex) > spaceNeeded)
+                            break;
+                    }
+                }
+                rc = splitIndex;
             }
             return rc;
         }
@@ -1020,14 +1074,34 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        private int RefreshWordCount()
+        private int GetWordCountInChapter()
         {
             var rc = 0;
             foreach (var line in TextLines)
             {
                 rc += GetWordCountInLine(line);
             }
-            WordCount = rc;
+            return rc;
+        }
+
+        private int GetNextParaBreakRow(int rowIndex)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((TextLines != null) && (rowIndex >= 0) && (rowIndex < lineCount))
+            {
+                rc = lineCount - 1;
+                while (rowIndex < lineCount)
+                {
+                    if (TextLines[rowIndex].EndsWith(ParaBreakChar))
+                    {
+                        rc = rowIndex;
+                        break;
+                    }
+                    rowIndex++;
+                }
+            }
             return rc;
         }
 
@@ -1088,6 +1162,31 @@ namespace KLineEdCmdApp.Model
                 if ((rowIndex >= 0) && (rowIndex < linesCount) && (TextLines[rowIndex] != null))
                 {
                     rc = (TextLines[rowIndex].EndsWith(ParaBreakChar)) ? TextLines[rowIndex].Length-1 : TextLines[rowIndex].Length; 
+                }
+            }
+            return rc;
+        }
+
+
+        public string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert) //delete candidate
+        {
+            string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters
+            if ((updateText != null) && (existingText != null) && (updateIndex >= 0) && (updateIndex < maxLength) && (Body.GetErrorsInText(updateText) == null))
+            {
+                if (insert)
+                {       //move all text at index text.length spaces right and insert at index
+                    if ((existingText.Length + updateText.Length) <= maxLength)
+                        rc = existingText.Insert(updateIndex, updateText);
+                }
+                else
+                {       //overwrite from startindex = index to endIndex=index+word.Length-1
+                    if (((updateIndex + updateText.Length) <= existingText.Length) && (existingText.Length <= maxLength))
+                    {
+                        var start = existingText.Snip(0, updateIndex - 1);
+                        var end = existingText.Substring(updateIndex + updateText.Length);
+                        if (((start?.Length ?? 0) + updateText.Length + ((end?.Length ?? 0)) <= maxLength))
+                            rc = (start ?? "") + updateText + (end ?? "");
+                    }
                 }
             }
             return rc;
