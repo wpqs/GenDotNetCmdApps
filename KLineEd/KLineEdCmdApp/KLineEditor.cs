@@ -26,13 +26,17 @@ namespace KLineEdCmdApp
 
     //display vertical layout: CmdHelp, Msg, - note: any change to ModeHelpLineCount, MsgLineCount, Status LineCount needs changes to their view.setup()
         public const int EditorHelpLineRowIndex = 0;
-        public const int ModeHelpLineRowCount = 1;   //height = ModeHelpLineRow + ModeHelpLineCount + MsgLineCount + EditAreaMarginTop + param.DisplayLastLinesCnt +  EditAreaMarginBottom + StatusLineCount
-        public const int MsgLineRowIndex = EditorHelpLineRowIndex + ModeHelpLineRowCount;
+        public const int HelpLineRowCount = 1;   //height = ModeHelpLineRow + ModeHelpLineCount + MsgLineCount + EditAreaMarginTop + param.DisplayLastLinesCnt +  EditAreaMarginBottom + StatusLineCount
+        public const int MsgLineRowIndex = EditorHelpLineRowIndex + HelpLineRowCount;
         public const int MsgLineRowCount = 1;
         public const int EditAreaMarginTopRowIndex = MsgLineRowIndex + MsgLineRowCount;
         public const int EditAreaMarginTopRowCount = 2;
-        public const int EditAreaTopRowIndex = EditAreaMarginTopRowIndex + EditAreaMarginTopRowCount;
+        public const int EditAreaMarginTopRuleRowCount = 1;
+        public const int EditAreaMarginTopRuleIndex = EditAreaMarginTopRowIndex + EditAreaMarginTopRowCount;
+
+        public const int EditAreaTopRowIndex = EditAreaMarginTopRowIndex + EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount;
         //param.DisplayLastLinesCnt
+        public const int EditAreaMarginBottomRuleRowCount = 1;
         public const int EditAreaMarginBottomRowCount = 10;
         public const int StatusLineRowCount = 1;
 
@@ -141,8 +145,8 @@ namespace KLineEdCmdApp
                 {
                     //BrowserExe = param.BrowserExe;
                     EditAreaLineWidth = param.EditAreaLineWidth;
-                    Width = EditAreaMarginLeft + EditAreaLineWidth + EditAreaMarginRight;  //there is actually an addition column, but writing to it creates a new line
-                    Height = ModeHelpLineRowCount + EditAreaMarginTopRowCount + param.EditAreaLinesCount + EditAreaMarginBottomRowCount + StatusLineRowCount;
+                    Width = EditAreaMarginLeft + EditAreaLineWidth + EditAreaMarginRight;  //there is actually an additional column used by cursor when at end of line
+                    Height = HelpLineRowCount +  EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + param.EditAreaLinesCount + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount;
 
                     var settings = new TerminalProperties
                     {

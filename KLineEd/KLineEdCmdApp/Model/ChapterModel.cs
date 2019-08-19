@@ -339,25 +339,6 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> BodyInsertLine(string line, bool atEndOfChapter = true) //delete candidate
-        {
-            var rc = new MxReturnCode<bool>("ChapterModel.BodyInsertLine");
-
-            if (Ready == false)
-                rc.SetError(1050801, MxError.Source.Program, "InitDone is not done- Initialise not called or not successful", MxMsgs.MxErrInvalidCondition);
-            else
-            {
-                var rcInsert = ChapterBody.InsertLine(line, atEndOfChapter);
-                rc += rcInsert;
-                if (rcInsert.IsSuccess(true))
-                {
-                    UpdateAllViews((int)ChangeHint.All);  //ChangeHint.Line or ChangeHint.Para
-                    rc.SetResult(true);
-                }
-            }
-            return rc;
-        }
-
         public MxReturnCode<bool> BodyInsertText(string text, bool insertMode = false)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.BodyInsertText");
@@ -462,24 +443,6 @@ namespace KLineEdCmdApp.Model
                 rc = ChapterHeader?.GetLastSessionReport() ?? "[chapter info not available]";
             return rc;
         }
-        public int GetTextLineCount()
-        {
-            var rc = Program.PosIntegerNotSet;
-
-            if (Ready)
-                rc = ChapterBody.GetLineCount();
-            return rc;
-        }
-
-        public int GetTextWordCount()  //delete candidate only called from tests
-        {
-            var rc = Program.PosIntegerNotSet;
-
-            if (Ready)
-                rc = ChapterBody.WordCount;
-            return rc;
-        }
-
 
         private MxReturnCode<bool> Write(string pathFilename, bool newFile = false)
         {

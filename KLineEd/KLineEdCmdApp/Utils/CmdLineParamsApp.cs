@@ -56,12 +56,13 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamAudioCR = "--audiocr"; //bell.mpeg 2
         public static readonly string ParamAudioKeyPress = "--audiokey"; //click.mpeg 4
         public static readonly string ParamBackGndColour = "--backgnd"; // text black(details black) (cmds black) (spell black)
-        public static readonly string ParamForeGndColour = "--foregnd"; // text green(details grey) (cmds grey) (spell red)
+        public static readonly string ParamForeGndColour = "--foregnd"; // text green(details grey) (cmds grey) (spell red) 
         public static readonly string ParamScrollReviewMode = "--scrollreview"; // on | off
         public static readonly string ParamEditLineMode = "--editline"; // on | off
         public static readonly string ParamSpellCheckMode = "--spellcheck"; // on | off
         public static readonly string ParamBrowser = "--browser"; // exe='Explorer'
         public static readonly string ParamParaBreak = "--parabreak"; // char=' '
+        public static readonly string ParamRulers = "--rulers"; // display=on|off backgnd=black foregnd=darkgreen 
 
         public const char ArgParaBreakDisplayCharDefault = '>';
 

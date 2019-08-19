@@ -17,10 +17,42 @@ namespace KLineEdCmdApp.View
     public class TextEditView : EditAreaView
     {
         public static readonly string TextEditorMode = "Text Editing:";
+
+
+
         // ReSharper disable once RedundantBaseConstructorCall
         public TextEditView(ITerminal terminal) : base(terminal)
         {
+        }
 
+        protected override bool SetRulers(int maxColIndex)
+        {
+            var rc = false;
+          
+            if ((maxColIndex > 0) && (maxColIndex < 999))
+            {
+                if (DisplayRulers == false)
+                    rc = base.SetRulers(maxColIndex);
+                else
+                {
+                    for (var index = 0; index <= maxColIndex; index++)
+                    {
+                        if ((index % 10) == 0)
+                        {
+                            var tick = (index / 10).ToString();
+                            TopRule += (tick.Length > 1) ? tick.Substring(1) : tick;
+                            BottomRule += "_";
+                        }
+                        else
+                        {
+                            TopRule += ".";
+                            BottomRule += "_";
+                        }
+                    }
+                    rc = true;
+                }
+            }
+            return rc;
         }
 
         public override void OnUpdate(NotificationItem notificationItem)
@@ -28,7 +60,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("TextEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsError())
+            if (IsOnUpdateError())
                 rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
@@ -48,7 +80,7 @@ namespace KLineEdCmdApp.View
                             case ChapterModel.ChangeHint.All:
                             {
                                 Terminal.SetCursorVisible(false);
-                                rc += ClearEditAreaText();
+                                rc += InitDisplay();
                                 if (rc.IsSuccess(true))
                                 {
                                     var rcRes = model.BodyGetEditAreaLinesForDisplay();
@@ -65,8 +97,9 @@ namespace KLineEdCmdApp.View
                                                 break;
                                             row++;
                                         }
+
                                         if (rc.IsSuccess())
-                                        { 
+                                        {
                                             rc += SetEditAreaCursor(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0);
                                             if (rc.IsSuccess(true))
                                                 rc.SetResult(true);
@@ -76,7 +109,7 @@ namespace KLineEdCmdApp.View
                                 Terminal.SetCursorVisible(CursorOn);
                                 break;
                             }
-                            case ChapterModel.ChangeHint.Line:
+                            case ChapterModel.ChangeHint.Line: //change to line so update line at cursor.rowIndex and all others to bottom
                             {
                                 var rcRes = model.BodyGetEditAreaLinesForDisplay(1);
                                 rc += rcRes;
@@ -93,18 +126,7 @@ namespace KLineEdCmdApp.View
 
                                 break;
                             }
-                            case ChapterModel.ChangeHint.Word:
-                            {
-                                var lastWord = model.ChapterBody?.GetWordInLine() ?? null;
-                                if (lastWord != null)
-                                {
-                                    rc += DisplayEditAreaWord(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0, lastWord);
-                                    if (rc.IsSuccess(true))
-                                        rc.SetResult(true);
-                                }
-                                break;
-                            }
-                            case ChapterModel.ChangeHint.Char:
+                            case ChapterModel.ChangeHint.Char:  //overwrite char only so just update char at cursor position
                             {
                                 var lastChar = model.ChapterBody?.GetCharacterInLine() ?? Body.NullChar;
                                 if (lastChar != Body.NullChar)

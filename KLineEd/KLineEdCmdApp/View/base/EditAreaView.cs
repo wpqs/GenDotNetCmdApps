@@ -8,13 +8,24 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public abstract class EditAreaView : BaseView
     {
-        public ConsoleColor EditAreaForeGndColour { private set; get; }
-        public ConsoleColor EditAreaBackGndColour { private set; get; }
+        public bool DisplayRulers { private set; get; }
+        public string TopRule { protected set; get; }
+        public string BottomRule { protected set; get; }
+        public ConsoleColor RuleForeGndColour { private set; get; }
+        public ConsoleColor RuleBackGndColour { private set; get; }
+        public ConsoleColor TextForeGndColour { private set; get; }
+        public ConsoleColor TextBackGndColour { private set; get; }
 
         public EditAreaView(ITerminal terminal) : base(terminal)
         {
-            EditAreaForeGndColour = ConsoleColor.Gray;
-            EditAreaBackGndColour = ConsoleColor.Black;
+            TopRule = "";
+            BottomRule = "";
+
+            RuleForeGndColour = ConsoleColor.Gray;
+            RuleBackGndColour = ConsoleColor.Black;
+
+            TextForeGndColour = ConsoleColor.Gray;
+            TextBackGndColour = ConsoleColor.Black;
         }
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
@@ -29,16 +40,19 @@ namespace KLineEdCmdApp.View.Base
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {       //todo apply ResetResult()
-                    EditAreaForeGndColour = ConsoleColor.Green; // param.ForeGndTextColour; //todo rename param.EditAreaForeGndColour  
-                    EditAreaBackGndColour = ConsoleColor.Black; // param.BackGndTextColour; //todo rename param.EditAreaBackGndColour 
+                    TextForeGndColour = ConsoleColor.Green; // param.ForeGndTextColour; //todo rename param.EditAreaForeGndColour  
+                    TextBackGndColour = ConsoleColor.Black; // param.BackGndTextColour; //todo rename param.EditAreaBackGndColour 
 
-                    var rcClear = ClearEditAreaText();
-                    rc += rcClear;
-                    if (rcClear.IsSuccess(true))
+                    RuleForeGndColour = ConsoleColor.DarkGreen; // param.ForeGndTextColour; //todo rename param.RuleForeGndColour  
+                    RuleBackGndColour = ConsoleColor.Black; // param.BackGndTextColour; //todo rename param.RuleBackGndColour 
+                    DisplayRulers = true;  //param.EditAreaRulersDisplay;
+
+                    if (SetRulers(EditAreaWidth-1))
                     {
                         Ready = true;
                         rc.SetResult(true);
                     }
+
                 }
             }
             return rc;
@@ -47,38 +61,55 @@ namespace KLineEdCmdApp.View.Base
         public override void OnUpdate(NotificationItem notificationItem)
         {
             base.OnUpdate(notificationItem);
-            if (IsError() == false)
+            if (IsOnUpdateError() == false)
             {
-                if (Terminal.SetColour(EditAreaForeGndColour, EditAreaBackGndColour) == false)
+                if (Terminal.SetColour(TextForeGndColour, TextBackGndColour) == false)
                     SetMxError(1140202, Terminal.GetErrorSource(), $"Terminal: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
             }
         }
 
-        public MxReturnCode<bool> ClearEditAreaText()
+        public MxReturnCode<bool> InitDisplay()
         {
-            var rc = new MxReturnCode<bool>("EditAreaView.ClearTextArea");
+            var rc = new MxReturnCode<bool>("EditAreaView.InitDisplay");
 
-            if (Terminal.SetColour(EditAreaForeGndColour, EditAreaBackGndColour) == false)
-                rc.SetError(1140301, Terminal.GetErrorSource(), $"EditAreaView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+            Terminal.SetCursorVisible(false);
+
+            if (Terminal.SetColour(RuleForeGndColour, RuleBackGndColour) == false)
+                rc.SetError(1140301, Terminal.GetErrorSource(), $"TextEditView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
             else
             {
-                Terminal.SetCursorVisible(false);
-                for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
+                var rcTop = DisplayLine(KLineEditor.EditAreaMarginTopRuleIndex, KLineEditor.EditAreaMarginLeft, TopRule);
+                rc += rcTop;
+                if (rcTop.IsSuccess(true))
                 {
-                    //var blank = $"{editRowIndex}";         ////see also BaseView.Setup()
-                    //blank = blank.PadRight(EditAreaWidth - 2, ',');
-                    //blank += "o";
-                    //DisplayLine(KLineEditor.EditAreaTopRowIndex+editRowIndex, KLineEditor.EditAreaMarginLeft, blank, true);
+                    var rcBot = DisplayLine(KLineEditor.EditAreaMarginTopRuleIndex + EditAreaHeight + 1, KLineEditor.EditAreaMarginLeft, BottomRule);
+                    rc += rcBot;
+                    if (rcBot.IsSuccess(true))
+                    {
+                        if (Terminal.SetColour(TextForeGndColour, TextBackGndColour) == false)
+                            rc.SetError(1140302, Terminal.GetErrorSource(), $"EditAreaView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+                        else
+                        {
+                            for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
+                            {
+                                //var blank = $"{editRowIndex}";         ////see also BaseView.Setup()
+                                //blank = blank.PadRight(EditAreaWidth - 2, ',');
+                                //blank += "o";
+                                //DisplayLine(KLineEditor.EditAreaTopRowIndex+editRowIndex, KLineEditor.EditAreaMarginLeft, blank, true);
 
-                    var rcClear = ClearLine(KLineEditor.EditAreaTopRowIndex + editRowIndex, 0);
-                    rc += rcClear;
-                    if (rcClear.IsError(true))
-                        break;
+                                var rcClear = ClearLine(KLineEditor.EditAreaTopRowIndex + editRowIndex, 0);
+                                rc += rcClear;
+                                if (rcClear.IsError(true))
+                                    break;
+                            }
+                            if (rc.IsSuccess())
+                                rc.SetResult(true);
+                        }
+                    }
                 }
-               Terminal.SetCursorVisible(CursorOn);
-                if (rc.IsSuccess())
-                    rc.SetResult(true);
             }
+            Terminal.SetCursorVisible(CursorOn);
+
             return rc;
         }
 
@@ -129,7 +160,6 @@ namespace KLineEdCmdApp.View.Base
             }
             return rc;
         }
-
         public MxReturnCode<bool> DisplayEditAreaChar(int editRowIndex, int editColIndex, char c)
         {
             var rc = new MxReturnCode<bool>("EditAreaView.DisplayEditAreaChar");
@@ -138,6 +168,21 @@ namespace KLineEdCmdApp.View.Base
             if (rc.IsSuccess(true))
                 rc.SetResult(true);
 
+            return rc;
+        }
+        protected virtual bool SetRulers(int maxColIndex)
+        {
+            var rc = false;
+
+            if ((maxColIndex > 0) && (maxColIndex < BlankLine.Length))
+            {
+                TopRule = BlankLine.Snip(0, maxColIndex);
+                if (TopRule != null)
+                {
+                    BottomRule = TopRule;
+                    rc = true;
+                }
+            }
             return rc;
         }
     }

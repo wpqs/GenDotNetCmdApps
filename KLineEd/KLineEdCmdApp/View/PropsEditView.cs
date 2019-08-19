@@ -40,7 +40,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("PropsEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsError())
+            if (IsOnUpdateError())
                 rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
@@ -84,7 +84,7 @@ namespace KLineEdCmdApp.View
                             }
                             case ChapterModel.ChangeHint.All:
                             {
-                                rc += ClearEditAreaText();
+                                rc += InitDisplay();
                                 if (rc.IsSuccess(true))
                                     rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.Author, authorLine, false);
                                 if (rc.IsSuccess(true))

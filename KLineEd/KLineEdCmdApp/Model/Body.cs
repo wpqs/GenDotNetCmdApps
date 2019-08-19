@@ -74,6 +74,7 @@ namespace KLineEdCmdApp.Model
         public Body()
         {
             TextLines = new List<string>();
+
             Cursor = new CursorPosition(0, 0);
             EditAreaViewCursorLimit = new CursorPosition(CmdLineParamsApp.ArgEditAreaLinesCountDefault, CmdLineParamsApp.ArgEditAreaLineWidthDefault); //updated by Model.Initialise
 
@@ -318,7 +319,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.SetCursorInChapter");
                                         //rowIndex == -1 or rowIndex == TextLines.Count are errors needing specific reporting
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((linesCount == Program.PosIntegerNotSet) || (rowIndex < -1) || (rowIndex > linesCount) || (colIndex < -1) || (colIndex > (EditAreaViewCursorLimit?.ColIndex ?? colIndex-1)))
+            if ((linesCount == Program.PosIntegerNotSet) || (rowIndex < -1) || (rowIndex > linesCount) || (colIndex < -1) || (colIndex > (EditAreaViewCursorLimit?.ColIndex+1 ?? colIndex-1))) //allow cursor to move one character after last permitted col
                 rc.SetError(1100601, MxError.Source.Param, $"rowIndex={rowIndex} > max({linesCount}), colIndex={colIndex} > max({EditAreaViewCursorLimit?.ColIndex ?? colIndex-1}", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -453,18 +454,6 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> InsertInitialText(string text)
-        {
-            var rc = new MxReturnCode<bool>("Body.InsertInitialText");
-
-            var rcInsertLine = InsertLine(text);
-            rc += rcInsertLine;
-            if (rcInsertLine.IsSuccess(true))
-                rc.SetResult(true);
-
-            return rc;
-        }
-
         public CursorPosition GetCursorInEditArea()
         {
             CursorPosition rc = null;
@@ -495,10 +484,8 @@ namespace KLineEdCmdApp.Model
                     {
                         if (linesCount == 0)
                         {
-                            var rcInitial = InsertInitialText(ParaBreak);
-                            rc += rcInitial;
-                            if (rcInitial.IsSuccess(true))
-                                rc.SetResult(true);
+                            TextLines.Add(ParaBreak);
+                            rc.SetResult(true);
                         }
                         else
                         {
@@ -528,6 +515,7 @@ namespace KLineEdCmdApp.Model
                                 }
                             }
                         }
+
                     }
                 }
                 catch (Exception e)
@@ -538,13 +526,13 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> InsertLine(string line, bool atEndOfChapter = true)
+        public MxReturnCode<bool> InsertLine(string line)
         {
             var rc = new MxReturnCode<bool>("Body.InsertLine");
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(line) ) || (line.Length+1 > EditAreaViewCursorLimit.ColIndex + 1)) //allow for cursor after end of line
-                rc.SetError(1100801, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than {EditAreaViewCursorLimit.ColIndex + 2}");
+            if ((string.IsNullOrEmpty(line) ) || (line.Length-1 > EditAreaViewCursorLimit.ColIndex)) 
+                rc.SetError(1100801, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than {EditAreaViewCursorLimit.ColIndex + 1}");
             else
             {
                 if (IsError() || (linesCount == Program.PosIntegerNotSet))
@@ -562,33 +550,26 @@ namespace KLineEdCmdApp.Model
                             else
                             {
                                 var rowIndex = Cursor.RowIndex + 1;
-                                if ((atEndOfChapter == true) || (rowIndex >= linesCount))
+                                if (rowIndex >= linesCount)
                                 {
-                                    TextLines.Add(line);
+                                    TextLines.Add(line); 
                                     rowIndex = TextLines.Count - 1;
                                 }
                                 else
                                 {
-                                    var startLine = TextLines[Cursor.RowIndex].Substring(0, Cursor.ColIndex);
-                                    var endLine = TextLines[Cursor.RowIndex].Substring(Cursor.ColIndex);
-                                    TextLines[Cursor.RowIndex] = startLine;
-
-                                    TextLines.Insert(rowIndex, line + endLine); // (line == ParaBreak) ? endLine : line + endLine); //(line == Environment.NewLine) ? endLine : line + endLine);
-
-                                    //adjust rest of paragraph lines
-
-                                    // AutoLineBreak(Cursor.RowIndex+1, (line == Environment.NewLine) ? endLine : line+endLine);
-
-                                    // 
-                                    //get line @ Cursor.RowIndex
-                                    //split line @ Cursor.ColIndex - existing, newline
-                                    //AutoLineBreak(Cursor.RowIndex, (line == Environment.NewLine) ? "" ? line);
-
-
-                                    //append split to line and further split if needed + cascade following lines
-
-
+                                    if (Cursor.ColIndex == 0)
+                                        TextLines.Insert(rowIndex, line); 
+                                    else
+                                    {
+                                        var startLine = TextLines[Cursor.RowIndex].Substring(0, Cursor.ColIndex);
+                                        var endLine = TextLines[Cursor.RowIndex].Substring(Cursor.ColIndex);
+                                        TextLines[Cursor.RowIndex] = startLine;
+                                        TextLines.Insert(rowIndex, line + endLine); 
+                                    }
                                 }
+
+                                //LeftJustifyLinesInParagraph
+
                                 WordCount += GetWordCountInLine(line);
                                 var rcCursor = SetCursorInChapter(rowIndex, line.EndsWith(ParaBreakChar)? line.Length-1 : line.Length); // (line == ParaBreak) ? 0 : line.Length);  // line added so assume SetCursor succeeds; worst case user needs to click 'end'
                                 rc += rcCursor;
@@ -611,12 +592,12 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.InsertText");
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(text) == true) || (text.Length > maxColIndex))
+            if ((string.IsNullOrEmpty(text) == true) || (text.Length-1 > maxColIndex))
                 rc.SetError(1100901, MxError.Source.Param, $"text is null, or length={text?.Length ?? Program.PosIntegerNotSet} > maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-                if (IsError() || (linesCount == Program.PosIntegerNotSet))
+                if (IsError() || (TextLines == null) || (linesCount == Program.PosIntegerNotSet))
                     rc.SetError(1100902, MxError.Source.Program, $"Body not initialized", MxMsgs.MxErrInvalidCondition);
                 else
                 {
@@ -627,44 +608,41 @@ namespace KLineEdCmdApp.Model
                         else
                         {
                             if (linesCount <= 0)
-                            {
-                                var rcInitial = InsertInitialText(text); 
-                                rc += rcInitial;
-                                if (rcInitial.IsSuccess(true))
-                                    rc.SetResult(true);
-                            }
+                                rc += InsertParaBreak();
+
+                            if (rc.IsError() || (Cursor.RowIndex < 0) || (Cursor.RowIndex >= TextLines.Count) || (Cursor.ColIndex < 0) || (Cursor.ColIndex > maxColIndex+1)) //allow cursor one char beyond last permitted char in line
+                                rc.SetError(1100904, MxError.Source.Program, $"Invalid Cursor: Cursor.ColIndex={Cursor.ColIndex} (max={maxColIndex}) Cursor.RowIndex={Cursor.RowIndex} (max={linesCount-1})", MxMsgs.MxErrInvalidCondition);
                             else
                             {
-                                if ((Cursor.RowIndex < 0) || (Cursor.RowIndex >= linesCount) || (Cursor.ColIndex < 0) || (Cursor.ColIndex > maxColIndex))
-                                    rc.SetError(1100904, MxError.Source.Program, $"Invalid Cursor: Cursor.ColIndex={Cursor.ColIndex} (max={maxColIndex}) Cursor.RowIndex={Cursor.RowIndex} (max={linesCount-1})", MxMsgs.MxErrInvalidCondition);
+                                var line = TextLines[Cursor.RowIndex];
+                                var existWordCount = GetWordCountInLine(line);
+
+                                if ((Cursor.ColIndex == line.Length) || insert)
+                                    TextLines[Cursor.RowIndex] = line.Insert(Cursor.ColIndex, text);
                                 else
                                 {
-                                    var line = TextLines[Cursor.RowIndex];
-                                    var existWordCount = GetWordCountInLine(line);
-
-                                    if ((Cursor.ColIndex == line.Length) || insert)
-                                        TextLines[Cursor.RowIndex] = line.Insert(Cursor.ColIndex, text);
-                                    else
-                                    {
-                                        var start = line.Snip(0, Cursor.ColIndex - 1); //null if Cursor.ColIndex=0
-                                        var end = line.Snip(Cursor.ColIndex + text.Length, line.Length-1); //null if text overwrites all text in line after Cursor.ColIndex
-                                        TextLines[Cursor.RowIndex] = (start ?? "") + text + (end ?? "");
-                                    }
-                                    WordCount += GetWordCountInLine(TextLines[Cursor.RowIndex]) - existWordCount; //maybe less words now so += -3
-
-                                    //adjust lines to next ParaBreak 
-                                    LeftJustifyLinesInParagraph(Cursor.ColIndex + text.Length, maxColIndex, Cursor.RowIndex); 
-
-                                    //if (Cursor.ColIndex + text.Length <= maxColIndex)
-                                    //    Cursor.ColIndex = Cursor.ColIndex + text.Length;
-                                    //else
-                                    //{
-                                    //    Cursor.ColIndex = Cursor.ColIndex + text.Length - maxColIndex;
-                                    //    Cursor.RowIndex++;
-                                    //}
-                                    rc.SetResult(true);
+                                    var paraBreak = line.EndsWith(ParaBreakChar) ? Body.ParaBreak : "";
+                                    var start = line.Snip(0, Cursor.ColIndex - 1); //null if Cursor.ColIndex=0
+                                    var end = line.Snip(Cursor.ColIndex + text.Length, line.Length-1); //null if text overwrites all text in line after Cursor.ColIndex
+                                    if (end?.EndsWith(ParaBreakChar) ?? false)
+                                        paraBreak = "";
+                                    TextLines[Cursor.RowIndex] = (start ?? "") + text + (end ?? "") + paraBreak;
                                 }
+                                WordCount += GetWordCountInLine(TextLines[Cursor.RowIndex]) - existWordCount; //maybe less words now so += -3
+
+                                //adjust lines to next ParaBreak 
+                                LeftJustifyLinesInParagraph(Cursor.ColIndex + text.Length, maxColIndex+1, Cursor.RowIndex); 
+
+                                //if (Cursor.ColIndex + text.Length <= maxColIndex)
+                                //    Cursor.ColIndex = Cursor.ColIndex + text.Length;
+                                //else
+                                //{
+                                //    Cursor.ColIndex = Cursor.ColIndex + text.Length - maxColIndex;
+                                //    Cursor.RowIndex++;
+                                //}
+                                rc.SetResult(true);
                             }
+
                         }
                     }
                     catch (Exception e)
@@ -754,8 +732,8 @@ namespace KLineEdCmdApp.Model
                                 {
                                     WordCount -= existWordCount - GetWordCountInLine(line);
                                     TextLines[Cursor.RowIndex] = line;
-                                    
-                                    //keep cursor position and adjust lines to next ParaBreak
+
+                                    //LeftJustifyLinesInParagraph - keep cursor position and adjust lines to next ParaBreak
 
                                     rc.SetResult(true);
                                 }
@@ -771,67 +749,37 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> AutoLineBreak(int rowIndex, string insertText)    //delete candidate
-        {
-            var rc = new MxReturnCode<bool>("Body.AutoLineBreak");
-
-            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((TextLines == null) || (lineCount == Program.PosIntegerNotSet) || (rowIndex < 0) || (rowIndex >= lineCount) || (String.IsNullOrEmpty(insertText) == true) || (insertText.Length > (TabSpaces?.Length ?? Program.PosIntegerNotSet)))
-                rc.SetError(1101201, MxError.Source.Param, $"invalid: lineCount={lineCount} lineIndex={rowIndex}, insertText is NullorEmpty, or insertText.Length={insertText?.Length ?? -1} > {TabSpaces?.Length ?? Program.PosIntegerNotSet}", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                var breakIndex = Body.GetSplitIndexFromEnd(TextLines[rowIndex], insertText.Length);
-                if (breakIndex == Program.PosIntegerNotSet)
-                    rc.SetError(1101202, MxError.Source.User, $"appendChar.Length={insertText.Length} > line length={GetCharacterCountInRow()} when LineWidth={EditAreaViewCursorLimit.ColIndex}", MxMsgs.MxErrLineTooLong);
-                else
-                {
-                    var newLine = SplitLine(rowIndex, breakIndex);
-                    if (newLine == null)
-                        rc.SetError(1101203, MxError.Source.User, $"SplitLine({rowIndex}, {breakIndex}) is null for TextLines.Count={TextLines.Count}", MxMsgs.MxErrLineTooLong);
-                    else
-                    {
-                        var rcInsert = InsertLine(newLine + insertText);  //todo cascade to end of para - take care as Loop here
-                        rc += rcInsert;
-                        if (rcInsert.IsSuccess(true))
-                            rc.SetResult(true);
-                    }
-                }
-            }
-            return rc;
-        }
-
         public bool LeftJustifyLinesInParagraph(int colIndex, int maxColWidth, int startRowIndex, int endRowIndex = Program.PosIntegerNotSet)
         {
             var rc = false;
 
-            if ((colIndex >= 0) && (maxColWidth >= 0) && (maxColWidth <= (EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet)))
+            if ((colIndex >= 0) && (maxColWidth >= 0) && (maxColWidth <= (EditAreaViewCursorLimit?.ColIndex+1 ?? Program.PosIntegerNotSet)))
             {
-                if (endRowIndex == Program.PosIntegerNotSet)
-                    endRowIndex = GetNextParaBreakRow(startRowIndex);
-                if (endRowIndex != Program.PosIntegerNotSet)
+                if ((endRowIndex = GetNextParaBreakRow(startRowIndex)) != Program.PosIntegerNotSet)
                 {
                     var rowIndex = startRowIndex;
-                    while ((rc == false) && (rowIndex <= endRowIndex))
+                    while (rowIndex <= endRowIndex) //(rc == false) && (rowIndex <= endRowIndex))
                     {
                         var line = TextLines[rowIndex];
                         if (line == null)
                             break;
                         var lineLen = line.EndsWith(ParaBreakChar) ? line.Length-1 : line.Length;
-                        if (lineLen+1 > maxColWidth) 
+                        if (lineLen > maxColWidth) 
                         {           //line too long so split at last possible previous word and insert rest into next line, move cursor
                             var splitIndex = Body.GetSplitIndexFromEnd(line, lineLen + 1 - maxColWidth);
                             if (splitIndex == Program.PosIntegerNotSet)
                                 break;
-                            TextLines[rowIndex] = line.Snip(0, splitIndex-1);
-                            InsertLine(line.Snip(splitIndex + 1, line.Length - 1), false);
+                            var existLine = line.Snip(0, splitIndex-1);
+                            var insertLine = line.Snip(splitIndex + 1, line.Length - 1);
 
-                            rc = LeftJustifyLinesInParagraph(colIndex, maxColWidth, rowIndex, endRowIndex);
+                            WordCount -= GetWordCountInLine(insertLine);
+                            TextLines[rowIndex] = existLine;
+                            InsertLine(insertLine); //change cursor
+                            endRowIndex++;
                         }
                         else
-                        {       
-                            if (rowIndex + 1 > endRowIndex)
-                                rc = true;  //done
-                            else
+                        {
+                            if (rowIndex < endRowIndex)
                             {       //line too short so split next line and append its first part, no change to cursor
                                 var nextLine = TextLines[rowIndex + 1];
                                 var splitIndex = Body.GetSplitIndexFromStart(nextLine, maxColWidth - line.Length);
@@ -846,10 +794,13 @@ namespace KLineEdCmdApp.Model
                         }
                         rowIndex++;
                     }
+                    if (rowIndex - 1 == endRowIndex)
+                    {
+                      //  WordCount = GetWordCountInChapter();
+                        rc = true;
+                    }
                 }
             }
-            if (rc == true)
-                WordCount = GetWordCountInChapter();
             return rc;
         }
 
@@ -1118,7 +1069,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        private int SetTabSpaces(int count)
+        private void SetTabSpaces(int count)
         {
             if (count > 0)
             {
@@ -1126,7 +1077,6 @@ namespace KLineEdCmdApp.Model
                 for (int x = 0; x < count; x++)
                     TabSpaces += " ";
             }
-            return TabSpaces.Length;   
         }
 
         private bool ResetCursorInChapter()
@@ -1167,30 +1117,6 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-
-        public string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert) //delete candidate
-        {
-            string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters
-            if ((updateText != null) && (existingText != null) && (updateIndex >= 0) && (updateIndex < maxLength) && (Body.GetErrorsInText(updateText) == null))
-            {
-                if (insert)
-                {       //move all text at index text.length spaces right and insert at index
-                    if ((existingText.Length + updateText.Length) <= maxLength)
-                        rc = existingText.Insert(updateIndex, updateText);
-                }
-                else
-                {       //overwrite from startindex = index to endIndex=index+word.Length-1
-                    if (((updateIndex + updateText.Length) <= existingText.Length) && (existingText.Length <= maxLength))
-                    {
-                        var start = existingText.Snip(0, updateIndex - 1);
-                        var end = existingText.Substring(updateIndex + updateText.Length);
-                        if (((start?.Length ?? 0) + updateText.Length + ((end?.Length ?? 0)) <= maxLength))
-                            rc = (start ?? "") + updateText + (end ?? "");
-                    }
-                }
-            }
-            return rc;
-        }
 
         public string GetWordInLine(int lineNo = Body.LastLine, int wordNo = Program.PosIntegerNotSet) //delete candidate
         {

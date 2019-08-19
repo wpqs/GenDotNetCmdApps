@@ -111,99 +111,32 @@ namespace KLineEdCmdAppTest.ModelTests
 
         }
 
+        //[Fact]
+        //public void GetWordInLineTest()
+        //{
+        //    var body = new Body();
+        //    Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+        //    Assert.False(body.IsError());
 
-        [Fact]
-        public void GetLineUpdateTextOverwriteTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
+        //    Assert.Equal(0, body.GetLineCount());
+        //    Assert.True(body.InsertLine("one two three four").GetResult());
+        //    Assert.Equal(4, body.WordCount);
+        //    Assert.Equal(1, body.GetLineCount());
+        //    Assert.Equal(18, body.GetCharacterCountInRow());
+        //    Assert.Equal("one two three four", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            var property = "hello world";
-            Assert.Equal("helloXworld", body.GetLineUpdateText(property, "X", 5, property.Length, false));
-
-            Assert.Equal("Xello world", body.GetLineUpdateText(property, "X", 0, property.Length, false));
-            Assert.Null(body.GetLineUpdateText(property, "X", -1, property.Length, false));
-
-            Assert.Equal("hello worlX", body.GetLineUpdateText(property, "X", property.Length - 1, property.Length, false));
-            Assert.Null(body.GetLineUpdateText(property, "X", property.Length, property.Length, false));
-            Assert.Null(body.GetLineUpdateText(property, "X", -1, property.Length - 1, false));
-
-            Assert.Equal("hello moond", body.GetLineUpdateText(property, "moon", 6, property.Length, false));
-            Assert.Equal("hello moons", body.GetLineUpdateText(property, "moons", 6, property.Length, false));
-            Assert.Null(body.GetLineUpdateText(property, "moonsx", 6, property.Length, false));
-        }
-
-        [Fact]
-        public void GetLineUpdateTextInsertTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            var property = "hello world"; //index 0-10  insert before index
-
-            Assert.Equal("helloX world", body.GetLineUpdateText(property, "X", 5, property.Length + 1, true));
-            Assert.Equal("Xhello world", body.GetLineUpdateText(property, "X", 0, property.Length + 1, true));
-            Assert.Equal("hello worXld", body.GetLineUpdateText(property, "X", 9, property.Length + 1, true));
-            Assert.Equal("hello worlXd", body.GetLineUpdateText(property, "X", 10, property.Length + 1, true));
-            Assert.Equal("hello worldX", body.GetLineUpdateText(property, "X", 11, property.Length + 1, true));
-
-            var insertText = " wonderful";
-            Assert.Equal($"hello wonderful world", body.GetLineUpdateText(property, insertText, 5, property.Length + insertText.Length, true));
-            Assert.Equal($" wonderfulhello world", body.GetLineUpdateText(property, insertText, 0, property.Length + insertText.Length, true));
-            Assert.Equal($"hello world wonderful", body.GetLineUpdateText(property, insertText, property.Length, property.Length + insertText.Length, true));
-
-        }
-
-        [Fact]
-        public void GetLineUpdateTextInvalidTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            var property = "hello world"; //index 0-10  insert before index
-
-            Assert.Equal("helloX world", body.GetLineUpdateText(property, "X", 5, property.Length + 1, true));
-
-            Assert.Null(body.GetLineUpdateText(property, "X", 5, property.Length, true));
-            Assert.Null(body.GetLineUpdateText(property, "X", -1, property.Length + 1, true));
-            Assert.Null(body.GetLineUpdateText(property, "X", 12, property.Length + 1, true));
-
-            Assert.Null(body.GetLineUpdateText(property, "<", 5, property.Length + 1, true));
-            Assert.Null(body.GetLineUpdateText(property, ">", 5, property.Length + 1, true));
-            Assert.Null(body.GetLineUpdateText(property, Environment.NewLine, 5, property.Length + 1, true));
-            var c = (char) 0;
-            Assert.Null(body.GetLineUpdateText(property, c.ToString(), 5, property.Length + 1, true));
-        }
-
-        [Fact]
-        public void GetWordInLineTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.InsertLine("one two three four").GetResult());
-            Assert.Equal(4, body.WordCount);
-            Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(18, body.GetCharacterCountInRow());
-            Assert.Equal("one two three four", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
-
-            Assert.Equal("one", body.GetWordInLine(Body.LastLine, 1));
-            Assert.Equal("two", body.GetWordInLine(Body.LastLine, 2));
-            Assert.Equal("three", body.GetWordInLine(Body.LastLine, 3));
-            Assert.Equal("four", body.GetWordInLine(Body.LastLine, 4));
-            Assert.Equal("four", body.GetWordInLine(Body.LastLine, -1));
-            Assert.Equal("four", body.GetWordInLine(Body.LastLine));
+        //    Assert.Equal("one", body.GetWordInLine(Body.LastLine, 1));
+        //    Assert.Equal("two", body.GetWordInLine(Body.LastLine, 2));
+        //    Assert.Equal("three", body.GetWordInLine(Body.LastLine, 3));
+        //    Assert.Equal("four", body.GetWordInLine(Body.LastLine, 4));
+        //    Assert.Equal("four", body.GetWordInLine(Body.LastLine, -1));
+        //    Assert.Equal("four", body.GetWordInLine(Body.LastLine));
 
 
-            Assert.Null(body.GetWordInLine(Body.LastLine, 5));
-            Assert.Null(body.GetWordInLine(Body.LastLine, 0));
-            Assert.Null(body.GetWordInLine(Body.LastLine, -2));
-        }
+        //    Assert.Null(body.GetWordInLine(Body.LastLine, 5));
+        //    Assert.Null(body.GetWordInLine(Body.LastLine, 0));
+        //    Assert.Null(body.GetWordInLine(Body.LastLine, -2));
+        //}
 
         [Fact]
         public void InsertOneLineTest()
@@ -512,8 +445,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.WordCount);
 
-            Assert.Equal('a', body.GetCharacterInLine(Body.LastLine));
-            Assert.Equal('a', body.GetCharacterInLine());
+            Assert.Equal('a', body.GetCharacterInLine(Body.LastLine, 4));
+            Assert.Equal(Body.ParaBreakChar, body.GetCharacterInLine());
             Assert.Equal(Body.NullChar, body.GetCharacterInLine(0));
         }
 

@@ -17,7 +17,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("SpellEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsError())
+            if (IsOnUpdateError())
                 rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
@@ -36,7 +36,7 @@ namespace KLineEdCmdApp.View
                             case ChapterModel.ChangeHint.Props:
                             case ChapterModel.ChangeHint.All:
                             {
-                                rc += ClearEditAreaText();
+                                rc += InitDisplay();
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
                                 break;

@@ -42,8 +42,7 @@ namespace KLineEdCmdApp.View.Base
         protected int EditAreaWidth { private set; get; }
         protected int EditAreaHeight { private set; get; }
         protected bool CursorOn { set; get; }
-
-        private string BlankLine { set; get; }
+        protected string BlankLine { set; get; }
 
         protected ConsoleColor MsgLineErrorForeGndColour { private set; get; }
         protected ConsoleColor MsgLineErrorBackGndColour { private set; get; }
@@ -58,7 +57,7 @@ namespace KLineEdCmdApp.View.Base
 
         private MxReturnCode<bool> _mxErrorCode;
 
-        public bool IsError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
+        public bool IsOnUpdateError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
         public MxError.Source GetErrorSource() { return _mxErrorCode?.GetErrorType() ?? MxError.Source.Program; }
         public int GetErrorNo() { return _mxErrorCode?.GetErrorCode() ?? Program.PosIntegerNotSet; }
         public string GetErrorTechMsg() { return _mxErrorCode?.GetErrorTechMsg() ?? Program.ValueNotSet; }
@@ -128,7 +127,7 @@ namespace KLineEdCmdApp.View.Base
                 //MsgLineInfoForeGndColour = ConsoleColor.Gray;             //todo add param.MsgLineInfoForeGndColour
                 //MsgLineInfoBackGndColour = ConsoleColor.Black;            //todo add param.MsgLineInfoBackGndColour 
 
-                WindowHeight = KLineEditor.ModeHelpLineRowCount + KLineEditor.MsgLineRowCount + KLineEditor.EditAreaMarginTopRowCount + EditAreaHeight + KLineEditor.EditAreaMarginBottomRowCount + KLineEditor.StatusLineRowCount;
+                WindowHeight = KLineEditor.HelpLineRowCount + KLineEditor.MsgLineRowCount + KLineEditor.EditAreaMarginTopRowCount + KLineEditor.EditAreaMarginTopRuleRowCount + EditAreaHeight + KLineEditor.EditAreaMarginBottomRowCount + KLineEditor.EditAreaMarginTopRuleRowCount + KLineEditor.StatusLineRowCount;
                 WindowWidth = KLineEditor.EditAreaMarginLeft + EditAreaWidth + KLineEditor.EditAreaMarginRight;
 
                 if ((WindowWidth < KLineEditor.MinWindowWidth) || (WindowWidth > KLineEditor.MaxWindowWidth) || (WindowHeight > KLineEditor.MaxWindowHeight) || (WindowHeight < KLineEditor.MinWindowHeight))
@@ -190,6 +189,7 @@ namespace KLineEdCmdApp.View.Base
             }
             return rc;
         }
+
         public MxReturnCode<bool> ClearLine(int rowIndex, int colIndex)
         {
             var rc = new MxReturnCode<bool>("BaseView.ClearLine");

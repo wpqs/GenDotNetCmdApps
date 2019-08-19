@@ -47,7 +47,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("MsgLineView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsError())
+            if (IsOnUpdateError())
                 rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
             else
             {
