@@ -973,15 +973,19 @@ namespace KLineEdCmdApp.Model
                 for (var x = 0; x < words.Length; x++)
                 {
                     if (words[x].Length == 0)
+                    {
+                        if ((splitIndex + 1) >= spaceNeeded)
+                            break;
                         splitIndex++;
+                    }
                     else
                     {
-                        splitIndex += words[x].Length; // + 1;
+                        splitIndex += words[x].Length;
                         if (splitIndex >= spaceNeeded)
                             break;
                     }
                 }
-                rc = splitIndex;
+                rc = (splitIndex < line.Length) ? splitIndex : Program.PosIntegerNotSet; 
             }
             return rc;
         }
@@ -1000,13 +1004,12 @@ namespace KLineEdCmdApp.Model
                     if (words[x].Length == 0)
                         splitIndex--;
                     else
-                    {
                         splitIndex -= words[x].Length + 1;
-                        if ((line.Length - splitIndex) > spaceNeeded)
-                            break;
-                    }
+
+                    if ((line.Length - splitIndex) > spaceNeeded)
+                        break;
                 }
-                rc = splitIndex;
+                rc = (splitIndex < line.Length) ? splitIndex : Program.PosIntegerNotSet;
             }
             return rc;
         }

@@ -229,7 +229,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 3));
             Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 4));
 
-            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 5));
+            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 6));
             Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 6));
 
             Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 54));
@@ -239,7 +239,7 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetSplitIndexFromEndMultiSpaceTest()
         {
-            //"0123456789 123456789 123456789 123456789 123456789 1234567 654321";
+                     //"0123456789 123456789 123456789 123456789 123456789 123456789 1234";
             var line = "0123456789 123456789 123456789 123456789 123456789 1234567   1234";
             Assert.Equal(65, line.Length);
 
@@ -249,13 +249,51 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 3));
             Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 4));
 
-            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 5));
-            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 6));
+            Assert.Equal(59, Body.GetSplitIndexFromEnd(line, 5));
+            Assert.Equal(58, Body.GetSplitIndexFromEnd(line, 6));
             Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 7));
             Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 8));
 
             Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 54));
             Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 55));
+        }
+
+        [Fact]
+        public void GetSplitIndexNoSpaceLineTest()
+        {
+            var line = "0123456789x123456789x123456789x123456789x123456789x123456789x1234";
+            Assert.Equal(65, line.Length);
+  
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 1));
+            Assert.Equal(-1, Body.GetSplitIndexFromStart(line, 1));
+        }
+
+        [Fact]
+        public void GetSplitIndexFromEndLimitTest()
+        {
+            var line1 = " 123456789x123456789x123456789x123456789x123456789x123456789x1234";
+            Assert.Equal(65, line1.Length);
+            Assert.Equal(0, Body.GetSplitIndexFromEnd(line1, 1));
+
+            var line2 = "0123456789x123456789x123456789x123456789x123456789x123456789x123 ";
+            Assert.Equal(65, line2.Length);
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line2, 1)); //no point in splitting at index 64
+
+            var line3 = "0123456789x123456789x123456789x123456789x123456789x123456789x12  ";
+            Assert.Equal(65, line3.Length);
+            Assert.Equal(63, Body.GetSplitIndexFromEnd(line3, 1));
+        }
+
+        [Fact]
+        public void GetSplitIndexFromStartLimitTest()
+        {
+            var line1 = "0123456789x123456789x123456789x123456789x123456789x123456789x123 ";
+            Assert.Equal(65, line1.Length);
+            Assert.Equal(64, Body.GetSplitIndexFromStart(line1, 1));
+
+            var line2 = " 123456789x123456789x123456789x123456789x123456789x123456789x1234";
+            Assert.Equal(65, line2.Length);
+            Assert.Equal(0, Body.GetSplitIndexFromStart(line2, 1));
         }
 
         [Fact]
