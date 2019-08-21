@@ -871,7 +871,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(body.InsertText(" 1234").GetResult());      //col #35
             Assert.Equal("aaaaa bbbb 123456789 123456789 1234>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
-         //   Assert.Equal(35, body.Cursor.ColIndex);
+            Assert.Equal(35, body.Cursor.ColIndex);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(5, body.WordCount);
 
