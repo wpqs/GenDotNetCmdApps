@@ -77,7 +77,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly int ArgEditAreaLinesCountMin = 0;
         public static readonly int ArgEditAreaLinesCountMax = 50;
 
-        public static readonly int ArgEditAreaLineWidthDefault = 68;   //todo rename counted from Jack Kerouac's book 'On the Road';
+        public const int ArgEditAreaLineWidthDefault = 68;   //todo rename counted from Jack Kerouac's book 'On the Road';
         public static readonly int ArgEditAreaLineWidthMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
         public static readonly int ArgEditAreaLineWidthMin = 5;
 

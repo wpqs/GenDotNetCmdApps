@@ -614,27 +614,6 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(line + body.ParaBreakDisplayChar.ToString(), body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
         }
 
-        [Fact]
-        public void InsertLineLongLineTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, 35).GetResult());
-            Assert.False(body.IsError());
-
-            var line = "0123456789 123456789 123456789 1234";
-            Assert.Equal(35, line.Length);
-
-            Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.InsertLine(line).GetResult());
-            Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(4, body.WordCount);
-            Assert.Equal(line, body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
-
-            var tooLong = line + "x";
-            Assert.False(body.InsertLine(tooLong).GetResult());
-            Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(4, body.WordCount);
-        }
 
         [Fact]
         public void InsertLineSpaceTest()

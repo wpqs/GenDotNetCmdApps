@@ -61,12 +61,12 @@ namespace KLineEdCmdApp.Model
             End
         }
 
-        public List<string> TextLines { private set; get; }
+        protected List<string> TextLines { set; get; }
         public CursorPosition Cursor { get; private set; }
         public CursorPosition EditAreaViewCursorLimit { get; private set; }
 
         public int EditAreaBottomChapterIndex { private set; get; }        //TextLines[TopDisplayLineIndex] is displayed as first line in console
-        public int WordCount { private set; get; }
+        public int WordCount { protected set; get; }
         public string TabSpaces { private set; get; }
         public char ParaBreakDisplayChar { private set; get; }
 
@@ -533,8 +533,8 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.InsertLine");
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(line) ) || (line.Length-1 > EditAreaViewCursorLimit.ColIndex)) 
-                rc.SetError(1100901, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than {EditAreaViewCursorLimit.ColIndex + 1}");
+            if ((string.IsNullOrEmpty(line) ) ||  (line.Length-1 > CmdLineParamsApp.ArgEditAreaLineWidthMax)) 
+                rc.SetError(1100901, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than { CmdLineParamsApp.ArgEditAreaLineWidthMax}");
             else
             {
                 if (IsError() || (linesCount == Program.PosIntegerNotSet))
@@ -572,8 +572,16 @@ namespace KLineEdCmdApp.Model
 
                                 //LeftJustifyLinesInParagraph
 
+                                //var rcJustify = LeftJustifyLinesInParagraph(Cursor.RowIndex, Cursor.ColIndex + line.Length);
+                                //rc += rcJustify;
+                                //if (rcJustify.IsSuccess(true))
+                                //{
+                                //    WordCount += GetWordCountInLine(line); 
+                                //    rc.SetResult(true);
+                                //}
+
                                 WordCount += GetWordCountInLine(line);
-                                var rcCursor = SetCursorInChapter(rowIndex, line.EndsWith(ParaBreakChar)? line.Length-1 : line.Length); // (line == ParaBreak) ? 0 : line.Length);  // line added so assume SetCursor succeeds; worst case user needs to click 'end'
+                                var rcCursor = SetCursorInChapter(rowIndex, line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length); // (line == ParaBreak) ? 0 : line.Length);  // line added so assume SetCursor succeeds; worst case user needs to click 'end'
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
                                     rc.SetResult(true);
@@ -804,7 +812,7 @@ namespace KLineEdCmdApp.Model
         }
 
 
-        private MxReturnCode<bool> FillShortLine(int rowIndex, int maxColIndex, out bool removeLine)
+        protected MxReturnCode<bool> FillShortLine(int rowIndex, int maxColIndex, out bool removeLine)
         {
             var rc = new MxReturnCode<bool>("Body.FillShortLine");
 
@@ -844,35 +852,48 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        private MxReturnCode<bool> SplitLongLine(int rowIndex, int maxColIndex, out int updatedCursorIndex)
+        public MxReturnCode<bool> SplitLongLine(int rowIndex, int maxColIndex, out int updatedCursorIndex)
         {
             var rc = new MxReturnCode<bool>("Body.SplitLongLine");
 
             updatedCursorIndex = Program.PosIntegerNotSet;
 
             var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((TextLines == null) || (maxColIndex <  0) || (rowIndex >= lineCount))
+            if ((TextLines == null) || (maxColIndex < CmdLineParamsApp.ArgEditAreaLineWidthMin) || (rowIndex >= lineCount))
                 rc.SetError(1101601, MxError.Source.Param, $"rowIndex={rowIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
             else
             {
+                var existLine = "";
+                var insertLine = "";
                 var line = TextLines[rowIndex];
                 var lineLen = line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length;
+
                 var splitIndex = Body.GetSplitIndexFromEnd(line, lineLen - maxColIndex);
                 if (splitIndex == Program.PosIntegerNotSet)
-                    splitIndex = maxColIndex;  //force split 
+                {
+                    existLine = line.Snip(0, maxColIndex - 1); 
+                    if(((insertLine = line.Snip(maxColIndex, lineLen - 1)) != null)) // && (insertLine != Body.ParaBreak))
+                        WordCount++;
+                }
+                else
+                {
+                    existLine = line.Snip(0, splitIndex - 1); //space is removed
+                    insertLine = line.Snip(splitIndex + 1, lineLen - 1);
+                }
+                if (line.EndsWith(ParaBreakChar) && ((insertLine != null)))
+                    insertLine += ParaBreak;
 
-                var existLine = line.Snip(0, splitIndex - 1);
-                var insertLine = line.Snip(splitIndex + 1, line.Length - 1);
                 if (string.IsNullOrEmpty(existLine) || (string.IsNullOrEmpty(insertLine)))
                     rc.SetError(1101603, MxError.Source.Program, $"existLine.Length={existLine?.Length ?? -1}, insertLine.Length={insertLine?.Length ?? -1}", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     TextLines[rowIndex] = existLine;
-                    WordCount -= GetWordCountInLine(insertLine);
-                    var rcInsert = InsertLine(insertLine);  //InsertLine increments WordCount by same amount
+                    
+                    var rcInsert = InsertLine(insertLine);  
                     rc += rcInsert;
                     if (rcInsert.IsSuccess(true))
                     {
+                        WordCount -= GetWordCountInLine(insertLine); //InsertLine increments WordCount by same amount
                         updatedCursorIndex = (insertLine.EndsWith(ParaBreakChar)) ? insertLine.Length-1 : insertLine.Length;
                         rc.SetResult(true);
                     }
@@ -1081,12 +1102,16 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        private int GetWordCountInChapter()
+        public int RefreshWordCountInChapter()
         {
             var rc = 0;
-            foreach (var line in TextLines)
+            if (TextLines != null)
             {
-                rc += GetWordCountInLine(line);
+                foreach (var line in TextLines)
+                {
+                    rc += GetWordCountInLine(line);
+                }
+                WordCount = rc;
             }
             return rc;
         }

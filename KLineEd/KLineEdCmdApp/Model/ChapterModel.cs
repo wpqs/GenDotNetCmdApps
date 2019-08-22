@@ -406,6 +406,7 @@ namespace KLineEdCmdApp.Model
 
         public void Refresh()
         {
+            ChapterBody?.RefreshWordCountInChapter();
             UpdateAllViews((int)ChangeHint.All);
         }
 
