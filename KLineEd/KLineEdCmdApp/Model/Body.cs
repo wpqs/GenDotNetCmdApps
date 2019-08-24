@@ -541,7 +541,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.InsertLine");
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(line) ) ||  (line.Length-1 > CmdLineParamsApp.ArgEditAreaLineWidthMax)) 
+            if ((string.IsNullOrEmpty(line)) || (line.Length - 1 > CmdLineParamsApp.ArgEditAreaLineWidthMax))
                 rc.SetError(1100901, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than { CmdLineParamsApp.ArgEditAreaLineWidthMax}");
             else
             {
@@ -562,19 +562,19 @@ namespace KLineEdCmdApp.Model
                                 var rowIndex = Cursor.RowIndex + 1;
                                 if (rowIndex >= linesCount)
                                 {
-                                    TextLines.Add(line); 
+                                    TextLines.Add(line);
                                     rowIndex = TextLines.Count - 1;
                                 }
                                 else
                                 {
                                     if (Cursor.ColIndex == 0)
-                                        TextLines.Insert(rowIndex, line); 
+                                        TextLines.Insert(rowIndex, line);
                                     else
                                     {
                                         var startLine = TextLines[Cursor.RowIndex].Substring(0, Cursor.ColIndex);
                                         var endLine = TextLines[Cursor.RowIndex].Substring(Cursor.ColIndex);
                                         TextLines[Cursor.RowIndex] = startLine;
-                                        TextLines.Insert(rowIndex, line + endLine); 
+                                        TextLines.Insert(rowIndex, line + endLine);
                                     }
                                 }
 
@@ -592,7 +592,7 @@ namespace KLineEdCmdApp.Model
                                 //var rcCursor = SetCursorInChapter(rowIndex, line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length); // (line == ParaBreak) ? 0 : line.Length);  // line added so assume SetCursor succeeds; worst case user needs to click 'end'
                                 //rc += rcCursor;
                                 //if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                rc.SetResult(true);
                             }
                         }
                     }
@@ -837,7 +837,7 @@ namespace KLineEdCmdApp.Model
                     var currentLine = TextLines[rowIndex];
                     var currentLineLen = (currentLine.EndsWith(ParaBreakChar)) ? currentLine.Length - 1 : currentLine.Length;
                     var nextLine = TextLines[rowIndex + 1];
-                    var nextLineLen = (nextLine.EndsWith(ParaBreakChar)) ? nextLine.Length - 1 : nextLine.Length;
+                    var nextLineLen = nextLine.Length; //(nextLine.EndsWith(ParaBreakChar)) ? nextLine.Length - 1 : nextLine.Length;
 
                     var splitIndex = Body.GetSplitIndexFromStart(nextLine, (maxColIndex + 1) - currentLineLen - 1); 
                     if ((splitIndex == Program.PosIntegerNotSet) || (splitIndex >= maxColIndex))
@@ -847,7 +847,7 @@ namespace KLineEdCmdApp.Model
                         var start = nextLine.Snip(0, splitIndex);
                         TextLines[rowIndex] += " " + start;
 
-                        var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1);
+                        var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1); // nextLineLen - 1); // nextLine.Length - 1);
                         if (string.IsNullOrEmpty(end) == false)
                             TextLines[rowIndex + 1] = end;
                         else
@@ -953,9 +953,9 @@ namespace KLineEdCmdApp.Model
         {
             var rc = Program.PosIntegerNotSet;
 
-            if ((spaceAvailable > 0) && (line != null)) 
+            if ((spaceAvailable > 0) && (line != null))
             {
-                var lineLen = (line.EndsWith(ParaBreakChar)) ? line.Length - 1 : line.Length;
+                var lineLen = line.Length; //  (line.EndsWith(ParaBreakChar)) ? line.Length - 1 : line.Length;
                 if (lineLen <= spaceAvailable)
                     rc = lineLen - 1;
                 else
@@ -963,7 +963,7 @@ namespace KLineEdCmdApp.Model
                     var splitIndex = Program.PosIntegerNotSet;
                     for (var x = 0; x < line.Length; x++)
                     {
-                        if ((line[x] == ' ') && (x <= spaceAvailable))
+                        if (((line[x] == ' ') || (line[x] == Body.ParaBreakChar) ) && (x <= spaceAvailable))
                             splitIndex = x;
                         if (x > spaceAvailable)
                             break;
