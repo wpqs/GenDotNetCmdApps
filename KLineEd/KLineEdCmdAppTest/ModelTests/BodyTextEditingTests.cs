@@ -21,6 +21,32 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
+        public void InsertTextInvalidCharFailTest()
+        {
+            var body = new Body();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            Assert.False(body.InsertText('>'.ToString()).GetResult());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.False(body.InsertText('<'.ToString()).GetResult());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.False(body.InsertText($"hello{Environment.NewLine}").GetResult());  //not in col=0
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+
+            Assert.False(body.InsertText($"{Environment.NewLine}").GetResult());  //in col=0
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.WordCount);
+        }
+
+
+        [Fact]
         public void InsertParaBreakInEmptyChapterTest()
         {
             var body = new Body();
@@ -126,6 +152,29 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("qw>", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("erty>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(Body.NullChar, body.GetCharacterInLine(2, 6));
+
+        }
+
+
+        [Fact]
+        public void IsCursorAtEndOfParagraphTest()
+        {
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+            Assert.Equal(0, body.GetLineCount());
+
+            var line1 = "qwerty";
+            body.SetTestLine(line1);
+
+            Assert.True(body.InsertParaBreak().GetResult());
+            Assert.Equal(2, body.GetLineCount());
+
+            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.False(body.IsCursorAtEndOfParagraph());
+
+            Assert.True(body.SetCursorInChapter(0, line1.Length).GetResult());
+            Assert.True(body.IsCursorAtEndOfParagraph());
 
         }
 
@@ -235,13 +284,13 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void DeleteCharacterCursorStartOneLineTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
 
             var line1 = "qwerty";
-            Assert.True(body.InsertLine(line1).GetResult());
+            body.SetTestLine(line1);
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(body.SetCursorInChapter(0,0).GetResult());
@@ -260,13 +309,13 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void DeleteCharacterCursorEndOneLineTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
 
             var line1 = "qwerty";
-            Assert.True(body.InsertLine(line1).GetResult());
+            body.SetTestLine(line1);
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(body.SetCursorInChapter(0, 5).GetResult());
@@ -291,13 +340,13 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void DeleteCharacterParaBreakTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
 
             var line1 = "qwerty";
-            Assert.True(body.InsertLine(line1).GetResult());
+            body.SetTestLine(line1);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
@@ -326,7 +375,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
 
             var line1 = "qwerty";
-            Assert.True(manuscriptNew.ChapterBody.InsertLine(line1).GetResult());
+            Assert.True(manuscriptNew.BodyInsertText(line1).GetResult());
 
             Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(0, 2).GetResult());
             Assert.True(manuscriptNew.BodyInsertParaBreak().GetResult());
@@ -336,7 +385,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, manuscriptNew.ChapterBody.Cursor.ColIndex);
 
             Assert.Equal("qw>", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("erty", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("erty>", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[1]);
 
             Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(1, 0).GetResult());
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
@@ -354,15 +403,15 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
 
             var line1 = "qwerty";
-            Assert.True(manuscriptNew.ChapterBody.InsertLine(line1).GetResult());
-            Assert.Equal("qwerty", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.True(manuscriptNew.ChapterBody.InsertText(line1).GetResult());
+            Assert.Equal("qwerty>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(manuscriptNew.BodyMoveCursor(Body.CursorMove.End).GetResult());
             Assert.Equal(6, manuscriptNew.ChapterBody.Cursor.ColIndex);
 
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
             Assert.Equal(5, manuscriptNew.ChapterBody.Cursor.ColIndex);
-            Assert.Equal("qwert", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("qwert>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
 
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
@@ -371,58 +420,6 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
 
             Assert.Contains("Warning: Chapter is empty", manuscriptNew.BodyBackSpace().GetErrorUserMsg());
-        }
-
-
-        [Fact]
-        public void InsertLineNullFailTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            Assert.Equal(0, body.GetLineCount());
-            Assert.False(body.InsertLine(null).GetResult());
-            Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
-        }
-
-        [Fact]
-        public void InsertLineEmptyFailTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            Assert.Equal(0, body.GetLineCount());
-            Assert.False(body.InsertLine("").GetResult()); //lines cannot be empty 
-            Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
-        }
-
-        [Fact]
-        public void InsertTextInvalidCharFailTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            Assert.Equal(0, body.GetLineCount());
-            Assert.False(body.InsertText('>'.ToString()).GetResult());
-            Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
-
-            Assert.False(body.InsertText('<'.ToString()).GetResult());
-            Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
-
-            Assert.False(body.InsertText($"hello{Environment.NewLine}").GetResult());  //not in col=0
-            Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
-
-            Assert.False(body.InsertText($"{Environment.NewLine}").GetResult());  //in col=0
-            Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
         }
 
 
@@ -536,57 +533,57 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void InsertTextInsertStartTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.InsertLine("one two three").GetResult());
+            body.SetTestLine("one two three");
             Assert.Equal(1, body.GetLineCount());
-        //    Assert.Equal(3, body.WordCount);
+            Assert.Equal(3, body.WordCount);
             body.SetCursorInChapter(0, 0);
 
             Assert.True(body.InsertText("xxx ", true).GetResult());
             Assert.Equal(1, body.GetLineCount());
-        //    Assert.Equal(4, body.WordCount);
+            Assert.Equal(4, body.WordCount);
             Assert.Equal("xxx one two three", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
         }
 
         [Fact]
         public void InsertTextInsertMiddleTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.InsertLine("one two three").GetResult());
+            body.SetTestLine("one two three");
             Assert.Equal(1, body.GetLineCount());
-        //    Assert.Equal(3, body.WordCount);
+            Assert.Equal(3, body.WordCount);
             body.SetCursorInChapter(0, 4);
 
             Assert.True(body.InsertText("xxx ", true).GetResult());
             Assert.Equal(1, body.GetLineCount());
-      //      Assert.Equal(4, body.WordCount);
+            Assert.Equal(4, body.WordCount);
             Assert.Equal("one xxx two three", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
         }
 
         [Fact]
         public void InsertTextInsertEndTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.InsertLine("one two three").GetResult());
+            body.SetTestLine("one two three");
             Assert.Equal(1, body.GetLineCount());
-       //     Assert.Equal(3, body.WordCount);
+            Assert.Equal(3, body.WordCount);
             body.SetCursorInChapter(0, 13);
 
             Assert.True(body.InsertText(" xxx", true).GetResult());
             Assert.Equal(1, body.GetLineCount());
-       //     Assert.Equal(4, body.WordCount);
+            Assert.Equal(4, body.WordCount);
             Assert.Equal("one two three xxx", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
         }
 
@@ -614,19 +611,6 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(line + body.ParaBreakDisplayChar.ToString(), body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
         }
 
-
-        [Fact]
-        public void InsertLineSpaceTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-
-            Assert.Equal(0, body.GetLineCount());
-            Assert.True(body.InsertLine(" ").GetResult()); //lines can start with space
-            Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(0, body.WordCount);
-        }
 
         [Fact]
         public void InsertTextCharacterTest()
@@ -951,15 +935,15 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetNextParaBreakNotFoundTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
 
             var line1 = "qwerty";
-            Assert.True(body.InsertLine(line1).GetResult());
-            Assert.True(body.InsertLine(line1).GetResult());
-            Assert.True(body.InsertLine(line1).GetResult());
+            body.SetTestLine(line1);
+            body.SetTestLine(line1);
+            body.SetTestLine(line1);
             Assert.Equal(3, body.GetLineCount());
 
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
@@ -972,15 +956,15 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetNextParaBreakTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
 
             var line1 = "qwerty";
-            Assert.True(body.InsertLine(line1).GetResult());
-            Assert.True(body.InsertLine(line1).GetResult());
-            Assert.True(body.InsertLine(line1).GetResult());
+            body.SetTestLine(line1);
+            body.SetTestLine(line1);
+            body.SetTestLine(line1);
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(3, body.GetLineCount());
 
@@ -1011,15 +995,16 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void LeftJustifyLinesInParagraphTest()
         {
-            var body = new Body();
+            var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, 15).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
 
             var line1 = "0123456789 1234";
-            Assert.True(body.InsertLine(line1).GetResult());
-            Assert.True(body.InsertLine(line1).GetResult());
-            Assert.True(body.InsertLine(line1).GetResult());
+            body.SetTestLine(line1);
+            body.SetTestLine(line1);
+            body.SetTestLine(line1);
+
 
             Assert.Equal(3, body.GetLineCount());
 
@@ -1027,42 +1012,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
         }
 
-        [Fact]
-        public void GetCharacterCountInLineTest()
-        {
-            var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-            Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(Program.PosIntegerNotSet, body.GetCharacterCountInRow(0));
 
-            var line1 = "qwerty";
-            Assert.True(body.InsertLine(line1).GetResult());
-            Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(line1.Length, body.GetCharacterCountInRow(0));
-            Assert.Equal(Program.PosIntegerNotSet, body.GetCharacterCountInRow(1));
-        }
 
-        [Fact]
-        public void IsCursorAtEndOfParagraphTest()
-        {
-            var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
-            Assert.False(body.IsError());
-            Assert.Equal(0, body.GetLineCount());
-
-            var line1 = "qwerty";
-            body.SetTestLine(line1);
-
-            Assert.True(body.InsertParaBreak().GetResult());
-            Assert.Equal(2, body.GetLineCount());
-
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
-            Assert.False(body.IsCursorAtEndOfParagraph());
-
-            Assert.True(body.SetCursorInChapter(0, line1.Length).GetResult());
-            Assert.True(body.IsCursorAtEndOfParagraph());
-
-        }
     }
 }

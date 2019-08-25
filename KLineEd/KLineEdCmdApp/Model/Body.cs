@@ -191,6 +191,7 @@ namespace KLineEdCmdApp.Model
                                 rc.SetError(1100403, MxError.Source.User, $"first line is {firstLine}", MxMsgs.MxErrInvalidCondition);
                             else
                             {
+                                var rowIndex = 0;
                                 string lastLine = null;
                                 string line = null;
                                 while ((line = file.ReadLine()) != null)
@@ -198,12 +199,13 @@ namespace KLineEdCmdApp.Model
                                     lastLine = line;
                                     if (lastLine == ClosingElement)
                                         break;
-                                    var rcLine = InsertLine(lastLine); 
+                                    var rcLine = InsertLine(rowIndex, lastLine); 
                                     if (rcLine.IsError(true))
                                     {
                                         rc += rcLine;
                                         break;
                                     }
+                                    rowIndex++;
                                 }
                                 if (rc.IsSuccess())
                                 {
@@ -211,11 +213,10 @@ namespace KLineEdCmdApp.Model
                                         rc.SetError(1100404, MxError.Source.User, $"last line is {lastLine ?? "[null]"}", MxMsgs.MxErrInvalidCondition);
                                     else
                                     {
-                                        var rcCursor = SetCursorInChapter(TextLines.Count-1, GetMaxColCursorIndexForRow(TextLines.Count - 1)); 
-                                        rc += rcCursor;
-                                        if (rcCursor.IsSuccess(true))
+                                        var rcRefresh = RefreshChapter(TextLines.Count - 1, GetMaxColCursorIndexForRow(TextLines.Count - 1));
+                                        rc += rcRefresh;
+                                        if (rcRefresh.IsSuccess(true))
                                         {
-                                            WordCount = RefreshWordCountInChapter();
                                             rc.SetResult(true);
                                         }
                                     }
@@ -232,7 +233,34 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-    
+        public MxReturnCode<bool> RefreshChapter(int rowIndex, int colIndex)
+        {
+            var rc = new MxReturnCode<bool>("Body.RefreshChapter");
+
+            var rowCountIndex = 0;
+            //while ((rowCountIndex = GetNextParaBreak(rowCountIndex)) != -1)
+            //{
+                //var rcJustify = LeftJustifyLinesInParagraph(rowCountIndex, 0);
+                //if (rcJustify.IsError(true))
+                //{
+                //    rc += rcJustify;
+                //    break;
+                //}
+            //}
+            if (rc.IsSuccess())
+            {
+                var rcCursor = SetCursorInChapter(rowIndex, colIndex);
+                rc += rcCursor;
+                if (rcCursor.IsSuccess(true))
+                {
+                    WordCount = RefreshWordCountInChapter();
+                    rc.SetResult(true);
+                }
+            }
+            return rc;
+        }
+
+
         public MxReturnCode<bool> MoveCursorInChapter(CursorMove move)
         {
             var rc = new MxReturnCode<bool>("Body.MoveCursorInChapter");
@@ -536,75 +564,6 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> InsertLine(string line)
-        {
-            var rc = new MxReturnCode<bool>("Body.InsertLine");
-
-            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(line)) || (line.Length - 1 > CmdLineParamsApp.ArgEditAreaLineWidthMax))
-                rc.SetError(1100901, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than { CmdLineParamsApp.ArgEditAreaLineWidthMax}");
-            else
-            {
-                if (IsError() || (linesCount == Program.PosIntegerNotSet))
-                    rc.SetError(1100902, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
-                else
-                {
-                    try
-                    {
-                        if (linesCount >= Body.MaxTextLines)
-                            rc.SetError(1100903, MxError.Source.User, $"too many lines in chapter={linesCount}", MxMsgs.MxWarnTooManyLines);
-                        else
-                        {
-                            if (Body.GetErrorsInText(line) != null)
-                                rc.SetError(1100904, MxError.Source.User, Body.GetErrorsInText(line, Cursor.RowIndex + 2));
-                            else
-                            {
-                                var rowIndex = Cursor.RowIndex + 1;
-                                if (rowIndex >= linesCount)
-                                {
-                                    TextLines.Add(line);
-                                    rowIndex = TextLines.Count - 1;
-                                }
-                                else
-                                {
-                                    if (Cursor.ColIndex == 0)
-                                        TextLines.Insert(rowIndex, line);
-                                    else
-                                    {
-                                        var startLine = TextLines[Cursor.RowIndex].Substring(0, Cursor.ColIndex);
-                                        var endLine = TextLines[Cursor.RowIndex].Substring(Cursor.ColIndex);
-                                        TextLines[Cursor.RowIndex] = startLine;
-                                        TextLines.Insert(rowIndex, line + endLine);
-                                    }
-                                }
-
-                                //LeftJustifyLinesInParagraph
-
-                                //var rcJustify = LeftJustifyLinesInParagraph(Cursor.RowIndex, Cursor.ColIndex + line.Length);
-                                //rc += rcJustify;
-                                //if (rcJustify.IsSuccess(true))
-                                //{
-                                //    WordCount += GetWordCountInLine(line); 
-                                //    rc.SetResult(true);
-                                //}
-
-                                //WordCount += GetWordCountInLine(line);
-                                //var rcCursor = SetCursorInChapter(rowIndex, line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length); // (line == ParaBreak) ? 0 : line.Length);  // line added so assume SetCursor succeeds; worst case user needs to click 'end'
-                                //rc += rcCursor;
-                                //if (rcCursor.IsSuccess(true))
-                                rc.SetResult(true);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        rc.SetError(1100905, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
-                    }
-                }
-            }
-            return rc;
-        }
-
         public MxReturnCode<bool> InsertText(string text, bool insert = false)     //text is not null or empty and length < EditAreaViewCursorLimit.ColIndex
         {
             var rc = new MxReturnCode<bool>("Body.InsertText");
@@ -662,45 +621,6 @@ namespace KLineEdCmdApp.Model
                     {
                         rc.SetError(1101005, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                     }
-                }
-            }
-            return rc;
-        }
-
-
-        public MxReturnCode<bool> DeleteLine(int rowIndex, bool moveCursorBack = false)
-        {
-            var rc = new MxReturnCode<bool>("Body.DeleteLine");
-
-            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((linesCount <= 0) || (TextLines == null)  || (Cursor == null) || (Cursor.RowIndex < 0) || (Cursor.RowIndex >= linesCount))
-                rc.SetError(1101101, MxError.Source.Param, $"TextLines.Count={linesCount} or Cursor.RowIndex={Cursor?.RowIndex ?? -1} for TextLines.Count={linesCount}", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                try
-                {
-                    if (moveCursorBack && (rowIndex == 0))
-                        rc.SetError(1101102, MxError.Source.User, Resources.MxWarnStartOfChapter);
-                    else
-                    {
-                        WordCount -= TextLines[rowIndex].EndsWith(ParaBreakChar) ? TextLines[rowIndex].Length-1 : TextLines[rowIndex].Length;
-                        TextLines.RemoveAt(rowIndex);
-
-                        rowIndex = (((rowIndex > 0)) && ((moveCursorBack == true) || (rowIndex == TextLines.Count))) ? rowIndex - 1 : rowIndex;
-                        var colIndex = ((moveCursorBack == true) && (TextLines.Count > 0) && (rowIndex < TextLines.Count)) ? GetMaxColCursorIndexForRow(rowIndex) : 0;
-
-                        var rcCursor = SetCursorInChapter(rowIndex, colIndex);
-                        rc += rcCursor;
-                        if (rcCursor.IsSuccess(true))
-                        {
-                            //LeftJustifyLinesInParagraph adjust lines to next ParaBreak
-                            rc.SetResult(true);
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    rc.SetError(1101103, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
@@ -819,7 +739,6 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-
         public MxReturnCode<bool> FillShortLine(int rowIndex, int maxColIndex, out bool removeLine)
         {
             var rc = new MxReturnCode<bool>("Body.FillShortLine");
@@ -899,7 +818,7 @@ namespace KLineEdCmdApp.Model
                 {
                     TextLines[rowIndex] = existLine;
                     
-                    var rcInsert = InsertLine(insertLine);  
+                    var rcInsert = InsertLine(rowIndex+1, insertLine);  
                     rc += rcInsert;
                     if (rcInsert.IsSuccess(true))
                     {
@@ -1143,6 +1062,94 @@ namespace KLineEdCmdApp.Model
                         break;
                     }
                     rowIndex++;
+                }
+            }
+            return rc;
+        }
+
+
+        private MxReturnCode<bool> InsertLine(int rowIndex, string line)
+        {
+            var rc = new MxReturnCode<bool>("Body.InsertLine");
+
+            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((string.IsNullOrEmpty(line)) || (line.Length - 1 > CmdLineParamsApp.ArgEditAreaLineWidthMax))
+                rc.SetError(1101901, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than { CmdLineParamsApp.ArgEditAreaLineWidthMax}");
+            else
+            {
+                if (IsError() || (linesCount == Program.PosIntegerNotSet))
+                    rc.SetError(1101902, MxError.Source.Program, "IsError() == true, Initialise not called?", MxMsgs.MxErrInvalidCondition);
+                else
+                {
+                    try
+                    {
+                        if (linesCount >= Body.MaxTextLines)
+                            rc.SetError(1101903, MxError.Source.User, $"too many lines in chapter={linesCount}", MxMsgs.MxWarnTooManyLines);
+                        else
+                        {
+                            if (Body.GetErrorsInText(line) != null)
+                                rc.SetError(1101904, MxError.Source.User, Body.GetErrorsInText(line, Cursor.RowIndex + 2));
+                            else
+                            {
+                                if ((rowIndex + 1) >= linesCount)
+                                    TextLines.Add(line);
+                                else
+                                {
+                                    if (Cursor.ColIndex == 0)
+                                        TextLines.Insert(rowIndex + 1, line);
+                                    else
+                                    {
+                                        var startLine = TextLines[rowIndex].Substring(0, Cursor.ColIndex);
+                                        var endLine = TextLines[rowIndex].Substring(Cursor.ColIndex);
+                                        TextLines[rowIndex] = startLine;
+                                        TextLines.Insert(rowIndex + 1, line + endLine);
+                                    }
+                                }
+                                rc.SetResult(true);
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        rc.SetError(1101905, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    }
+                }
+            }
+            return rc;
+        }
+
+        private MxReturnCode<bool> DeleteLine(int rowIndex, bool moveCursorBack = false)
+        {
+            var rc = new MxReturnCode<bool>("Body.DeleteLine");
+
+            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((linesCount <= 0) || (TextLines == null) || (Cursor == null) || (Cursor.RowIndex < 0) || (Cursor.RowIndex >= linesCount))
+                rc.SetError(1102001, MxError.Source.Param, $"TextLines.Count={linesCount} or Cursor.RowIndex={Cursor?.RowIndex ?? -1} for TextLines.Count={linesCount}", MxMsgs.MxErrBadMethodParam);
+            else
+            {
+                try
+                {
+                    if (moveCursorBack && (rowIndex == 0))
+                        rc.SetError(1102002, MxError.Source.User, Resources.MxWarnStartOfChapter);
+                    else
+                    {
+                        WordCount -= TextLines[rowIndex].EndsWith(ParaBreakChar) ? TextLines[rowIndex].Length - 1 : TextLines[rowIndex].Length;
+                        TextLines.RemoveAt(rowIndex);
+
+                        rowIndex = (((rowIndex > 0)) && ((moveCursorBack == true) || (rowIndex == TextLines.Count))) ? rowIndex - 1 : rowIndex;
+                        var colIndex = ((moveCursorBack == true) && (TextLines.Count > 0) && (rowIndex < TextLines.Count)) ? GetMaxColCursorIndexForRow(rowIndex) : 0;
+
+                        var rcCursor = SetCursorInChapter(rowIndex, colIndex);
+                        rc += rcCursor;
+                        if (rcCursor.IsSuccess(true))
+                        {
+                            rc.SetResult(true);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    rc.SetError(1102003, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;

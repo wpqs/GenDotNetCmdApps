@@ -43,7 +43,7 @@ namespace KLineEdCmdApp.Model
         public string Folder { private set; get; }
         public bool Ready { private set; get; }
         public Header ChapterHeader { get; } 
-        public Body ChapterBody { get; }
+        public Body ChapterBody { get; protected set; }
 
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }

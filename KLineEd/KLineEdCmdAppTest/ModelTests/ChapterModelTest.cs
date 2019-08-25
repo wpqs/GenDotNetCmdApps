@@ -3,6 +3,7 @@ using System.IO;
 using KLineEdCmdApp;
 using KLineEdCmdApp.Model;
 using KLineEdCmdAppTest.TestSupport;
+using Microsoft.Azure.Services.AppAuthentication;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests
@@ -84,17 +85,19 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void InsertLineTest()
+        public void SaveOpenTest()
         {
-            var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
+            var manuscriptNew = new MockModelChapterModel();
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test one").GetResult());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test two").GetResult());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test three").GetResult());
+
+            manuscriptNew.SetTestLine("test one");
+            manuscriptNew.SetTestLine("test two");
+            manuscriptNew.SetTestLine("test three");
+
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
 
@@ -171,7 +174,7 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void GetReportTest()
         {
-            var manuscript = new ChapterModel();
+            var manuscript = new MockModelChapterModel();
             var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(manuscript.CreateNewSession().GetResult());
@@ -179,9 +182,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);
             Assert.Equal(0, manuscript.ChapterBody.GetLineCount());
-            Assert.True(manuscript.ChapterBody.InsertLine("test one").GetResult());
-            Assert.True(manuscript.ChapterBody.InsertLine("test two").GetResult());
-            Assert.True(manuscript.ChapterBody.InsertLine("test three").GetResult());
+            manuscript.SetTestLine("test one");
+            manuscript.SetTestLine("test two");
+            manuscript.SetTestLine("test three");
 
             Assert.StartsWith($"{Environment.NewLine}Author: [author not set]{Environment.NewLine}Project: [project not set]", manuscript.GetReport());
             Assert.Contains("Chapter stats:", manuscript.GetReport());
@@ -215,22 +218,22 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void SaveTest()
         {
-            var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
+            var manuscriptNew = new MockModelChapterModel();
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
 
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test one").GetResult());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test two").GetResult());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test three").GetResult());
+            manuscriptNew.SetTestLine("test one");
+            manuscriptNew.SetTestLine("test two");
+            manuscriptNew.SetTestLine("test three");
 
             Assert.True(manuscriptNew.Save().GetResult());
             Assert.True(manuscriptNew.Close(false).GetResult());
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
@@ -246,33 +249,33 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void CloseTest()
         {
-            var manuscriptNew = new ChapterModel();
-            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
+            var manuscriptNew = new MockModelChapterModel();
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptNew.Ready);
             Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test oneX").GetResult());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test twoX").GetResult());
-            Assert.True(manuscriptNew.ChapterBody.InsertLine("test threeX").GetResult());
+            manuscriptNew.SetTestLine("test oneY");
+            manuscriptNew.SetTestLine("test twoY");
+            manuscriptNew.SetTestLine("test threeY");
             Assert.True(manuscriptNew.Close().GetResult()); //default parameter closes and saves
 
             var manuscriptExisting = new ChapterModel();
-            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
+            rc = manuscriptExisting.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscriptExisting.Ready);
             Assert.Equal(3, manuscriptExisting.ChapterBody.GetLineCount());  //check that reopening an existing file doesn't add any empty lines to body
-            Assert.Equal("test oneX", manuscriptExisting.BodyGetEditAreaLinesForDisplay(3).GetResult()[0]);
-            Assert.Equal("test twoX", manuscriptExisting.BodyGetEditAreaLinesForDisplay(3).GetResult()[1]);
-            Assert.Equal("test threeX", manuscriptExisting.BodyGetEditAreaLinesForDisplay(3).GetResult()[2]);
+            Assert.Equal("test oneY", manuscriptExisting.BodyGetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("test twoY", manuscriptExisting.BodyGetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("test threeY", manuscriptExisting.BodyGetEditAreaLinesForDisplay(3).GetResult()[2]);
             Assert.True(manuscriptExisting.Close().GetResult());
         }
 
         [Fact]
         public void CreateNewSessionTest()
         {
-            var manuscript = new ChapterModel();
+            var manuscript = new MockModelChapterModel();
             var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth,  _instancePathFileName);
 
             Assert.True(rc.GetResult());
@@ -282,9 +285,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, manuscript.GetLastSession().SessionNo);
 
             Assert.Equal(0, manuscript.ChapterBody.GetLineCount());
-            Assert.True(manuscript.ChapterBody.InsertLine("test oneX").GetResult());
-            Assert.True(manuscript.ChapterBody.InsertLine("test twoX").GetResult());
-            Assert.True(manuscript.ChapterBody.InsertLine("test threeX").GetResult());
+            manuscript.SetTestLine("test oneX");
+            manuscript.SetTestLine("test twoX");
+            manuscript.SetTestLine("test threeX");
 
             Assert.True(manuscript.Close().GetResult()); //default parameter closes and saves
         }
@@ -292,18 +295,19 @@ namespace KLineEdCmdAppTest.ModelTests
         [Fact]
         public void RemoveAllLinesTest()
         {
-            var manuscript = new ChapterModel();
+            var manuscript = new MockModelChapterModel();
             var rc = manuscript.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth, _instancePathFileName);
 
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);
 
             Assert.Equal(0, manuscript.ChapterBody.GetLineCount());
-            Assert.True(manuscript.ChapterBody.InsertLine("test one").GetResult());
-            Assert.True(manuscript.ChapterBody.InsertLine("test two").GetResult());
-            Assert.True(manuscript.ChapterBody.InsertLine("test three").GetResult());
+            manuscript.SetTestLine("test one");
+            manuscript.SetTestLine("test two");
+            manuscript.SetTestLine("test three");
+
             Assert.Equal(3, manuscript.ChapterBody.GetLineCount());
-        //    Assert.Equal(6, manuscript.ChapterBody.WordCount);
+            Assert.Equal(6, manuscript.ChapterBody.WordCount);
 
             Assert.True(manuscript.RemoveAllLines());
             Assert.Equal(0, manuscript.ChapterBody.GetLineCount());
