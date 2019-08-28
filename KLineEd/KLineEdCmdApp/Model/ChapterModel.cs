@@ -271,37 +271,17 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1050601, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
             else
             {
-                //if (ChapterBody.GetCharacterCountInRow(ChapterBody.Cursor.RowIndex) == 1)
-                //{
-                //    var rcDelete = ChapterBody.DeleteLine(ChapterBody.Cursor.RowIndex, ChapterBody.Cursor.RowIndex > 0);
-                //    rc += rcDelete;
-                //    if (rcDelete.IsSuccess(true))
-                //    {
-                //        UpdateAllViews((int)ChangeHint.All);
-                //        rc.SetResult(true);
-                //    }
-                //}
-                //else    
-                //{
-                if (ChapterBody.GetCharacterCountInRow(ChapterBody.Cursor.RowIndex) == 1)
+                var rcMove = ChapterBody.MoveCursorInChapter(Body.CursorMove.PreviousCol);
+                rc += rcMove;
+                if (rcMove.IsSuccess(true))
                 {
-                    var rcDelete = BodyDeleteCharacter();   //deleting last character deletes line
+                    var rcDelete = BodyDeleteCharacter();
                     rc += rcDelete;
-                }
-                else
-                {
-                    var rcMove = ChapterBody.MoveCursorInChapter(Body.CursorMove.PreviousCol);
-                    rc += rcMove;
-                    if (rcMove.IsSuccess(true))
+                    if (rcDelete.IsSuccess(true))
                     {
-                        var rcDelete = BodyDeleteCharacter();
-                        rc += rcDelete;
+                        UpdateAllViews((int) ChangeHint.All);
+                        rc.SetResult(true);
                     }
-                }
-                if (rc.IsSuccess())
-                {
-                    UpdateAllViews((int)ChangeHint.All);
-                    rc.SetResult(true);
                 }
             }
             return rc;

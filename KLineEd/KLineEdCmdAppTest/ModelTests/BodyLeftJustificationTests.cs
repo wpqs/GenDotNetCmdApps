@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using KLineEdCmdApp.Model;
+﻿using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
@@ -176,70 +173,87 @@ namespace KLineEdCmdAppTest.ModelTests
 
         [Fact]
         public void GetSplitIndexFromEndBasicTest()
-        { //6         5         4         3         2         1
+        {             //0         1         2         3         4         5 
             var line = "0123456789 123456789 123456789 123456789 123456789 123456789";
-            //0         1         2         3         4         5       
+                            
             Assert.Equal(60, line.Length);
 
-            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 0));
-            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 1));
-            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 2));
-            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 10));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 61));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 60));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 59));  //no point in splitting a line at the very end 
 
-            Assert.Equal(40, Body.GetSplitIndexFromEnd(line, 11));
-            Assert.Equal(40, Body.GetSplitIndexFromEnd(line, 12));
-            Assert.Equal(40, Body.GetSplitIndexFromEnd(line, 20));
+            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 58));
+            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 51));
+            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 50));
 
-            Assert.Equal(30, Body.GetSplitIndexFromEnd(line, 21));
-            Assert.Equal(30, Body.GetSplitIndexFromEnd(line, 22));
+            Assert.Equal(40, Body.GetSplitIndexFromEnd(line, 49));
+            Assert.Equal(40, Body.GetSplitIndexFromEnd(line, 41));
+            Assert.Equal(40, Body.GetSplitIndexFromEnd(line, 40));
+
+            Assert.Equal(30, Body.GetSplitIndexFromEnd(line, 39));
+            Assert.Equal(30, Body.GetSplitIndexFromEnd(line, 31));
             Assert.Equal(30, Body.GetSplitIndexFromEnd(line, 30));
 
-            Assert.Equal(20, Body.GetSplitIndexFromEnd(line, 31));
-            Assert.Equal(20, Body.GetSplitIndexFromEnd(line, 32));
+            Assert.Equal(20, Body.GetSplitIndexFromEnd(line, 29));
+            Assert.Equal(20, Body.GetSplitIndexFromEnd(line, 21));
+            Assert.Equal(20, Body.GetSplitIndexFromEnd(line, 20));
 
-            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 49));
-            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 50));
-            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 51));
+            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 19));
+            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 11));
+            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 10));
+
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 9));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 8));
+
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 2));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 1));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 0));
         }
 
         [Fact]
         public void GetSplitIndexFromEndLimitTest()
         {
-            var line = "0123456789x123456789x123456789x123456789x123456789x123456789x1234";
-            Assert.Equal(65, line.Length);
-
-            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 1));
+            var line0 = "0123456789x123456789x123456789x123456789x123456789x123456789x1234";
+            Assert.Equal(65, line0.Length);
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line0, 64));
 
             var line1 = " 123456789x123456789x123456789x123456789x123456789x123456789x1234";
             Assert.Equal(65, line1.Length);
-            Assert.Equal(0, Body.GetSplitIndexFromEnd(line1, 1));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line1, 64));
+            Assert.Equal(0, Body.GetSplitIndexFromEnd(line1, 63));
 
             var line2 = "0123456789x123456789x123456789x123456789x123456789x123456789x123 ";
             Assert.Equal(65, line2.Length);
-            Assert.Equal(64, Body.GetSplitIndexFromEnd(line2, 1));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line2, 64));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line2, 63));
+
+            var line3 = "0123456789x123456789x123456789x123456789x123456789x123456789x12 4";
+            Assert.Equal(65, line3.Length);
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line3, 64));
+            Assert.Equal(63, Body.GetSplitIndexFromEnd(line3, 63));
         }
 
         [Fact]
         public void GetSplitIndexFromEndMultiSpaceTest()
         {
-            //"0123456789 123456789 123456789 123456789 123456789 123456789 1234";
+                     //"0123456789 123456789 123456789 123456789 123456789 123456789 1234";
             var line = "0123456789 123456789 123456789 123456789 123456789 1234567   1234";
             Assert.Equal(65, line.Length);
 
-            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 0));
-            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 1));
-            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 2));
-            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 3));
-            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 4));
-            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 5));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 64));
+            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 63));
+            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 62));
+            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 61));
+            Assert.Equal(60, Body.GetSplitIndexFromEnd(line, 60));
+            Assert.Equal(59, Body.GetSplitIndexFromEnd(line, 59));
+            Assert.Equal(58, Body.GetSplitIndexFromEnd(line, 58));
 
-            Assert.Equal(59, Body.GetSplitIndexFromEnd(line, 6));
-            Assert.Equal(58, Body.GetSplitIndexFromEnd(line, 7));
-            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 8));
+            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 57));
+            Assert.Equal(50, Body.GetSplitIndexFromEnd(line, 56));
 
-            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 54));
-            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 55));
-            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 56));
+            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 11));
+            Assert.Equal(10, Body.GetSplitIndexFromEnd(line, 10));
+            Assert.Equal(-1, Body.GetSplitIndexFromEnd(line, 9));
         }
 
         [Fact]
@@ -358,18 +372,18 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
-            var line = "0123456789";
-            Assert.Equal(10, line.Length);
+            var line = "0123456789A";
+            Assert.Equal(11, line.Length);
             body.SetTestLine(line); //use test method to add line > maxColIndex
 
-            Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("0123456789A", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(1, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
             Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
 
-            Assert.Equal("012345678", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("9", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(1, updatedCursorIndex);
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
@@ -383,18 +397,18 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
-            var line = "0123456789";
-            Assert.Equal(10, line.Length);
+            var line = "0123456789A";
+            Assert.Equal(11, line.Length);
             body.SetTestLine(line + Body.ParaBreak); //use test method to add line > maxColIndex
 
-            Assert.Equal("0123456789>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("0123456789A>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(1, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
             Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
 
-            Assert.Equal("012345678", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("9>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("A>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(1, updatedCursorIndex);
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
@@ -408,19 +422,19 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
-            var line = "01234 6789";
-            Assert.Equal(10, line.Length);
+            var line = "01234 6789A";
+            Assert.Equal(11, line.Length);
             body.SetTestLine(line); //use test method to add line > maxColIndex
 
-            Assert.Equal("01234 6789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("01234 6789A", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
             Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("01234", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("6789", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-            Assert.Equal(4, updatedCursorIndex);
+            Assert.Equal("6789A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(5, updatedCursorIndex);
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
         }
@@ -854,7 +868,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void LeftJustifyLinesInParagraphParaBreakLongLineTest()
+        public void LeftJustifyLinesInParagraphParaBreaThreeLineTest()
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
@@ -874,12 +888,13 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
 
-            //Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
-            //Assert.Equal("0123 56789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-            //Assert.Equal("A23 456>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-            //Assert.Equal(4, body.WordCount);
-            //Assert.Equal(0, body.Cursor.ColIndex);
-            //Assert.Equal(1, body.Cursor.RowIndex);
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal("0123", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("56789 A23", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("456>", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(9, body.Cursor.ColIndex);
+            Assert.Equal(1, body.Cursor.RowIndex);
         }
 
     }

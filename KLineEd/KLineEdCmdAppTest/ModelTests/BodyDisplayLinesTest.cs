@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using KLineEdCmdApp.Model;
+﻿using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
