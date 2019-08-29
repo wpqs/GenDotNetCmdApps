@@ -236,24 +236,33 @@ namespace KLineEdCmdApp.Model
         {
             var rc = new MxReturnCode<bool>("Body.RefreshChapter");
 
-            var rowCountIndex = 0;
-            //while ((rowCountIndex = GetNextParaBreakRowIndex(rowCountIndex)) != Program.PosIntegerNotSet)
-            //{
-                //var rcJustify = LeftJustifyLinesInParagraph(rowCountIndex, 0);
-                //if (rcJustify.IsError(true))
-                //{
-                //    rc += rcJustify;
-                //    break;
-                //}
-            //}
-            if (rc.IsSuccess())
+            if (TextLines == null)
+                rc.SetError(1100501, MxError.Source.Program, $"TextLines is null", MxMsgs.MxErrInvalidCondition);
+            else
             {
-                var rcCursor = SetCursorInChapter(rowIndex, colIndex);
-                rc += rcCursor;
-                if (rcCursor.IsSuccess(true))
+                var rowCountIndex = 0;
+                while (rowCountIndex < TextLines.Count)
                 {
-                    WordCount = RefreshWordCountInChapter();
-                    rc.SetResult(true);
+                    if ((rowCountIndex = GetNextParaBreakRowIndex(rowCountIndex)) == Program.PosIntegerNotSet)
+                        break;
+                    var rcJustify = LeftJustifyLinesInParagraph(rowCountIndex, 0);
+                    if (rcJustify.IsError(true))
+                    {
+                        rc += rcJustify;
+                        break;
+                    }
+                    rowCountIndex++;
+                }
+
+                if (rc.IsSuccess())
+                {
+                    var rcCursor = SetCursorInChapter(rowIndex, colIndex);
+                    rc += rcCursor;
+                    if (rcCursor.IsSuccess(true))
+                    {
+                        WordCount = RefreshWordCountInChapter();
+                        rc.SetResult(true);
+                    }
                 }
             }
             return rc;
@@ -721,6 +730,7 @@ namespace KLineEdCmdApp.Model
                     var rowIndex = startRowIndex;
                     while (rowIndex <= endRowIndex)
                     {
+                        var linesCount = TextLines.Count;
                         var line = TextLines[rowIndex];
                         var lineLen = line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length;
                         if (lineLen <= (maxColIndex + 1))
@@ -728,11 +738,13 @@ namespace KLineEdCmdApp.Model
                             var rcFill = FillShortLine(rowIndex, maxColIndex, out var removeLine);
                             rc += rcFill;
                             if (rcFill.IsSuccess(true) && (rcFill.GetResult() == true) && removeLine)
-                                endRowIndex--;
+                            {
+                                if (TextLines.Count < linesCount)
+                                    endRowIndex--;
+                            }
                         }
                         else
                         {
-                            var linesCount = TextLines.Count;
                             var rcSplit = SplitLongLine(rowIndex, maxColIndex, out var updatedCursorColIndex);
                             rc += rcSplit;
                             if (rcSplit.IsSuccess(true)) 
@@ -823,11 +835,11 @@ namespace KLineEdCmdApp.Model
                     var existLine = "";
                     var insertLine = "";
 
-                    var splitIndex = Body.GetSplitIndexFromEnd(line, maxColIndex); //lineLen - maxColIndex); 
+                    var splitIndex = Body.GetSplitIndexFromEnd(line, maxColIndex); 
                     if (splitIndex == Program.PosIntegerNotSet)
                     { //line doesn't contain any spaces or otherwise cannot be split
-                        existLine = line.Snip(0, maxColIndex); // - 1);
-                        if (((insertLine = line.Snip(maxColIndex+1, lineLen - 1)) != null))//maxColIndex, lineLen - 1)) != null))
+                        existLine = line.Snip(0, maxColIndex) + "-";
+                        if (((insertLine = line.Snip(maxColIndex+1, lineLen - 1)) != null))
                             WordCount++;
                     }
                     else
@@ -911,7 +923,7 @@ namespace KLineEdCmdApp.Model
 
             if ((spaceAvailable > 0) && (line != null))
             {
-                var lineLen = line.Length; //  (line.EndsWith(ParaBreakChar)) ? line.Length - 1 : line.Length;
+                var lineLen = line.Length;
                 if (lineLen <= spaceAvailable)
                     rc = lineLen - 1;
                 else
@@ -919,7 +931,7 @@ namespace KLineEdCmdApp.Model
                     var splitIndex = Program.PosIntegerNotSet;
                     for (var x = 0; x < line.Length; x++)
                     {
-                        if (((line[x] == ' ') || (line[x] == Body.ParaBreakChar)) && (x <= spaceAvailable))
+                        if (((line[x] == ' ') || (line[x] == '-') || (line[x] == Body.ParaBreakChar)) && (x <= spaceAvailable))
                             splitIndex = x;
                         if (x > spaceAvailable)
                             break;
@@ -934,26 +946,18 @@ namespace KLineEdCmdApp.Model
         {
             var rc = Program.PosIntegerNotSet;
 
-            if ((line != null) && (columnLimitIndex > 0) && (columnLimitIndex < (line.Length))) // (columnLimitIndex < (line.Length-1)))
+            if ((line != null) && (columnLimitIndex > 0) && (columnLimitIndex < (line.Length)))
             {
-                //var splitIndex = line.LastIndexOf(' ');
-                // var splitIndex = Program.PosIntegerNotSet;
                 var splitIndex = line.Length - 1;
                 var endIndex = line.Length - 1;
                 for (var x = endIndex; x >= 0; x--)
                 {
-                    if (line[x] == ' ')
+                    if ((line[x] == ' ') || (line[x] == '-'))
                         splitIndex = x;
-                    if (splitIndex <= columnLimitIndex) //&& (line[splitIndex] == ' '))
+                    if (splitIndex <= columnLimitIndex) 
                         break;
                     if (x == 0)
                         splitIndex = Program.PosIntegerNotSet;
-
-                    //if ((line[x] == ' ') && (((endIndex - x) + 1) >= spaceNeeded))
-                    //{
-                    //    splitIndex = x;
-                    //    break;
-                    //}
                 }
 
                 rc = (splitIndex < line.Length-1) ? splitIndex : Program.PosIntegerNotSet;

@@ -1,6 +1,7 @@
 ﻿using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdAppTest.TestSupport;
+using Microsoft.Azure.Services.AppAuthentication;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests
@@ -382,7 +383,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
 
-            Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("0123456789-", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(1, updatedCursorIndex);
             Assert.Equal(2, body.GetLineCount());
@@ -407,7 +408,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
 
-            Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("0123456789-", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("A>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(1, updatedCursorIndex);
             Assert.Equal(2, body.GetLineCount());
@@ -868,7 +869,124 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void LeftJustifyLinesInParagraphParaBreaThreeLineTest()
+        public void LeftJustifyLinesInParagraphNoLineTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.WordCount);
+            Assert.Equal(0, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            var rc = body.LeftJustifyLinesInParagraph(0, 0);
+            Assert.True(rc.IsError(true));
+            Assert.Equal(1101302, rc.GetErrorCode());
+            Assert.False(rc.GetResult());
+
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphOneLineLongTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "01 3456 89A12";
+            Assert.Equal(13, line1.Length);
+            body.SetTestLine(line1);
+
+            Assert.Equal("01 3456 89A12", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal(13, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal("01 3456", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("89A12", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal(5, body.Cursor.ColIndex);
+            Assert.Equal(1, body.Cursor.RowIndex);
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphParaBreakOneLineLongTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "01 3456 89A12" + Body.ParaBreak;
+            Assert.Equal(14, line1.Length);
+            body.SetTestLine(line1);
+
+            Assert.Equal("01 3456 89A12>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal(13, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal("01 3456", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("89A12>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal(5, body.Cursor.ColIndex); //long line split, so cursor goes from end of row 0 to end of row 1
+            Assert.Equal(1, body.Cursor.RowIndex);
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphOneLineShortTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "0123 56789";
+            Assert.Equal(10, line1.Length);
+            body.SetTestLine(line1);
+
+            Assert.Equal("0123 56789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal(10, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 10).GetResult());
+            Assert.Equal("0123 56789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal(10, body.Cursor.ColIndex); //line not split so cursor doesn't move
+            Assert.Equal(0, body.Cursor.RowIndex);
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphParamBreakOneLineShortTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "0123 56789" + Body.ParaBreak;
+            Assert.Equal(11, line1.Length);
+            body.SetTestLine(line1);
+
+            Assert.Equal("0123 56789>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal(10, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 10).GetResult());
+            Assert.Equal("0123 56789>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal(10, body.Cursor.ColIndex); //line not split so cursor doesn't move
+            Assert.Equal(0, body.Cursor.RowIndex);
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphTwoLineLongShortTest()
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
@@ -878,12 +996,12 @@ namespace KLineEdCmdAppTest.ModelTests
             var line1 = "0123 56789 A23";
             Assert.Equal(14, line1.Length);
             body.SetTestLine(line1);
-            var line2 = "456" + Body.ParaBreak;
-            Assert.Equal(4, line2.Length);
+            var line2 = "456";
+            Assert.Equal(3, line2.Length);
             body.SetTestLine(line2);
 
             Assert.Equal("0123 56789 A23", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("456>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal("456", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(4, body.WordCount);
             Assert.Equal(3, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
@@ -891,9 +1009,101 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
             Assert.Equal("0123", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("56789 A23", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("456", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(9, body.Cursor.ColIndex);
+            Assert.Equal(1, body.Cursor.RowIndex);
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphParaBreakTwoLineLongShortTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "0123 56789 123";
+            Assert.Equal(14, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "456" + Body.ParaBreak;
+            Assert.Equal(4, line2.Length);
+            body.SetTestLine(line2);
+
+            Assert.Equal("0123 56789 123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("456>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(3, body.Cursor.ColIndex);
+            Assert.Equal(1, body.Cursor.RowIndex);
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal("0123", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("56789 123", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
             Assert.Equal("456>", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
             Assert.Equal(4, body.WordCount);
             Assert.Equal(9, body.Cursor.ColIndex);
+            Assert.Equal(1,body.Cursor.RowIndex);
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphTwoLineShortLongTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "456";
+            Assert.Equal(3, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "0123 56789 A23";
+            Assert.Equal(14, line2.Length);
+            body.SetTestLine(line2);
+
+
+            Assert.Equal("456", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("0123 56789 A23", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(14, body.Cursor.ColIndex);
+            Assert.Equal(1, body.Cursor.RowIndex);
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal("456 0123 ", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("56789 A23", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(4, body.WordCount);
+        //    Assert.Equal(9, body.Cursor.ColIndex);
+        //    Assert.Equal(1, body.Cursor.RowIndex);
+        }
+
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphCursorSetTest()
+        {
+            var maxColIndex = 9;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "0123 56789 123";
+            Assert.Equal(14, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "456" + Body.ParaBreak;
+            Assert.Equal(4, line2.Length);
+            body.SetTestLine(line2);
+            Assert.True(body.SetCursorInChapter(0, 9).GetResult());
+
+            Assert.Equal("0123 56789 123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("456>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal(9, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 9).GetResult());
+            Assert.Equal("0123", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("56789 123", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("456>", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+            Assert.Equal(4, body.WordCount);
+          //  Assert.Equal(4, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
         }
 
