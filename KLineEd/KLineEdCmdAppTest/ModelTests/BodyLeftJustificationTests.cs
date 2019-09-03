@@ -265,9 +265,11 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex+1).GetResult());
             Assert.False(body.IsError());
 
-            Assert.False(body.SplitLongLine(0, -1, out var updatedCursorIndex).GetResult());
-            Assert.False(body.SplitLongLine(0, CmdLineParamsApp.ArgEditAreaLineWidthMin-1, out updatedCursorIndex).GetResult());
-            Assert.False(body.SplitLongLine(1, -1, out updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(0, 0, -1, out var updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(0, -1, CmdLineParamsApp.ArgEditAreaLineWidthMin-1, out updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(-1, 0, CmdLineParamsApp.ArgEditAreaLineWidthMin - 1, out updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(1, 0, CmdLineParamsApp.ArgEditAreaLineWidthMin - 1, out updatedCursorIndex).GetResult());
+
             Assert.Equal(-1, updatedCursorIndex);
         }
 
@@ -290,7 +292,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("0123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("56789ABC", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -318,7 +320,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("0123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("56789ABC>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -343,7 +345,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
-            Assert.False(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
         }
 
         [Fact]
@@ -362,7 +364,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
-            Assert.False(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
         }
 
         [Fact]
@@ -381,7 +383,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]); //"0123456789-"
             Assert.Equal("A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -406,7 +408,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]); //"0123456789-"
             Assert.Equal("A>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -431,7 +433,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("01234", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("6789A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -456,7 +458,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("01234", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("6789>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -481,7 +483,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line1.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("0", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -499,7 +501,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line2.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out updatedCursorIndex).GetResult());
 
             Assert.Equal("0", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("0123456789A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -524,7 +526,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line1.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, maxColIndex, out var updatedCursorIndex).GetResult());
+            Assert.True(body.SplitLongLine(0, 0, maxColIndex, out var updatedCursorIndex).GetResult());
 
             Assert.Equal("0123 ", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("0123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -541,12 +543,15 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
-            Assert.False(body.FillShortLine(0, -1, out var removeLine).GetResult());
-            Assert.False(removeLine);
-            Assert.False(body.FillShortLine(0, CmdLineParamsApp.ArgEditAreaLineWidthMin - 1, out removeLine).GetResult());
-            Assert.False(removeLine);
-            Assert.False(body.FillShortLine(1, -1, out removeLine).GetResult());
-            Assert.False(removeLine);
+            Assert.False(body.FillShortLine(0, 0, -1, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(-1, updatedCursorColIndex);
+            Assert.False(body.FillShortLine(0,  -1, CmdLineParamsApp.ArgEditAreaLineWidthMin - 1, out updatedCursorColIndex).GetResult());
+            Assert.Equal(-1, updatedCursorColIndex);
+            Assert.False(body.FillShortLine(-1, 0, CmdLineParamsApp.ArgEditAreaLineWidthMin - 1, out updatedCursorColIndex).GetResult());
+            Assert.Equal(-1, updatedCursorColIndex);
+            Assert.False(body.FillShortLine(1, 0, CmdLineParamsApp.ArgEditAreaLineWidthMin - 1, out updatedCursorColIndex).GetResult());
+            Assert.Equal(-1, updatedCursorColIndex);
+
         }
 
         [Fact]
@@ -569,8 +574,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line2.Length, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.True(removeLine);
+            Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
             Assert.Equal("0123 456", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
@@ -596,8 +601,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(line2.Length-1, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.True(removeLine);
+            Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
             Assert.Equal("0123 456>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
@@ -623,8 +628,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(4, body.Cursor.ColIndex);
 
-            Assert.False(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.False(removeLine);
+            Assert.False(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
 
             Assert.Equal("012345", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("789A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -652,8 +657,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(4, body.Cursor.ColIndex);
 
-            Assert.False(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.False(removeLine);
+            Assert.False(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
 
             Assert.Equal("012345", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("789A>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -681,8 +686,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.WordCount);
             Assert.Equal(5, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.False(removeLine);
+            Assert.True(body.FillShortLine(0, 0,  maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
             Assert.Equal("012345 789 ", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(2, body.GetLineCount());
@@ -709,8 +714,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.WordCount);
             Assert.Equal(5, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.False(removeLine);
+            Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
             Assert.Equal("012345 789 ", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("A>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(2, body.GetLineCount());
@@ -737,8 +742,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.WordCount);
             Assert.Equal(5, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.False(removeLine);
+            Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
             Assert.Equal("012345 78  ", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("A", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(2, body.GetLineCount());
@@ -766,8 +771,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.WordCount);
             Assert.Equal(5, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.False(removeLine);
+            Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
             Assert.Equal("012345 78  ", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("A>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(2, body.GetLineCount());
@@ -794,8 +799,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(3, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.True(removeLine);
+            Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0,updatedCursorColIndex);
             Assert.Equal("012345 789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
@@ -821,8 +826,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.WordCount);
             Assert.Equal(3, body.Cursor.ColIndex);
 
-            Assert.True(body.FillShortLine(0, maxColIndex, out var removeLine).GetResult());
-            Assert.True(removeLine);
+            Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            Assert.Equal(0, updatedCursorColIndex);
             Assert.Equal("012345 789>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
@@ -1066,12 +1071,12 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(14, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult()); // body.Cursor.ColIndex).GetResult());
             Assert.Equal("456 0123 ", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("56789 A23", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(4, body.WordCount);
         //    Assert.Equal(9, body.Cursor.ColIndex);
-        //    Assert.Equal(1, body.Cursor.RowIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
         }
 
 
