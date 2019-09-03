@@ -279,7 +279,6 @@ namespace KLineEdCmdApp.Model
                     rc += rcDelete;
                     if (rcDelete.IsSuccess(true))
                     {
-                        UpdateAllViews((int) ChangeHint.All);
                         rc.SetResult(true);
                     }
                 }

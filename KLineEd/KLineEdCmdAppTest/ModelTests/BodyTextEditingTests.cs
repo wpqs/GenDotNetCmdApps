@@ -361,7 +361,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(body.SetCursorInChapter(0, 2).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
-            Assert.Equal("qw", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("qw erty", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
         }
 
         [Fact]
@@ -389,7 +389,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(1, 0).GetResult());
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
-            Assert.Equal("qw", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("qw erty>", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[0]);
         }
 
         [Fact]
@@ -413,11 +413,15 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(5, manuscriptNew.ChapterBody.Cursor.ColIndex);
             Assert.Equal("qwert>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
-            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
-            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
-            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
-            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult()); 
+            Assert.Equal("qwer>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult()); //qwe>
+            Assert.Equal("qwe>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult()); //qw>
+            Assert.Equal("qw>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult()); //q>
+            Assert.Equal("q>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult()); //>
 
             Assert.Contains("Warning: Chapter is empty", manuscriptNew.BodyBackSpace().GetErrorUserMsg());
         }
@@ -975,21 +979,21 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.GetNextParaBreakRowIndex(0));
 
             Assert.True(body.SetCursorInChapter(1, 2).GetResult());
-            Assert.True(body.InsertParaBreak().GetResult());
-            Assert.Equal(4, body.GetLineCount());
+            Assert.True(body.InsertParaBreak().GetResult()); //invokes LeftJustifyLinesInParagraph()
+            Assert.Equal(3, body.GetLineCount());
             Assert.Equal(2, body.Cursor.RowIndex);
             Assert.Equal(0, body.Cursor.ColIndex);
 
-            Assert.Equal("qw>", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
-            Assert.Equal("erty", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("qw>", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("erty qwerty", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
 
             //0 qwerty
             //1 qw>
-            //2 erty
-            //3 qwerty
+            //2 erty qwerty
 
             Assert.Equal(1, body.GetNextParaBreakRowIndex(0));
-            Assert.Equal(3, body.GetNextParaBreakRowIndex(2));
+            Assert.Equal(2, body.GetNextParaBreakRowIndex(2));
         }
 
         [Fact]

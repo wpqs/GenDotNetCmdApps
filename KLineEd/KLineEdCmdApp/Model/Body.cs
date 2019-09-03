@@ -212,7 +212,7 @@ namespace KLineEdCmdApp.Model
                                         rc.SetError(1100404, MxError.Source.User, $"last line is {lastLine ?? "[null]"}", MxMsgs.MxErrInvalidCondition);
                                     else
                                     {
-                                        var rcRefresh = RefreshChapter(TextLines.Count - 1, GetMaxColCursorIndexForRow(TextLines.Count - 1));
+                                        var rcRefresh = Refresh(TextLines.Count - 1, GetMaxColCursorIndexForRow(TextLines.Count - 1));
                                         rc += rcRefresh;
                                         if (rcRefresh.IsSuccess(true))
                                         {
@@ -232,9 +232,9 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> RefreshChapter(int rowIndex, int colIndex)
+        public MxReturnCode<bool> Refresh(int rowIndex, int colIndex)
         {
-            var rc = new MxReturnCode<bool>("Body.RefreshChapter");
+            var rc = new MxReturnCode<bool>("Body.Refresh");
 
             if (TextLines == null)
                 rc.SetError(1100501, MxError.Source.Program, $"TextLines is null", MxMsgs.MxErrInvalidCondition);
@@ -553,17 +553,13 @@ namespace KLineEdCmdApp.Model
                                     TextLines[Cursor.RowIndex] = (before == null) ? ParaBreak : before + ParaBreak;
                                     TextLines.Insert(Cursor.RowIndex + 1, after ?? ParaBreak);
 
-                                    //adjust rest of paragraph lines - avoids need for SetCursorInChapter
-                                    //var rcJustify = LeftJustifyLinesInParagraph(rowCountIndex, 0);
-                                    //if (rcJustify.IsError(true))
-                                    //{
-                                    //    rc += rcJustify;
-                                    //    rc.SetResult(true);
-                                    //}
-
-                                    SetCursorInChapter(Cursor.RowIndex + 1, 0);
-
-                                    rc.SetResult(true);
+                                    //adjust rest of paragraph lines - avoids need for SetCursorInChapter(Cursor.RowIndex + 1, 0);
+                                    var rcJustify = LeftJustifyLinesInParagraph(Cursor.RowIndex+1, 0);
+                                    rc += rcJustify;
+                                    if (rcJustify.IsSuccess(true))
+                                    {
+                                        rc.SetResult(true);
+                                    }
                                 }
                             }
                         }
@@ -690,16 +686,15 @@ namespace KLineEdCmdApp.Model
 
                         if (rc.IsSuccess())
                         {
-                            Cursor.RowIndex = rowIndex; //remove after enabling LeftJustifyLinesInParagraph
-                            Cursor.ColIndex = colIndex; //remove after enabling LeftJustifyLinesInParagraph
+                            //Cursor.RowIndex = rowIndex; //remove after enabling LeftJustifyLinesInParagraph
+                            //Cursor.ColIndex = colIndex; //remove after enabling LeftJustifyLinesInParagraph
                             //adjust rest of paragraph lines - avoids need for SetCursorInChapter
-                            //var rcJustify = LeftJustifyLinesInParagraph(rowIndex, colIndex);
-                            //if (rcJustify.IsError(true))
-                            //{
-                            //    rc += rcJustify;
-                            //    rc.SetResult(true);
-                            //}
-                            rc.SetResult(true);
+                            var rcJustify = LeftJustifyLinesInParagraph(rowIndex, colIndex);
+                            rc += rcJustify;
+                            if (rcJustify.IsSuccess(true))
+                            {
+                                rc.SetResult(true);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -720,14 +715,13 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1101301, MxError.Source.Param, $"startRowIndex={startRowIndex}, startColIndex={startColIndex}, maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
             else
             {
+                var rowIndex = startRowIndex;
+                var cursorRowIndex = startRowIndex;
+                var cursorColIndex = startColIndex;
+
                 var endRowIndex = GetNextParaBreakRowIndex(startRowIndex);
-                if (endRowIndex == Program.PosIntegerNotSet)
-                    rc.SetError(1101302, MxError.Source.Program, $"GetNextParaBreakRowIndex({startRowIndex}) failed; TextLines.Count={TextLines?.Count ?? Program.PosIntegerNotSet}", MxMsgs.MxErrInvalidCondition);
-                else
+                if (endRowIndex > Program.PosIntegerNotSet) //rc.SetError(1101302, MxError.Source.Program, $"GetNextParaBreakRowIndex({startRowIndex}) failed; TextLines.Count={TextLines?.Count ?? Program.PosIntegerNotSet}", MxMsgs.MxErrInvalidCondition);
                 {
-                    var cursorRowIndex = startRowIndex;
-                    var cursorColIndex = startColIndex;
-                    var rowIndex = startRowIndex;
                     while (rowIndex <= endRowIndex)
                     {
                         var linesCount = TextLines.Count;
@@ -747,7 +741,7 @@ namespace KLineEdCmdApp.Model
                         {
                             var rcSplit = SplitLongLine(rowIndex, maxColIndex, out var updatedCursorColIndex);
                             rc += rcSplit;
-                            if (rcSplit.IsSuccess(true)) 
+                            if (rcSplit.IsSuccess(true))
                             {
                                 if (TextLines.Count > linesCount)
                                     endRowIndex++;
@@ -760,13 +754,13 @@ namespace KLineEdCmdApp.Model
                         }
                         rowIndex++;
                     }
-                    if (rowIndex - 1 == endRowIndex)
-                    {
-                        var rcCursor = SetCursorInChapter(cursorRowIndex, cursorColIndex);
-                        rc += rcCursor;
-                        if (rcCursor.IsSuccess(true))
-                            rc.SetResult(true);
-                    }
+                }
+                if ((endRowIndex == rowIndex - 1 ) || (endRowIndex == Program.PosIntegerNotSet))
+                {
+                    var rcCursor = SetCursorInChapter(cursorRowIndex, cursorColIndex);
+                    rc += rcCursor;
+                    if (rcCursor.IsSuccess(true))
+                        rc.SetResult(true);
                 }
             }
             return rc;
@@ -838,7 +832,7 @@ namespace KLineEdCmdApp.Model
                     var splitIndex = Body.GetSplitIndexFromEnd(line, maxColIndex); 
                     if (splitIndex == Program.PosIntegerNotSet)
                     { //line doesn't contain any spaces or otherwise cannot be split
-                        existLine = line.Snip(0, maxColIndex) + "-";
+                        existLine = line.Snip(0, maxColIndex); // + "-";
                         if (((insertLine = line.Snip(maxColIndex+1, lineLen - 1)) != null))
                             WordCount++;
                     }
@@ -931,7 +925,7 @@ namespace KLineEdCmdApp.Model
                     var splitIndex = Program.PosIntegerNotSet;
                     for (var x = 0; x < line.Length; x++)
                     {
-                        if (((line[x] == ' ') || (line[x] == '-') || (line[x] == Body.ParaBreakChar)) && (x <= spaceAvailable))
+                        if (((line[x] == ' ')  || (line[x] == Body.ParaBreakChar)) && (x <= spaceAvailable)) //|| (line[x] == '-')
                             splitIndex = x;
                         if (x > spaceAvailable)
                             break;
@@ -952,7 +946,7 @@ namespace KLineEdCmdApp.Model
                 var endIndex = line.Length - 1;
                 for (var x = endIndex; x >= 0; x--)
                 {
-                    if ((line[x] == ' ') || (line[x] == '-'))
+                    if (line[x] == ' ') // || (line[x] == '-'))
                         splitIndex = x;
                     if (splitIndex <= columnLimitIndex) 
                         break;
