@@ -197,6 +197,30 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
+        public void MoveCursorEndOfLineTest()
+        {
+            var maxColIndex = 9;
+            var manuscriptNew = new ChapterModel();
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1, _instancePathFileName);
+
+            Assert.True(rc.GetResult());
+            Assert.True(manuscriptNew.Ready);
+            Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
+
+            var line1 = "0123456789";
+            Assert.True(manuscriptNew.BodyInsertText(line1).GetResult());
+
+            Assert.Equal("0123456789>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            Assert.Equal(1, manuscriptNew.ChapterBody.GetLineCount());
+            Assert.Equal(0, manuscriptNew.ChapterBody.Cursor.RowIndex);
+            Assert.Equal(10, manuscriptNew.ChapterBody.Cursor.ColIndex);
+
+            Assert.True(manuscriptNew.BodyMoveCursor(Body.CursorMove.PreviousCol).GetResult());
+
+        }
+
+        [Fact]
         public void MoveCursorOneLineTest()
         {
             var body = new Body();
@@ -390,6 +414,31 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(1, 0).GetResult());
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
             Assert.Equal("qw erty>", manuscriptNew.BodyGetEditAreaLinesForDisplay(2).GetResult()[0]);
+        }
+
+        [Fact]
+        public void BackSpaceEndOfLineTest()
+        {
+            var maxColIndex = 9;
+            var manuscriptNew = new ChapterModel();
+            var rc = manuscriptNew.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex+1, _instancePathFileName);
+
+            Assert.True(rc.GetResult());
+            Assert.True(manuscriptNew.Ready);
+            Assert.Equal(0, manuscriptNew.ChapterBody.GetLineCount());
+
+            var line1 = "0123456789";
+            Assert.True(manuscriptNew.BodyInsertText(line1).GetResult());
+
+            Assert.Equal("0123456789>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            Assert.Equal(1, manuscriptNew.ChapterBody.GetLineCount());
+            Assert.Equal(0, manuscriptNew.ChapterBody.Cursor.RowIndex);
+            Assert.Equal(10, manuscriptNew.ChapterBody.Cursor.ColIndex);
+
+            Assert.True(manuscriptNew.BodyBackSpace().GetResult());
+            Assert.Equal("012345678>", manuscriptNew.BodyGetEditAreaLinesForDisplay(1).GetResult()[0]);
+
         }
 
         [Fact]
