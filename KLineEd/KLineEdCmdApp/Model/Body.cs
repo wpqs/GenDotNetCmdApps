@@ -686,9 +686,6 @@ namespace KLineEdCmdApp.Model
 
                         if (rc.IsSuccess())
                         {
-                            //Cursor.RowIndex = rowIndex; //remove after enabling LeftJustifyLinesInParagraph
-                            //Cursor.ColIndex = colIndex; //remove after enabling LeftJustifyLinesInParagraph
-                            //adjust rest of paragraph lines - avoids need for SetCursorInChapter
                             var rcJustify = LeftJustifyLinesInParagraph(rowIndex, colIndex);
                             rc += rcJustify;
                             if (rcJustify.IsSuccess(true))
@@ -783,33 +780,37 @@ namespace KLineEdCmdApp.Model
             {
                 updatedCursorColIndex = colIndex;
                 if ((rowIndex+1) >= lineCount)
-                    rc.SetResult(false);         //last line in chapter cannot be filled with text from subsequent lines ;-)
+                    rc.SetResult(false);                      //last line in chapter cannot be filled with text from subsequent lines ;-)
                 else
                 {
                     var currentLine = TextLines[rowIndex];
-                    var currentLineLen = (currentLine.EndsWith(ParaBreakChar)) ? currentLine.Length - 1 : currentLine.Length;
-                    var nextLine = TextLines[rowIndex + 1];
-                    var nextLineLen = nextLine.Length; //(nextLine.EndsWith(ParaBreakChar)) ? nextLine.Length - 1 : nextLine.Length;
-
-                    var splitIndex = Body.GetSplitIndexFromStart(nextLine, (maxColIndex + 1) - currentLineLen - 1); 
-                    if ((splitIndex == Program.PosIntegerNotSet) || (splitIndex >= maxColIndex))
-                        rc.SetResult(false);     //split text in next line is too long be put into current line
+                    if (currentLine.EndsWith(ParaBreakChar)) //current line is end of paragraph so cannot fill from next line
+                        rc.SetResult(false);
                     else
-                    {
-                        var start = nextLine.Snip(0, splitIndex);
-                        TextLines[rowIndex] += " " + start;
+                    { 
+                        var currentLineLen = (currentLine.EndsWith(ParaBreakChar)) ? currentLine.Length - 1 : currentLine.Length;
+                        var nextLine = TextLines[rowIndex + 1];
+                        var nextLineLen = nextLine.Length; //(nextLine.EndsWith(ParaBreakChar)) ? nextLine.Length - 1 : nextLine.Length;
 
-                        var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1); // nextLineLen - 1); // nextLine.Length - 1);
-                        if (string.IsNullOrEmpty(end) == false)
-                            TextLines[rowIndex + 1] = end;
+                        var splitIndex = Body.GetSplitIndexFromStart(nextLine, (maxColIndex + 1) - currentLineLen - 1);
+                        if ((splitIndex == Program.PosIntegerNotSet) || (splitIndex >= maxColIndex))
+                            rc.SetResult(false); //split text in next line is too long be put into current line
                         else
                         {
-                            TextLines.RemoveAt(rowIndex + 1);
-                            updatedCursorColIndex = 0;
+                            var start = nextLine.Snip(0, splitIndex);
+                            TextLines[rowIndex] += " " + start;
+
+                            var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1); // nextLineLen - 1); // nextLine.Length - 1);
+                            if (string.IsNullOrEmpty(end) == false)
+                                TextLines[rowIndex + 1] = end;
+                            else
+                            {
+                                TextLines.RemoveAt(rowIndex + 1);
+                            }
+                            rc.SetResult(true);
                         }
-                        rc.SetResult(true);
-                    }
                 }
+            }
             }
             return rc;
         }
