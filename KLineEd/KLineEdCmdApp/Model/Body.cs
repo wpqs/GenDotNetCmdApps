@@ -1143,18 +1143,8 @@ namespace KLineEdCmdApp.Model
                                 if ((rowIndex + 1) >= linesCount)
                                     TextLines.Add(line);
                                 else
-                                {
                                     TextLines.Insert(rowIndex + 1, line);
-                                    //if (Cursor.ColIndex == 0)
-                                    //    TextLines.Insert(rowIndex + 1, line);
-                                    //else
-                                    //{
-                                    //    var startLine = TextLines[rowIndex].Substring(0, Cursor.ColIndex);
-                                    //    var endLine = TextLines[rowIndex].Substring(Cursor.ColIndex);
-                                    //    TextLines[rowIndex] = startLine;
-                                    //    TextLines.Insert(rowIndex + 1, line + endLine);
-                                    //}
-                                }
+
                                 rc.SetResult(true);
                             }
                         }
