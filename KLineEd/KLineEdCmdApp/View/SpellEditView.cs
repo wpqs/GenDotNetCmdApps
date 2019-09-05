@@ -45,7 +45,7 @@ namespace KLineEdCmdApp.View
                             case ChapterModel.ChangeHint.MsgLine:
                             case ChapterModel.ChangeHint.HelpLine:
                             {
-                                rc += SetEditAreaCursor();
+                                rc += SetEditAreaCursorPosition();
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
                                 break;

@@ -68,6 +68,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Null(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgEditAreaLinesCountMax + 1).GetResult());
         }
 
+
         [Fact]
         public void SetEditAreaBottomChapterIndexFiveDisplayLineTest()
         {
@@ -239,6 +240,165 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(9, body.EditAreaBottomChapterIndex);
             Assert.True(body.SetEditAreaBottomIndex(Body.Scroll.PageDown).GetResult());  //can scroll page down, though not entire page
             Assert.Equal(10, body.EditAreaBottomChapterIndex);
+
+        }
+
+        [Fact]
+        public void ScrollCursorInChapterFiveDisplayLineTest()
+        {
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(5, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(4, body.EditAreaViewCursorLimit.RowIndex);
+
+            body.SetTestLine("0aaaaaa");
+            body.SetTestLine("1bbbbbb");
+            body.SetTestLine("2cccccc");
+            body.SetTestLine("3dddddd");
+            body.SetTestLine("4eeeeee");
+            body.SetTestLine("5ffffff");
+            body.SetTestLine("6gggggg");
+            body.SetTestLine("7hhhhhh");
+            body.SetTestLine("8iiiiii");
+            body.SetTestLine("9jjjjjj");
+            body.SetTestLine("10kkkkk");
+
+            Assert.Equal(11, body.GetLineCount());
+            Assert.Equal(10, body.Cursor.RowIndex);
+
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.Bottom).GetResult());   //can't scroll further down
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.Top).GetResult());       //can scroll to top
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());   //can't scroll further up
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.PageUp).GetResult());
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());  //can scroll down
+            Assert.Equal(1, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());    //can now scroll up
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());  //can scroll page down
+            Assert.Equal(5, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageUp).GetResult());    //can now scroll page up
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.Bottom).GetResult());    //can scroll to bottom
+            Assert.Equal(10, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());     //can scroll up three lines
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());
+            Assert.Equal(7, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());   //can scroll page down, though not entire page
+            Assert.Equal(10, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());     //can scroll up five lines
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());
+            Assert.Equal(5, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());   //can scroll page down (entire page)
+            Assert.Equal(10, body.Cursor.RowIndex);
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());  //can't scroll further down
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.Top).GetResult());       //can scroll to top
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());     //can scroll down three lines
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.Equal(3, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageUp).GetResult());   //can scroll page up, though not entire page
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());     //can scroll down five lines
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.Equal(5, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageUp).GetResult());   //can scroll page up (entire page)
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult()); //can scroll down one line
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageUp).GetResult());   //can scroll page up, though not entire page
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.Bottom).GetResult());   //can scroll bottom,
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());   //can scroll line up
+            Assert.Equal(9, body.Cursor.RowIndex);
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());  //can scroll page down, though not entire page
+            Assert.Equal(10, body.Cursor.RowIndex);
+
+        }
+
+        [Fact]
+        public void ScrollCursorInChapterOneDisplayLineTest()
+        {
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(1, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.False(body.IsError());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.EditAreaViewCursorLimit.RowIndex);
+
+            body.SetTestLine("0aaaaaa");
+            body.SetTestLine("1bbbbbb");
+            body.SetTestLine("2cccccc");
+            body.SetTestLine("3dddddd");
+            body.SetTestLine("4eeeeee");
+            body.SetTestLine("5ffffff");
+            body.SetTestLine("6gggggg");
+            body.SetTestLine("7hhhhhh");
+            body.SetTestLine("8iiiiii");
+            body.SetTestLine("9jjjjjj");
+            body.SetTestLine("10kkkkk");
+
+            Assert.Equal(11, body.GetLineCount());
+            Assert.Equal(10, body.Cursor.RowIndex);
+
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.Bottom).GetResult());   //can't scroll further down
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.Top).GetResult());
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());   //can scroll page down, though just one line
+            Assert.Equal(1, body.Cursor.RowIndex);
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());   //can scroll page down, though just one line
+            Assert.Equal(2, body.Cursor.RowIndex);
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());   //can scroll page down, though just one line
+            Assert.Equal(3, body.Cursor.RowIndex);
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());   //can't scroll page down any more
+            Assert.Equal(4, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.Top).GetResult());       //can scroll to top
+            Assert.Equal(0, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineDown).GetResult());  //can scroll down one line
+            Assert.Equal(1, body.Cursor.RowIndex);
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageUp).GetResult());   //can scroll page up, though just one line
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.False(body.ScrollCursorInChapter(Body.Scroll.PageUp).GetResult());   //can't scroll page up again
+
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.Bottom).GetResult());   //can scroll bottom,
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.LineUp).GetResult());   //can scroll line up
+            Assert.Equal(9, body.Cursor.RowIndex);
+            Assert.True(body.ScrollCursorInChapter(Body.Scroll.PageDown).GetResult());  //can scroll page down, though not entire page
+            Assert.Equal(10, body.Cursor.RowIndex);
 
         }
 

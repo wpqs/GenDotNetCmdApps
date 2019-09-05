@@ -248,7 +248,7 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1050501, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var existingIndex = ChapterBody.EditAreaBottomChapterIndex;
+               // var existingIndex = ChapterBody.EditAreaBottomChapterIndex;
                 var rcMove = ChapterBody.MoveCursorInChapter(move);
                 rc += rcMove;
                 if (rcMove.IsSuccess(true))

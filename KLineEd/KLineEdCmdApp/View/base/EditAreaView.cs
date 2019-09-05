@@ -92,10 +92,10 @@ namespace KLineEdCmdApp.View.Base
                         {
                             for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
                             {
-                                //var blank = $"{editRowIndex}";         ////see also BaseView.Setup()
+                                //var blank = $"{editAreaRowIndex}";         ////see also BaseView.Setup()
                                 //blank = blank.PadRight(EditAreaWidth - 2, ',');
                                 //blank += "o";
-                                //DisplayLine(KLineEditor.EditAreaTopRowIndex+editRowIndex, KLineEditor.EditAreaMarginLeft, blank, true);
+                                //DisplayLine(KLineEditor.EditAreaTopRowIndex+editAreaRowIndex, KLineEditor.EditAreaMarginLeft, blank, true);
 
                                 var rcClear = ClearLine(KLineEditor.EditAreaTopRowIndex + editRowIndex, 0);
                                 rc += rcClear;
@@ -113,15 +113,15 @@ namespace KLineEdCmdApp.View.Base
             return rc;
         }
 
-        public MxReturnCode<bool>SetEditAreaCursor(int editRowIndex = 0, int editColIndex = 0)
+        protected MxReturnCode<bool> SetEditAreaCursorPosition(int editAreaRowIndex = 0, int editAreaColIndex = 0)
         {
-            var rc = new MxReturnCode<bool>("EditAreaView.SetCursor");
+            var rc = new MxReturnCode<bool>("EditAreaView.SetEditAreaCursorPosition");
 
-            if ((editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= WindowWidth-1))
-                rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editRowIndex} (max={EditAreaHeight}), col={editColIndex} (max={WindowWidth-1})", MxMsgs.MxErrBadMethodParam);
+            if ((editAreaRowIndex < 0) || (editAreaRowIndex >= EditAreaHeight) || (editAreaColIndex < 0) || (editAreaColIndex >= WindowWidth - 1))
+                rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editAreaRowIndex} (max={EditAreaHeight}), col={editAreaColIndex} (max={WindowWidth - 1})", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editRowIndex, KLineEditor.EditAreaMarginLeft + editColIndex) == false)
+                if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editAreaRowIndex, KLineEditor.EditAreaMarginLeft + editAreaColIndex) == false)
                     rc.SetError(1110402, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
                 else
                     rc.SetResult(true);
@@ -129,6 +129,26 @@ namespace KLineEdCmdApp.View.Base
             return rc;
         }
 
+        protected MxReturnCode<CursorPosition> GetEditAreaCursorPosition(int lineCount, int chapterRowIndex, int chapterColIndex)
+        {
+            var rc = new MxReturnCode<CursorPosition>("EditAreaView.GetEditAreaCursorPosition");
+
+            if ((lineCount < 0) || (EditAreaHeight < 0) || (chapterRowIndex < 0) || ((lineCount > 0) && (chapterRowIndex > lineCount-1)) || (chapterColIndex < 0))
+                rc.SetError(1140501, MxError.Source.Param, $"lineCount={lineCount} row{chapterRowIndex} col={chapterColIndex} (EditAreaHeight={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
+            else
+            {
+                if ((lineCount <= EditAreaHeight) || (chapterRowIndex < EditAreaHeight))
+                    rc.SetResult(new CursorPosition(chapterRowIndex, chapterColIndex));
+                else
+                {
+                    var rem = chapterRowIndex % EditAreaHeight; //0-4 if EditAreaHeight is 5
+                    var editAreaRow = rem;
+
+                    rc.SetResult(new CursorPosition(EditAreaHeight-1, chapterColIndex));
+                }
+            }
+            return rc;
+        }
         public MxReturnCode<bool> DisplayEditAreaLine(int editRowIndex, string line, bool clear=true)
         {
             var rc = new MxReturnCode<bool>("EditAreaView.DisplayEditAreaLine");

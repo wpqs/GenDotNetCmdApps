@@ -77,7 +77,7 @@ namespace KLineEdCmdApp.View
                                         rc.SetError(1150102, MxError.Source.Program, $"currentCursorRow={currentCursorRow} not supported", MxMsgs.MxErrInvalidCondition);
 
                                     if (rc.IsSuccess(true))
-                                        rc += SetEditAreaCursor((int)currentCursorRow, currentCursorCol);
+                                        rc += SetEditAreaCursorPosition((int)currentCursorRow, currentCursorCol);
                                     if (rc.IsSuccess(true))
                                         rc.SetResult(true);
                                     break;
@@ -94,7 +94,7 @@ namespace KLineEdCmdApp.View
                                 if (rc.IsSuccess(true))
                                     rc += DisplayEditAreaLine((int)PropsEditViewCursorRow.PathFileName, filenameLine, false);
                                 if (rc.IsSuccess(true))
-                                    rc += SetEditAreaCursor((int)currentCursorRow, currentCursorCol); 
+                                    rc += SetEditAreaCursorPosition((int)currentCursorRow, currentCursorCol); 
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
                                 break;
@@ -103,7 +103,7 @@ namespace KLineEdCmdApp.View
                             case ChapterModel.ChangeHint.MsgLine:
                             case ChapterModel.ChangeHint.HelpLine:
                             { //get from Model ActivePropLine and ActivePropColumn and set line accordingly
-                                rc += SetEditAreaCursor((int)currentCursorRow, currentCursorCol); 
+                                rc += SetEditAreaCursorPosition((int)currentCursorRow, currentCursorCol); 
                                 if (rc.IsSuccess(true))
                                     rc.SetResult(true);
                                 break;

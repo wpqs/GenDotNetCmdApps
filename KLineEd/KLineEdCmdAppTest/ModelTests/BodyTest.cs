@@ -23,7 +23,6 @@ namespace KLineEdCmdAppTest.ModelTests
             body.SetTestLine("three");
             Assert.Equal(5, body.Cursor.ColIndex); //cursor at end of line
             Assert.Equal(2, body.Cursor.RowIndex);
-            Assert.Equal(2, body.EditAreaBottomChapterIndex);
             Assert.Equal(3, body.WordCount);
             Assert.Equal(3, body.GetLineCount());
 
@@ -33,7 +32,6 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.GetLineCount());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.Cursor.ColIndex);
-            Assert.Equal(0, body.EditAreaBottomChapterIndex);
 
         }
 

@@ -63,7 +63,6 @@ namespace KLineEdCmdApp.Model
         protected List<string> TextLines { set; get; }
         public CursorPosition Cursor { get; private set; }
         public CursorPosition EditAreaViewCursorLimit { get; private set; }
-
         public int EditAreaBottomChapterIndex { private set; get; }        //TextLines[TopDisplayLineIndex] is displayed as first line in console
         public int WordCount { protected set; get; }
         public string TabSpaces { private set; get; }
@@ -78,8 +77,8 @@ namespace KLineEdCmdApp.Model
 
             Cursor = new CursorPosition(0, 0);
             EditAreaViewCursorLimit = new CursorPosition(CmdLineParamsApp.ArgEditAreaLinesCountDefault, CmdLineParamsApp.ArgEditAreaLineWidthDefault); //updated by Model.Initialise
-
             EditAreaBottomChapterIndex = Program.PosIntegerNotSet;
+
             WordCount = Program.PosIntegerNotSet;
             SetTabSpaces(CmdLineParamsApp.ArgSpacesForTabDefault);
             ParaBreakDisplayChar = CmdLineParamsApp.ArgParaBreakDisplayCharDefault;
@@ -417,7 +416,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.SetEditAreaBottomIndex");
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((linesCount == Program.PosIntegerNotSet) || (EditAreaViewCursorLimit == null) )
+            if ((linesCount == Program.PosIntegerNotSet) || (EditAreaViewCursorLimit == null))
                 rc.SetError(1100801, MxError.Source.Program, $"EditAreaViewCursorLimit or TextLines is null", MxMsgs.MxErrInvalidCondition);
             else
             {
@@ -425,68 +424,156 @@ namespace KLineEdCmdApp.Model
                 switch (scroll)
                 {
                     case Scroll.ToCursor:
-                    {
-                        EditAreaBottomChapterIndex = Cursor.RowIndex; 
-                        rc.SetResult(true);
-                        break;
-                    }
+                        {
+                            EditAreaBottomChapterIndex = Cursor.RowIndex;
+                            rc.SetResult(true);
+                            break;
+                        }
+                    case Scroll.Top:
+                        {
+                            if (EditAreaBottomChapterIndex != displayHt - 1)
+                            {
+                                EditAreaBottomChapterIndex = displayHt - 1;
+                                rc.SetResult(true);
+                            }
+                            break;
+                        }
+                    case Scroll.Bottom:
+                        {
+                            if (EditAreaBottomChapterIndex != linesCount - 1)
+                            {
+                                EditAreaBottomChapterIndex = linesCount - 1;
+                                rc.SetResult(true);
+                            }
+                            break;
+                        }
+                    case Scroll.LineUp:
+                        {
+                            if (EditAreaBottomChapterIndex + 1 > displayHt)
+                            {
+                                EditAreaBottomChapterIndex -= 1;
+                                rc.SetResult(true);
+                            }
+                            break;
+                        }
+                    case Scroll.LineDown:
+                        {
+                            if (EditAreaBottomChapterIndex + 1 < linesCount)
+                            {
+                                EditAreaBottomChapterIndex += 1;
+                                rc.SetResult(true);
+                            }
+                            break;
+                        }
+                    case Scroll.PageUp:
+                        {
+                            if (EditAreaBottomChapterIndex > displayHt - 1)
+                            {
+                                if (EditAreaBottomChapterIndex + 1 > ((displayHt - 1) * 2))
+                                    EditAreaBottomChapterIndex -= (displayHt == 1) ? 1 : displayHt - 1;
+                                else
+                                    EditAreaBottomChapterIndex = displayHt - 1;
+                                rc.SetResult(true);
+                            }
+                            break;
+                        }
+                    case Scroll.PageDown:
+                        {
+                            if (EditAreaBottomChapterIndex != linesCount - 1)
+                            {
+                                if (EditAreaBottomChapterIndex + (displayHt - 1) < linesCount)
+                                    EditAreaBottomChapterIndex += (displayHt == 1) ? 1 : displayHt - 1;
+                                else
+                                    EditAreaBottomChapterIndex = linesCount - 1;
+                                rc.SetResult(true);
+                            }
+                            break;
+                        }
+                    default:
+                        {
+                            rc.SetError(1100802, MxError.Source.Program, $"unsupported scroll={scroll}", MxMsgs.MxErrInvalidCondition);
+                            break;
+                        }
+                }
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> ScrollCursorInChapter(Body.Scroll scroll = Body.Scroll.Bottom) //replacement for  SetEditAreaBottomIndex
+        {
+            var rc = new MxReturnCode<bool>("Body.ScrollCursorInChapter");
+
+            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((linesCount == Program.PosIntegerNotSet) || (Cursor == null) || (EditAreaViewCursorLimit == null))
+                rc.SetError(1100801, MxError.Source.Program, $"Cursor, EditAreaViewCursorLimit or TextLines is null", MxMsgs.MxErrInvalidCondition);
+            else
+            {
+                var displayHt = EditAreaViewCursorLimit.RowIndex + 1;
+                switch (scroll)
+                {
                     case Scroll.Top:
                     {
-                        if (EditAreaBottomChapterIndex != displayHt - 1)
+                        if (Cursor.RowIndex != 0)
                         {
-                            EditAreaBottomChapterIndex = displayHt - 1;
+                            Cursor.RowIndex = 0;
                             rc.SetResult(true);
                         }
                         break;
                     }
                     case Scroll.Bottom:
                     {
-                        if (EditAreaBottomChapterIndex != linesCount - 1)
+                        if (Cursor.RowIndex != linesCount-1)
                         {
-                            EditAreaBottomChapterIndex = linesCount - 1;
+                            Cursor.RowIndex = linesCount-1;
                             rc.SetResult(true);
                         }
                         break;
                     }
                     case Scroll.LineUp:
                     {
-                        if (EditAreaBottomChapterIndex + 1 > displayHt)
+                        if (Cursor.RowIndex > 0)
                         {
-                            EditAreaBottomChapterIndex -= 1;
+                            Cursor.RowIndex -= 1;
                             rc.SetResult(true);
                         }
                         break;
                     }
                     case Scroll.LineDown:
                     {
-                        if (EditAreaBottomChapterIndex + 1 < linesCount)
+                        if (Cursor.RowIndex < linesCount-1)
                         {
-                            EditAreaBottomChapterIndex += 1;
+                            Cursor.RowIndex += 1;
                             rc.SetResult(true);
                         }
                         break;
                     }
                     case Scroll.PageUp:
                     {
-                        if (EditAreaBottomChapterIndex > displayHt - 1)
+                        if (linesCount > displayHt)
                         {
-                            if (EditAreaBottomChapterIndex + 1 > ((displayHt - 1) * 2))
-                                EditAreaBottomChapterIndex -= (displayHt == 1) ? 1 : displayHt - 1;
-                            else
-                                EditAreaBottomChapterIndex = displayHt - 1;
-                            rc.SetResult(true);
+                            var rowIndex = 0;
+                            if (Cursor.RowIndex >= (displayHt - 1))
+                                rowIndex = Cursor.RowIndex - displayHt; 
+                            if ((rowIndex >= 0) && (rowIndex <= linesCount-1) && (rowIndex != Cursor.RowIndex))
+                            {
+                                Cursor.RowIndex = rowIndex;
+                                rc.SetResult(true);
+                            }
                         }
                         break;
                     }
                     case Scroll.PageDown:
                     {
-                        if (EditAreaBottomChapterIndex != linesCount - 1)
+                        if (linesCount > displayHt)
                         {
-                            if (EditAreaBottomChapterIndex + (displayHt - 1) < linesCount)
-                                EditAreaBottomChapterIndex += (displayHt == 1) ? 1 : displayHt - 1;
-                            else
-                                EditAreaBottomChapterIndex = linesCount - 1;
-                            rc.SetResult(true);
+                            var rowIndex = linesCount - 1;
+                            if ((linesCount - Cursor.RowIndex) > (displayHt - 1))
+                                rowIndex = Cursor.RowIndex + displayHt; 
+                            if ((rowIndex >= 0) && (rowIndex <= linesCount - 1) && (rowIndex != Cursor.RowIndex))
+                            {
+                                Cursor.RowIndex = rowIndex;
+                                rc.SetResult(true);
+                            }
                         }
                         break;
                     }
@@ -499,20 +586,7 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
-
-        public CursorPosition GetCursorInEditArea()
-        {
-            CursorPosition rc = null;
-
-            var displayHt = EditAreaViewCursorLimit?.RowIndex + 1 ?? Program.PosIntegerNotSet;
-            if (displayHt > 0)
-            {
-                var rowIndex = (Cursor.RowIndex <= EditAreaBottomChapterIndex) ? Cursor.RowIndex : Cursor.RowIndex - (EditAreaBottomChapterIndex - displayHt);
-                if ((rowIndex >= 0) && (rowIndex < displayHt))
-                    rc = new CursorPosition(rowIndex, Cursor.ColIndex);
-            }
-           return rc;
-        }
+                                                                                                                                                                                                                       
 
         public MxReturnCode<bool> InsertParaBreak()
         {
@@ -885,6 +959,38 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public MxReturnCode<string[]> GetEditAreaLines(int startRowIndex, int displayLineCount)
+        {
+            var rc = new MxReturnCode<string[]>("Body.GetEditAreaLinesForDisplay", null);
+
+            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((linesCount == Program.PosIntegerNotSet) || (displayLineCount <= 0) || (displayLineCount > (EditAreaViewCursorLimit.RowIndex + 1)))
+                rc.SetError(1101801, MxError.Source.Param, $"TextLines.Count={linesCount}; displayLineCount={displayLineCount} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
+            else
+            {
+                if (IsError())
+                    rc.SetError(1101802, MxError.Source.Program, $"IsError() == true - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
+                else
+                {
+                    var lines = new string[displayLineCount];
+                    if (linesCount > 0)
+                    {
+                        var topLineIndex = ((startRowIndex - (displayLineCount-1)) > 0) ? startRowIndex - (displayLineCount-1) : 0;
+                        for (var bufferIndex = 0; bufferIndex < displayLineCount; bufferIndex++)
+                        {
+                            if (topLineIndex >= linesCount)
+                                break;
+                            lines[bufferIndex] = (TextLines[topLineIndex].EndsWith(ParaBreakChar)) ? TextLines[topLineIndex].Replace(ParaBreakChar, ParaBreakDisplayChar) : TextLines[topLineIndex]; //(TextLines[lineIndex] == Environment.NewLine) ? ParaBreakDisplayChar.ToString(): TextLines[lineIndex];
+                            topLineIndex++;
+                        }
+                    }
+                    rc.SetResult(lines);
+                }
+            }
+            return rc;
+        }
+
+
 
         public MxReturnCode<string[]> GetEditAreaLinesForDisplay(int displayLineCount) 
         {
@@ -896,13 +1002,13 @@ namespace KLineEdCmdApp.Model
             else
             {
                 if (IsError() || (EditAreaBottomChapterIndex <= Program.PosIntegerNotSet))
-                    rc.SetError(1101802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
+                    rc.SetError(1101802, MxError.Source.Program, $"IsError() == true - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
                 else
                 {
                     var lines = new string[displayLineCount];
                     if (linesCount > 0)
                     {
-                        var topLineIndex = ((EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex) > 0) ? EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex : 0;
+                        var topLineIndex = ((EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex) > 0) ? EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex : 0; ; 
                         for (var bufferIndex = 0; bufferIndex < displayLineCount; bufferIndex++)
                         {
                             if (topLineIndex >= linesCount)
