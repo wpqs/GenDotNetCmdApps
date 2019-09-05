@@ -253,9 +253,9 @@ namespace KLineEdCmdApp.Model
                 rc += rcMove;
                 if (rcMove.IsSuccess(true))
                 {
-                    if (existingIndex == ChapterBody.EditAreaBottomChapterIndex)
-                        UpdateAllViews((int) ChangeHint.Cursor);
-                    else
+                    //if (existingIndex == ChapterBody.EditAreaBottomChapterIndex)
+                    //    UpdateAllViews((int) ChangeHint.Cursor);
+                    //else
                         UpdateAllViews((int) ChangeHint.All);
                     rc.SetResult(true);
                 }
@@ -381,7 +381,7 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1051001, MxError.Source.Program, $"Initialise not called or not successful, or countFromBottom={countFromBottom} is 0 or < Program.PosIntegerNotSet", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var lineCount = (countFromBottom == Program.PosIntegerNotSet) ? ChapterBody.EditAreaViewCursorLimit.RowIndex : countFromBottom;
+                var lineCount = (countFromBottom != Program.PosIntegerNotSet) ? countFromBottom : ChapterBody.EditAreaViewCursorLimit.RowIndex+1; //ChapterBody.EditAreaViewCursorLimit.RowIndex;
                 var rcLastLines = ChapterBody.GetEditAreaLinesForDisplay(lineCount);
                 rc += rcLastLines;
                 if (rcLastLines.IsSuccess(true))

@@ -505,12 +505,13 @@ namespace KLineEdCmdApp.Model
             CursorPosition rc = null;
 
             var displayHt = EditAreaViewCursorLimit?.RowIndex + 1 ?? Program.PosIntegerNotSet;
-            var rowIndex = (EditAreaBottomChapterIndex < displayHt) ? Cursor.RowIndex : EditAreaBottomChapterIndex - Cursor.RowIndex;
-
-            if ((displayHt > 0) && (rowIndex >= 0) && (rowIndex < displayHt))
-                rc = new CursorPosition(rowIndex, Cursor.ColIndex);
-
-            return rc;
+            if (displayHt > 0)
+            {
+                var rowIndex = (Cursor.RowIndex <= EditAreaBottomChapterIndex) ? Cursor.RowIndex : Cursor.RowIndex - (EditAreaBottomChapterIndex - displayHt);
+                if ((rowIndex >= 0) && (rowIndex < displayHt))
+                    rc = new CursorPosition(rowIndex, Cursor.ColIndex);
+            }
+           return rc;
         }
 
         public MxReturnCode<bool> InsertParaBreak()
@@ -885,34 +886,29 @@ namespace KLineEdCmdApp.Model
         }
 
 
-        public MxReturnCode<string[]> GetEditAreaLinesForDisplay(int countFromBottom) 
+        public MxReturnCode<string[]> GetEditAreaLinesForDisplay(int displayLineCount) 
         {
             var rc = new MxReturnCode<string[]>("Body.GetEditAreaLinesForDisplay", null);
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((linesCount == Program.PosIntegerNotSet) || (countFromBottom <= 0) || (countFromBottom > (EditAreaViewCursorLimit.RowIndex+1)))
-                rc.SetError(1101801, MxError.Source.Param, $"TextLines.Count={linesCount}; countFromBottom={countFromBottom} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
+            if ((linesCount == Program.PosIntegerNotSet) || (displayLineCount <= 0) || (displayLineCount > (EditAreaViewCursorLimit.RowIndex+1)))
+                rc.SetError(1101801, MxError.Source.Param, $"TextLines.Count={linesCount}; displayLineCount={displayLineCount} is 0 or is > EditAreaViewCursorLimit.RowIndex={EditAreaViewCursorLimit.RowIndex}+1", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (IsError() || (EditAreaBottomChapterIndex <= Program.PosIntegerNotSet))
                     rc.SetError(1101802, MxError.Source.Program, $"IsError() == true, or TopDisplayLineIndex={EditAreaBottomChapterIndex} invalid - Initialise not called? ", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    var lines = new string[countFromBottom];
+                    var lines = new string[displayLineCount];
                     if (linesCount > 0)
                     {
-                        var lineIndex = ((EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex) > 0) ? EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex : 0;
-                        if (lineIndex + countFromBottom < linesCount)
-                            lineIndex += linesCount - countFromBottom;
-                        for (var bufferIndex = 0; bufferIndex < countFromBottom; bufferIndex++)
+                        var topLineIndex = ((EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex) > 0) ? EditAreaBottomChapterIndex - EditAreaViewCursorLimit.RowIndex : 0;
+                        for (var bufferIndex = 0; bufferIndex < displayLineCount; bufferIndex++)
                         {
-                            if (lineIndex < linesCount)
-                            {
-                                lines[bufferIndex] =  (TextLines[lineIndex].EndsWith(ParaBreakChar)) ? TextLines[lineIndex].Replace(ParaBreakChar, ParaBreakDisplayChar) : TextLines[lineIndex]; //(TextLines[lineIndex] == Environment.NewLine) ? ParaBreakDisplayChar.ToString(): TextLines[lineIndex];
-                                lineIndex++;
-                            }
-                            else
+                            if (topLineIndex >= linesCount)
                                 break;
+                            lines[bufferIndex] =  (TextLines[topLineIndex].EndsWith(ParaBreakChar)) ? TextLines[topLineIndex].Replace(ParaBreakChar, ParaBreakDisplayChar) : TextLines[topLineIndex]; //(TextLines[lineIndex] == Environment.NewLine) ? ParaBreakDisplayChar.ToString(): TextLines[lineIndex];
+                            topLineIndex++;
                         }
                     }
                     rc.SetResult(lines);

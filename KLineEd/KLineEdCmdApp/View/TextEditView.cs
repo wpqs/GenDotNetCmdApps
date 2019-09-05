@@ -109,35 +109,35 @@ namespace KLineEdCmdApp.View
                                 Terminal.SetCursorVisible(CursorOn);
                                 break;
                             }
-                            case ChapterModel.ChangeHint.Line: //change to line so update line at cursor.rowIndex and all others to bottom
-                            {
-                                var rcRes = model.BodyGetEditAreaLinesForDisplay(1);
-                                rc += rcRes;
-                                if (rcRes.IsSuccess(true))
-                                {
-                                    var line = rcRes.GetResult()?[0] ?? null;
-                                    if (line != null)
-                                    {
-                                        rc += DisplayEditAreaLine(editAreaCursor?.RowIndex ?? 0, line, true);
-                                        if (rc.IsSuccess(true))
-                                            rc.SetResult(true);
-                                    }
-                                }
+                            //case ChapterModel.ChangeHint.Line: //change to line so update line at cursor.rowIndex and all others to bottom
+                            //{
+                            //    var rcRes = model.BodyGetEditAreaLinesForDisplay(1);
+                            //    rc += rcRes;
+                            //    if (rcRes.IsSuccess(true))
+                            //    {
+                            //        var line = rcRes.GetResult()?[0] ?? null;
+                            //        if (line != null)
+                            //        {
+                            //            rc += DisplayEditAreaLine(editAreaCursor?.RowIndex ?? 0, line, true);
+                            //            if (rc.IsSuccess(true))
+                            //                rc.SetResult(true);
+                            //        }
+                            //    }
 
-                                break;
-                            }
-                            case ChapterModel.ChangeHint.Char:  //overwrite char only so just update char at cursor position
-                            {
-                                var lastChar = model.ChapterBody?.GetCharacterInLine() ?? Body.NullChar;
-                                if (lastChar != Body.NullChar)
-                                {
-                                    rc += DisplayEditAreaChar(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0, lastChar);
-                                    if (rc.IsSuccess(true))
-                                        rc.SetResult(true);
-                                }
-                                break;
-                            }
-                            case ChapterModel.ChangeHint.Cursor:
+                            //    break;
+                            //}
+                            //case ChapterModel.ChangeHint.Char:  //overwrite char only so just update char at cursor position
+                            //{
+                            //    var lastChar = model.ChapterBody?.GetCharacterInLine() ?? Body.NullChar;
+                            //    if (lastChar != Body.NullChar)
+                            //    {
+                            //        rc += DisplayEditAreaChar(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0, lastChar);
+                            //        if (rc.IsSuccess(true))
+                            //            rc.SetResult(true);
+                            //    }
+                            //    break;
+                            //}
+                            //case ChapterModel.ChangeHint.Cursor: //remove comments in BodyMoveCursor() when re-enabling
                             case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
                             case ChapterModel.ChangeHint.MsgLine:
                             case ChapterModel.ChangeHint.HelpLine:
