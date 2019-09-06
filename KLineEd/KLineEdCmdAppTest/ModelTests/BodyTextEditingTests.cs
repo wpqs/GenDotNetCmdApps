@@ -385,7 +385,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(body.SetCursorInChapter(0, 2).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
-            Assert.Equal("qw erty", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
         }
 
         [Fact]
@@ -413,7 +413,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(1, 0).GetResult());
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
-            Assert.Equal("qw erty>", manuscriptNew.ChapterBody.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("qwerty>", manuscriptNew.ChapterBody.GetEditAreaLinesForDisplay(2).GetResult()[0]);
         }
 
         [Fact]
@@ -1035,7 +1035,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("qw>", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
-            Assert.Equal("erty qwerty", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+            Assert.Equal("ertyqwerty", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
 
             //0 qwerty
             //1 qw>

@@ -729,7 +729,6 @@ namespace KLineEdCmdApp.Model
                     { 
                         var currentLineLen = (currentLine.EndsWith(ParaBreakChar)) ? currentLine.Length - 1 : currentLine.Length;
                         var nextLine = TextLines[rowIndex + 1];
-                        var nextLineLen = nextLine.Length; //(nextLine.EndsWith(ParaBreakChar)) ? nextLine.Length - 1 : nextLine.Length;
 
                         var splitIndex = Body.GetSplitIndexFromStart(nextLine, (maxColIndex + 1) - currentLineLen - 1);
                         if ((splitIndex == Program.PosIntegerNotSet) || (splitIndex >= maxColIndex))
@@ -737,7 +736,7 @@ namespace KLineEdCmdApp.Model
                         else
                         {
                             var start = nextLine.Snip(0, splitIndex);
-                            TextLines[rowIndex] += " " + start;
+                            TextLines[rowIndex] += start; // " " + start;
 
                             var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1); // nextLineLen - 1); // nextLine.Length - 1);
                             if (string.IsNullOrEmpty(end) == false)
