@@ -56,8 +56,14 @@ namespace KLineEdCmdApp.Model
             PreviousRow,
             NextCol,
             PreviousCol,
-            Home,
-            End
+            StartChapter,
+            EndChapter,
+            PageUp,
+            PageDown,
+            StartPara,
+            EndPara,
+            StartLine,
+            EndLine
         }
 
         protected List<string> TextLines { set; get; }
@@ -273,7 +279,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.MoveCursorInChapter");
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((linesCount == Program.PosIntegerNotSet) || (Cursor == null) || (EditAreaViewCursorLimit == null) || (Cursor.RowIndex < 0) || ((linesCount > 0) && (Cursor.RowIndex >= linesCount)) || (Cursor.ColIndex < 0) || (Cursor.ColIndex > (EditAreaViewCursorLimit.ColIndex+1)))
+            if ((TextLines == null) || (linesCount == Program.PosIntegerNotSet) || (Cursor == null) || (EditAreaViewCursorLimit == null) || (Cursor.RowIndex < 0) || ((linesCount > 0) && (Cursor.RowIndex >= linesCount)) || (Cursor.ColIndex < 0) || (Cursor.ColIndex > (EditAreaViewCursorLimit.ColIndex+1)))
                 rc.SetError(1100601, MxError.Source.Program, $"TextLines, Cursor or EditAreaViewCursorLimit is null, or existing cursor is invalid; Cursor.RowIndex={Cursor?.RowIndex ?? -1} (max={linesCount}), Cursor.ColIndex={Cursor?.ColIndex ?? -1} (max={EditAreaViewCursorLimit?.ColIndex ?? -1})", MxMsgs.MxErrInvalidCondition);
             else
             {
@@ -327,7 +333,68 @@ namespace KLineEdCmdApp.Model
                                     rc.SetResult(true);
                                 break;
                             }
-                            case CursorMove.Home:
+                            case CursorMove.PageUp:
+                            {
+                                var rowIndex = Program.PosIntegerNotSet;
+                                if (Cursor.RowIndex > 0)
+                                {
+                                    var displayHt = EditAreaViewCursorLimit.RowIndex + 1;
+                                    rowIndex = ((Cursor.RowIndex - (displayHt-1)) > 0) ? Cursor.RowIndex - (displayHt-1) : 0;
+                                }
+                                var rcCursor = SetCursorInChapter(rowIndex, Cursor.ColIndex);
+                                rc += rcCursor;
+                                if (rcCursor.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case CursorMove.PageDown:
+                            {
+                                var rowIndex = linesCount;
+                                if (Cursor.RowIndex < linesCount-1)
+                                {
+                                    var displayHt = EditAreaViewCursorLimit.RowIndex + 1;
+                                    rowIndex = ((Cursor.RowIndex + (displayHt-1)) < (linesCount - 1)) ? Cursor.RowIndex + (displayHt-1) : linesCount - 1;
+                                }
+                                var rcCursor = SetCursorInChapter(rowIndex, Cursor.ColIndex); 
+                                rc += rcCursor;
+                                if (rcCursor.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case CursorMove.StartPara:
+                            {
+                                var rcCursor = SetCursorInChapter(GetStartParaRowIndex(Cursor.RowIndex), 0);
+                                rc += rcCursor;
+                                if (rcCursor.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case CursorMove.EndPara:
+                            {
+                                var rowIndex = GetNextParaBreakRowIndex(Cursor.RowIndex);
+                                var rcCursor = SetCursorInChapter(rowIndex, GetLineLength(rowIndex)); 
+                                rc += rcCursor;
+                                if (rcCursor.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case CursorMove.StartLine:
+                            {
+                                var rcCursor = SetCursorInChapter(Cursor.RowIndex, 0); 
+                                rc += rcCursor;
+                                if (rcCursor.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case CursorMove.EndLine:
+                            {
+                                var rcCursor = SetCursorInChapter(Cursor.RowIndex, GetLineLength(Cursor.RowIndex)); 
+                                rc += rcCursor;
+                                if (rcCursor.IsSuccess(true))
+                                    rc.SetResult(true);
+                                break;
+                            }
+                            case CursorMove.StartChapter:
                             {
                                 var rcCursor = SetCursorInChapter(0, 0);
                                 rc += rcCursor;
@@ -335,7 +402,7 @@ namespace KLineEdCmdApp.Model
                                     rc.SetResult(true);
                                 break;
                             }
-                            case CursorMove.End:
+                            case CursorMove.EndChapter:
                             {
                                 var rcCursor = SetCursorInChapter(linesCount - 1, GetMaxColCursorIndexForRow(linesCount - 1));
                                 rc += rcCursor;
@@ -1019,6 +1086,16 @@ namespace KLineEdCmdApp.Model
             return TextLines?.Count ?? Program.PosIntegerNotSet;
         }
 
+        public int GetLineLength(int rowIndex)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if ((TextLines != null) && (rowIndex >= 0) && (rowIndex < TextLines.Count))
+                rc = (TextLines[rowIndex].EndsWith(ParaBreakChar)) ? TextLines[rowIndex].Length - 1 : TextLines[rowIndex].Length;
+
+            return rc;
+        }
+
         public bool IsCursorAtEndOfParagraph()
         {
             var rc = false;
@@ -1028,6 +1105,26 @@ namespace KLineEdCmdApp.Model
                 var line = TextLines[Cursor.RowIndex];
                 if (line.EndsWith(ParaBreakChar) && (Cursor.ColIndex == line.Length-1 ))
                     rc = true;
+            }
+            return rc;
+        }
+
+        public int GetStartParaRowIndex(int rowIndex)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((TextLines != null) && (lineCount > 0) && (rowIndex >= 0) && (rowIndex < lineCount))
+            {
+                rc = 0;
+                while (--rowIndex >= 0)
+                {
+                    if (TextLines[rowIndex].EndsWith(ParaBreakChar))
+                    {
+                        rc = rowIndex+1;
+                        break;
+                    }
+                }
             }
             return rc;
         }

@@ -192,8 +192,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.MoveCursorInChapter(Body.CursorMove.NextCol).GetResult());
             Assert.False(body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
             Assert.False(body.MoveCursorInChapter(Body.CursorMove.NextRow).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.Home).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.End).GetResult());
+            Assert.False(body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
+            Assert.False(body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
         }
 
         [Fact]
@@ -241,11 +241,11 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(1, body.Cursor.ColIndex);
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.Home).GetResult());
+            Assert.True(body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.Cursor.ColIndex);
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.End).GetResult());
+            Assert.True(body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
         }
@@ -276,14 +276,14 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(1, body.Cursor.ColIndex);
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.Home).GetResult());
+            Assert.True(body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.Cursor.ColIndex);
 
             Assert.Contains("Warning: you cannot move beyond the start of the chapter", body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetErrorUserMsg());
             Assert.Contains("Warning: you cannot move beyond the start of the chapter", body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetErrorUserMsg());
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.End).GetResult());
+            Assert.True(body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
             Assert.Equal(2, body.Cursor.RowIndex);
             Assert.Equal(line3.Length, body.Cursor.ColIndex);
 
@@ -455,7 +455,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(manuscriptNew.ChapterBody.InsertText(line1).GetResult());
             Assert.Equal("qwerty>", manuscriptNew.ChapterBody.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            Assert.True(manuscriptNew.BodyMoveCursor(Body.CursorMove.End).GetResult());
+            Assert.True(manuscriptNew.BodyMoveCursor(Body.CursorMove.EndChapter).GetResult());
             Assert.Equal(6, manuscriptNew.ChapterBody.Cursor.ColIndex);
 
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());

@@ -20,43 +20,80 @@ namespace KLineEdCmdApp.Controller
                 else
                 {
                     //do stuff related to TextEditing, updating the model as needed
+                    var CtrlKeyPressed = ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0);
                     if (keyInfo.Key == ConsoleKey.F2)
                         controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController, BrowserExe);
                     else if (keyInfo.Key == ConsoleKey.F3)
                         controller = ControllerFactory.Make(Chapter, ControllerFactory.SpellEditingController, BrowserExe);
-                    else if (keyInfo.Key == ConsoleKey.UpArrow)
+                    else if ((CtrlKeyPressed == false) && (keyInfo.Key == ConsoleKey.UpArrow))
                     {
                         var rcMove = model.BodyMoveCursor(Body.CursorMove.PreviousRow);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
-                    else if (keyInfo.Key == ConsoleKey.DownArrow)
+                    else if (CtrlKeyPressed && (keyInfo.Key == ConsoleKey.UpArrow))
+                    {   
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.StartPara);
+                        if (rcMove.IsError(true))
+                            SetupMxError(rcMove);
+                   }
+                    else if ((CtrlKeyPressed == false) && (keyInfo.Key == ConsoleKey.DownArrow))
                     {
                         var rcMove = model.BodyMoveCursor(Body.CursorMove.NextRow);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
-                    else if (keyInfo.Key == ConsoleKey.LeftArrow)
+                    else if (CtrlKeyPressed && (keyInfo.Key == ConsoleKey.DownArrow))
+                    {   
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.EndPara);
+                        if (rcMove.IsError(true))
+                            SetupMxError(rcMove);
+                    }
+                    else if ((CtrlKeyPressed == false) && (keyInfo.Key == ConsoleKey.LeftArrow))
                     {
                         var rcMove = model.BodyMoveCursor(Body.CursorMove.PreviousCol);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
-                    else if (keyInfo.Key == ConsoleKey.RightArrow)
+                    else if (CtrlKeyPressed && (keyInfo.Key == ConsoleKey.LeftArrow))
+                    {
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.StartLine);
+                        if (rcMove.IsError(true))
+                            SetupMxError(rcMove);
+                    }
+                    else if ((CtrlKeyPressed == false) && (keyInfo.Key == ConsoleKey.RightArrow))
                     {
                         var rcMove = model.BodyMoveCursor(Body.CursorMove.NextCol);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
+                    else if (CtrlKeyPressed && (keyInfo.Key == ConsoleKey.RightArrow))
+                    {  
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.EndLine);
+                        if (rcMove.IsError(true))
+                            SetupMxError(rcMove);
+                    }
+                    else if (keyInfo.Key == ConsoleKey.PageUp)
+                    {
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.PageUp);
+                        if (rcMove.IsError(true))
+                            SetupMxError(rcMove);
+                    }
+                    else if (keyInfo.Key == ConsoleKey.PageDown)
+                    {
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.PageDown);
+                        if (rcMove.IsError(true))
+                            SetupMxError(rcMove);
+                    }
                     else if (keyInfo.Key == ConsoleKey.Home)
                     {
-                        var rcMove = model.BodyMoveCursor(Body.CursorMove.Home);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.StartChapter);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
                     else if (keyInfo.Key == ConsoleKey.End)
                     {
-                        var rcMove = model.BodyMoveCursor(Body.CursorMove.End);
+                        var rcMove = model.BodyMoveCursor(Body.CursorMove.EndChapter);
                         if (rcMove.IsError(true))
                             SetupMxError(rcMove);
                     }
