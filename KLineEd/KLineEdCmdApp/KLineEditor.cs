@@ -228,14 +228,14 @@ namespace KLineEdCmdApp
                                 if ((DateTime.UtcNow - nowUtc).TotalMilliseconds > StatusLineUpdateMilliSecs)
                                 {
                                     nowUtc = DateTime.UtcNow;
-                                    Model.SetStatusLine();
+                                    Model.SetStatusLine();            //1. comment out to stop StatusLine refresh during debugging
                                     if (Model.ChapterHeader.PauseProcessing(nowUtc, lastKeyPress, false) == false)
                                     {
                                         rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
                                         break;
                                     }
                                     if (Controller.IsError() == false)
-                                        Model.SetMsgLine("");
+                                        Model.SetMsgLine("");        //2. comment out to stop MsgLine refresh during debugging
                                     Terminal.SetCursorInsertMode((Controller.IsInsertMode()));
                                 }
                                 if (Terminal.IsKeyAvailable())

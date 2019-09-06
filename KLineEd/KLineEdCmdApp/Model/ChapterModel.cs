@@ -248,12 +248,12 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1050501, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
             else
             {
-               // var existingIndex = ChapterBody.EditAreaBottomChapterIndex;
+               // var existingIndex = ChapterBody.EditAreaTopLineChapterIndex;
                 var rcMove = ChapterBody.MoveCursorInChapter(move);
                 rc += rcMove;
                 if (rcMove.IsSuccess(true))
                 {
-                    //if (existingIndex == ChapterBody.EditAreaBottomChapterIndex)
+                    //if (existingIndex == ChapterBody.EditAreaTopLineChapterIndex)
                     //    UpdateAllViews((int) ChangeHint.Cursor);
                     //else
                         UpdateAllViews((int) ChangeHint.All);
@@ -370,23 +370,6 @@ namespace KLineEdCmdApp.Model
             var rc = ChapterHeader?.Properties?.SetText(text, insert) ?? false;
             if (rc == true)
                 UpdateAllViews((int)ChangeHint.Props);
-            return rc;
-        }
-
-        public MxReturnCode<string[]> BodyGetEditAreaLinesForDisplay(int countFromBottom = Program.PosIntegerNotSet) //string[] returned is only for display - altering these strings will not change the document
-        {
-            var rc = new MxReturnCode<string[]>("ChapterModel.BodyGetEditAreaLinesForDisplay", null);
-
-            if ((Ready == false) || (countFromBottom == 0) || (countFromBottom < Program.PosIntegerNotSet))
-                rc.SetError(1051001, MxError.Source.Program, $"Initialise not called or not successful, or countFromBottom={countFromBottom} is 0 or < Program.PosIntegerNotSet", MxMsgs.MxErrInvalidCondition);
-            else
-            {
-                var lineCount = (countFromBottom != Program.PosIntegerNotSet) ? countFromBottom : ChapterBody.EditAreaViewCursorLimit.RowIndex+1; //ChapterBody.EditAreaViewCursorLimit.RowIndex;
-                var rcLastLines = ChapterBody.GetEditAreaLinesForDisplay(lineCount);
-                rc += rcLastLines;
-                if (rcLastLines.IsSuccess(true))
-                    rc.SetResult(rcLastLines.GetResult());
-            }
             return rc;
         }
 

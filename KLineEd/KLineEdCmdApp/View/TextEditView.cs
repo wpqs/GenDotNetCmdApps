@@ -65,7 +65,7 @@ namespace KLineEdCmdApp.View
             else
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
-                if (model == null)
+                if ((model == null) || (model.ChapterBody == null))
                     rc.SetError(1140101, MxError.Source.Param, $"model is null", MxMsgs.MxErrBadMethodParam);
                 else
                 {
@@ -73,7 +73,7 @@ namespace KLineEdCmdApp.View
                         rc.SetResult(true);
                     else
                     {
-                        var rcCursor = GetEditAreaCursorPosition(model.ChapterBody?.GetLineCount() ?? Program.PosIntegerNotSet, model.ChapterBody?.Cursor.RowIndex ?? Program.PosIntegerNotSet, model.ChapterBody?.Cursor.ColIndex ?? Program.PosIntegerNotSet);
+                        var rcCursor = GetEditAreaCursorPosition(model.ChapterBody.Cursor.RowIndex, model.ChapterBody.Cursor.ColIndex, model.ChapterBody.EditAreaTopLineChapterIndex );
                         if (rcCursor.IsError(true))
                             rc += rcCursor;
                         else
@@ -88,7 +88,7 @@ namespace KLineEdCmdApp.View
                                     rc += InitDisplay();
                                     if (rc.IsSuccess(true))
                                     {
-                                        var rcRes = model.ChapterBody.GetEditAreaLines(model.ChapterBody.Cursor.RowIndex, EditAreaHeight); //  model.BodyGetEditAreaLinesForDisplay();
+                                        var rcRes = model.ChapterBody.GetEditAreaLinesForDisplay(EditAreaHeight);
                                         rc += rcRes;
                                         if (rcRes.IsSuccess(true))
                                         {

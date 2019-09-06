@@ -10,7 +10,7 @@ namespace KLineEdCmdAppTest.TestSupport
             WordCount += GetWordCountInLine(line);
             Cursor.RowIndex = TextLines.Count - 1;
             Cursor.ColIndex = line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length;
-            SetEditAreaBottomIndex(Scroll.ToCursor);
+            SetEditAreaTopLineChapterIndex(Scroll.ToCursor);
         }
     }
 }

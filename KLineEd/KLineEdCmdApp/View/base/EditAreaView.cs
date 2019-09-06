@@ -129,23 +129,19 @@ namespace KLineEdCmdApp.View.Base
             return rc;
         }
 
-        protected MxReturnCode<CursorPosition> GetEditAreaCursorPosition(int lineCount, int chapterRowIndex, int chapterColIndex)
+        protected MxReturnCode<CursorPosition> GetEditAreaCursorPosition(int chapterRowIndex, int chapterColIndex, int editAreaTopLineChapterIndex)
         {
             var rc = new MxReturnCode<CursorPosition>("EditAreaView.GetEditAreaCursorPosition");
 
-            if ((lineCount < 0) || (EditAreaHeight < 0) || (chapterRowIndex < 0) || ((lineCount > 0) && (chapterRowIndex > lineCount-1)) || (chapterColIndex < 0))
-                rc.SetError(1140501, MxError.Source.Param, $"lineCount={lineCount} row{chapterRowIndex} col={chapterColIndex} (EditAreaHeight={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
+            if ((EditAreaHeight < 0) || (chapterRowIndex < 0) ||  (chapterColIndex < 0) || (editAreaTopLineChapterIndex < 0) || (editAreaTopLineChapterIndex > chapterRowIndex))
+                rc.SetError(1140501, MxError.Source.Param, $"row{chapterRowIndex} col={chapterColIndex}, editAreaTopLineChapterIndex={editAreaTopLineChapterIndex} (EditAreaHeight={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if ((lineCount <= EditAreaHeight) || (chapterRowIndex < EditAreaHeight))
-                    rc.SetResult(new CursorPosition(chapterRowIndex, chapterColIndex));
+                var editAreaRowIndex = chapterRowIndex - editAreaTopLineChapterIndex; 
+                if ((editAreaRowIndex < 0) || (editAreaRowIndex > (EditAreaHeight-1)))
+                    rc.SetError(1140502, MxError.Source.Program, $"editAreaRowIndex={editAreaRowIndex} EditAreaHeight={EditAreaHeight}", MxMsgs.MxErrInvalidCondition);
                 else
-                {
-                    var rem = chapterRowIndex % EditAreaHeight; //0-4 if EditAreaHeight is 5
-                    var editAreaRow = rem;
-
-                    rc.SetResult(new CursorPosition(EditAreaHeight-1, chapterColIndex));
-                }
+                    rc.SetResult(new CursorPosition(editAreaRowIndex, chapterColIndex));
             }
             return rc;
         }
