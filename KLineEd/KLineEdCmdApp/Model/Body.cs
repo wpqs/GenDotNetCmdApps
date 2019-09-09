@@ -19,6 +19,8 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "RedundantEmptySwitchSection")]
     [SuppressMessage("ReSharper", "RedundantNameQualifier")]
     [SuppressMessage("ReSharper", "InvertIf")]
+    [SuppressMessage("ReSharper", "RedundantCaseLabel")]
+    [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
     public class Body
     {
         public static readonly string OpeningElement = "<body>";
@@ -456,7 +458,12 @@ namespace KLineEdCmdApp.Model
                             {
                                 var lastColIndex = GetMaxColCursorIndexForRow(rowIndex);
                                 if ((lastColIndex == Program.PosIntegerNotSet) || (colIndex > lastColIndex))
-                                    rc.SetError( 1100705, MxError.Source.Program, $"GetLastColumnIndexForRow({rowIndex}) failed or colIndex={colIndex} > lastColIndex={lastColIndex}", MxMsgs.MxErrInvalidCondition);
+                                {     //this will result in split line so move cursor to column on next row which is at end of word where split happened
+                                    var lastSpaceIndex = TextLines[rowIndex].LastIndexOf(' '); 
+                                    var lastWordLen = (lastSpaceIndex > -1) ? TextLines[rowIndex].Length - (lastSpaceIndex + 1) : 1;
+                                    Cursor.ColIndex = (lastWordLen <= 1) ? 0 : lastWordLen-1;
+                                    Cursor.RowIndex = rowIndex;
+                                }
                                 else
                                 {
                                     Cursor.RowIndex = rowIndex;
@@ -802,8 +809,11 @@ namespace KLineEdCmdApp.Model
                             rc.SetResult(false); //split text in next line is too long be put into current line
                         else
                         {
-                            var start = nextLine.Snip(0, splitIndex);
-                            TextLines[rowIndex] += start; // " " + start;
+                            var start = nextLine.Snip(0, (nextLine[splitIndex] != ' ') ? splitIndex : splitIndex-1);
+                            if (TextLines[rowIndex].EndsWith(' ') == false)
+                                TextLines[rowIndex] +=  " " + start;  
+                            else
+                                TextLines[rowIndex] += start;       
 
                             var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1); // nextLineLen - 1); // nextLine.Length - 1);
                             if (string.IsNullOrEmpty(end) == false)
@@ -858,7 +868,7 @@ namespace KLineEdCmdApp.Model
                     }
 
                     if (rowIndex < TextLines.Count - 1)
-                        insertLine = insertLine + " " + TextLines[rowIndex + 1];
+                        insertLine = insertLine + " " + TextLines[rowIndex + 1]; 
 
                     if (string.IsNullOrEmpty(existLine) || (string.IsNullOrEmpty(insertLine)))
                         rc.SetError(1101603, MxError.Source.Program, $"existLine.Length={existLine?.Length ?? -1}, insertLine.Length={insertLine?.Length ?? -1}", MxMsgs.MxErrInvalidCondition);
@@ -911,6 +921,9 @@ namespace KLineEdCmdApp.Model
                             if (chapterIndex >= linesCount) 
                                 break;
                             lines[bufferIndex] = (TextLines[chapterIndex].EndsWith(ParaBreakChar)) ? TextLines[chapterIndex].Replace(ParaBreakChar, ParaBreakDisplayChar) : TextLines[chapterIndex];
+
+                           // lines[bufferIndex] = lines[bufferIndex].Replace(' ', '.');
+
                             chapterIndex++;
                         }
                     }
@@ -933,8 +946,8 @@ namespace KLineEdCmdApp.Model
                 {
                     var splitIndex = Program.PosIntegerNotSet;
                     for (var x = 0; x < line.Length; x++)
-                    {
-                        if (((line[x] == ' ')  || (line[x] == Body.ParaBreakChar)) && (x <= spaceAvailable)) //|| (line[x] == '-')
+                    {   //todo remove , and |  (line[x] == ',') || (line[x] == '|') ||
+                        if (((line[x] == ' ') || (line[x] == Body.ParaBreakChar)) && (x <= spaceAvailable)) 
                             splitIndex = x;
                         if (x > spaceAvailable)
                             break;
