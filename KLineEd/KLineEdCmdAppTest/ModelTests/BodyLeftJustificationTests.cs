@@ -328,7 +328,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(2, body.WordCount);
         }
-
+        
         [Fact]
         public void SplitLongLineTooShortFailTest()
         {
@@ -1158,6 +1158,162 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(5, body.Cursor.ColIndex);
 
+        }
+
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphThreeLineDeleteTest()
+        {
+            var maxColIndex = 67;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "A123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "B123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line2.Length);
+            body.SetTestLine(line2);
+            var line3 = "C123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line3.Length);
+            body.SetTestLine(line3);
+
+            Assert.Equal("A123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+
+            Assert.True(body.SetCursorInChapter(0, 11).GetResult());
+
+            Assert.True(body.LeftJustifyLinesInParagraph(0, 11).GetResult());
+            Assert.Equal(11, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.Equal(3, body.GetLineCount());
+
+            Assert.True(body.InsertParaBreak().GetResult());
+            Assert.Equal(0, body.Cursor.ColIndex);
+            Assert.Equal(1, body.Cursor.RowIndex);
+            Assert.Equal(4, body.GetLineCount());
+
+            Assert.Equal("A123456789 >", body.GetEditAreaLinesForDisplay(4).GetResult()[0]);
+            Assert.Equal("123456789 123456789 123456789 123456789 123456789 B123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[1]);
+            Assert.Equal("123456789 123456789 123456789 123456789 123456789 C123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[2]);
+            Assert.Equal("123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[3]);
+
+            Assert.True(body.SetCursorInChapter(0, 11).GetResult());
+            Assert.True(body.DeleteCharacter().GetResult());
+            Assert.Equal(11, body.Cursor.ColIndex);
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.Equal(3, body.GetLineCount());
+
+            Assert.Equal("A123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+        }
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphThreeLineAppendEndTest()
+        {
+            var maxColIndex = 67;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "A123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "B123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line2.Length);
+            body.SetTestLine(line2);
+            var line3 = "C123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line3.Length);
+            body.SetTestLine(line3);
+
+            Assert.Equal("A123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+
+            Assert.True(body.SetCursorInChapter(0, 60).GetResult());
+
+            Assert.True(body.InsertText(" ").GetResult());
+            Assert.True(body.InsertText("a").GetResult());
+            Assert.True(body.InsertText("b").GetResult());
+            Assert.True(body.InsertText("c").GetResult());
+            Assert.True(body.InsertText("d").GetResult());
+            Assert.True(body.InsertText("e").GetResult());
+            Assert.True(body.InsertText("f").GetResult());
+            Assert.True(body.InsertText("g").GetResult());
+
+            Assert.Equal("A123456789 123456789 123456789 123456789 123456789 123456789 abcdefg", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.Equal(68, body.Cursor.ColIndex);
+            Assert.Equal(3, body.GetLineCount());
+
+            Assert.True(body.InsertText("h").GetResult());
+            Assert.Equal(1, body.Cursor.RowIndex);
+            Assert.Equal(8, body.Cursor.ColIndex);
+            Assert.Equal(4, body.GetLineCount());
+
+            Assert.Equal("A123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[0]);
+            Assert.Equal("abcdefgh B123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[1]);
+            Assert.Equal("123456789 C123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[2]);
+            Assert.Equal("123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[3]);
+        }
+
+
+        [Fact]
+        public void LeftJustifyLinesInParagraphThreeLineInsertMiddleTest()
+        {
+            var maxColIndex = 67;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "A123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "B123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line2.Length);
+            body.SetTestLine(line2);
+            var line3 = "C123456789 123456789 123456789 123456789 123456789 123456789";
+            Assert.Equal(60, line3.Length);
+            body.SetTestLine(line3);
+
+            Assert.Equal("A123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+
+            Assert.True(body.SetCursorInChapter(0, 11).GetResult());
+
+            Assert.True(body.InsertText("a", true).GetResult());
+            Assert.True(body.InsertText("b", true).GetResult());
+            Assert.True(body.InsertText("c", true).GetResult());
+            Assert.True(body.InsertText("d", true).GetResult());
+            Assert.True(body.InsertText("e", true).GetResult());
+            Assert.True(body.InsertText("f", true).GetResult());
+            Assert.True(body.InsertText("g", true).GetResult());
+            Assert.True(body.InsertText("h", true).GetResult());
+
+            Assert.Equal("A123456789 abcdefgh123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
+            Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
+            Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
+
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.Equal(19, body.Cursor.ColIndex);
+            Assert.Equal(3, body.GetLineCount());
+
+            Assert.True(body.InsertText("i", true).GetResult());
+            Assert.Equal(0, body.Cursor.RowIndex);
+            Assert.Equal(20, body.Cursor.ColIndex);
+            Assert.Equal(4, body.GetLineCount());
+
+            Assert.Equal("A123456789 abcdefghi123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[0]);
+            Assert.Equal("123456789 B123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[1]);
+            Assert.Equal("123456789 C123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[2]);
+            Assert.Equal("123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[3]);
         }
 
     }
