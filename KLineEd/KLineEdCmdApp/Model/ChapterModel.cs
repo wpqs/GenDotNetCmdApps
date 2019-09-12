@@ -27,16 +27,16 @@ namespace KLineEdCmdApp.Model
 
         public enum ChangeHint
         {
-            [EnumMember(Value = "Cursor")] Cursor = 0,  //->, <-, ^, v, with no change to EditAreaBottomLineIndex 
-            [EnumMember(Value = "Char")] Char = 1,      //AppendChar()
-            [EnumMember(Value = "Line")] Line = 2,      //AppendLine()
-            [EnumMember(Value = "Word")] Word = 3,      //AppendWord()
-            [EnumMember(Value = "Props")] Props = 4,      //SetAuthor(), SetTitle(), SetProject() - change to char
-            [EnumMember(Value = "Spell")] Spell = 5,      //
-            [EnumMember(Value = "StatusLine")] StatusLine = 6,  //SetStatusLine()
-            [EnumMember(Value = "MsgLine")] MsgLine = 7,        //SetMsgLine()
-            [EnumMember(Value = "HelpLine")] HelpLine = 8,      //SetEditorHelpLine()
-            [EnumMember(Value = "All")] All = 9,        //RefreshDisplay()
+            [EnumMember(Value = "Cursor")] Cursor = 0,          //TextEditView: ->, <-, ^, v, with no change to EditAreaBottomLineIndex 
+            [EnumMember(Value = "Char")] Char = 1,              //TextEditView: not implemented
+            [EnumMember(Value = "Line")] Line = 2,              //TextEditView: redraw Cursor.RowIndex line
+            [EnumMember(Value = "End")] End = 3,                //TextEditView: redraw from Cursor.RowIndex line to last displayed line
+            [EnumMember(Value = "Props")] Props = 4,            //PropsEditView: SetAuthor(), SetTitle(), SetProject() - change to char
+            [EnumMember(Value = "Spell")] Spell = 5,            //SpellEditView:
+            [EnumMember(Value = "StatusLine")] StatusLine = 6,  //StatusLineView: SetStatusLine()
+            [EnumMember(Value = "MsgLine")] MsgLine = 7,        //MsgLineView: SetMsgLine()
+            [EnumMember(Value = "HelpLine")] HelpLine = 8,      //EditorHelpLineView: SetEditorHelpLine()
+            [EnumMember(Value = "All")] All = 9,                //(all views): RefreshDisplay()
             [EnumMember(Value = "Unknown")] Unknown = NotificationItem.ChangeUnknown
         }
         public string FileName { private set; get; }
@@ -248,15 +248,11 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1050501, MxError.Source.Program, "ChapterBody is null", MxMsgs.MxErrInvalidCondition);
             else
             {
-               // var existingIndex = ChapterBody.EditAreaTopLineChapterIndex;
                 var rcMove = ChapterBody.MoveCursorInChapter(move);
                 rc += rcMove;
                 if (rcMove.IsSuccess(true))
                 {
-                    //if (existingIndex == ChapterBody.EditAreaTopLineChapterIndex)
-                    //    UpdateAllViews((int) ChangeHint.Cursor);
-                    //else
-                        UpdateAllViews((int) ChangeHint.All);
+                    UpdateAllViews((int) rcMove.GetResult());
                     rc.SetResult(true);
                 }
             }
@@ -275,6 +271,7 @@ namespace KLineEdCmdApp.Model
                 rc += rcMove;
                 if (rcMove.IsSuccess(true))
                 {
+                    var hint = rcMove.GetResult();
                     var rcDelete = BodyDeleteCharacter();
                     rc += rcDelete;
                     if (rcDelete.IsSuccess(true))

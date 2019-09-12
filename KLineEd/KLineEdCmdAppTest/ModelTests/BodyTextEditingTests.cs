@@ -69,7 +69,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.True(body.InsertText("qwerty").GetResult());
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 0).GetResult());
 
             Assert.Equal(0, body.Cursor.ColIndex); //cursor at start of line
             Assert.Equal(0, body.Cursor.RowIndex);
@@ -136,7 +136,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.True(body.InsertText("qwerty").GetResult());
-            Assert.True(body.SetCursorInChapter(0, 2).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 2).GetResult());
             Assert.Equal(2, body.Cursor.ColIndex); //cursor in middle of line
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(1, body.WordCount);
@@ -170,10 +170,10 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.InsertParaBreak().GetResult());
             Assert.Equal(2, body.GetLineCount());
 
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 0).GetResult());
             Assert.False(body.IsCursorAtEndOfParagraph());
 
-            Assert.True(body.SetCursorInChapter(0, line1.Length).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, line1.Length).GetResult());
             Assert.True(body.IsCursorAtEndOfParagraph());
 
         }
@@ -186,14 +186,14 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
 
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 0).GetResult());
 
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.NextCol).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.NextRow).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.MoveCursorInChapter(Body.CursorMove.NextCol).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.MoveCursorInChapter(Body.CursorMove.NextRow).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
         }
 
         [Fact]
@@ -231,21 +231,21 @@ namespace KLineEdCmdAppTest.ModelTests
             var line = "qwerty";
             Assert.True(body.InsertText(line).GetResult());
             Assert.Equal(1, body.GetLineCount());
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 0).GetResult());
 
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.NextRow).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.NextRow).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.NextCol).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.NextCol).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(1, body.Cursor.ColIndex);
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.Cursor.ColIndex);
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(line.Length, body.Cursor.ColIndex);
         }
@@ -267,23 +267,23 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(3, body.GetLineCount());
 
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 0).GetResult());
 
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
-            Assert.False(body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
-            
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.NextCol).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
+
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.NextCol).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(1, body.Cursor.ColIndex);
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.StartChapter).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.Cursor.ColIndex);
 
             Assert.Contains("Warning: you cannot move beyond the start of the chapter", body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetErrorUserMsg());
             Assert.Contains("Warning: you cannot move beyond the start of the chapter", body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetErrorUserMsg());
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.EndChapter).GetResult());
             Assert.Equal(2, body.Cursor.RowIndex);
             Assert.Equal(line3.Length, body.Cursor.ColIndex);
 
@@ -291,15 +291,15 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Contains("Warning: you cannot move beyond the end of the chapter", body.MoveCursorInChapter(Body.CursorMove.NextRow).GetErrorUserMsg());
 
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.PreviousCol).GetResult());
             Assert.Equal(2, body.Cursor.RowIndex);
             Assert.Equal(line3.Length-1, body.Cursor.ColIndex);
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
             Assert.Equal(1, body.Cursor.RowIndex);
             Assert.Equal(line3.Length-1, body.Cursor.ColIndex); //don't move column - line2.length> line3.line
 
-            Assert.True(body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.MoveCursorInChapter(Body.CursorMove.PreviousRow).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(line3.Length - 1, body.Cursor.ColIndex); //don't move column - line1.length> line3.line
         }
@@ -317,7 +317,7 @@ namespace KLineEdCmdAppTest.ModelTests
             body.SetTestLine(line1);
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            Assert.True(body.SetCursorInChapter(0,0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0,0).GetResult());
 
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.Equal("werty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
@@ -342,19 +342,19 @@ namespace KLineEdCmdAppTest.ModelTests
             body.SetTestLine(line1);
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            Assert.True(body.SetCursorInChapter(0, 5).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 5).GetResult());
 
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.Equal("qwert", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
-            Assert.True(body.SetCursorInChapter(0, 4).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 4).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
-            Assert.True(body.SetCursorInChapter(0, 3).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 3).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
-            Assert.True(body.SetCursorInChapter(0, 2).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 2).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
-            Assert.True(body.SetCursorInChapter(0, 1).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 1).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 0).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
 
             Assert.Contains("Warning: Chapter is empty", body.DeleteCharacter().GetErrorUserMsg());
@@ -374,7 +374,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal("qwerty", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            Assert.True(body.SetCursorInChapter(0, 2).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 2).GetResult());
             Assert.True(body.InsertParaBreak().GetResult());
 
             Assert.Equal(2, body.GetLineCount());
@@ -383,7 +383,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("qw>", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("erty", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
 
-            Assert.True(body.SetCursorInChapter(0, 2).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 2).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.Equal("qw erty", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
         }
@@ -401,7 +401,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var line1 = "qwerty";
             Assert.True(manuscriptNew.BodyInsertText(line1).GetResult());
 
-            Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(0, 2).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, manuscriptNew.ChapterBody.SetCursorInChapter(0, 2).GetResult());
             Assert.True(manuscriptNew.BodyInsertParaBreak().GetResult());
 
             Assert.Equal(2, manuscriptNew.ChapterBody.GetLineCount());
@@ -411,7 +411,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("qw>", manuscriptNew.ChapterBody.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("erty>", manuscriptNew.ChapterBody.GetEditAreaLinesForDisplay(2).GetResult()[1]);
 
-            Assert.True(manuscriptNew.ChapterBody.SetCursorInChapter(1, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, manuscriptNew.ChapterBody.SetCursorInChapter(1, 0).GetResult());
             Assert.True(manuscriptNew.BodyBackSpace().GetResult());
             Assert.Equal("qw erty>", manuscriptNew.ChapterBody.GetEditAreaLinesForDisplay(2).GetResult()[0]);
         }
@@ -1027,7 +1027,7 @@ namespace KLineEdCmdAppTest.ModelTests
             
             Assert.Equal(2, body.GetNextParaBreakRowIndex(0));
 
-            Assert.True(body.SetCursorInChapter(1, 2).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(1, 2).GetResult());
             Assert.True(body.InsertParaBreak().GetResult()); //invokes LeftJustifyLinesInParagraph()
             Assert.Equal(3, body.GetLineCount());
             Assert.Equal(2, body.Cursor.RowIndex);

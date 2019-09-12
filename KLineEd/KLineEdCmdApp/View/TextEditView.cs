@@ -143,7 +143,7 @@ namespace KLineEdCmdApp.View
                                 //    }
                                 //    break;
                                 //}
-                                //case ChapterModel.ChangeHint.Cursor: //remove comments in BodyMoveCursor() when re-enabling
+                                case ChapterModel.ChangeHint.Cursor:
                                 case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
                                 case ChapterModel.ChangeHint.MsgLine:
                                 case ChapterModel.ChangeHint.HelpLine:

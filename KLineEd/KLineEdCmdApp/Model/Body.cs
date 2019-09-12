@@ -276,9 +276,9 @@ namespace KLineEdCmdApp.Model
         }
 
 
-        public MxReturnCode<bool> MoveCursorInChapter(CursorMove move)
+        public MxReturnCode<ChapterModel.ChangeHint> MoveCursorInChapter(CursorMove move)
         {
-            var rc = new MxReturnCode<bool>("Body.MoveCursorInChapter");
+            var rc = new MxReturnCode<ChapterModel.ChangeHint>("Body.MoveCursorInChapter", ChapterModel.ChangeHint.Unknown);
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
             if ((TextLines == null) || (linesCount == Program.PosIntegerNotSet) || (Cursor == null) || (EditAreaViewCursorLimit == null) || (Cursor.RowIndex < 0) || ((linesCount > 0) && (Cursor.RowIndex >= linesCount)) || (Cursor.ColIndex < 0) || (Cursor.ColIndex > (EditAreaViewCursorLimit.ColIndex+1)))
@@ -295,26 +295,26 @@ namespace KLineEdCmdApp.Model
                         {
                             case CursorMove.NextCol:
                             {
-                                MxReturnCode<bool> rcCursor = null;
+                                MxReturnCode<ChapterModel.ChangeHint> rcCursor = null;
                                 if ((Cursor.ColIndex + 1) <= GetMaxColCursorIndexForRow(Cursor.RowIndex))
                                     rcCursor = SetCursorInChapter(Cursor.RowIndex, Cursor.ColIndex + 1);
                                 else
                                     rcCursor = SetCursorInChapter(Cursor.RowIndex + 1, 0);
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.PreviousCol:
                             {
-                                MxReturnCode<bool> rcCursor = null;
+                                MxReturnCode<ChapterModel.ChangeHint> rcCursor = null;
                                 if ((Cursor.ColIndex - 1) >= 0)
                                     rcCursor = SetCursorInChapter(Cursor.RowIndex, Cursor.ColIndex - 1);
                                 else
                                     rcCursor = SetCursorInChapter(Cursor.RowIndex - 1, GetMaxColCursorIndexForRow(Cursor.RowIndex - 1));
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.NextRow:
@@ -323,7 +323,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(Cursor.RowIndex + 1, (Cursor.ColIndex < lastColIndex) ? Cursor.ColIndex : lastColIndex);
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.PreviousRow:
@@ -332,7 +332,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(Cursor.RowIndex - 1, (Cursor.ColIndex < lastColIndex) ? Cursor.ColIndex : lastColIndex);
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.PageUp:
@@ -346,7 +346,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(rowIndex, Cursor.ColIndex);
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.PageDown:
@@ -360,7 +360,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(rowIndex, Cursor.ColIndex); 
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.StartPara:
@@ -368,7 +368,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(GetStartParaRowIndex(Cursor.RowIndex), 0);
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.EndPara:
@@ -377,7 +377,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(rowIndex, GetLineLength(rowIndex)); 
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.StartLine:
@@ -385,7 +385,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(Cursor.RowIndex, 0); 
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.EndLine:
@@ -393,7 +393,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(Cursor.RowIndex, GetLineLength(Cursor.RowIndex)); 
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.StartChapter:
@@ -401,7 +401,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(0, 0);
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             case CursorMove.EndChapter:
@@ -409,7 +409,7 @@ namespace KLineEdCmdApp.Model
                                 var rcCursor = SetCursorInChapter(linesCount - 1, GetMaxColCursorIndexForRow(linesCount - 1));
                                 rc += rcCursor;
                                 if (rcCursor.IsSuccess(true))
-                                    rc.SetResult(true);
+                                    rc.SetResult(rcCursor.GetResult());
                                 break;
                             }
                             default:
@@ -428,9 +428,9 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> SetCursorInChapter(int rowIndex, int colIndex)
+        public MxReturnCode<ChapterModel.ChangeHint> SetCursorInChapter(int rowIndex, int colIndex)
         {
-            var rc = new MxReturnCode<bool>("Body.SetCursorInChapter");
+            var rc = new MxReturnCode<ChapterModel.ChangeHint>("Body.SetCursorInChapter", ChapterModel.ChangeHint.Unknown);
                                         //rowIndex == -1 or rowIndex == TextLines.Count are errors needing specific reporting
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
             if ((linesCount == Program.PosIntegerNotSet) || (rowIndex < -1) || (rowIndex > linesCount) || (colIndex < -1) || (colIndex > (EditAreaViewCursorLimit?.ColIndex+1 ?? colIndex-1))) //allow cursor to move one character after last permitted col
@@ -477,7 +477,7 @@ namespace KLineEdCmdApp.Model
                         var rcScroll = SetEditAreaTopLineChapterIndex(Scroll.ToCursor);
                         rc += rcScroll;
                         if (rcScroll.IsSuccess(true))
-                            rc.SetResult(true);
+                            rc.SetResult(rcScroll.GetResult());
                     }
                 }
             }
@@ -485,9 +485,9 @@ namespace KLineEdCmdApp.Model
         }
 
 
-        public MxReturnCode<bool> SetEditAreaTopLineChapterIndex(Body.Scroll scroll = Body.Scroll.Bottom)
+        public MxReturnCode<ChapterModel.ChangeHint> SetEditAreaTopLineChapterIndex(Body.Scroll scroll = Body.Scroll.Bottom)
         {
-            var rc = new MxReturnCode<bool>("Body.SetEditAreaTopLineChapterIndex");
+            var rc = new MxReturnCode<ChapterModel.ChangeHint>("Body.SetEditAreaTopLineChapterIndex", ChapterModel.ChangeHint.Unknown);
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
             if ((linesCount == Program.PosIntegerNotSet) || (EditAreaViewCursorLimit == null))
@@ -499,6 +499,7 @@ namespace KLineEdCmdApp.Model
                 {
                     case Scroll.ToCursor:
                     {
+                        var existingIndex = EditAreaTopLineChapterIndex;
                         if (Cursor.RowIndex < EditAreaTopLineChapterIndex)                      //cursor above top line in edit area    
                             EditAreaTopLineChapterIndex = Cursor.RowIndex;
                         else if (Cursor.RowIndex >= (EditAreaTopLineChapterIndex + displayHt))   //cursor below bottom line in edit area
@@ -507,7 +508,7 @@ namespace KLineEdCmdApp.Model
                         {
                                 //(Cursor.RowIndex >= EditAreaTopLineChapterIndex) && (Cursor.RowIndex < EditAreaTopLineChapterIndex + displayHt)
                         }
-                        rc.SetResult(true);
+                        rc.SetResult((existingIndex!= EditAreaTopLineChapterIndex) ? ChapterModel.ChangeHint.All: ChapterModel.ChangeHint.Cursor);
                         break;
                     }
                     case Scroll.Top:    //support for moving edit area (display) without moving Cursor.RowIndex - i.e. read only review of chapter

@@ -1111,7 +1111,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var line2 = "456" + Body.ParaBreak;
             Assert.Equal(4, line2.Length);
             body.SetTestLine(line2);
-            Assert.True(body.SetCursorInChapter(0, 9).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 9).GetResult());
 
             Assert.Equal("0123 56789 123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("456>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -1143,7 +1143,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var line2 = "123" + Body.ParaBreak;
             Assert.Equal(4, line2.Length);
             body.SetTestLine(line2);
-            Assert.True(body.SetCursorInChapter(0, 5).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 5).GetResult());
 
             Assert.Equal("01234>", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("123>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -1183,7 +1183,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
             Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
 
-            Assert.True(body.SetCursorInChapter(0, 11).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 11).GetResult());
 
             Assert.True(body.LeftJustifyLinesInParagraph(0, 11).GetResult());
             Assert.Equal(11, body.Cursor.ColIndex);
@@ -1200,7 +1200,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("123456789 123456789 123456789 123456789 123456789 C123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[2]);
             Assert.Equal("123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[3]);
 
-            Assert.True(body.SetCursorInChapter(0, 11).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 11).GetResult());
             Assert.True(body.DeleteCharacter().GetResult());
             Assert.Equal(11, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
@@ -1233,7 +1233,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
             Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
 
-            Assert.True(body.SetCursorInChapter(0, 60).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 60).GetResult());
 
             Assert.True(body.InsertText(" ").GetResult());
             Assert.True(body.InsertText("a").GetResult());
@@ -1286,7 +1286,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
             Assert.Equal("C123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[2]);
 
-            Assert.True(body.SetCursorInChapter(0, 11).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 11).GetResult());
 
             Assert.True(body.InsertText("a", true).GetResult());
             Assert.True(body.InsertText("b", true).GetResult());

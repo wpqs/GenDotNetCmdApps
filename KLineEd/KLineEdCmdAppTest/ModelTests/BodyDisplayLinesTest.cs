@@ -93,56 +93,56 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(11, body.GetLineCount());
             Assert.Equal(10, body.Cursor.RowIndex);
 
-            Assert.True(body.SetEditAreaTopLineChapterIndex(Body.Scroll.ToCursor).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetEditAreaTopLineChapterIndex(Body.Scroll.ToCursor).GetResult());
             Assert.Equal(10-(displayHt-1), body.EditAreaTopLineChapterIndex);
 
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult()); //invokes SetEditAreaTopLineChapterIndex
+            Assert.Equal(ChapterModel.ChangeHint.All, body.SetCursorInChapter(0, 0).GetResult()); //invokes SetEditAreaTopLineChapterIndex
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.EditAreaTopLineChapterIndex);
 
-            Assert.True(body.SetCursorInChapter(1, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(1, 0).GetResult());
             Assert.Equal(1, body.Cursor.RowIndex);
             Assert.Equal(0, body.EditAreaTopLineChapterIndex);
 
-            Assert.True(body.SetCursorInChapter(4,0).GetResult()); 
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(4,0).GetResult()); 
             Assert.Equal(4, body.Cursor.RowIndex);
             Assert.Equal(0, body.EditAreaTopLineChapterIndex);
 
-            Assert.True(body.SetCursorInChapter(5, 0).GetResult()); 
+            Assert.Equal(ChapterModel.ChangeHint.All, body.SetCursorInChapter(5, 0).GetResult()); 
             Assert.Equal(5, body.Cursor.RowIndex);
             Assert.Equal(5- (displayHt - 1), body.EditAreaTopLineChapterIndex);      //move down one line
             Assert.Equal(1, body.EditAreaTopLineChapterIndex);
 
-            Assert.True(body.SetCursorInChapter(4, 0).GetResult()); 
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(4, 0).GetResult()); 
             Assert.Equal(4, body.Cursor.RowIndex);
             Assert.Equal(1, body.EditAreaTopLineChapterIndex);                      //move up one line
 
-            Assert.True(body.SetCursorInChapter(3, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(3, 0).GetResult());
             Assert.Equal(3, body.Cursor.RowIndex);
             Assert.Equal(1, body.EditAreaTopLineChapterIndex);                      //move up one line
 
-            Assert.True(body.SetCursorInChapter(2, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(2, 0).GetResult());
             Assert.Equal(2, body.Cursor.RowIndex);
             Assert.Equal(1, body.EditAreaTopLineChapterIndex);                      //move up one line
 
-            Assert.True(body.SetCursorInChapter(1, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(1, 0).GetResult());
             Assert.Equal(1, body.Cursor.RowIndex);
             Assert.Equal(1, body.EditAreaTopLineChapterIndex);                      //move up one line
 
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.All, body.SetCursorInChapter(0, 0).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.EditAreaTopLineChapterIndex);                      //move up one line
 
-            Assert.True(body.SetCursorInChapter(9, 0).GetResult()); 
+            Assert.Equal(ChapterModel.ChangeHint.All, body.SetCursorInChapter(9, 0).GetResult()); 
             Assert.Equal(9, body.Cursor.RowIndex);
             Assert.Equal(9- (displayHt - 1), body.EditAreaTopLineChapterIndex);     //move to penultimate line
-            Assert.Equal(5, body.EditAreaTopLineChapterIndex);     
+            Assert.Equal(5, body.EditAreaTopLineChapterIndex);
 
-            Assert.True(body.SetCursorInChapter(0, 0).GetResult()); 
+            Assert.Equal(ChapterModel.ChangeHint.All, body.SetCursorInChapter(0, 0).GetResult()); 
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(0, body.EditAreaTopLineChapterIndex);                      //move to top line
 
-            Assert.True(body.SetCursorInChapter(10, 0).GetResult()); 
+            Assert.Equal(ChapterModel.ChangeHint.All, body.SetCursorInChapter(10, 0).GetResult()); 
             Assert.Equal(10, body.Cursor.RowIndex);
             Assert.Equal(10 - (displayHt - 1), body.EditAreaTopLineChapterIndex);   //move to bottom line
         }
