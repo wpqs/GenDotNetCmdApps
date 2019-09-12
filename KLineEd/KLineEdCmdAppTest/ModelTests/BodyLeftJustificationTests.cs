@@ -849,8 +849,8 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
-            Assert.False(body.LeftJustifyLinesInParagraph(0, -1).GetResult());
-            Assert.False(body.LeftJustifyLinesInParagraph(-1, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.LeftJustifyLinesInParagraph(0, -1).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Unknown, body.LeftJustifyLinesInParagraph(-1, 0).GetResult());
         }
 
         [Fact]
@@ -874,7 +874,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.LeftJustifyLinesInParagraph(0, 0).GetResult());
 
             Assert.Equal("0123 456>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(2, body.WordCount);
@@ -918,7 +918,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(13, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 13).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.LeftJustifyLinesInParagraph(0, 13).GetResult());
 
             Assert.Equal("01 3456", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("89A12", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -944,7 +944,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(13, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 13).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.LeftJustifyLinesInParagraph(0, 13).GetResult());
 
             Assert.Equal("01 3456", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("89A12>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -970,7 +970,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(10, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 10).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.LeftJustifyLinesInParagraph(0, 10).GetResult());
 
             Assert.Equal("0123 56789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(2, body.WordCount);
@@ -995,7 +995,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(10, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 10).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.LeftJustifyLinesInParagraph(0, 10).GetResult());
 
             Assert.Equal("0123 56789>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(2, body.WordCount);
@@ -1024,7 +1024,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.LeftJustifyLinesInParagraph(0, 0).GetResult());
 
             Assert.Equal("0123", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("56789 A23", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
@@ -1055,7 +1055,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(3, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 0).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.LeftJustifyLinesInParagraph(0, 0).GetResult());
 
             Assert.Equal("0123", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("56789 123", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
@@ -1087,7 +1087,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(14, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 8).GetResult()); // body.Cursor.ColIndex).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.LeftJustifyLinesInParagraph(0, 8).GetResult()); // body.Cursor.ColIndex).GetResult());
 
             Assert.Equal("456 0123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("56789 A23", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
@@ -1119,7 +1119,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(9, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 9).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.LeftJustifyLinesInParagraph(0, 9).GetResult());
 
             Assert.Equal("0123", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("56789 123", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
@@ -1151,7 +1151,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(5, body.Cursor.ColIndex);
 
-            Assert.True(body.DeleteCharacter().GetResult()); //invokes LeftJustifyLinesInParagraph
+            Assert.Equal(ChapterModel.ChangeHint.End, body.DeleteCharacter().GetResult()); //invokes LeftJustifyLinesInParagraph
 
             Assert.Equal("01234 123>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
             Assert.Equal(2, body.WordCount);
@@ -1185,12 +1185,12 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 11).GetResult());
 
-            Assert.True(body.LeftJustifyLinesInParagraph(0, 11).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.LeftJustifyLinesInParagraph(0, 11).GetResult());
             Assert.Equal(11, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(3, body.GetLineCount());
 
-            Assert.True(body.InsertParaBreak().GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.InsertParaBreak().GetResult());
             Assert.Equal(0, body.Cursor.ColIndex);
             Assert.Equal(1, body.Cursor.RowIndex);
             Assert.Equal(4, body.GetLineCount());
@@ -1201,7 +1201,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(4).GetResult()[3]);
 
             Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 11).GetResult());
-            Assert.True(body.DeleteCharacter().GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.DeleteCharacter().GetResult());
             Assert.Equal(11, body.Cursor.ColIndex);
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(3, body.GetLineCount());
@@ -1235,14 +1235,14 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 60).GetResult());
 
-            Assert.True(body.InsertText(" ").GetResult());
-            Assert.True(body.InsertText("a").GetResult());
-            Assert.True(body.InsertText("b").GetResult());
-            Assert.True(body.InsertText("c").GetResult());
-            Assert.True(body.InsertText("d").GetResult());
-            Assert.True(body.InsertText("e").GetResult());
-            Assert.True(body.InsertText("f").GetResult());
-            Assert.True(body.InsertText("g").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText(" ").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("a").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("b").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("c").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("d").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("e").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("f").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("g").GetResult());
 
             Assert.Equal("A123456789 123456789 123456789 123456789 123456789 123456789 abcdefg", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
@@ -1252,7 +1252,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(68, body.Cursor.ColIndex);
             Assert.Equal(3, body.GetLineCount());
 
-            Assert.True(body.InsertText("h").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.InsertText("h").GetResult());
             Assert.Equal(1, body.Cursor.RowIndex);
             Assert.Equal(8, body.Cursor.ColIndex);
             Assert.Equal(4, body.GetLineCount());
@@ -1288,14 +1288,14 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 11).GetResult());
 
-            Assert.True(body.InsertText("a", true).GetResult());
-            Assert.True(body.InsertText("b", true).GetResult());
-            Assert.True(body.InsertText("c", true).GetResult());
-            Assert.True(body.InsertText("d", true).GetResult());
-            Assert.True(body.InsertText("e", true).GetResult());
-            Assert.True(body.InsertText("f", true).GetResult());
-            Assert.True(body.InsertText("g", true).GetResult());
-            Assert.True(body.InsertText("h", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("a", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("b", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("c", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("d", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("e", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("f", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("g", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("h", true).GetResult());
 
             Assert.Equal("A123456789 abcdefgh123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("B123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(3).GetResult()[1]);
@@ -1305,7 +1305,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(19, body.Cursor.ColIndex);
             Assert.Equal(3, body.GetLineCount());
 
-            Assert.True(body.InsertText("i", true).GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.InsertText("i", true).GetResult());
             Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(20, body.Cursor.ColIndex);
             Assert.Equal(4, body.GetLineCount());

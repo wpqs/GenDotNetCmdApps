@@ -271,8 +271,7 @@ namespace KLineEdCmdApp.Model
                 rc += rcMove;
                 if (rcMove.IsSuccess(true))
                 {
-                    var hint = rcMove.GetResult();
-                    var rcDelete = BodyDeleteCharacter();
+                    var rcDelete = BodyDeleteCharacter(rcMove.GetResult());
                     rc += rcDelete;
                     if (rcDelete.IsSuccess(true))
                     {
@@ -284,7 +283,7 @@ namespace KLineEdCmdApp.Model
         }
 
 
-        public MxReturnCode<bool> BodyDeleteCharacter()
+        public MxReturnCode<bool> BodyDeleteCharacter(ChangeHint hint = ChangeHint.Unknown)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.BodyDeleteCharacter");
 
@@ -296,7 +295,7 @@ namespace KLineEdCmdApp.Model
                rc += rcDelete;
                if (rcDelete.IsSuccess(true))
                {
-                   UpdateAllViews((int) ChangeHint.All);
+                   UpdateAllViews((int)rcDelete.GetResult());
                    rc.SetResult(true);
                }
             }
@@ -315,7 +314,7 @@ namespace KLineEdCmdApp.Model
                 rc += rcInsert;
                 if (rcInsert.IsSuccess(true))
                 {
-                    UpdateAllViews((int)ChangeHint.All);  //ChangeHint.Line or ChangeHint.Para
+                    UpdateAllViews((int)rcInsert.GetResult()); 
                     rc.SetResult(true);
                 }
             }
@@ -333,7 +332,10 @@ namespace KLineEdCmdApp.Model
                 var rcInsertText = ChapterBody.InsertText(text, insertMode);
                 rc += rcInsertText;
                 if (rcInsertText.IsSuccess(true))
-                    UpdateAllViews((int)ChangeHint.All);
+                {
+                    UpdateAllViews((int) rcInsertText.GetResult());
+                    rc.SetResult(true);
+                }
             }
             return rc;
         }

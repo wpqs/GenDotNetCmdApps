@@ -200,12 +200,12 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.True(rc.GetResult());
             Assert.True(manuscript.Ready);
             Assert.Equal(0, manuscript.ChapterBody.GetLineCount());
-            Assert.True(manuscript.ChapterBody.InsertText("test one").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, manuscript.ChapterBody.InsertText("test one").GetResult());
             Assert.Equal("test one>", manuscript.ChapterBody.GetEditAreaLinesForDisplay(1).GetResult()[0]);
-            Assert.True(manuscript.ChapterBody.InsertParaBreak().GetResult()); 
-            Assert.True(manuscript.ChapterBody.InsertText("test two").GetResult());
-            Assert.True(manuscript.ChapterBody.InsertParaBreak().GetResult());
-            Assert.True(manuscript.ChapterBody.InsertText("test three").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, manuscript.ChapterBody.InsertParaBreak().GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, manuscript.ChapterBody.InsertText("test two").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, manuscript.ChapterBody.InsertParaBreak().GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, manuscript.ChapterBody.InsertText("test three").GetResult());
 
             Assert.Equal("test one>", manuscript.ChapterBody.GetEditAreaLinesForDisplay(3).GetResult()[0]);
             Assert.Equal("test two>", manuscript.ChapterBody.GetEditAreaLinesForDisplay(3).GetResult()[1]);

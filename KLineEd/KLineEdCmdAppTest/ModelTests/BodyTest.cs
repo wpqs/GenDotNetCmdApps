@@ -183,7 +183,7 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.Equal(0, body.GetLineCount());
             Assert.Equal(0, body.WordCount);
-            Assert.True(body.InsertText("123a").GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.Line, body.InsertText("123a").GetResult()); //inserts ParaBreak
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(1, body.WordCount);
 

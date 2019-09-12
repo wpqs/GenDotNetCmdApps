@@ -65,7 +65,7 @@ namespace KLineEdCmdApp.View
             else
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
-                if ((model == null) || (model.ChapterBody == null))
+                if (model?.ChapterBody == null)
                     rc.SetError(1140101, MxError.Source.Param, $"model is null", MxMsgs.MxErrBadMethodParam);
                 else
                 {
@@ -82,67 +82,63 @@ namespace KLineEdCmdApp.View
                             ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
                             switch (change)
                             {
+                                case ChapterModel.ChangeHint.End:
                                 case ChapterModel.ChangeHint.All:
                                 {
                                     Terminal.SetCursorVisible(false);
-                                    rc += InitDisplay();
-                                    if (rc.IsSuccess(true))
+
+                                    var rcRes = model.ChapterBody.GetEditAreaLinesForDisplay(EditAreaHeight);
+                                    rc += rcRes;
+                                    if (rcRes.IsSuccess(true))
                                     {
-                                        var rcRes = model.ChapterBody.GetEditAreaLinesForDisplay(EditAreaHeight);
-                                        rc += rcRes;
-                                        if (rcRes.IsSuccess(true))
+                                        if (change == ChapterModel.ChangeHint.All)
+                                            rc += InitDisplay();
+                                        if (rc.IsSuccess() && (editAreaCursor != null))
                                         {
                                             var row = 0;
                                             var lines = rcRes.GetResult();
                                             foreach (var line in lines)
                                             {
-                                                if (line != null)
-                                                    rc += DisplayEditAreaLine(row, line, false);
-                                                if (rc.IsError(true))
+                                                if (line == null)
                                                     break;
+                                                if ((change == ChapterModel.ChangeHint.All) || ((change == ChapterModel.ChangeHint.End) && (row >= editAreaCursor.RowIndex - 1)))
+                                                {
+                                                    rc += DisplayEditAreaLine(row, line, (change == ChapterModel.ChangeHint.End));
+                                                    if (rc.IsError(true))
+                                                        break;
+                                                }
                                                 row++;
                                             }
-
-                                            if (rc.IsSuccess())
-                                            {
-                                                rc += SetEditAreaCursorPosition(editAreaCursor.RowIndex, editAreaCursor.ColIndex);
-                                                if (rc.IsSuccess(true))
-                                                    rc.SetResult(true);
-                                            }
+                                        }
+                                        if (rc.IsSuccess() && (editAreaCursor != null))
+                                        {
+                                            rc += SetEditAreaCursorPosition(editAreaCursor.RowIndex, editAreaCursor?.ColIndex ?? 0);
+                                            if (rc.IsSuccess(true))
+                                                rc.SetResult(true);
                                         }
                                     }
-
                                     Terminal.SetCursorVisible(CursorOn);
                                     break;
                                 }
-                                //case ChapterModel.ChangeHint.Line: //change to line so update line at cursor.rowIndex and all others to bottom
-                                //{
-                                //    var rcRes = model.BodyGetEditAreaLinesForDisplay(1);
-                                //    rc += rcRes;
-                                //    if (rcRes.IsSuccess(true))
-                                //    {
-                                //        var line = rcRes.GetResult()?[0] ?? null;
-                                //        if (line != null)
-                                //        {
-                                //            rc += DisplayEditAreaLine(editAreaCursor?.RowIndex ?? 0, line, true);
-                                //            if (rc.IsSuccess(true))
-                                //                rc.SetResult(true);
-                                //        }
-                                //    }
+                                case ChapterModel.ChangeHint.Line: //only change to line so just update line at cursor.rowIndex 
+                                {
+                                    Terminal.SetCursorVisible(false);
 
-                                //    break;
-                                //}
-                                //case ChapterModel.ChangeHint.Char:  //overwrite char only so just update char at cursor position
-                                //{
-                                //    var lastChar = model.ChapterBody?.GetCharacterInLine() ?? Body.NullChar;
-                                //    if (lastChar != Body.NullChar)
-                                //    {
-                                //        rc += DisplayEditAreaChar(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0, lastChar);
-                                //        if (rc.IsSuccess(true))
-                                //            rc.SetResult(true);
-                                //    }
-                                //    break;
-                                //}
+                                    var rcRes = model.ChapterBody.GetEditAreaCursorLineForDisplay();
+                                    rc += rcRes;
+                                    if (rcRes.IsSuccess(true))
+                                    {
+                                        rc += DisplayEditAreaLine(editAreaCursor?.RowIndex ?? 0, rcRes.GetResult(), true);
+                                        if (rc.IsSuccess(true))
+                                        {
+                                            rc += SetEditAreaCursorPosition(editAreaCursor?.RowIndex ?? 0, editAreaCursor?.ColIndex ?? 0);
+                                            if (rc.IsSuccess(true))
+                                                rc.SetResult(true);
+                                        }
+                                    }
+                                    Terminal.SetCursorVisible(true);
+                                    break;
+                                }
                                 case ChapterModel.ChangeHint.Cursor:
                                 case ChapterModel.ChangeHint.StatusLine: //reset the cursor after update to EditHelpView, MsgLineView, StatusLineView
                                 case ChapterModel.ChangeHint.MsgLine:
