@@ -1,106 +1,181 @@
 Todo: KLineEd
 =============
 
-Release work
+Development work v1.0.43.0
+--------------------------
 
-1.	Installer - Wix
-2.	Reintegrate with packages
-		MxReturnCode - interop with C++ lib for sending error messages + SetUserName
-		MxDotNetUtils - with MVC Obs 
-3.  Reporting param
-4.  Logo
-5.  Wiki
+1. Change filetype from .txt to .ksx
 
-Development work
-
-1. done - Import MxDotNetUtilsLib package (with MxReturnCode)
 2. Implement command line parameters/args and settings
-     --BrowserName "explorer.exe"
+     --parabreak char=' '
+	 --rulers display=on|off backgnd=black foregnd=darkgreen sepchar='.'
+     --BrowserName "explorer.exe" - was ParamBrowser, --browser
 	    --Help 
 		--Search https://www.google.com/ args search {word}
 		--Thesaurus  https://www.thesaurus.com/ args /browse/{word}
-     --Reporting on | off
-	 --EditFile 'mytext.txt'
-	     --CursorSize 20
-		 --TypingPauseSecs 60
-		 --TabSize 3
-		 --DisplayLastLines 10
-		 --DisplayLineWidth 80
-		 --Volumne 1 (0-9)
-		 --Backgnd text black (msg-error red) (msg-warn black) (msg-note black) (cmds black) (status black)
-		 --Foregnd text green (msg-error black) (msg-warn yellow) (msg-note green) (cmds grey) (status grey)
-		 --scrollreview on
-		 --editline 0-n  0 = BS/De disabled, 1 = edit last line, 10 = edit last ten lines, -1 edit all
-		 --spellcheck on
+		--Spell https://www.spell.com args search {word}
+     --ErrorReporting on | off
+     --CursorSize 20
+	 --TypingPauseSecs 60
+	 --TabSize 3
+	 --DisplayLineWidth 80
+	 --Backgnd text black (msg-error red) (msg-warn black) (msg-note black) (cmds black) (status black) - was  ParamBackGndColour
+	 --Foregnd text green (msg-error black) (msg-warn yellow) (msg-note green) (cmds grey) (status grey) - was ParamForeGndColour
 	 --export filename.txt 
-3. Implement DisplayHeader
-     - program details, filename
-	 - Command hints
-	 - footer
-4. Implement program flow
-	 - DisplayHeader, ReadFile, Reformat, DisplayLastLines, WriteFile, DisplayReport
-		(Reformat changes line length if MaxCol changes)
-5. Implement basic line editor
-     - save getchar() to line buffer 
-	 - allowed characters (disallow <>)
-	 - command processing
-	 	- Esc: DisplayHeader(), DisplayLastLines, display current content of line buffer, put cursor at end
-		- LFCR: save line buffer to file, clear line buffer, DisplayLastLines
-		- Ctrl+X: save buffer, DisplayReport and exit
-	    - Automatic LFCR at end of line (> max cols)
-		- Backspace: remove character to left of current insertion point and move all subsequent chars one space left
-		- Delete: remove character at current insertion point and move all subsequent chars one space left
-		- Cursor left: move insertion position one character left
-		- Cursor right: move insertion position one character right
-		- When --editline on allow editing of other words in the line buffer besides current word
- 			- Home: move insertion position to start of line
-			- End: move insertion position to end of line
-			- Ctrl+W: move insertion position to start of previous word
-			- Ctrl+E: move insertion position to start of next word
+	 --import filename.txt
+	 --fix filename.ksx - removes any errors in the file that stop it being opened
+	 --autosave CR | ParaBreak | off - was ParamSpellCheckMode, spellcheck
+	 --scrollback 0-n (0 is off, n is any number less than the number of lines) - was DisplayLastLines, scrollreview, ParamScrollReviewMode
+	 --editback 0-n (0 is off, n is any number less than the number of lines) - was editline (min current line) ParamEditLineMode
+	 --autocorrect on | off
+	 --Volumne 1 (0-9)
+	 --audiocr"; //bell.mpeg 2
+	 --audiokey"; //click.mpeg 4
+	 --audiostart"; //insertpaper.mpeg 4
+	 --audioEnd"; //removepaper.mpeg 4
+	 --SVNUsername wills
+	 --SVNPassword [secret manager]
+	 --SVNUrlRoot [https//me.svnrepository.com]
 
-	- GetLastLines() - reformat for linelength
-6. done - Implement last session stats in DisplayReport
-	 - last session word count
-	 - last session duration 
-	 - last session WPM
-	 - last session line start
-	 - last session line end
-7. Done - Implement stats meta data
-	 - append last session stats to start of file before <start>
-	 - export without meta data
-	 - read previous session stats and calculate
-		 - total edit sessions
-		 - mean session word count
-		 - mean session duration
-		 - mean session words per min (WPM)
-	-  add stats meta data ito DisplayReport
-8. Implement unit tests for Program.cs
-9. Done - Implement content meta data
-	- book/project name
-	- chapter
-	- add content meta data to DisplayHeader
-10. Implement scroll review - allow review of lines previous to those in DisplayLastLines
-	- commands
-			- scroll up - DisplayLastLines up by one line
-			- scroll down - DisplayLastLines down by one line 	
-			- PgUp - DisplayLastLines up by number of lines displayed
-			- PgDn - DisplayLastLines down by number of lines displayed
-			- Esc - return to end so you can continue to edit
-11. Implement spelling checking
-	- automatically check last word and if not found
-	    - Tab - ignore and continue
+3. Implement Import and Export
+	 --export create .txt file and copy body.TextLines; add CRLF at the end of each line; replace ParaBreak with double CRLF 
+	 --import create new .KSX file and read into body.TextLines; replace double CRLF with ParaBreak and remove any remaining CRLF
+
+4. General improvements
+	- Detect any change in the Command Window Size and restore 
+	- Autosave and manual save
+	- Implement view help - help for a particular view
+	- Implement search - pass word at cursor
+	- Implement thesaurus - pass word at cursor
+	- Implement spelling checking - pass word at cursor (but don't implement autocorrect)
+	- Implement max scroll back - maximum number of lines that the user can scroll back from end of chapter (Home, PgUp, up)
+	- Implement max edit back - maximum number of lines that the user can edit from end of chapter
+	- Check Chapter/Session stats are correct
+
+6. Publish and Test
+	- Windows
+	- iOS
+
+7. Create pre-release ZIP for GitHub
+
+Development work v1.0.44.0
+--------------------------
+
+1. Refactor Application structure
+	- Rename KLineEdCmdApp Project, KLineEditor.cs and KLineEdCmdApp.json to KScribeCmdApp, KScribeEditor.cs, KScribe.json
+	- Rename KLineEdCmdAppTest to KScribeCmdAppTest (KLineEditorTests) 
+	- Create KScribeLib Class Library 
+		- Move Controller, Model, Utils, View from KScribeCmdApp (not Terminal.cs)
+		- Integrate KScribeLib Class Library with KScribeCmdApp - Program.cs, KScribeEditor, Terminal.cs.
+	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
+
+2. Build and test with VS2019
+
+Development work v1.0.45.0
+--------------------------
+
+1. Implement ModalDlgView - a modal dialog box
+
+2. Add to KScribeCmdApp UIElements.cs
+	- text box
+	- radio button selection
+	- check box selection
+	- drop down list selection
+
+3. Test UIElements.cs
+    - Unit test
+	- Modal Dialog box
+
+4. Refactor
+	- Move to MxDotNetUtils general MVC and factory stuff as well as Terminal.cs, ITerminal.cs and UIElements.cs 
+    - Update KScribe for new version of MxDotNetUtils
+
+Development work v1.0.46.0
+--------------------------
+
+1. Implement Secret Manager for json settings (SVN)
+
+2. Refactor
+    - Update KScribe for new version of MxReturnCode (C++ interop)
+
+Development work v1.0.47.0
+--------------------------
+
+1. Implement SettingsView - allow command line parameters to be changed from within the Editor
+
+2. Implement Abort - exit without saving unsaved changes
+	ModalDlgView - abort y/n?
+
+3. Implement Undo (Ctrl+Z)
+
+4. Implement two line error messages
+
+5. Improve warning messages - use of modal dialog, better separation of data and user errors
+
+6. Improve unit testing and full test
+
+7. Create Windows/iOS Installer - Wix
+
+Release work v1.1 (first major release)
+--------------------------------------
+
+1.  Create Logo
+2.	Migrate to GitHub KScribe public project and make existing private
+3.  Create GitHub wiki
+		- user manual 
+			- list of views
+			- help on a view
+		- technical 
+			- architectural overview
+				- MVC pattern
+				- factory
+			- structure of app
+4.  Create YouTube video
+5.  Create KScribe.org website
+
+
+Development work v1.1.30.0
+--------------------------
+
+WARNING: changes may break iOS version
+	
+1. Implement autocorrect spelling checking
+	- automatically check last word and if not found switch to SpellEditView
 		- Ctrl+A - add to dictionary
 		- Ctrl+K - review added words since last version of dictionary (del allows removal)
-		- 1 ... n - replace with suggested word
+		- 0 - switch back to TextEditView (ignore)
+		- 1 ... n - replace with suggested word and switch back to TextEditView
 	- see	
 		- https://stackoverflow.com/questions/15252596/using-the-c-sharp-nhunspell-how-do-i-check-words
 		- https://www.codeproject.com/Articles/5277/NetSpell-Spell-Checker-for-NET
 		- https://www.codeproject.com/Articles/4572/Using-Word-s-spellchecker-in-C
-12. Implement audio
+
+2. Implement audio
 	- play sound on keypress (read into memory at startup)
-13. Implement console colours
-	- set colours from settings
-14. Implement Structure Editing - a way of breaking-up a document into sections
+
+3. Implement Clipboard
+	- Ctrl+V
+	- Ctrl+C
+	- Ctrl+X
+
+Release work v1.2
+-----------------
+
+1. Store settings in Chapter.ksx to override global settings in KScribe.json
+2. Create ConsoleApp launcher for Cmd Line version (Windows only)
+3. Create KScribeWinApp - window version
+4. Create KScribeMacApp - iOS version
+5. Integrate with CVS
+		- store user settings
+		- create repository (delete from cmd line - intentional difficult)
+		- add files
+		- put file(s)
+		- get file(s)
+		- list files
+		- list version stats for selected file
+		- diff between selected versions
+		- restore from selected version
+6. Implement Structure Editing - a way of breaking-up a document into sections
 	- Command Ctrl+Q toggles between normal text editing (NTE) mode and structure editing (SE) mode
 	- Structure Editing commands
 		- Ctrl+H+1 - H1 Caps with double underline (=) on last line followed by blank line
@@ -116,6 +191,17 @@ Development work
 			- Save contents of line buffer and move next heading into it, DisplayLastLines
 		- Ctrl+Q
 			-  Save contents of line buffer and resume NTE in sected section 
+7. Implement integration with KScribe.org Learning Features (AI)
+	- list misspellings by frequency
+	- send list to your account on KScribe (spelling test)
+	- list mistypes (S rather than D, etc)
+	- send list to your account on KScribe (typing test)
+	- export chapter to your account on KScribe for AI grammar analysis, idiom misuse, etc and generate a report (PDF)
+
+
+
+
+
 
 
 
