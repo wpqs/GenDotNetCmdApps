@@ -32,7 +32,7 @@ namespace KLineEdCmdAppTest.TestSupport.Base
                 if (Model.RemoveAllLines())
                 {
                     AppCmdLineParams = new CmdLineParamsApp();
-                    var rcParam = AppCmdLineParams.Initialise(new[] {"--edit", "Test.txt"});
+                    var rcParam = AppCmdLineParams.Initialise(new[] {"--edit", "Test.ksx"});
                     if (rcParam.IsError(true))
                         Error = rcParam.GetErrorTechMsg();
                     else

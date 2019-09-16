@@ -1,0 +1,12 @@
+Settings.txt
+============
+
+List of settings used by KLineEd and some examples
+
+Examples
+--------
+
+
+
+Setting List
+------------

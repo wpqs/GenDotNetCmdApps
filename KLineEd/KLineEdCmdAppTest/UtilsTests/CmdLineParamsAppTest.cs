@@ -129,7 +129,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestExportParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.txt", "Export.txt" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.ksx", "Export.txt" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -161,7 +161,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestExportParamExtraArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.txt", "Export.txt", "extra" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.ksx", "Export.txt", "extra" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
@@ -172,7 +172,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestEditParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--edit", "Test.txt" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--edit", "Test.ksx" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
@@ -193,7 +193,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestEditParamExtraArg()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--edit", "Test.txt", "extra" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--edit", "Test.ksx", "extra" });
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1020801-user: parameter --edit has incorrect number of arguments; found 2", rcParam.GetErrorUserMsg());

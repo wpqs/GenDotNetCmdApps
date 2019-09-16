@@ -4,7 +4,7 @@ Todo: KLineEd
 Development work v1.0.43.0
 --------------------------
 
-1. Change filetype from .txt to .ksx
+1. done - Change filetype from .txt to .ksx
 
 2. Implement command line parameters/args and settings
      --parabreak char=' '
@@ -28,11 +28,11 @@ Development work v1.0.43.0
 	 --scrollback 0-n (0 is off, n is any number less than the number of lines) - was DisplayLastLines, scrollreview, ParamScrollReviewMode
 	 --editback 0-n (0 is off, n is any number less than the number of lines) - was editline (min current line) ParamEditLineMode
 	 --autocorrect on | off
-	 --Volumne 1 (0-9)
-	 --audiocr"; //bell.mpeg 2
-	 --audiokey"; //click.mpeg 4
-	 --audiostart"; //insertpaper.mpeg 4
-	 --audioEnd"; //removepaper.mpeg 4
+	 --audiovol 1 (0-9)
+	 --audiofilecr"; //bell.mpeg 2
+	 --audiofilekey"; //click.mpeg 4
+	 --audiofilestart"; //insertpaper.mpeg 4
+	 --audiofileend"; //removepaper.mpeg 4
 	 --SVNUsername wills
 	 --SVNPassword [secret manager]
 	 --SVNUrlRoot [https//me.svnrepository.com]
@@ -42,8 +42,10 @@ Development work v1.0.43.0
 	 --import create new .KSX file and read into body.TextLines; replace double CRLF with ParaBreak and remove any remaining CRLF
 
 4. General improvements
+    - clear entire window after abend or reset
 	- Detect any change in the Command Window Size and restore 
 	- Autosave and manual save
+	- Implement --fix filename.ksx
 	- Implement view help - help for a particular view
 	- Implement search - pass word at cursor
 	- Implement thesaurus - pass word at cursor

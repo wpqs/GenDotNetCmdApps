@@ -36,9 +36,10 @@ namespace KLineEdCmdApp.Utils
 
     public class CmdLineParamsApp : CmdLineParams
     {
+        public static readonly string EditFileType = ".ksx"; //text file in XML format with custom elements
         public static readonly ConsoleColor UnsetColour = ConsoleColor.DarkMagenta;
         public static readonly string ColourName = "COLOUR";
-        public static readonly string EditFileNameForm = "'drive:path\\edit.txt'";
+        public static readonly string EditFileNameForm = "'drive:path\\edit'" + EditFileType;
         public static readonly string ExportFileNameForm = "'drive:path\\export.txt'";
         public static readonly string AudioFileNameForm = "'drive:path\\audio.wav'";
         public static readonly string SettingsFileNameForm = $"'drive:path\\{Program.CmdAppName}.json'";
@@ -47,9 +48,9 @@ namespace KLineEdCmdApp.Utils
 
         public static readonly string ParamReset = "--reset";
         public static readonly string ParamSettings = "--settings";
-        public static readonly string ParamExportFile = "--export"; // editfilename.txt exportfilename.txt
+        public static readonly string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
 
-        public static readonly string ParamEditFile = "--edit"; // filename.txt
+        public static readonly string ParamEditFile = "--edit"; // filename.ksx 
         public static readonly string ParamPauseWaitSecs = "--typingpause";
         public static readonly string ParamDisplayLastLines = "--displaylastlines"; // 10
         public static readonly string ParamDisplayLineWidth = "--DisplayLineWidth"; // 80

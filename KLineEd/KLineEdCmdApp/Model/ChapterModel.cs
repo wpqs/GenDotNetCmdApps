@@ -98,18 +98,18 @@ namespace KLineEdCmdApp.Model
                             FileName = Path.GetFileName(pathFilename);
 
                             MxReturnCode<bool> rcDone = null;
-                            if (File.Exists(pathFilename) == false)
-                            {
-                                rcDone = Write(pathFilename, true);
-                                rc += rcDone;
-                            }
-                            else
+                            if (File.Exists(pathFilename))
                             {
                                 rcDone = Read(pathFilename);
                                 rc += rcDone;
                             }
-                            if (rcDone.IsSuccess(true))
+                            else
                             {
+                                rcDone = Write(pathFilename, true);
+                                rc += rcDone;
+                            }
+                            if (rcDone.IsSuccess(true))
+                             {
                                 ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgPauseWaitSecsDefault); //todo set from value
                                 Ready = true;
                                 rc.SetResult(true);
