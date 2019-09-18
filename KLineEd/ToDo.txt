@@ -28,14 +28,9 @@ Development work v1.0.43.0
 	 --scrollback 0-n (0 is off, n is any number less than the number of lines) - was DisplayLastLines, scrollreview, ParamScrollReviewMode
 	 --editback 0-n (0 is off, n is any number less than the number of lines) - was editline (min current line) ParamEditLineMode
 	 --autocorrect on | off
-	 --audiovol 1 (0-9)
-	 --audiofilecr"; //bell.mpeg 2
-	 --audiofilekey"; //click.mpeg 4
-	 --audiofilestart"; //insertpaper.mpeg 4
-	 --audiofileend"; //removepaper.mpeg 4
-	 --SVNUsername wills
-	 --SVNPassword [secret manager]
-	 --SVNUrlRoot [https//me.svnrepository.com]
+	 --audiovol 1 (0-9) (0 is off)
+	 --audiofile //cr=bell.mpeg, key=click.mpeg, startup=insertpaper.mpeg end=removepaper.mpeg 
+	 --SVN //Username=wills, Password=[secret manager key], -urlRoot=https//me.svnrepository.com
 
 3. Implement Import and Export
 	 --export create .txt file and copy body.TextLines; add CRLF at the end of each line; replace ParaBreak with double CRLF 

@@ -19,6 +19,7 @@ namespace KLineEdCmdApp.Utils
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
+    
     //when adding a new parameter:
     // a) define static readonly for i) name (SettingsParam) ii) args (SettingsArgUpdate) iii) default value(s)(SettingsArgUpdateValueDefault)
     // b) add properties for args (SettingsFile, UpdateSettingsFile) 
@@ -29,11 +30,7 @@ namespace KLineEdCmdApp.Utils
     // g) update GetParamHelp()
     // h) update unit tests
 
-    //--help
-    //--reset colours --settings 'mysettings.json' (update)
-    //--export 'drive:path\\filename'
-    //--edit 'drive:path\\filename' (--displaylastlines 10 --DisplayLineWidth 80 --audiocr bell.mpeg 2 --audiokey click.mpeg 2 --backgnd text black details black cmds black spell black --foregnd text white details white cmds white spell white --scrollreview on --editline on  --spellcheck on --settings 'mysettings.json' (update))  
-
+   
     public class CmdLineParamsApp : CmdLineParams
     {
         public static readonly string EditFileType = ".ksx"; //text file in XML format with custom elements
@@ -49,21 +46,22 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamReset = "--reset";
         public static readonly string ParamSettings = "--settings";
         public static readonly string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
-
+        public static readonly string ParamImportFile = "--import"; // exportfilename.txt editfilename.ksx
         public static readonly string ParamEditFile = "--edit"; // filename.ksx 
-        public static readonly string ParamPauseWaitSecs = "--typingpause";
-        public static readonly string ParamDisplayLastLines = "--displaylastlines"; // 10
-        public static readonly string ParamDisplayLineWidth = "--DisplayLineWidth"; // 80
-        public static readonly string ParamAudioCR = "--audiocr"; //bell.mpeg 2
-        public static readonly string ParamAudioKeyPress = "--audiokey"; //click.mpeg 4
-        public static readonly string ParamBackGndColour = "--backgnd"; // text black(details black) (cmds black) (spell black)
-        public static readonly string ParamForeGndColour = "--foregnd"; // text green(details grey) (cmds grey) (spell red) 
-        public static readonly string ParamScrollReviewMode = "--scrollreview"; // on | off
+
+        public static readonly string ParamEditPauseWaitSecs = "--typingpause";
+        public static readonly string ParamEditDisplayLastLines = "--displaylastlines"; // 10
+        public static readonly string ParamEditDisplayLineWidth = "--DisplayLineWidth"; // 80
+        public static readonly string ParamEditAudioCR = "--audiocr"; //bell.mpeg 2
+        public static readonly string ParamEditAudioKeyPress = "--audiokey"; //click.mpeg 4
+        public static readonly string ParamEditBackGndColour = "--backgnd"; // text black(details black) (cmds black) (spell black)
+        public static readonly string ParamEditForeGndColour = "--foregnd"; // text green(details grey) (cmds grey) (spell red) 
+        public static readonly string ParamEditScrollReviewMode = "--scrollreview"; // on | off
         public static readonly string ParamEditLineMode = "--editline"; // on | off
-        public static readonly string ParamSpellCheckMode = "--spellcheck"; // on | off
-        public static readonly string ParamBrowser = "--browser"; // exe='Explorer'
-        public static readonly string ParamParaBreak = "--parabreak"; // char=' '
-        public static readonly string ParamRulers = "--rulers"; // display=on|off backgnd=black foregnd=darkgreen 
+        public static readonly string ParamEditSpellCheckMode = "--spellcheck"; // on | off
+        public static readonly string ParamEditBrowser = "--browser"; // exe='Explorer'
+        public static readonly string ParamEditParaBreak = "--parabreak"; // char=' '
+        public static readonly string ParamEditRulers = "--rulers"; // display=on|off backgnd=black foregnd=darkgreen 
 
         public const char ArgParaBreakDisplayCharDefault = '>';
 
@@ -369,7 +367,7 @@ namespace KLineEdCmdApp.Utils
                         break;
                         case Param.Reset:
                         {
-                            var rcReset = ProcessResetParam(paramLine);
+                            var rcReset = ProcessResetParam(paramLine); //update to set factory defaults in file given by second arg
                             rc += rcReset;
                             if (rcReset.IsSuccess())
                                 rc.SetResult(true);
@@ -393,7 +391,7 @@ namespace KLineEdCmdApp.Utils
                         break;
                         case Param.Settings:
                         {
-                            var rcSettings = ProcessSettingsParam(paramLine);
+                            var rcSettings = ProcessSettingsParam(paramLine); //change to be part of EditFile
                             rc += rcSettings;
                             if (rcSettings.IsSuccess())
                                 rc.SetResult(true);
