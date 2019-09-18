@@ -6,33 +6,12 @@ Development work v1.0.43.0
 
 1. done - Change filetype from .txt to .ksx
 
-2. Implement command line parameters/args and settings
-     --parabreak char=' '
-	 --rulers display=on|off backgnd=black foregnd=darkgreen sepchar='.'
-     --BrowserName "explorer.exe" - was ParamBrowser, --browser
-	    --Help 
-		--Search https://www.google.com/ args search {word}
-		--Thesaurus  https://www.thesaurus.com/ args /browse/{word}
-		--Spell https://www.spell.com args search {word}
-     --ErrorReporting on | off
-     --CursorSize 20
-	 --TypingPauseSecs 60
-	 --TabSize 3
-	 --DisplayLineWidth 80
-	 --Backgnd text black (msg-error red) (msg-warn black) (msg-note black) (cmds black) (status black) - was  ParamBackGndColour
-	 --Foregnd text green (msg-error black) (msg-warn yellow) (msg-note green) (cmds grey) (status grey) - was ParamForeGndColour
-	 --export filename.txt 
-	 --import filename.txt
-	 --fix filename.ksx - removes any errors in the file that stop it being opened
-	 --autosave CR | ParaBreak | off - was ParamSpellCheckMode, spellcheck
-	 --scrollback 0-n (0 is off, n is any number less than the number of lines) - was DisplayLastLines, scrollreview, ParamScrollReviewMode
-	 --editback 0-n (0 is off, n is any number less than the number of lines) - was editline (min current line) ParamEditLineMode
-	 --autocorrect on | off
-	 --audiovol 1 (0-9) (0 is off)
-	 --audiofile //cr=bell.mpeg, key=click.mpeg, startup=insertpaper.mpeg end=removepaper.mpeg 
-	 --SVN //Username=wills, Password=[secret manager key], -urlRoot=https//me.svnrepository.com
+2. Implement help, reset, command line parameters/args and settings (see settings.txt), but not global.json (see v1.0.46.0)
+	--help														//display help info
+	--reset factory-defaults 'drive:path\xxx.json'			    //reset setitngs file to factory default 
 
-3. Implement Import and Export
+3. Implement Fix, Import and Export
+     --fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx
 	 --export create .txt file and copy body.TextLines; add CRLF at the end of each line; replace ParaBreak with double CRLF 
 	 --import create new .KSX file and read into body.TextLines; replace double CRLF with ParaBreak and remove any remaining CRLF
 
@@ -40,7 +19,6 @@ Development work v1.0.43.0
     - clear entire window after abend or reset
 	- Detect any change in the Command Window Size and restore 
 	- Autosave and manual save
-	- Implement --fix filename.ksx
 	- Implement view help - help for a particular view
 	- Implement search - pass word at cursor
 	- Implement thesaurus - pass word at cursor
@@ -92,7 +70,9 @@ Development work v1.0.46.0
 
 1. Implement Secret Manager for json settings (SVN)
 
-2. Refactor
+2. Implement global.json - base settings which can be overriden by settings files specified by command line parameter
+
+3. Refactor
     - Update KScribe for new version of MxReturnCode (C++ interop)
 
 Development work v1.0.47.0
@@ -158,11 +138,10 @@ WARNING: changes may break iOS version
 Release work v1.2
 -----------------
 
-1. Store settings in Chapter.ksx to override global settings in KScribe.json
-2. Create ConsoleApp launcher for Cmd Line version (Windows only)
-3. Create KScribeWinApp - window version
-4. Create KScribeMacApp - iOS version
-5. Integrate with CVS
+1. Create ConsoleApp launcher for Cmd Line version (Windows only)
+2. Create KScribeWinApp - window version
+3. Create KScribeMacApp - iOS version
+4. Integrate with CVS
 		- store user settings
 		- create repository (delete from cmd line - intentional difficult)
 		- add files
@@ -172,7 +151,7 @@ Release work v1.2
 		- list version stats for selected file
 		- diff between selected versions
 		- restore from selected version
-6. Implement Structure Editing - a way of breaking-up a document into sections
+5. Implement Structure Editing - a way of breaking-up a document into sections
 	- Command Ctrl+Q toggles between normal text editing (NTE) mode and structure editing (SE) mode
 	- Structure Editing commands
 		- Ctrl+H+1 - H1 Caps with double underline (=) on last line followed by blank line
@@ -188,7 +167,7 @@ Release work v1.2
 			- Save contents of line buffer and move next heading into it, DisplayLastLines
 		- Ctrl+Q
 			-  Save contents of line buffer and resume NTE in sected section 
-7. Implement integration with KScribe.org Learning Features (AI)
+6. Implement integration with KScribe.org Learning Features (AI)
 	- list misspellings by frequency
 	- send list to your account on KScribe (spelling test)
 	- list mistypes (S rather than D, etc)
