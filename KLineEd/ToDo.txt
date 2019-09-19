@@ -7,10 +7,11 @@ Development work v1.0.43.0
 1. done - Change filetype from .txt to .ksx
 
 2. Implement help, command line parameters/args and settings - see settings.txt
-	--help			//update help info
-	--reset			//remove
-	--settings		//remove and implement global (default) settings, if not found create using factory-defaults  
-
+	--help									//update help info
+	--reset									//remove
+	--settings KLineEdCmdApp.json update	//update KLineEdCmdApp.json from given command line params and args.
+											// If settings parameter not given then read settings from KLineEdCmdApp.json 
+   											// in working directory (if not found create using factory-defaults).  
 3. Implement Fix, Import and Export
      --fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx
 	 --export create .txt file and copy body.TextLines; add CRLF at the end of each line; replace ParaBreak with double CRLF 
