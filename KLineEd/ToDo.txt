@@ -6,9 +6,10 @@ Development work v1.0.43.0
 
 1. done - Change filetype from .txt to .ksx
 
-2. Implement help, reset, command line parameters/args and settings (see settings.txt), but not global.json (see v1.0.46.0)
-	--help														//display help info
-	--reset factory-defaults 'drive:path\xxx.json'			    //reset setitngs file to factory default 
+2. Implement help, command line parameters/args and settings - see settings.txt
+	--help			//update help info
+	--reset			//remove
+	--settings		//remove and implement global (default) settings, if not found create using factory-defaults  
 
 3. Implement Fix, Import and Export
      --fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx
@@ -68,9 +69,9 @@ Development work v1.0.45.0
 Development work v1.0.46.0
 --------------------------
 
-1. Implement Secret Manager for json settings (SVN)
+1. Implement --settings and use any settings found in the specified file to override those given in the default (global) .json
 
-2. Implement global.json - base settings which can be overriden by settings files specified by command line parameter
+2. Implement Secret Manager lookup for json settings (SVN)
 
 3. Refactor
     - Update KScribe for new version of MxReturnCode (C++ interop)
@@ -119,7 +120,6 @@ WARNING: changes may break iOS version
 1. Implement autocorrect spelling checking
 	- automatically check last word and if not found switch to SpellEditView
 		- Ctrl+A - add to dictionary
-		- Ctrl+K - review added words since last version of dictionary (del allows removal)
 		- 0 - switch back to TextEditView (ignore)
 		- 1 ... n - replace with suggested word and switch back to TextEditView
 	- see	
@@ -141,7 +141,7 @@ Release work v1.2
 1. Create ConsoleApp launcher for Cmd Line version (Windows only)
 2. Create KScribeWinApp - window version
 3. Create KScribeMacApp - iOS version
-4. Integrate with CVS
+4. Integrate with SVN
 		- store user settings
 		- create repository (delete from cmd line - intentional difficult)
 		- add files
@@ -151,7 +151,10 @@ Release work v1.2
 		- list version stats for selected file
 		- diff between selected versions
 		- restore from selected version
-5. Implement Structure Editing - a way of breaking-up a document into sections
+5. Implement Dictionary versioning and listing of words added (Ctrl+K)
+	--updatedict (see settings) - dictionary file stored in SVN
+	--Ctrl+K (see settings) list added words since last version of dictionary (del allows removal)
+6. Implement Structure Editing - a way of breaking-up a document into sections
 	- Command Ctrl+Q toggles between normal text editing (NTE) mode and structure editing (SE) mode
 	- Structure Editing commands
 		- Ctrl+H+1 - H1 Caps with double underline (=) on last line followed by blank line
@@ -167,7 +170,7 @@ Release work v1.2
 			- Save contents of line buffer and move next heading into it, DisplayLastLines
 		- Ctrl+Q
 			-  Save contents of line buffer and resume NTE in sected section 
-6. Implement integration with KScribe.org Learning Features (AI)
+7. Implement integration with KScribe.org Learning Features (AI)
 	- list misspellings by frequency
 	- send list to your account on KScribe (spelling test)
 	- list mistypes (S rather than D, etc)

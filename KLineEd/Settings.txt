@@ -1,10 +1,35 @@
 Settings.txt
 ============
 
-List of settings used by KLineEd and some examples
+The priorty of settings is:
 
-Format
-------
+	1) those found in KLineEdCmdApp.json located in working directory. This is the global settings file and is created if not found 
+	2) those found in the file specificed by --settings. It is created if not found and initialised by settings given in the command line 
+	3) any given on the command line override those in settings files
+
+Command Line Examples
+---------------------
+
+
+
+
+Settings File
+-------------
+
+1. the default (global) settings file is KLineEdCmdApp.json as found in the working directory. It contains all the 
+   application settings - i.e. properties in Utils\CmdLineParamsApp.cs - implemented v1.0.43.0 
+2. running the app when KLineEdCmdApp.json is not found results in a new file being created using factory defaults - implemented v1.0.43.0  
+3. the settings in the file specified by the --settings paramter override those found in the default settings file. If not found
+   a new file is created and initialised from parameters and args given in the command line. The settings in this file can be a
+   subset of those in the default (global) file - implemented v1.0.46.0
+
+  --settings 'drive:path\xxx.json' (update)		
+
+4. the 'update' argument for the --settings parameter causes the settings file to be updated using the parameters and args found
+     in the given command line. This updated settings file then defines the settings for the editing session - implemented v1.0.46.0
+
+Settings Documentation Format
+-----------------------------
 
    --a 1 2 3 means parameter 'a' with arguments 1, 2 and 3.
    [--a ... | --b ...] means either parameter a or b. 
@@ -15,14 +40,8 @@ Format
    --e 1 '2 x' 3 means there are three arguments for parameter e; 1, '2 x' and 3. The second argument is 2 x (with space between 2 and x).
 
 
-
-Examples
---------
-
-
-
-Setting List
-------------
+Settings that can be set from command line
+------------------------------------------
 
    {word} is the word currently selected by the cursor 
    COLOUR is any of the defined colour words; black, 
@@ -32,41 +51,56 @@ Setting List
    [secret manager key] lookup value in secret manager using key value
 
 --help														//display help info
---reset factory-defaults 'drive:path\xxx.json'			    //reset setitngs file to factory default 
 --export 'drive:path\edit'.ksx 'drive:path\export.txt'		//export edit.ksx to export.txt
 --import 'drive:path\import.txt' 'drive:path\edit.ksx'		//import import.txt to edit.ksx
 --fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx
 --edit 'drive:path\edit.ksx'								//edit specified .ksx file
-  --settings 'drive:path\xxx.json' (update)				    //name of settings file to read (note 1) or update (note2). These settings override the corresponding settings found in the global settings file (see note 3)
+--updatedict 'drive:path\dictionary.qqq'					//updates dictionary and ver setting - determines Ctrl+K list - see  
   
-Edit parameter additional options - overrides those found in setting file(s)
+Additional options for edit parameter
 
-  --svn username 'wills' password=[secret manager key] urlRoot 'https//me.svnrepository.com'
-  --audiovol 0  <min 1 max 10>								//(0 is off)
-  --audiofile (cr 'drive:path\bell.mpeg')  (key 'drive:path\click.mpeg') (startup 'drive:path\insertpaper.mpeg') (end 'drive:path\removepaper.mpeg') 
-  --browser 'explorer.exe' - was ParamBrowser
-  --urlhelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0
-  --urlsearch url https://www.google.com/ arg 'search/{word}'
-  --urlthesaurus url https://www.thesaurus.com/ arg '/browse/{word}'
-  --urlspell ulr https://www.spell.com arg 'search/{word}'
-  --autocorrect [on | off]
-  --rulers display [on | off] unit '.'
-  --typingpause 60 <min 5 max 36000>						//in seconds
-  --cursorsize 20 <min 1 max 100>
+	Colour page
+
   --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
   --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)//- was  ParamForeGndColour
+
+	UI options page
+
+  --cursorsize 20 <min 1 max 100>
+  --displaycols 80 <min 20 max 250>							//was DisplayLineWidth, now EditAreaLineWidth
+  --displayrows 10 <min 1 max 25>                           //was displaylastlines, now EditAreaLinesCount
+  --rulers display [on | off] unit '.'
+  --parabreak char='>'
+  --audiovol 0  <min 1 max 10>								//(0 is off)
+
+	edit options page
+
+  --typingpause 60 <min 5 max 36000>						//in seconds
   --autosave [CR | ParaBreak | off]							//was ParamSpellCheckMode, spellcheck
   --scrollback 0  <min 1 max 10000>							//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
   --editback  0  <min 1 max 10000>							//(0 is unlimited) - was editline (min current line) ParamEditLineMode
-  --displaycols 80 <min 20 max 250>							//was DisplayLineWidth, now EditAreaLineWidth
-  --displayrows 10 <min 1 max 25>                           //was displaylastlines, now EditAreaLinesCount
   --tabsize 3 <min 1 max 25>
-  --parabreak char='>'
 
-  Notes:
-  1. the current command line parameters and args overwrite those found in the settings file
-  2. the current command line parameters and args are used to update the settings file which is then read to define the settings for the editing session
-  3. the priorty of settings is 1) any found in global settings file 2) any found in the specified file 3) any give on the command line
-  4. settings file contains  ErrorReporting=[on | off] this allows disabling of MxReturnCode reporting
+	tools options page
+
+  --browser 'explorer.exe' - was ParamBrowser
+  --helplookup url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0
+  --searchlookup url https://www.google.com/ arg 'search/{word}'
+  --thesauruslookup url https://www.thesaurus.com/ arg '/browse/{word}'
+  --spelllookup ulr https://www.spell.com arg 'search/{word}'
+  --autocorrect [on | off] 
+  --svn username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
+  
+
+Settings that cannot be set from command line
+---------------------------------------------
+
+  --audiofile (cr 'drive:path\bell.mpeg')  (key 'drive:path\click.mpeg') (startup 'drive:path\insertpaper.mpeg') (end 'drive:path\removepaper.mpeg') 
+  --reporterror [on | off] //allows disabling of MxReturnCode reporting to Azure. 
+  --dictionary 'drive:path/dictionary.qqq' ver 1.1 ulr 'https//me.svnrepository.com/dict'
+
+[end]
+
+
 
 
