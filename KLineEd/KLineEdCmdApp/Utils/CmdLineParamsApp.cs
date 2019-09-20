@@ -41,51 +41,8 @@ namespace KLineEdCmdApp.Utils
         public static readonly string AudioFileNameForm = "'drive:path\\audio.wav'";
         public static readonly string SettingsFileNameForm = $"'drive:path\\{Program.CmdAppName}.json'";
 
-        public static readonly string ParamHelp = "--help";
-
-        public static readonly string ParamReset = "--reset";
-        public static readonly string ParamSettings = "--settings";
-        public static readonly string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
-        public static readonly string ParamImportFile = "--import"; // exportfilename.txt editfilename.ksx
-        public static readonly string ParamEditFile = "--edit"; // filename.ksx 
-
-        public static readonly string ParamEditPauseWaitSecs = "--typingpause";
-        public static readonly string ParamEditDisplayLastLines = "--displaylastlines"; // 10
-        public static readonly string ParamEditDisplayLineWidth = "--DisplayLineWidth"; // 80
-        public static readonly string ParamEditAudioCR = "--audiocr"; //bell.mpeg 2
-        public static readonly string ParamEditAudioKeyPress = "--audiokey"; //click.mpeg 4
-        public static readonly string ParamEditBackGndColour = "--backgnd"; // text black(details black) (cmds black) (spell black)
-        public static readonly string ParamEditForeGndColour = "--foregnd"; // text green(details grey) (cmds grey) (spell red) 
-        public static readonly string ParamEditScrollReviewMode = "--scrollreview"; // on | off
-        public static readonly string ParamEditLineMode = "--editline"; // on | off
-        public static readonly string ParamEditSpellCheckMode = "--spellcheck"; // on | off
-        public static readonly string ParamEditBrowser = "--browser"; // exe='Explorer'
-        public static readonly string ParamEditParaBreak = "--parabreak"; // char=' '
-        public static readonly string ParamEditRulers = "--rulers"; // display=on|off backgnd=black foregnd=darkgreen 
-
-        public const char ArgParaBreakDisplayCharDefault = '>';
-
-        public const int ArgSpacesForTabDefault = 3;    //min 1 max?
-        public static readonly int ArgSpacesForTabMin = 1;
-
-        public static readonly int ArgPauseWaitSecsDefault = 60;
-        public static readonly int ArgPauseWaitSecsMin = 0;
-        public static readonly int ArgPauseWaitSecsMax = 86400; //24 * 60 * 60 - 24 hours
-
-        public static readonly int ArgEditAreaLinesCountDefault = 10; //todo rename
-        public static readonly int ArgEditAreaLinesCountMin = 0;
-        public static readonly int ArgEditAreaLinesCountMax = 50;
-
-        public const int ArgEditAreaLineWidthDefault = 68;   //todo rename counted from Jack Kerouac's book 'On the Road';
-        public static readonly int ArgEditAreaLineWidthMax = 250;      //see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
-        public static readonly int ArgEditAreaLineWidthMin = 5;
-
-        public static readonly string ArgBrowserExeDefault = "explorer.exe";
-
-
-        public static readonly int ArgVolDefault = 3;
-        public static readonly int ArgVolMax = 10;
-        public static readonly int ArgVolMin = 0;
+        public static readonly string ArgOn = "on";
+        public static readonly string ArgOff = "off";
 
         public static readonly string ArgYes = "yes";
         public static readonly string ArgNo = "no";
@@ -96,9 +53,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ArgDarkBlue = "darkblue";
         public static readonly string ArgDarkCyan = "darkcyan";
         public static readonly string ArgDarkGray = "darkgray";
-
         public static readonly string ArgDarkGreen = "darkgreen";
-
         // public static readonly string ArgDarkMagenta = "darkmagenta"; //used as unset colour
         public static readonly string ArgDarkRed = "darkred";
         public static readonly string ArgDarkYellow = "darkyellow";
@@ -109,17 +64,150 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ArgWhite = "white";
         public static readonly string ArgYellow = "yellow";
 
-        public static readonly string ArgText = "text";
-        public static readonly string ArgDetails = "details";   //footer
-        public static readonly string ArgCmds = "cmds";
-        public static readonly string ArgSpell = "spell";
+        //main operational parameters
+        public static readonly string ParamHelp = "--help";
+        public static readonly string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
+        public static readonly string ParamImportFile = "--import"; // exportfilename.txt editfilename.ksx
+        public static readonly string ParamFix = "--fix";           // editfilename.ksx fixed.txt 
+        public static readonly string ParamEditFile = "--edit";     // filename.ksx 
 
-        public static readonly string ArgResetColours = "colours";
-        public static readonly string ArgResetFactory = "factory-defaults";
+        public static readonly string ParamEditSettings = "--settings";
+
+        //edit operational parameters
+        public static readonly string ParamEditBackGndColour = "--backgnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
+        public static readonly string ParamEditForeGndColour = "--foregnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
+        public static readonly string ParamEditRulers = "--rulers";             //  [on | off] unit '.'
+        public static readonly string ParamEditAudioVol = "--audiovol";         //  0  <min 1 max 10> //(0 is off)
+
+        public static readonly string ParamEditCursorSize = "--cursorsize";     // 20 <min 1 max 100>
+        public static readonly string ParamEditDisplaysCols = "--displaycols";  // 80 <min 20 max 250>	    //was DisplayLineWidth, now EditAreaLineWidth
+        public static readonly string ParamEditDisplaysRows = "--displayrow";   // 10 <min 1 max 25>	    //was displaylastlines, now EditAreaLinesCount
+        public static readonly string ParamEditScrollBack = "--scrollback";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
+        public static readonly string ParamEditParaBreak = "--parabreak";       // displaychar ' '
+
+        public static readonly string ParamEditPauseWaitSecs = "--typingpause"; // 60 <min 5 max 36000>
+        public static readonly string ParamEditAutoSave = "--autosave";         // [CR | ParaBreak | off]
+        public static readonly string ParamEditEditBack = "--editback";         // 0  <min 1 max 10000>		//(0 is unlimited) - was editline ParamEditLineMode
+        public static readonly string ParamEditTabSize = "--tabsize";           // 3  <min 1 max 25>		
+
+        public static readonly string ParamEditBrowser = "--browser";                   // name 'Explorer'
+        public static readonly string ParamEditLookupHelp = "--lookuphelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0'
+        public static readonly string ParamEditLookupSearch = "--lookupsearch";         // url 'https://www.google.com/' arg 'search/{word}'
+        public static readonly string ParamEditLookupThesaurus = "--lookupthesaurus";   // url https://www.thesaurus.com/ arg '/search/{word}'
+        public static readonly string ParamEditLookupSpell = "-lookup-spell";           // url https://www.spell.com/ arg '/search/{word}'
+        public static readonly string ParamEditAutoCorrect = "--autocorrect";           // [on | off]
+        public static readonly string ParamEditSvn = "--svn";                           // username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
+
 
         public static readonly string ArgSettingsUpdate = "update";
-        public static readonly bool ArgSettingsUpdateValueDefault = false;
         public static readonly string ArgSettingsFilenameDefault = $"{Program.CmdAppName}.json";
+
+        public static readonly string ArgEditColourText = "text";
+        public static readonly string ArgEditBackGndColourTextDefault = ArgBlack;
+        public static readonly string ArgEditForeGndColourTextDefault = ArgGreen;
+
+        public static readonly string ArgEditColourMsgError = "msg-error";
+        public static readonly string ArgEditBackGndColourMsgErrorDefault = ArgBlack;
+        public static readonly string ArgEditForeGndColourMsgErrorDefault = ArgRed;
+
+        public static readonly string ArgEditColourMsgWarn = "msg-warn";
+        public static readonly string ArgEditBackGndColourMsgWarnDefault = ArgBlack;
+        public static readonly string ArgEditForeGndColourMsgWarnDefault = ArgYellow;
+
+        public static readonly string ArgEditColourMsgNote = "msg-note";
+        public static readonly string ArgEditBackGndColourMsgNoteDefault = ArgBlack;
+        public static readonly string ArgEditForeGndColourMsgNoteDefault = ArgWhite;
+
+        public static readonly string ArgEditColourCmds = "cmds";
+        public static readonly string ArgEditBackGndColourCmdsDefault = ArgBlack;
+        public static readonly string ArgEditForeGndColourCmdDefault = ArgDarkBlue;
+
+        public static readonly string ArgEditColourStatus = "status";
+        public static readonly string ArgEditBackGndColourStatusDefault = ArgBlack;
+        public static readonly string ArgEditForeGndColourStatusDefault = ArgGray;
+
+        public static readonly string ArgEditColourRule = "rule";
+        public static readonly string ArgEditBackGndColourRuleDefault = ArgBlack;
+        public static readonly string ArgEditForeGndColourRuleDefault = ArgGray;
+
+        public static readonly string ArgEditRulersDefault = ArgOn;
+        public static readonly string ArgEditRulersUnit = "unit";
+        public static readonly string ArgEditRulersUnitDefault = ".";
+
+        public static readonly int    ArgEditAudioVolDefault = 3;
+        public static readonly int    ArgEditAudioVolMax = 10;
+        public static readonly int    ArgEditAudioVolMin = 0;
+
+        public static readonly int ArgEditCursorSizeDefault = 20;
+        public static readonly int ArgEditCursorSizeMax = 100;
+        public static readonly int ArgEditCursorSizeMin = 1;
+
+        public static readonly int ArgEditDisplayColsDefault = 68;      //was ArgEditAreaLineWidthDefault - counted from Jack Kerouac's book 'On the Road'
+        public static readonly int ArgEditDisplayColsMax = 250;         //was ArgEditAreaLineWidthMax - see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
+        public static readonly int ArgEditDisplayColsMin = 5;           //was ArgEditAreaLineWidthMin
+
+        public static readonly int ArgEditDisplayRowsDefault = 10;      //was ArgEditAreaLinesCountDefault
+        public static readonly int ArgEditDisplayRowsMax = 50;          //was ArgEditAreaLinesCountMax 
+        public static readonly int ArgEditDisplayRowsMin = 5;           //was ArgEditAreaLinesCountMin
+
+        public static readonly int ArgEditScrollBackDefault = 0;     
+        public static readonly int ArgEditScrollBackMax = 10000;      
+        public static readonly int ArgEditScrollBackMin = 0;            //0 is unlimited
+
+        public static readonly string ArgEditParaBreakDisplayChar = "displaychar";
+        public const char             ArgEditParaBreakDisplayCharDefault = '>';
+
+        public static readonly int ArgEditPauseWaitSecsDefault = 60;
+        public static readonly int ArgEditPauseWaitSecsMin = 0;
+        public static readonly int ArgEditPauseWaitSecsMax = 86400;     //24 * 60 * 60 - 24 hours
+
+        public static readonly string ArgEditAutoSaveCR = "cr";
+        public static readonly string ArgEditAutoSaveParaBreak = "parabreak";
+        public static readonly string ArgEditAutoSaveDefault = ArgOff;
+
+        public static readonly int ArgEditEditBackDefault = 0;
+        public static readonly int ArgEditEditBackMax = 10000;
+        public static readonly int ArgEditEditBackMin = 0;              //0 is unlimited
+
+        public const int ArgEditTabSizeDefault = 3;
+        public static readonly int ArgEditTabSizeMax = 25;
+        public static readonly int ArgEditTabSizeMin = 1;
+
+        public static readonly string ArgEditBrowserExe = "exe";
+        public static readonly string ArgEditBrowserNameDefault = "explorer.exe";
+
+        public static readonly string ArgEditLookupUrl = "url";
+        public static readonly string ArgEditLookupArg = "arg";
+
+        public static readonly string ArgEditLookupHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0";
+        public static readonly string ArgEditLookupSearchUrlDefault = " https://www.google.com/";
+        public static readonly string ArgEditLookupSearchArgDefault = "search/{word}";
+        public static readonly string ArgEditLookupThesaurusUrlDefault = "https://www.thesaurus.com/";
+        public static readonly string ArgEditLookupThesaurusArgDefault = "search/{word}";
+        public static readonly string ArgEditLookupSpellUrlDefault = "https://www.spell.com/";
+        public static readonly string ArgEditLookupSpellArgDefault = "search/{word}";
+
+        public static readonly string ArgEditAutoCorrectDefault = ArgOff;
+
+        public static readonly string ArgEditSVNUser = "username";
+        public static readonly string ArgEditSVNUserDefault = Program.ValueNotSet;
+        public static readonly string ArgEditSVNPassword = "password";
+        public static readonly string ArgEditSVNPasswordDefault = "SvnPassword";
+        public static readonly string ArgEditSVNUrl = "url";
+        public static readonly string ArgEditSVNUrlDefault = Program.ValueNotSet;
+
+        public string AudioFileKeyPress { set; get; }
+        public string AudioFileCr { set; get; }
+        public string AudioFileStartup { set; get; }
+        public string AudioFileEnd { set; get; }
+
+        public bool ReportError { set; get; }
+
+        public string DictionaryFile { set; get; }
+        public string DictionaryUrl { set; get; }
+        public string DictionaryVersion { set; get; }
+
+
 
         public string EditFile { set; get; }
         public string ExportFile { set; get; }
@@ -253,8 +341,8 @@ namespace KLineEdCmdApp.Utils
             msg += Environment.NewLine;
             msg += $"[{ParamHelp} |";
 
-            msg += Environment.NewLine;
-            msg += $" {ParamReset} [{ArgResetColours} | {ArgResetFactory}] ({ParamSettings} {SettingsFileNameForm} ({ArgSettingsUpdate})) |";
+            //msg += Environment.NewLine;
+            //msg += $" {ParamReset} [{ArgResetColours} | {ArgResetFactory}] ({ParamEditSettings} {SettingsFileNameForm} ({ArgSettingsUpdate})) |";
 
             msg += Environment.NewLine;
             msg += $" {ParamExportFile} {EditFileNameForm} {ExportFileNameForm} |";
@@ -278,7 +366,7 @@ namespace KLineEdCmdApp.Utils
             //msg += Environment.NewLine;
             //msg += $"   {ParamSpellCheckMode} [{ArgYes} | {ArgNo}]";
             msg += Environment.NewLine;
-            msg += $"   {ParamSettings} {SettingsFileNameForm} ({ArgSettingsUpdate}))]";
+            msg += $"   {ParamEditSettings} {SettingsFileNameForm} ({ArgSettingsUpdate}))]";
             msg += Environment.NewLine;
 
             //msg += Environment.NewLine;
@@ -365,14 +453,14 @@ namespace KLineEdCmdApp.Utils
                                 rc.SetResult(true);
                         }
                         break;
-                        case Param.Reset:
-                        {
-                            var rcReset = ProcessResetParam(paramLine); //update to set factory defaults in file given by second arg
-                            rc += rcReset;
-                            if (rcReset.IsSuccess())
-                                rc.SetResult(true);
-                        }
-                        break;
+                        //case Param.Reset:
+                        //{
+                        //    var rcReset = ProcessResetParam(paramLine); //update to set factory defaults in file given by second arg
+                        //    rc += rcReset;
+                        //    if (rcReset.IsSuccess())
+                        //        rc.SetResult(true);
+                        //}
+                        //break;
                         case Param.ExportFile:
                         {
                             var rcReset = ProcessExportParam(paramLine);
@@ -482,12 +570,12 @@ namespace KLineEdCmdApp.Utils
                 msg += GetHelpNotes();
                 rc = msg;
             }
-            else if (help == Param.Reset)
-            {
-                msg += $"{ParamReset} [{ArgResetColours} | {ArgResetFactory}]";
-                msg += GetHelpNotes();
-                rc = msg;
-            }
+            //else if (help == Param.Reset)
+            //{
+            //    msg += $"{ParamReset} [{ArgResetColours} | {ArgResetFactory}]";
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
             else if (help == Param.ExportFile)
             {
                 msg += $"{ParamExportFile} {EditFileNameForm} {ExportFileNameForm}";
@@ -546,7 +634,7 @@ namespace KLineEdCmdApp.Utils
             //}
             else if (help == Param.Settings)
             {
-                msg += $"{ParamSettings} 'drive:path\\filename' ({ArgSettingsUpdate})";
+                msg += $"{ParamEditSettings} 'drive:path\\filename' ({ArgSettingsUpdate})";
                 msg += GetHelpNotes();
                 rc = msg;
             }
@@ -643,41 +731,41 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
-        private MxReturnCode<bool> ProcessResetParam(string paramLine)
-        {
-            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessResetParam", false);
+        //private MxReturnCode<bool> ProcessResetParam(string paramLine)
+        //{
+        //    var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessResetParam", false);
 
-            HelpHint = Environment.NewLine;
+        //    HelpHint = Environment.NewLine;
 
-            var rcCnt = GetArgCount(paramLine, ParamReset);
-            rc += rcCnt;
-            if (rcCnt.IsSuccess())
-            {
-                var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1020601, MxError.Source.User, $"parameter {ParamReset} has incorrect number of arguments; found {argCnt} should be one");
-                else
-                {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamReset}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
-                    {
-                        var value = rcArg1.GetResult()?.ToLower() ?? "[not found]";
-                        if ((value!= ArgResetColours) && (value != ArgResetFactory))
-                            rc.SetError(1020602, MxError.Source.User, $"parameter {ParamReset} has invalid argument; found {value} should be [{ArgResetColours} | {ArgResetFactory}]");
-                        else
-                        {
-                            Op = OpMode.Reset;
-                            ResetType = (value == ArgResetColours) ? ResetMode.Colours : ResetMode.FactoryDefaults;
-                            rc.SetResult(true);
-                        }
-                    }
-                }
-            }
-            if (rc.IsError())
-                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int) Param.Reset)}";
-            return rc;
-        }
+        //    var rcCnt = GetArgCount(paramLine, ParamReset);
+        //    rc += rcCnt;
+        //    if (rcCnt.IsSuccess())
+        //    {
+        //        var argCnt = rcCnt.GetResult();
+        //        if (argCnt != 1)
+        //            rc.SetError(1020601, MxError.Source.User, $"parameter {ParamReset} has incorrect number of arguments; found {argCnt} should be one");
+        //        else
+        //        {
+        //            var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamReset}");
+        //            rc += rcArg1;
+        //            if (rcArg1.IsSuccess(true))
+        //            {
+        //                var value = rcArg1.GetResult()?.ToLower() ?? "[not found]";
+        //                if ((value!= ArgResetColours) && (value != ArgResetFactory))
+        //                    rc.SetError(1020602, MxError.Source.User, $"parameter {ParamReset} has invalid argument; found {value} should be [{ArgResetColours} | {ArgResetFactory}]");
+        //                else
+        //                {
+        //                    Op = OpMode.Reset;
+        //                    ResetType = (value == ArgResetColours) ? ResetMode.Colours : ResetMode.FactoryDefaults;
+        //                    rc.SetResult(true);
+        //                }
+        //            }
+        //        }
+        //    }
+        //    if (rc.IsError())
+        //        HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int) Param.Reset)}";
+        //    return rc;
+        //}
 
         private MxReturnCode<bool> ProcessExportParam(string paramLine)
         {
@@ -749,16 +837,16 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessSettingsParam", false);
 
-            var rcCnt = GetArgCount(paramLine, ParamSettings);
+            var rcCnt = GetArgCount(paramLine, ParamEditSettings);
             rc += rcCnt;
             if (rcCnt.IsSuccess())
             {
                 int argCnt = rcCnt.GetResult();
                 if ((argCnt != 1) && (argCnt != 2))
-                    rc.SetError(1022001, MxError.Source.User, $"parameter {ParamSettings} has incorrect number of arguments; found {argCnt} should be 1 or 2");
+                    rc.SetError(1022001, MxError.Source.User, $"parameter {ParamEditSettings} has incorrect number of arguments; found {argCnt} should be 1 or 2");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamSettings}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamEditSettings}");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess())
                     {
@@ -767,13 +855,13 @@ namespace KLineEdCmdApp.Utils
                             rc.SetResult(true);
                         else
                         {
-                            var rcArg2 = GetArgValue(paramLine, 2, false, $"parameter {ParamSettings}");
+                            var rcArg2 = GetArgValue(paramLine, 2, false, $"parameter {ParamEditSettings}");
                             rc += rcArg2;
                             if (rcArg2.IsSuccess())
                             {
                                 var update = rcArg2.GetResult();
                                 if ((update != null) && (update != ArgSettingsUpdate))
-                                    rc.SetError(1022002, MxError.Source.User, $"parameter {ParamSettings} has incorrect second argument {update}; it should be {ArgSettingsUpdate}");
+                                    rc.SetError(1022002, MxError.Source.User, $"parameter {ParamEditSettings} has incorrect second argument {update}; it should be {ArgSettingsUpdate}");
                                 else
                                 {
                                     UpdateSettings = BoolValue.Yes;
@@ -862,9 +950,9 @@ namespace KLineEdCmdApp.Utils
             if (mode == ResetMode.FactoryDefaults)
             {
                 if ((EditAreaLinesCount == Program.PosIntegerNotSet) || (unsetOnly == false))
-                    EditAreaLinesCount = ArgEditAreaLinesCountDefault;
+                    EditAreaLinesCount = ArgEditDisplayRowsDefault;
                 if ((EditAreaLineWidth == Program.PosIntegerNotSet) || (unsetOnly == false))
-                    EditAreaLineWidth = ArgEditAreaLineWidthDefault;
+                    EditAreaLineWidth = ArgEditDisplayColsDefault;
 
                 if ((ScrollReview == BoolValue.Unset) || (unsetOnly == false))
                     ScrollReview = BoolValue.Yes;

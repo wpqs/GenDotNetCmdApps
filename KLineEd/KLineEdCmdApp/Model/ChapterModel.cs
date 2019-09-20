@@ -72,12 +72,12 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab = CmdLineParamsApp.ArgSpacesForTabDefault, char paraBreakChar = CmdLineParamsApp.ArgParaBreakDisplayCharDefault)
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab = CmdLineParamsApp.ArgEditTabSizeDefault, char paraBreakChar = CmdLineParamsApp.ArgEditParaBreakDisplayCharDefault)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 
-            if ((editAreaLinesCount == Program.PosIntegerNotSet) || (editAreaLineWidth == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgSpacesForTabMin))
-                rc.SetError(1050101, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount}, editAreaLineWidth={editAreaLineWidth} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} (min={CmdLineParamsApp.ArgSpacesForTabMin})", MxMsgs.MxErrBadMethodParam);
+            if ((editAreaLinesCount == Program.PosIntegerNotSet) || (editAreaLineWidth == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgEditTabSizeMin))
+                rc.SetError(1050101, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount}, editAreaLineWidth={editAreaLineWidth} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} (min={CmdLineParamsApp.ArgEditTabSizeMin})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -110,7 +110,7 @@ namespace KLineEdCmdApp.Model
                             }
                             if (rcDone.IsSuccess(true))
                              {
-                                ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgPauseWaitSecsDefault); //todo set from value
+                                ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgEditPauseWaitSecsDefault); //todo set from value
                                 Ready = true;
                                 rc.SetResult(true);
                             }

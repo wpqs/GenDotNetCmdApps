@@ -52,78 +52,78 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--help", cmdLineParams.HelpHint);
         }
 
-        [Fact]
-        public void TestResetColoursParam()
-        {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "colours"}); 
+        //[Fact]
+        //public void TestResetColoursParam()
+        //{
+        //    var cmdLineParams = new CmdLineParamsApp();
+        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "colours"}); 
 
-            Assert.True(rcParam.GetResult());
-            Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        }
+        //    Assert.True(rcParam.GetResult());
+        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
+        //}
 
-        [Fact]
-        public void TestResetFactoryParam()
-        {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults" }); 
+        //[Fact]
+        //public void TestResetFactoryParam()
+        //{
+        //    var cmdLineParams = new CmdLineParamsApp();
+        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults" }); 
 
-            Assert.True(rcParam.GetResult());
-            Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        }
+        //    Assert.True(rcParam.GetResult());
+        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
+        //}
 
-        [Fact]
-        public void TestResetFactoryParamWithSettingsParam()
-        {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json" });
+        //[Fact]
+        //public void TestResetFactoryParamWithSettingsParam()
+        //{
+        //    var cmdLineParams = new CmdLineParamsApp();
+        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json" });
 
-            Assert.True(rcParam.GetResult());
-            Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        }
+        //    Assert.True(rcParam.GetResult());
+        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
+        //}
 
-        [Fact]
-        public void TestResetFactoryParamWithSettingsUpdateParams()
-        {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json", "update" });
+        //[Fact]
+        //public void TestResetFactoryParamWithSettingsUpdateParams()
+        //{
+        //    var cmdLineParams = new CmdLineParamsApp();
+        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json", "update" });
 
-            Assert.True(rcParam.GetResult());
-            Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        }
+        //    Assert.True(rcParam.GetResult());
+        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
+        //}
 
-        [Fact]
-        public void TestResetParamNoArg()
-        {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--reset" });
+        //[Fact]
+        //public void TestResetParamNoArg()
+        //{
+        //    var cmdLineParams = new CmdLineParamsApp();
+        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset" });
 
-            Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
-        }
+        //    Assert.False(rcParam.GetResult());
+        //    Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
+        //    Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
+        //}
 
-        [Fact]
-        public void TestResetParamUnknownArg()
-        {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "test" });
+        //[Fact]
+        //public void TestResetParamUnknownArg()
+        //{
+        //    var cmdLineParams = new CmdLineParamsApp();
+        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "test" });
 
-            Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1020602-user: parameter --reset has invalid argument; found test should be [colours | factory-defaults]", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
-        }
+        //    Assert.False(rcParam.GetResult());
+        //    Assert.StartsWith("error 1020602-user: parameter --reset has invalid argument; found test should be [colours | factory-defaults]", rcParam.GetErrorUserMsg());
+        //    Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
+        //}
 
-        [Fact]
-        public void TestResetParamExtraArg()
-        {
-            var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "KLineEdApp.json", "update", "extra" });
+        //[Fact]
+        //public void TestResetParamExtraArg()
+        //{
+        //    var cmdLineParams = new CmdLineParamsApp();
+        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "KLineEdApp.json", "update", "extra" });
 
-            Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 4", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
-        }
+        //    Assert.False(rcParam.GetResult());
+        //    Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 4", rcParam.GetErrorUserMsg());
+        //    Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
+        //}
 
         [Fact]
         public void TestExportParam()

@@ -4,13 +4,13 @@ Settings.txt
 The priorty of settings is:
 
 	1) those found in KLineEdCmdApp.json located in working directory. This is the global settings file and is created if not found 
-	2) those found in the file specificed by --settings. It is created if not found and initialised by settings given in the command line 
+	2) implemented in v1.0.46.0: those found in the file specificed by --settings. It is a subset of KLineEdCmdApp.json and created if not found and initialised by settings given in the command line 
 	3) any given on the command line override those in settings files
 
 Command Line Examples
 ---------------------
 
-
+--edit mytest.ksx --displaycols 80 --settings KLineEdCmdApp.json update  //edit mytest.ksx and update displaycols setting in  KLineEdCmdApp.json 
 
 
 Settings File
@@ -70,44 +70,51 @@ Additional options for edit parameter
   --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
   --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)//- was  ParamForeGndColour
   --rulers display [on | off] unit '.'
-  --audiovol 0  <min 1 max 10>								//(0 is off)
+  --audiovol 0  <min 0 max 10>								//(0 is off)
 
 	Editor display options page
 
   --cursorsize 20 <min 1 max 100>
   --displaycols 80 <min 20 max 250>							//was DisplayLineWidth, now EditAreaLineWidth
   --displayrows 10 <min 1 max 25>                           //was displaylastlines, now EditAreaLinesCount
-  --scrollback 0  <min 1 max 10000>							//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
+  --scrollback 0  <min 0 max 10000>							//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
   --parabreak char='>'
 
 	Editor typing options page
 
   --typingpause 60 <min 5 max 36000>						//in seconds
   --autosave [CR | ParaBreak | off]							//was ParamSpellCheckMode, spellcheck
-  --editback  0  <min 1 max 10000>							//(0 is unlimited) - was editline (min current line) ParamEditLineMode
+  --editback  0  <min 0 max 10000>							//(0 is unlimited) - was editline (min current line) ParamEditLineMode
   --tabsize 3 <min 1 max 25>
 
 	Tools options page
 
-  --browser 'explorer.exe' - was ParamBrowser
-  --helplookup url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0
-  --searchlookup url https://www.google.com/ arg 'search/{word}'
-  --thesauruslookup url https://www.thesaurus.com/ arg '/browse/{word}'
-  --spelllookup ulr https://www.spell.com arg 'search/{word}'
+  --browser exe 'explorer.exe'								//was ParamBrowser
+  --lookuphelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0
+  --lookupsearch url https://www.google.com/ arg 'search/{word}'
+  --lookupthesaurus url https://www.thesaurus.com/ arg '/browse/{word}'
+  --lookupspell ulr https://www.spell.com arg 'search/{word}'
   --autocorrect [on | off] 
-  --svn username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
+  --svn username 'wills' password [secret manager key] url 'https//me.svnrepository.com/books'
 
 Implemented v1.2
 
   --updatedict 'drive:path\dictionary.qqq' (--settings 'drive:path\xxx.json')		//updates dictionary and ver setting - determines Ctrl+K list - see  
 
-
 Settings that cannot be set from command line
 ---------------------------------------------
 
-  --audiofile (cr 'drive:path\bell.mpeg')  (key 'drive:path\click.mpeg') (startup 'drive:path\insertpaper.mpeg') (end 'drive:path\removepaper.mpeg') 
-  --reporterror [on | off] //allows disabling of MxReturnCode reporting to Azure. 
-  --dictionary 'drive:path/dictionary.qqq' ver 1.1 ulr 'https//me.svnrepository.com/dict'
+  AudioFileKeyPress		//'drive:path\click.mpeg'
+  AudioFileCr			//'drive:path\bell.mpeg'
+  AudioFileStartup	    //'drive:path\insertpaper.mpeg'
+  AudioFileEnd			//'drive:path\removepaper.mpeg'
+
+  ReportError			//true | false
+
+  DictionaryFile		//'drive:path/dictionary.qqq'
+  DictionaryUrl			//https//me.svnrepository.com/dict
+  DictionaryVersion     //v1.2
+
 
 [end]
 

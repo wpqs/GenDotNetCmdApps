@@ -77,7 +77,7 @@ namespace KLineEdCmdApp.Model
             if (pathFilename != null)
             {
                 Error = true;
-                SetMaxPropertyLength(CmdLineParamsApp.ArgEditAreaLineWidthDefault);
+                SetMaxPropertyLength(CmdLineParamsApp.ArgEditDisplayColsDefault);
                 if (SetAuthor("[author not set]") && SetProject("[project not set]") && SetTitle("[title not set]") && SetPathFileName(pathFilename))
                     rc = !Error;
             }

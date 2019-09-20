@@ -75,7 +75,7 @@ namespace KLineEdCmdApp
             Height = Program.PosIntegerNotSet;
             EditAreaLineWidth = Program.PosIntegerNotSet;
             Report = Program.ValueNotSet;
-            BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
+            BrowserExe = CmdLineParamsApp.ArgEditBrowserNameDefault;
             Ready = false;
 
 
