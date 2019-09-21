@@ -266,9 +266,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.False(body.IsError());
 
             Assert.False(body.SplitLongLine(0, 0, -1, out var updatedCursorIndex).GetResult());
-            Assert.False(body.SplitLongLine(0, -1, CmdLineParamsApp.ArgEditDisplayColsMin - 1, out updatedCursorIndex).GetResult());
-            Assert.False(body.SplitLongLine(-1, 0, CmdLineParamsApp.ArgEditDisplayColsMin - 1, out updatedCursorIndex).GetResult());
-            Assert.False(body.SplitLongLine(1, 0, CmdLineParamsApp.ArgEditDisplayColsMin - 1, out updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(0, -1, CmdLineParamsApp.ArgTextEditorDisplayColsMin - 1, out updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(-1, 0, CmdLineParamsApp.ArgTextEditorDisplayColsMin - 1, out updatedCursorIndex).GetResult());
+            Assert.False(body.SplitLongLine(1, 0, CmdLineParamsApp.ArgTextEditorDisplayColsMin - 1, out updatedCursorIndex).GetResult());
 
             Assert.Equal(-1, updatedCursorIndex);
         }
@@ -545,11 +545,11 @@ namespace KLineEdCmdAppTest.ModelTests
 
             Assert.False(body.FillShortLine(0, 0, -1, out var updatedCursorColIndex).GetResult());
             Assert.Equal(-1, updatedCursorColIndex);
-            Assert.False(body.FillShortLine(0, -1, CmdLineParamsApp.ArgEditDisplayColsMin - 1, out updatedCursorColIndex).GetResult());
+            Assert.False(body.FillShortLine(0, -1, CmdLineParamsApp.ArgTextEditorDisplayColsMin - 1, out updatedCursorColIndex).GetResult());
             Assert.Equal(-1, updatedCursorColIndex);
-            Assert.False(body.FillShortLine(-1, 0, CmdLineParamsApp.ArgEditDisplayColsMin - 1, out updatedCursorColIndex).GetResult());
+            Assert.False(body.FillShortLine(-1, 0, CmdLineParamsApp.ArgTextEditorDisplayColsMin - 1, out updatedCursorColIndex).GetResult());
             Assert.Equal(-1, updatedCursorColIndex);
-            Assert.False(body.FillShortLine(1, 0, CmdLineParamsApp.ArgEditDisplayColsMin - 1, out updatedCursorColIndex).GetResult());
+            Assert.False(body.FillShortLine(1, 0, CmdLineParamsApp.ArgTextEditorDisplayColsMin - 1, out updatedCursorColIndex).GetResult());
             Assert.Equal(-1, updatedCursorColIndex);
 
         }

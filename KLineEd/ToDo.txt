@@ -86,15 +86,17 @@ Development work v1.0.47.0
 2. Implement Abort - exit without saving unsaved changes
 	ModalDlgView - abort y/n?
 
-3. Implement Undo (Ctrl+Z)
+3. Implement Find, Replace
 
-4. Implement two line error messages
+4. Implement Undo (Ctrl+Z)
 
-5. Improve warning messages - use of modal dialog, better separation of data and user errors
+5. Implement two line error messages
 
-6. Improve unit testing and full test
+6. Improve warning messages - use of modal dialog, better separation of data and user errors
 
-7. Create Windows/iOS Installer - Wix
+7. Improve unit testing and full test
+
+8. Create Windows/iOS Installer - Wix
 
 Release work v1.1 (first major release)
 --------------------------------------

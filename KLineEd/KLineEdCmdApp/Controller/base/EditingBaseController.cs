@@ -27,7 +27,7 @@ namespace KLineEdCmdApp.Controller.Base
             _mxErrorCode = new MxReturnCode<bool>($"{GetType().Name}.Ctor", false); //SetResult(true) on error
             Chapter = null;
             _insertMode = false;
-            BrowserExe = CmdLineParamsApp.ArgEditBrowserNameDefault;
+            BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
         }
 
         public bool IsInsertMode() { return _insertMode; }

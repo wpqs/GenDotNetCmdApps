@@ -49,7 +49,8 @@ Settings Documentation Format
 Settings that can be set from command line
 ------------------------------------------
 
-   {word} is the word currently selected by the cursor 
+   {word} is the word currently selected by the cursor
+   {version} is the current help documentation version (typically the app version major.minor)
    COLOUR is any of the defined colour words; black, 
    > is any displayable character
    . is any displayable character
@@ -66,35 +67,35 @@ Additional options for edit parameter
 
 	General options page
 
-  --settings 'drive:path\xxx.json' (update)					//see Settings File - update saves setting changes in specified file
+  --settings display yes (file 'drive:path\xxx.json' (update yes))	//update saves setting changes in specified file
   --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
   --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)//- was  ParamForeGndColour
-  --rulers display [on | off] unit '.'
   --audiovol 0  <min 0 max 10>								//(0 is off)
 
-	Editor display options page
+	Text Editor Display options page
 
+  --rulers show [yes | no] UnitChar '.'
   --cursorsize 20 <min 1 max 100>
-  --displaycols 80 <min 20 max 250>							//was DisplayLineWidth, now EditAreaLineWidth
   --displayrows 10 <min 1 max 25>                           //was displaylastlines, now EditAreaLinesCount
-  --scrollback 0  <min 0 max 10000>							//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
-  --parabreak char='>'
+  --displaycols 80 <min 20 max 250>							//was DisplayLineWidth, now EditAreaLineWidth
+  --parabreak DisplayChar '>'
 
-	Editor typing options page
+	Text Editor Typing options page
 
   --typingpause 60 <min 5 max 36000>						//in seconds
-  --autosave [CR | ParaBreak | off]							//was ParamSpellCheckMode, spellcheck
-  --editback  0  <min 0 max 10000>							//(0 is unlimited) - was editline (min current line) ParamEditLineMode
+  --scrolllimit 0  <min 0 max 10000>						//number of lines you can scroll back from end of chapter (0 is unlimited) - was scrollreview, ParamScrollReviewMode
+  --editlimit  0  <min 0 max 10000>							//number of lines that can be edited from end of chapter (0 is unlimited) - was editline (min current line) ParamEditLineMode
   --tabsize 3 <min 1 max 25>
+  --autosave [CR | ParaBreak | off]							//was ParamSpellCheckMode, spellcheck
+  --autocorrect [on | off] 
 
 	Tools options page
 
   --browser exe 'explorer.exe'								//was ParamBrowser
-  --lookuphelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0
-  --lookupsearch url https://www.google.com/ arg 'search/{word}'
-  --lookupthesaurus url https://www.thesaurus.com/ arg '/browse/{word}'
-  --lookupspell ulr https://www.spell.com arg 'search/{word}'
-  --autocorrect [on | off] 
+  --browserhelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual arg '{version}
+  --browsersearch url https://www.google.com/ arg 'search/{word}'
+  --browserthesaurus url https://www.thesaurus.com/ arg '/browse/{word}'
+  --browserspell ulr https://www.spell.com arg 'search/{word}'
   --svn username 'wills' password [secret manager key] url 'https//me.svnrepository.com/books'
 
 Implemented v1.2
@@ -109,7 +110,7 @@ Settings that cannot be set from command line
   AudioFileStartup	    //'drive:path\insertpaper.mpeg'
   AudioFileEnd			//'drive:path\removepaper.mpeg'
 
-  ReportError			//true | false
+  ReportMxErrors		//true | false
 
   DictionaryFile		//'drive:path/dictionary.qqq'
   DictionaryUrl			//https//me.svnrepository.com/dict

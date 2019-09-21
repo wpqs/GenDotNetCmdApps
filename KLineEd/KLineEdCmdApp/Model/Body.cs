@@ -84,12 +84,12 @@ namespace KLineEdCmdApp.Model
             TextLines = new List<string>();
 
             Cursor = new CursorPosition(0, 0);
-            EditAreaViewCursorLimit = new CursorPosition(CmdLineParamsApp.ArgEditDisplayRowsDefault, CmdLineParamsApp.ArgEditDisplayColsDefault); //updated by Model.Initialise
+            EditAreaViewCursorLimit = new CursorPosition(CmdLineParamsApp.ArgTextEditorDisplayRowsDefault, CmdLineParamsApp.ArgTextEditorDisplayColsDefault); //updated by Model.Initialise
             EditAreaTopLineChapterIndex = Program.PosIntegerNotSet;
 
             WordCount = Program.PosIntegerNotSet;
-            SetTabSpaces(CmdLineParamsApp.ArgEditTabSizeDefault);
-            ParaBreakDisplayChar = CmdLineParamsApp.ArgEditParaBreakDisplayCharDefault;
+            SetTabSpaces(CmdLineParamsApp.ArgTextEditorTabSizeDefault);
+            ParaBreakDisplayChar = CmdLineParamsApp.ArgTextEditorParaBreakDisplayCharDefault;
 
             Error = true;
         }
@@ -110,12 +110,12 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgEditTabSizeDefault, char paraBreakDisplayChar = CmdLineParamsApp.ArgEditParaBreakDisplayCharDefault)
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorParaBreakDisplayCharDefault)
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgEditTabSizeMin) || (paraBreakDisplayChar == NullChar))
-                rc.SetError(1100201, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount} not set, editAreaLineWidth={editAreaLineWidth} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgEditTabSizeMin}, paraBreak is 0", MxMsgs.MxErrBadMethodParam);
+            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (paraBreakDisplayChar == NullChar))
+                rc.SetError(1100201, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount} not set, editAreaLineWidth={editAreaLineWidth} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgTextEditorTabSizeMin}, paraBreak is 0", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if ((TextLines == null) || (Cursor == null) || (EditAreaViewCursorLimit == null))
@@ -844,7 +844,7 @@ namespace KLineEdCmdApp.Model
             updatedCursorColIndex = Program.PosIntegerNotSet;
 
             var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((TextLines == null) || (maxColIndex < CmdLineParamsApp.ArgEditDisplayColsMin) || (rowIndex < 0) || (rowIndex >= lineCount) || (colIndex < 0))
+            if ((TextLines == null) || (maxColIndex < CmdLineParamsApp.ArgTextEditorDisplayColsMin) || (rowIndex < 0) || (rowIndex >= lineCount) || (colIndex < 0))
                 rc.SetError(1101601, MxError.Source.Param, $"rowIndex={rowIndex}; colIndex={colIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -1016,8 +1016,8 @@ namespace KLineEdCmdApp.Model
                 rc = $"{lineNoText}unexpected text (null). This is a program error. Please save your work and restart the program.";
             else
             {
-                if (text.Length > CmdLineParamsApp.ArgEditDisplayColsMax)
-                    rc = $"{lineNoText}attempt to enter {text.Length} characters, but only {CmdLineParamsApp.ArgEditDisplayColsMax} allowed.";
+                if (text.Length > CmdLineParamsApp.ArgTextEditorDisplayColsMax)
+                    rc = $"{lineNoText}attempt to enter {text.Length} characters, but only {CmdLineParamsApp.ArgTextEditorDisplayColsMax} allowed.";
                 else
                 {
                     var index = text.IndexOf(Environment.NewLine, StringComparison.Ordinal);
@@ -1194,8 +1194,8 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.InsertLine");
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(line)) || (line.Length - 1 > CmdLineParamsApp.ArgEditDisplayColsMax))
-                rc.SetError(1103001, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than { CmdLineParamsApp.ArgEditDisplayColsMax}");
+            if ((string.IsNullOrEmpty(line)) || (line.Length - 1 > CmdLineParamsApp.ArgTextEditorDisplayColsMax))
+                rc.SetError(1103001, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than { CmdLineParamsApp.ArgTextEditorDisplayColsMax}");
             else
             {
                 if (IsError() || (linesCount == Program.PosIntegerNotSet))

@@ -13,7 +13,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var body = new Body();
             Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
-            Assert.NotNull(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgEditDisplayRowsDefault).GetResult());
+            Assert.NotNull(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgTextEditorDisplayRowsDefault).GetResult());
         }
 
         [Fact]
@@ -21,7 +21,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var body = new Body();
             Assert.True(body.IsError());
-            Assert.Null(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgEditDisplayRowsDefault).GetResult());
+            Assert.Null(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgTextEditorDisplayRowsDefault).GetResult());
         }
 
         [Fact]
@@ -42,7 +42,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetLastLinesMaxTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(CmdLineParamsApp.ArgEditDisplayRowsMax, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(CmdLineParamsApp.ArgTextEditorDisplayRowsMax, TestConst.UnitTestEditAreaWidth).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -50,8 +50,8 @@ namespace KLineEdCmdAppTest.ModelTests
             body.SetTestLine("two");
             Assert.Equal(2, body.GetLineCount());
 
-            Assert.Equal("one", body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgEditDisplayRowsMax).GetResult()[0]);
-            Assert.Equal("two", body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgEditDisplayRowsMax).GetResult()[1]);
+            Assert.Equal("one", body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgTextEditorDisplayRowsMax).GetResult()[0]);
+            Assert.Equal("two", body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgTextEditorDisplayRowsMax).GetResult()[1]);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace KLineEdCmdAppTest.ModelTests
             body.SetTestLine("one");
             body.SetTestLine("two");
             Assert.Equal(2, body.GetLineCount());
-            Assert.Null(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgEditDisplayRowsMax + 1).GetResult());
+            Assert.Null(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgTextEditorDisplayRowsMax + 1).GetResult());
         }
 
         [Fact]
