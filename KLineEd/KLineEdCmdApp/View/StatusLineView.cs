@@ -35,8 +35,8 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    StatusLineForeGndColour = param.ForeGndDetailsColour; //todo rename param.StatusLineForeGndColour    
-                    StatusLineBackGndColour = param.BackGndDetailsColour; //todo rename param.StatusLineBackGndColour 
+                    StatusLineForeGndColour = param.ForeGndColourMsgError; //todo rename param.StatusLineForeGndColour    
+                    StatusLineBackGndColour = param.BackGndColourMsgError; //todo rename param.StatusLineBackGndColour 
                     StatusLineRow = WindowHeight - KLineEditor.StatusLineRowCount - 1;
 
                     if (Terminal.SetColour(StatusLineForeGndColour, StatusLineBackGndColour) == false)

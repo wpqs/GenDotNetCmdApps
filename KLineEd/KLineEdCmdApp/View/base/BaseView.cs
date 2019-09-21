@@ -117,11 +117,11 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
-                EditAreaWidth = param.EditAreaLineWidth;                    //todo rename param.DisplayLineWidth 
-                EditAreaHeight = param.EditAreaLinesCount;                //todo rename param.DisplayLastLinesCnt  
+                EditAreaWidth = param.TextEditorDisplayCols;                    //todo rename param.DisplayLineWidth 
+                EditAreaHeight = param.TextEditorDisplayRows;                //todo rename param.DisplayLastLinesCnt  
 
-                //MsgLineErrorForeGndColour = param.ForeGndSpellColour;     //todo rename param.MsgLineErrorForeGndColour   
-                //MsgLineErrorBackGndColour = param.BackGndSpellColour;     //todo rename param.MsgLineErrorForeGndColour 
+                //MsgLineErrorForeGndColour = param.ForeGndColourStatus;     //todo rename param.MsgLineErrorForeGndColour   
+                //MsgLineErrorBackGndColour = param.BackGndColourStatus;     //todo rename param.MsgLineErrorForeGndColour 
                 //MsgLineWarnForeGndColour = ConsoleColor.Yellow;           //todo add param.MsgLineWarnForeGndColour
                 //MsgLineWarnBackGndColour = ConsoleColor.Black;            //todo add param.MsgLineWarnBackGndColour
                 //MsgLineInfoForeGndColour = ConsoleColor.Gray;             //todo add param.MsgLineInfoForeGndColour
@@ -131,7 +131,7 @@ namespace KLineEdCmdApp.View.Base
                 WindowWidth = KLineEditor.EditAreaMarginLeft + EditAreaWidth + KLineEditor.EditAreaMarginRight;
 
                 if ((WindowWidth < KLineEditor.MinWindowWidth) || (WindowWidth > KLineEditor.MaxWindowWidth) || (WindowHeight > KLineEditor.MaxWindowHeight) || (WindowHeight < KLineEditor.MinWindowHeight))
-                    rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.EditAreaLineWidth} (min={KLineEditor.MinWindowWidth}, max={KLineEditor.MaxWindowWidth}), param.DisplayLastLinesCnt{param.EditAreaLinesCount} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", MxMsgs.MxErrInvalidSettingsFile);
+                    rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.TextEditorDisplayCols} (min={KLineEditor.MinWindowWidth}, max={KLineEditor.MaxWindowWidth}), param.DisplayLastLinesCnt{param.TextEditorDisplayRows} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", MxMsgs.MxErrInvalidSettingsFile);
                 else
                 {
                     //BlankLine = "0";  //see also EditAreaView.ClearEditAreaText()

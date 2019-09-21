@@ -40,11 +40,11 @@ namespace KLineEdCmdApp.View.Base
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {       //todo apply ResetResult()
-                    TextForeGndColour = ConsoleColor.Green; // param.ForeGndTextColour; //todo rename param.EditAreaForeGndColour  
-                    TextBackGndColour = ConsoleColor.Black; // param.BackGndTextColour; //todo rename param.EditAreaBackGndColour 
+                    TextForeGndColour = ConsoleColor.Green; // param.ForeGndColourText; //todo rename param.EditAreaForeGndColour  
+                    TextBackGndColour = ConsoleColor.Black; // param.BackGndColourText; //todo rename param.EditAreaBackGndColour 
 
-                    RuleForeGndColour = ConsoleColor.DarkGreen; // param.ForeGndTextColour; //todo rename param.RuleForeGndColour  
-                    RuleBackGndColour = ConsoleColor.Black; // param.BackGndTextColour; //todo rename param.RuleBackGndColour 
+                    RuleForeGndColour = ConsoleColor.DarkGreen; // param.ForeGndColourText; //todo rename param.RuleForeGndColour  
+                    RuleBackGndColour = ConsoleColor.Black; // param.BackGndColourText; //todo rename param.RuleBackGndColour 
                     DisplayRulers = true;  //param.EditAreaRulersDisplay;
 
                     if (SetRulers(EditAreaWidth-1))

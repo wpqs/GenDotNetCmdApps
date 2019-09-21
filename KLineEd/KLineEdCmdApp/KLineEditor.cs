@@ -144,9 +144,9 @@ namespace KLineEdCmdApp
                 try
                 {
                     //BrowserExe = param.BrowserExe;
-                    EditAreaLineWidth = param.EditAreaLineWidth;
+                    EditAreaLineWidth = param.TextEditorDisplayCols;
                     Width = EditAreaMarginLeft + EditAreaLineWidth + EditAreaMarginRight;  //there is actually an additional column used by cursor when at end of line
-                    Height = HelpLineRowCount +  EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + param.EditAreaLinesCount + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount;
+                    Height = HelpLineRowCount +  EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + param.TextEditorDisplayRows + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount;
 
                     var settings = new TerminalProperties
                     {

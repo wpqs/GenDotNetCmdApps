@@ -40,6 +40,7 @@ Development work v1.0.44.0
 --------------------------
 
 1. Refactor Application structure
+    - resolve const / readonly issue
 	- Rename KLineEdCmdApp Project, KLineEditor.cs and KLineEdCmdApp.json to KScribeCmdApp, KScribeEditor.cs, KScribe.json
 	- Rename KLineEdCmdAppTest to KScribeCmdAppTest (KLineEditorTests) 
 	- Create KScribeLib Class Library 
@@ -56,9 +57,11 @@ Development work v1.0.45.0
 
 2. Add to KScribeCmdApp UIElements.cs
 	- text box
+    - button 
 	- radio button selection
 	- check box selection
 	- drop down list selection
+	- tab, arrow moves focus (enter acts)
 
 3. Test UIElements.cs
     - Unit test

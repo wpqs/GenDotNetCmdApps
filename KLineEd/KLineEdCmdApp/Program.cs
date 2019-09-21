@@ -26,6 +26,7 @@ namespace KLineEdCmdApp
         public const string ValueNotSet = "[not set]";
         public const string ValueOverflow = "...";
         public const string MxNoError = "[no error]";
+        public const char NullChar = (char)0;
 
         public static readonly string CmdAppVersion = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? Program.ValueNotSet;
         public static readonly string CmdAppName = typeof(Program).GetTypeInfo()?.Assembly?.GetName().Name ?? Program.ValueNotSet;
@@ -65,10 +66,6 @@ namespace KLineEdCmdApp
                     else  if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Edit)
                     {
                         rcOp = EditProcessing(cmdLineParams: cmdLineParams, terminal);
-                    }
-                    else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Reset)
-                    {
-                        rcOp = ResetProcessing(cmdLineParams: cmdLineParams, terminal);
                     }
                     else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Export)
                     {
@@ -138,7 +135,7 @@ namespace KLineEdCmdApp
                     terminal.WriteLine($"{Environment.NewLine}Opening file: {cmdLineParams?.EditFile ?? ValueNotSet}");
 
                     var editModel = new ChapterModel();
-                    var rcInitModel = editModel.Initialise(cmdLineParams.EditAreaLinesCount, cmdLineParams.EditAreaLineWidth, cmdLineParams.EditFile); //todo CmdLineParams.SpacesForTab, CmdLineParamsParaBreakChar;
+                    var rcInitModel = editModel.Initialise(cmdLineParams.TextEditorDisplayRows, cmdLineParams.TextEditorDisplayCols, cmdLineParams.EditFile); //todo CmdLineParams.SpacesForTab, CmdLineParamsParaBreakChar;
                     rc += rcInitModel;
                     if (rcInitModel.IsSuccess(true))
                     {
@@ -195,41 +192,12 @@ namespace KLineEdCmdApp
         }
 
 
-        private static MxReturnCode<string> ResetProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
-        {
-            var rc = new MxReturnCode<string>("Program.ResetProcessing");
-
-            try
-            {
-                if (cmdLineParams.UpdateSettings != CmdLineParamsApp.BoolValue.Yes)
-                    rc.SetError(1010401, MxError.Source.Program, $"{CmdLineParamsApp.ArgSettingsUpdate} not set", MxMsgs.MxErrInvalidParamArg);
-                else
-                {
-                    terminal.WriteLine($"resetting {EnumOps.XlatToString(cmdLineParams.ResetType)} in '{cmdLineParams.SettingsFile}'...");
-                    var rcReset = cmdLineParams.ResetProperties(cmdLineParams.ResetType); //writes to settingsfile
-                    rc += rcReset;
-                    if (rcReset.IsError(true))
-                        cmdLineParams.HelpHint = "";
-                    else
-                    {
-                        cmdLineParams.HelpHint = "";
-                        rc.SetResult("succeeded");
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                rc.SetError(1010402, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
-            }
-            return rc;
-        }
-
         private static MxReturnCode<string> ExportProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
         {
             var rc = new MxReturnCode<string>("Program.ExportProcessing");
 
-            if ((cmdLineParams.EditFile == null) || (cmdLineParams.ExportFile == null))
-                rc.SetError(1010501, MxError.Source.Program, $"EditFile={cmdLineParams.EditFile ?? "[null]"}, ExportFile={cmdLineParams.ExportFile ?? "[null]"}", MxMsgs.MxErrInvalidParamArg);
+            if ((cmdLineParams.EditFile == null) || (cmdLineParams.ExportOutputFile == null))
+                rc.SetError(1010501, MxError.Source.Program, $"EditFile={cmdLineParams.EditFile ?? "[null]"}, ExportOutputFile={cmdLineParams.ExportOutputFile ?? "[null]"}", MxMsgs.MxErrInvalidParamArg);
             else
             {
                 try
@@ -238,14 +206,14 @@ namespace KLineEdCmdApp
                         rc.SetError(1010502, MxError.Source.User, $"EditFile={cmdLineParams.EditFile ?? "[null]"} not found");
                     else
                     {
-                        var folder = Path.GetDirectoryName(cmdLineParams.ExportFile);
+                        var folder = Path.GetDirectoryName(cmdLineParams.ExportOutputFile);
                         if ((String.IsNullOrEmpty(folder) == false) && (Directory.Exists(folder) == false))
-                            rc.SetError(1010503, MxError.Source.User, $"folder for output file {cmdLineParams.ExportFile} does not exist. Create folder and try again.");
+                            rc.SetError(1010503, MxError.Source.User, $"folder for output file {cmdLineParams.ExportOutputFile} does not exist. Create folder and try again.");
                         else
                         {
-                            terminal.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportFile}...");
+                            terminal.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportOutputFile}...");
                             //process editfile to remove all metadata - see EditFileOps class
-                            File.Copy(cmdLineParams.EditFile, cmdLineParams.ExportFile, true);
+                            File.Copy(cmdLineParams.EditFile, cmdLineParams.ExportOutputFile, true);
                             cmdLineParams.HelpHint = "";
                             rc.SetResult("succeeded");
                         }

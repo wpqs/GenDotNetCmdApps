@@ -35,8 +35,8 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    EditorHelpLineForeGndColour = ConsoleColor.Blue;// param.ForeGndCmdsColour; //todo rename ForeGndCmdsHelpColour
-                    EditorHelpLineBackGndColour = ConsoleColor.Black;// param.BackGndCmdsColour; //todo rename BackGndCmdsHelpColour
+                    EditorHelpLineForeGndColour = ConsoleColor.Blue;// param.ForeGndColourCmds; //todo rename ForeGndCmdsHelpColour
+                    EditorHelpLineBackGndColour = ConsoleColor.Black;// param.BackGndColourCmds; //todo rename BackGndCmdsHelpColour
 
                     if (Terminal.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
                         rc.SetError(1120102, Terminal.GetErrorSource(), $"EditHelpLineView. {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());

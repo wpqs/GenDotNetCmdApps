@@ -51,11 +51,16 @@ Settings that can be set from command line
 
    {word} is the word currently selected by the cursor
    {version} is the current help documentation version (typically the app version major.minor)
-   COLOUR is any of the defined colour words; black, 
+   COLOUR is any of the defined colour words; ArgBlack = "black"; ArgBlue = "blue"; ArgCyan = "cyan"; ArgDarkBlue = "darkblue"; 
+        ArgDarkCyan = "darkcyan"; ArgDarkGray = "darkgray"; ArgDarkGreen = "darkgreen"; ArgDarkMagenta = "darkmagenta"; 
+		ArgDarkRed = "darkred"; ArgDarkYellow = "darkyellow"; ArgGray = "gray"; ArgGreen = "green"; ArgMagenta = "magenta"; 
+		ArgRed = "red"; ArgWhite = "white"; ArgYellow = "yellow"; 
    > is any displayable character
    . is any displayable character
    drive:path\ is any valid full path
    [secret manager key] lookup value in secret manager using key value
+
+Main operations 
 
 --help														//display help info
 --export 'drive:path\edit'.ksx 'drive:path\export.txt'		//export edit.ksx to export.txt
@@ -63,11 +68,11 @@ Settings that can be set from command line
 --fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx
 --edit 'drive:path\edit.ksx'								//edit specified .ksx file
  
-Additional options for edit parameter
+Additional options for edit operation (--edit)
 
 	General options page
 
-  --settings display yes (file 'drive:path\xxx.json' (update yes))	//update saves setting changes in specified file
+  --settings display [yes |no] (file 'drive:path\xxx.json' (update [yes | no]))	//update saves setting changes in specified file
   --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
   --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)//- was  ParamForeGndColour
   --audiovol 0  <min 0 max 10>								//(0 is off)
