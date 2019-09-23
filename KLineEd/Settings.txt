@@ -50,7 +50,7 @@ Settings that can be set from command line
 ------------------------------------------
 
    {word} is the word currently selected by the cursor
-   {version} is the current help documentation version (typically the app version major.minor)
+   {HelpVer} is the current help documentation version (typically the app version major.minor)
    COLOUR is any of the defined colour words; ArgBlack = "black"; ArgBlue = "blue"; ArgCyan = "cyan"; ArgDarkBlue = "darkblue"; 
         ArgDarkCyan = "darkcyan"; ArgDarkGray = "darkgray"; ArgDarkGreen = "darkgreen"; ArgDarkMagenta = "darkmagenta"; 
 		ArgDarkRed = "darkred"; ArgDarkYellow = "darkyellow"; ArgGray = "gray"; ArgGreen = "green"; ArgMagenta = "magenta"; 
@@ -63,9 +63,8 @@ Settings that can be set from command line
 Main operations 
 
 --help														//display help info
---export 'drive:path\edit'.ksx 'drive:path\export.txt'		//export edit.ksx to export.txt
+--export 'drive:path\edit'.ksx 'drive:path\export.txt'		//export edit.ksx to export.txt 
 --import 'drive:path\import.txt' 'drive:path\edit.ksx'		//import import.txt to edit.ksx
---fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx
 --edit 'drive:path\edit.ksx'								//edit specified .ksx file
  
 Additional options for edit operation (--edit)
@@ -73,35 +72,29 @@ Additional options for edit operation (--edit)
 	General options page
 
   --settings display [yes |no] (file 'drive:path\xxx.json' (update [yes | no]))	//update saves setting changes in specified file
-  --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
-  --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)//- was  ParamForeGndColour
-  --audiovol 0  <min 0 max 10>								//(0 is off)
+  --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-info COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
+  --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-info COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)//- was  ParamForeGndColour
+  --audio vol 0  <min 0 max 10>								//(0 is off)
 
-	Text Editor Display options page
+	Text Editor options page
 
   --rulers show [yes | no] UnitChar '.'
-  --cursorsize 20 <min 1 max 100>
-  --displayrows 10 <min 1 max 25>                           //was displaylastlines, now EditAreaLinesCount
-  --displaycols 80 <min 20 max 250>							//was DisplayLineWidth, now EditAreaLineWidth
-  --parabreak DisplayChar '>'
-
-	Text Editor Typing options page
-
-  --typingpause 60 <min 5 max 36000>						//in seconds
-  --scrolllimit 0  <min 0 max 10000>						//number of lines you can scroll back from end of chapter (0 is unlimited) - was scrollreview, ParamScrollReviewMode
-  --editlimit  0  <min 0 max 10000>							//number of lines that can be edited from end of chapter (0 is unlimited) - was editline (min current line) ParamEditLineMode
+  --cursor size 20 <min 1 max 100>
+  --display rows 10 <min 1 max 25> cols 80 <min 20 max 250> parabreak '>' //was displaylastlines, now EditAreaLinesCount was DisplayLineWidth, now EditAreaLineWidth
+  --limits scroll 0  <min 0 max 10000>	edit 0  <min 0 max 10000>		//number of lines you can scroll/edit back from end of chapter (0 is unlimited) - was scrollreview, ParamScrollReviewMode was editline (min current line) ParamEditLineMode
   --tabsize 3 <min 1 max 25>
+  --typingpause 60 <min 5 max 36000>									//in seconds
   --autosave [CR | ParaBreak | off]							//was ParamSpellCheckMode, spellcheck
   --autocorrect [on | off] 
 
 	Tools options page
 
-  --browser exe 'explorer.exe'								//was ParamBrowser
-  --browserhelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual arg '{version}
-  --browsersearch url https://www.google.com/ arg 'search/{word}'
-  --browserthesaurus url https://www.thesaurus.com/ arg '/browse/{word}'
-  --browserspell ulr https://www.spell.com arg 'search/{word}'
-  --svn username 'wills' password [secret manager key] url 'https//me.svnrepository.com/books'
+  --toolbrowser exe 'explorer.exe'								//was ParamBrowser
+  --toolhelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual arg '{HelpVer}
+  --toolsearch url https://www.google.com/ arg 'search/{word}'
+  --toolthesaurus url https://www.thesaurus.com/ arg '/browse/{word}'
+  --toolspell ulr https://www.spell.com arg 'search/{word}'
+  --toolsvn username 'wills' password [secret manager key] url 'https//me.svnrepository.com/books'
 
 Implemented v1.2
 
@@ -111,6 +104,7 @@ Settings that cannot be set from command line
 ---------------------------------------------
 
   AudioFileKeyPress		//'drive:path\click.mpeg'
+  AudioFileBackSpace	//'drive:path\bs.mpeg'
   AudioFileCr			//'drive:path\bell.mpeg'
   AudioFileStartup	    //'drive:path\insertpaper.mpeg'
   AudioFileEnd			//'drive:path\removepaper.mpeg'

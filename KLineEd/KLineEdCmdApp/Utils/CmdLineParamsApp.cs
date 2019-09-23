@@ -24,7 +24,9 @@ namespace KLineEdCmdApp.Utils
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
 
-    //when adding a new parameter:
+    //1. any change to Param consts value needs change to  enum Param
+
+    //2. when adding a new parameter:
     // a) define static readonly for i) name (SettingsParam) ii) args (SettingsArgUpdate) iii) default value(s)(SettingsArgUpdateValueDefault)
     // b) add properties for args (SettingsPathFileName, UpdateSettingsFile) 
     // c) update SetDefaultValues() SetFactoryDefaults() andUpdateProperties()
@@ -33,6 +35,7 @@ namespace KLineEdCmdApp.Utils
     // f) optionally update ValidateParams()
     // g) update GetParamHelp()
     // h) update unit tests
+
 
 
     public class CmdLineParamsApp : CmdLineParams
@@ -74,10 +77,9 @@ namespace KLineEdCmdApp.Utils
 
         //main operational parameters
         public static readonly string ParamHelp = "--help";
+        public static readonly string ParamEditFile = "--edit";     // filename.ksx 
         public static readonly string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
         public static readonly string ParamImportFile = "--import"; // exportfilename.txt editfilename.ksx
-        public static readonly string ParamFix = "--fix";           // editfilename.ksx fixed.txt 
-        public static readonly string ParamEditFile = "--edit";     // filename.ksx 
 
  //edit operational parameters - general
 
@@ -105,9 +107,9 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgBackGndColourMsgWarnDefault = ArgBlack;
             public static readonly string ArgForeGndColourMsgWarnDefault = ArgYellow;
 
-            public static readonly string ArgColourMsgNote = "msg-note";
-            public static readonly string ArgBackGndColourMsgNoteDefault = ArgBlack;
-            public static readonly string ArgForeGndColourMsgNoteDefault = ArgWhite;
+            public static readonly string ArgColourMsgInfo = "msg-info";
+            public static readonly string ArgBackGndColourMsgInfoDefault = ArgBlack;
+            public static readonly string ArgForeGndColourMsgInfoDefault = ArgWhite;
 
             public static readonly string ArgColourCmds = "cmds";
             public static readonly string ArgBackGndColourCmdsDefault = ArgBlack;
@@ -121,54 +123,57 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgBackGndColourRuleDefault = ArgBlack;
             public static readonly string ArgForeGndColourRuleDefault = ArgGray;
 
-       public static readonly string ParamBrowser = "--browser";
+       public static readonly string ParamToolBrowser = "--toolbrowser";
 
-            public static readonly string ArgBrowserExe = "exe";
-            public static readonly string ArgBrowserExeDefault = "explorer.exe";
+            public static readonly string ArgToolBrowserExe = "exe";
+            public static readonly string ArgToolBrowserExeDefault = "explorer.exe";
 
-            public static readonly string ArgBrowserLookupUrl = "url";
-            public static readonly string ArgBrowserLookupArg = "arg";
+            public static readonly string ArgToolBrowserUrl = "url";
+            public static readonly string ArgToolBrowserArg = "arg";
 
-        public static readonly string ParamBrowserHelp = "--browserhelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0'
+        public static readonly string ParamToolHelp = "--toolhelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0'
 
-            public static readonly string ArgBrowserHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual";
-            public static readonly string ArgBrowserHelpArgDefault = "{version}";
+            public static readonly string ArgToolHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual";
+            public static readonly string ArgToolHelpArgDefault = "{HelpVer}";
 
-        public static readonly string ParamBrowserSearch = "--browsersearch";         // url 'https://www.google.com/' arg 'search/{word}'
+        public static readonly string ParamToolSearch = "--toolsearch";         // url 'https://www.google.com/' arg 'search/{word}'
 
-            public static readonly string ArgBrowserSearchUrlDefault = " https://www.google.com/";
-            public static readonly string ArgBrowserSearchArgDefault = "search/{word}";
+            public static readonly string ArgToolSearchUrlDefault = " https://www.google.com/";
+            public static readonly string ArgToolSearchArgDefault = "search/{word}";
 
-        public static readonly string ParamBrowserThesaurus = "--browserthesaurus";   // url https://www.thesaurus.com/ arg '/search/{word}'
+        public static readonly string ParamToolThesaurus = "--toolthesaurus";   // url https://www.thesaurus.com/ arg '/search/{word}'
 
-            public static readonly string ArgBrowserThesaurusUrlDefault = "https://www.thesaurus.com/";
-            public static readonly string ArgBrowserThesaurusArgDefault = "search/{word}";
+            public static readonly string ArgToolThesaurusUrlDefault = "https://www.thesaurus.com/";
+            public static readonly string ArgToolThesaurusArgDefault = "search/{word}";
 
-        public static readonly string ParamBrowserSpell = "--browserspell";           // url https://www.spell.com/ arg '/search/{word}'
+        public static readonly string ParamToolSpell = "--toolspell";           // url https://www.spell.com/ arg '/search/{word}'
 
-            public static readonly string ArgBrowserSpellUrlDefault = "https://www.spell.com/";
-            public static readonly string ArgBrowserSpellArgDefault = "search/{word}";
+            public static readonly string ArgToolSpellUrlDefault = "https://www.spell.com/";
+            public static readonly string ArgToolSpellArgDefault = "search/{word}";
 
-        public static readonly string ParamAudioVol = "--audiovol";         //  0  <min 1 max 10> //(0 is off)
+        public static readonly string ParamToolSvn = "--toolsvn";                   // username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
 
-                public static readonly int ArgAudioVolDefault = 3;
-                public static readonly int ArgAudioVolMax = 10;
-                public static readonly int ArgAudioVolMin = 0;
+            public static readonly string ArgToolSvnUser = "username";
+            public static readonly string ArgToolSvnUserDefault = Program.ValueNotSet;
+            public static readonly string ArgToolSvnPassword = "password";
+            public static readonly string ArgToolSvnPasswordDefault = Program.ValueNotSet;
+            public static readonly string ArgToolSvnUrl = "url";
+            public static readonly string ArgToolSvnUrlDefault = Program.ValueNotSet;
+
+        public static readonly string ParamAudio = "--audio";         
+        
+            public static readonly string ArgAudioVol = "vol";      //  0  <min 1 max 10> //(0 is off)
+            public static readonly int ArgAudioVolDefault = 0;
+            public static readonly int ArgAudioVolMax = 10;
+            public static readonly int ArgAudioVolMin = 0;
+
                 public static readonly string ArgAudioFileKeyPressDefault = "keypress.mp3";
+                public static readonly string ArgAudioFileBackSpaceDefault = "bs.mp3";
                 public static readonly string ArgAudioFileCrDefault = "cr.mp3";
                 public static readonly string ArgAudioFileStartupDefault = "paperinsert.mp3";
                 public static readonly string ArgAudioFileEndDefault = "paperremove.mp3";
 
-        public static readonly string ParamSvn = "--svn";                   // username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
-
-                public static readonly string ArgSVNUser = "username";
-                public static readonly string ArgSVNUserDefault = Program.ValueNotSet;
-                public static readonly string ArgSVNPassword = "password";
-                public static readonly string ArgSVNPasswordDefault = Program.ValueNotSet;
-                public static readonly string ArgSVNUrl = "url";
-                public static readonly string ArgSVNUrlDefault = Program.ValueNotSet;
-
-        //edit operational parameters - text editor
+                //edit operational parameters - text editor
 
         public static readonly string ParamTextEditorRulers = "--rulers";             //  show [yes | no] unitchar '.'
 
@@ -177,28 +182,27 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgTextEditorRulersUnitChar = "UnitChar";
             public static readonly char ArgTextEditorRulersUnitCharDefault = '.';
 
-        public static readonly string ParamTextEditorCursorSize = "--cursorsize";     // 20 <min 1 max 100>
+        public static readonly string ParamTextEditorCursor = "--cursor";     
 
+            public static readonly string ArgTextEditorCursorSize = "size";     // 20 <min 1 max 100>
             public static readonly int ArgTextEditorCursorSizeDefault = 20;
             public static readonly int ArgTextEditorCursorSizeMax = 100;
             public static readonly int ArgTextEditorCursorSizeMin = 1;
 
-        public static readonly string ParamTextEditorDisplaysRows = "--displayrow";   // 10 <min 1 max 25>	    //was displaylastlines, now TextEditorDisplayRows
+        public static readonly string ParamTextEditorDisplay = "--display";   
 
+            public static readonly string ArgTextEditorDisplayRows = "rows";      // 10 <min 1 max 25>	    //was displaylastlines, now TextEditorDisplayRows
             public static readonly int ArgTextEditorDisplayRowsDefault = 10;      //was ArgEditAreaLinesCountDefault
             public static readonly int ArgTextEditorDisplayRowsMax = 50;          //was ArgEditAreaLinesCountMax 
             public static readonly int ArgTextEditorDisplayRowsMin = 5;           //was ArgEditAreaLinesCountMin
 
-        public static readonly string ParamTextEditorDisplaysCols = "--displaycols";  // 80 <min 20 max 250>	    //was DisplayLineWidth, now TextEditorDisplayCols
-
+            public static readonly string ArgTextEditorDisplayCols = "cols";      //68 <min 5 max 250> 
             public static readonly int ArgTextEditorDisplayColsDefault = 68;      //was ArgEditAreaLineWidthDefault - counted from Jack Kerouac's book 'On the Road'
             public static readonly int ArgTextEditorDisplayColsMax = 250;         //was ArgEditAreaLineWidthMax - see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
             public static readonly int ArgTextEditorDisplayColsMin = 5;           //was ArgEditAreaLineWidthMin
 
-        public static readonly string ParamTextEditorParaBreak = "--parabreak";       // displaychar ' '
-
-            public static readonly string ArgTextEditorParaBreakDisplayChar = "DisplayChar";
-            public const char             ArgTextEditorParaBreakDisplayCharDefault = '>';
+            public static readonly string ArgTextEditorDisplayParaBreakDisplayChar = "parabreak";
+            public const char             ArgTextEditorDisplayParaBreakDisplayCharDefault = '>';
 
         public static readonly string ParamTextEditorPauseWaitSecs = "--typingpause"; // 60 <min 5 max 36000>
 
@@ -206,17 +210,17 @@ namespace KLineEdCmdApp.Utils
             public static readonly int ArgTextEditorPauseWaitSecsMin = 0;
             public static readonly int ArgTextEditorPauseWaitSecsMax = 86400;     //24 * 60 * 60 - 24 hours
 
-        public static readonly string ParamTextEditorScrollLimit = "--scrolllimit";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
+        public static readonly string ParamTextEditorLimits = "--limits";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
 
-            public static readonly int ArgTextEditorScrollLimitDefault = 0;
-            public static readonly int ArgTextEditorScrollLimitMax = 10000;
-            public static readonly int ArgTextEditorScrollLimitMin = 0;            //0 is unlimited
+            public static readonly string ArgTextEditorLimitScroll = "scrollrows";
+            public static readonly int ArgTextEditorLimitScrollDefault = 0;
+            public static readonly int ArgTextEditorLimitScrollMax = 10000;
+            public static readonly int ArgTextEditorLimitScrollMin = 0;            //0 is unlimited
 
-        public static readonly string ParamTextEditorEditLimit = "--editlimit";         // 0  <min 1 max 10000>		//(0 is unlimited) - was editline ParamEditLineMode
-
-            public static readonly int ArgTextEditorEditLimitDefault = 0;
-            public static readonly int ArgTextEditorEditLimitMax = 10000;
-            public static readonly int ArgTextEditorEditLimitMin = 0;              //0 is unlimited
+            public static readonly string ArgTextEditorLimitEdit = "editrows";
+            public static readonly int ArgTextEditorLimitEditDefault = 0;
+            public static readonly int ArgTextEditorLimitEditMax = 10000;
+            public static readonly int ArgTextEditorLimitEditMin = 0;              //0 is unlimited
 
         public static readonly string ParamTextEditorTabSize = "--tabsize";           // 3  <min 1 max 25>	
 
@@ -227,7 +231,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamTextEditorAutoSave = "--autosave";         // [CR | ParaBreak | off]
 
             public static readonly string ArgTextEditorAutoSaveCR = "CR";
-            public static readonly string ArTextEditorAutoSaveParaBreak = "ParaBreak";
+            public static readonly string ArgTextEditorAutoSaveParaBreak = "ParaBreak";
             public static readonly string ArgTextEditorAutoSaveOff = ArgOff;
             public static readonly AutoSaveMode ArgTextEditorAutoSaveDefault = AutoSaveMode.Off;
 
@@ -254,6 +258,7 @@ namespace KLineEdCmdApp.Utils
         public BoolValue SettingsUpdate { set; get; }
 
         public string AudioFileKeyPress { set; get; }
+        public string AudioFileBackSpace { set; get; }
         public string AudioFileCr { set; get; }
         public string AudioFileStartup { set; get; }
         public string AudioFileEnd { set; get; }
@@ -274,8 +279,8 @@ namespace KLineEdCmdApp.Utils
         public ConsoleColor ForeGndColourMsgError {  set; get; }
         public ConsoleColor BackGndColourMsgWarn {  set; get; }
         public ConsoleColor ForeGndColourMsgWarn { set; get; }
-        public ConsoleColor BackGndColourMsgNote {  set; get; }
-        public ConsoleColor ForeGndColourMsgNote { set; get; }
+        public ConsoleColor BackGndColourMsgInfo {  set; get; }
+        public ConsoleColor ForeGndColourMsgInfo { set; get; }
         public ConsoleColor BackGndColourCmds { set; get; }
         public ConsoleColor ForeGndColourCmds { set; get; }
         public ConsoleColor BackGndColourStatus { set; get; }
@@ -283,18 +288,24 @@ namespace KLineEdCmdApp.Utils
         public ConsoleColor BackGndColourRule { set; get; }
         public ConsoleColor ForeGndColourRule { set; get; }
 
-        public string BrowserExe { set; get; }
-
-        public string BrowserHelpUrl { set; get; }
-        public string BrowserHelpArg { set; get; }
-        public string BrowserSearchUrl { set; get; }
-        public string BrowserSearchArg { set; get; }
-        public string BrowserThesaurusUrl { set; get; }
-        public string BrowserThesaurusArg { set; get; }
-        public string BrowserSpellUrl { set; get; }
-        public string BrowserSpellArg {  set; get; }
-
         public int AudioVol { set; get; }
+
+        //Tools options page
+
+        public string ToolBrowserExe { set; get; }
+
+        public string ToolHelpUrl { set; get; }
+        public string ToolHelpArg { set; get; }
+        public string ToolSearchUrl { set; get; }
+        public string ToolSearchArg { set; get; }
+        public string ToolThesaurusUrl { set; get; }
+        public string ToolThesaurusArg { set; get; }
+        public string ToolSpellUrl { set; get; }
+        public string ToolSpellArg {  set; get; }
+
+        public string ToolSvnUser { set; get; }
+        public string ToolSvnPasswordKey { set; get; }
+        public string ToolSvnUrl { set; get; }
 
         //edit operational parameters - text editor
 
@@ -324,10 +335,36 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = "Help")] Help = 0,
             [EnumMember(Value = "Import")]Import,
             [EnumMember(Value = "Export")] Export,
-            [EnumMember(Value = "Fix")] Fix,
             [EnumMember(Value = "Edit")] Edit,
             [EnumMember(Value = "Abort")] Abort,
             [EnumMember(Value = "Unknown")] Unknown
+        }
+
+        public enum Param
+        {
+            [EnumMember(Value = "--help")] Help = 0,
+            [EnumMember(Value = "--edit")] EditFile,
+            [EnumMember(Value = "--export")] ExportFile,
+            [EnumMember(Value = "--import")] ImportFile,
+            [EnumMember(Value = "--settings")] Settings,
+            [EnumMember(Value = "--backgnd")] BackGnd,
+            [EnumMember(Value = "--foregnd")] ForeGnd,
+            [EnumMember(Value = "--toolbrowser")] ToolBrowser,
+            [EnumMember(Value = "--toolhelp")] ToolHelp,
+            [EnumMember(Value = "--toolsearch")] ToolSearch,
+            [EnumMember(Value = "--toolthesaurus")] ToolThesaurus,
+            [EnumMember(Value = "--toolspell")] ToolSpell,
+            [EnumMember(Value = "--toolsvn")] Svn,
+            [EnumMember(Value = "--audio")] Audio,
+            [EnumMember(Value = "--rulers")] Rulers,
+            [EnumMember(Value = "--cursor")] Cursor,
+            [EnumMember(Value = "--display")] Display,
+            [EnumMember(Value = "--limits")] Limits,
+            [EnumMember(Value = "--tabsize")] TabSize,
+            [EnumMember(Value = "--typingpause")] TypingPause,
+            [EnumMember(Value = "--autosave")] AutoSave,
+            [EnumMember(Value = "--autocorrect")] AutoCorrect,
+            [EnumMember(Value = "[unknown]")] Unknown
         }
 
         public enum AutoSaveMode
@@ -338,110 +375,120 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = "Unknown")] Unknown
         }
 
-        public enum Param
-        {
-            [EnumMember(Value = "--help")] Help = 0,
-            [EnumMember(Value = "--edit")] EditFile,
-            [EnumMember(Value = "--export")] ExportFile,
-            [EnumMember(Value = "--displaylastlines")]DisplayLastLines,
-            [EnumMember(Value = "--displaylinewidth")] DisplayLineWidth,
-            [EnumMember(Value = "--audiocr")] AudioCR,
-            [EnumMember(Value = "--audiokey")] AudioKey,
-            [EnumMember(Value = "--backgnd")] BackGndColour,
-            [EnumMember(Value = "--foregnd")] ForeGndColour,
-            [EnumMember(Value = "--scrollreview")] ScrollReview,
-            [EnumMember(Value = "--editline")] EditLine,
-            [EnumMember(Value = "--spellcheck")] SpellCheck,
-            [EnumMember(Value = "--settings")] Settings,
-            [EnumMember(Value = "[unknown]")] Unknown
-        }
-
         public override string ToString()
         {
-            var rc = "Op=" + EnumOps.XlatToString(Op) + Environment.NewLine;
+            var rc = "SettingsFile=" + (SettingsPathFileName ?? "[null]") + (SettingsUpdate == BoolValue.Unset ? " [not set]" : ((SettingsUpdate == BoolValue.Yes) ? " update" : " no update")) + Environment.NewLine;
 
-            rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
-            rc += "ExportOutputFile=" + (ExportOutputFile ?? "[null]") + Environment.NewLine;
+            rc += Environment.NewLine;
+            rc += "ReportMxErrors=" + EnumOps.XlatToString(ReportMxErrors) + Environment.NewLine;
+            rc += Environment.NewLine;
 
-            rc += "DisplayLastLines=" + TextEditorDisplayRows + Environment.NewLine;  //todo rename
-            rc += "DisplayLineWidth=" + TextEditorDisplayCols + Environment.NewLine;    //todo rename
+            rc +=  "Op=" + EnumOps.XlatToString(Op) + Environment.NewLine;
 
-            rc += "AudioFileCr=" + (AudioFileCr ?? "[null]") + Environment.NewLine;
-            rc += "AudioFileKeyPress=" + (AudioFileKeyPress ?? "[null]") + Environment.NewLine;
+            if (Op == OpMode.Import)
+            {
+                rc += "ImportInputFile=" + (ImportInputFile ?? "[null]") + Environment.NewLine;
+                rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
+            }
+            else if (Op == OpMode.Export)
+            {
+                rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
+                rc += "ExportOutputFile=" + (ExportOutputFile ?? "[null]") + Environment.NewLine;
+            }
+            else if (Op == OpMode.Edit)
+            {
+                rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
+                rc += Environment.NewLine;
+                rc += "BackGndColourText=" + XlatConsoleColourToString(BackGndColourText) + Environment.NewLine;
+                rc += "ForeGndColourText=" + XlatConsoleColourToString(ForeGndColourText) + Environment.NewLine;
+                rc += "BackGndColourMsgError=" + XlatConsoleColourToString(BackGndColourMsgError) + Environment.NewLine;
+                rc += "ForeGndColourMsgError=" + XlatConsoleColourToString(ForeGndColourMsgError) + Environment.NewLine;
+                rc += "BackGndColourMsgWarn=" + XlatConsoleColourToString(BackGndColourMsgWarn) + Environment.NewLine;
+                rc += "BackGndColourMsgInfo=" + XlatConsoleColourToString(BackGndColourMsgInfo) + Environment.NewLine;
+                rc += "ForeGndColourMsgInfo=" + XlatConsoleColourToString(ForeGndColourMsgInfo) + Environment.NewLine;
+                rc += "BackGndColourCmds=" + XlatConsoleColourToString(BackGndColourCmds) + Environment.NewLine;
+                rc += "ForeGndColourCmds=" + XlatConsoleColourToString(ForeGndColourCmds) + Environment.NewLine;
+                rc += "BackGndColourStatus=" + XlatConsoleColourToString(BackGndColourStatus) + Environment.NewLine;
+                rc += "ForeGndColourStatus=" + XlatConsoleColourToString(ForeGndColourStatus) + Environment.NewLine;
+                rc += "BackGndColourRule=" + XlatConsoleColourToString(BackGndColourRule) + Environment.NewLine;
+                rc += "ForeGndColourRule=" + XlatConsoleColourToString(ForeGndColourRule) + Environment.NewLine;
+                rc += Environment.NewLine;
+                rc += "ToolBrowserExe=" + (ToolBrowserExe ?? "[null]") + Environment.NewLine;
+                rc += "ToolHelpUrl=" + (ToolHelpUrl ?? "[null]") + " ToolHelpArg=" + (ToolHelpArg ?? "[null]") + Environment.NewLine;
+                rc += "ToolSearchUrl=" + (ToolSearchUrl ?? "[null]") + " ToolSearchArg=" + (ToolSearchArg ?? "[null]") + Environment.NewLine;
+                rc += "ToolThesaurusUrl=" + (ToolThesaurusUrl ?? "[null]") + " ToolThesaurusArg=" + (ToolThesaurusArg ?? "[null]") + Environment.NewLine;
+                rc += "ToolSpellUrl=" + (ToolSpellUrl ?? "[null]") + " ToolSpellArg=" + (ToolSpellArg ?? "[null]") + Environment.NewLine;
+              //  rc += "ToolSvnUser=" + (ToolSvnUser ?? "[null]" ) + " ToolSvnPasswordKey=" + (ToolSvnPasswordKey ?? "[null]") + " ToolSvnUrl=" + (ToolSvnUrl ?? "[null]") + Environment.NewLine;
+                rc += "AudioVol=" + AudioVol + Environment.NewLine;
+                rc += "TextEditorRulersShow=" + EnumOps.XlatToString(ReportMxErrors) + Environment.NewLine;
+                rc += "TextEditorRulersUnitChar=" + TextEditorRulersUnitChar.ToString() + Environment.NewLine;
+                rc += "TextEditorCursorSize=" + TextEditorCursorSize + Environment.NewLine;
+                rc += "TextEditorDisplayRows=" + TextEditorDisplayRows + Environment.NewLine;
+                rc += "TextEditorDisplayCols=" + TextEditorDisplayCols + Environment.NewLine;
+                rc += "TextEditorParaBreakDisplayChar=" + TextEditorParaBreakDisplayChar.ToString() + Environment.NewLine;
+                rc += "TextEditorPauseWaitSecs=" + TextEditorPauseWaitSecs + Environment.NewLine;
+                rc += "TextEditorScrollLimit=" + TextEditorScrollLimit + Environment.NewLine;
+                rc += "TextEditorEditLimit=" + TextEditorEditLimit + Environment.NewLine;
+                rc += "TextEditorTabSize=" + TextEditorTabSize + Environment.NewLine;
+                rc += "TextEditorAutoSave=" + EnumOps.XlatToString(TextEditorAutoSave) + Environment.NewLine;
+                rc += "TextEditorAutoCorrect=" + EnumOps.XlatToString(TextEditorAutoCorrect) + Environment.NewLine;
+                rc += Environment.NewLine;
+                rc += "AudioFileKeyPress=" + (AudioFileKeyPress ?? "[null]") + Environment.NewLine;
+                rc += "AudioFileeBackSpace=" + (AudioFileBackSpace ?? "[null]") + Environment.NewLine;
+                rc += "AudioFileCr=" + (AudioFileCr ?? "[null]") + Environment.NewLine;
+                rc += "AudioFileStartup=" + (AudioFileStartup ?? "[null]") + Environment.NewLine;
+                rc += "AudioFileEnd=" + (AudioFileEnd ?? "[null]") + Environment.NewLine;
 
-            rc += "ForeGndColourText=" + XlatConsoleColourToString(ForeGndColourText) + Environment.NewLine;
-            rc += "ForeGndColourMsgError=" + XlatConsoleColourToString(ForeGndColourMsgError) + Environment.NewLine;
-            rc += "ForeGndColourCmds=" + XlatConsoleColourToString(ForeGndColourCmds) + Environment.NewLine;
-            rc += "ForeGndColourStatus=" + XlatConsoleColourToString(ForeGndColourStatus) + Environment.NewLine;
-            rc += "BackGndColourText=" + XlatConsoleColourToString(BackGndColourText) + Environment.NewLine;
-
-            rc += "BackGndColourMsgError=" + XlatConsoleColourToString(BackGndColourMsgError) + Environment.NewLine;
-            rc += "BackGndColourCmds=" + XlatConsoleColourToString(BackGndColourCmds) + Environment.NewLine;
-            rc += "BackGndColourStatus=" + XlatConsoleColourToString(BackGndColourStatus) + Environment.NewLine;
-            rc += "BackGndColourStatus=" + XlatConsoleColourToString(BackGndColourStatus) + Environment.NewLine;
-
-            rc += "TextEditorAutoCorrect=" + EnumOps.XlatToString(TextEditorAutoCorrect) + Environment.NewLine;
-
-            rc += "SettingsPathFileName=" + (SettingsPathFileName ?? "[null]") + Environment.NewLine;
-            rc += "SettingsUpdate=" + EnumOps.XlatToString(SettingsUpdate) + Environment.NewLine;
-
+            }
+            else if (Op == OpMode.Help)
+            {
+                    
+            }
+            //else if ((Op == OpMode.UpdateDictionary) || (Op == OpMode.GetDictionarySettings))
+            //{       //--updatedict 
+            //    rc += "DictionaryFile=" + (DictionaryFile ?? "[null]") + Environment.NewLine;
+            //    rc += "DictionaryUrl=" + (DictionaryUrl ?? "[null]") + Environment.NewLine;
+            //    rc += "DictionaryVersion=" + (DictionaryVersion ?? "[null]") + Environment.NewLine;
+            //}
+            else
+            {
+                rc += "invalid operation parameter" + Environment.NewLine;
+            }
             return rc;
         }
 
         public string GetFullHelpInfo()
         {
-            //[--help
-            //--reset [colours | factory-defaults] (--settings colours 'mysettings.json' (update)) |
-            //--export 'drive:path\\filename' 'drive:path\\filename' |
-            //--edit 'drive:path\\filename'
-            //   (--displaylastlines 10 <min 0 max 50>
-            //    --DisplayLineWidth 80 <min 0 max 250>
-            //    --audiocr 'drive:path\\filename' 3 <min 0 max 10>
-            //    --audiokey 'drive:path\\filename' 3 <min 0 max 10>
-            //    --backgnd text COLOUR details COLOUR cmds COLOUR spell COLOUR
-            //    --foregnd  text COLOUR details COLOUR cmds COLOUR spell COLOUR
-            //    --scrollreview [yes | no]
-            //    --editline [yes | no]
-            //    --spellcheck [yes | no]
-            //    --settings 'drive:path\\filename' (update))]  
-
             var msg = $"{Environment.NewLine}Hint: retry using program's expected parameters and their arguments which are:{Environment.NewLine}";
 
             msg += Environment.NewLine;
-            msg += $"[{ParamHelp} |";
-
-            //msg += Environment.NewLine;
-            //msg += $" {ParamReset} [{ArgResetColours} | {ArgResetFactory}] ({ParamSettings} {SettingsFileNameForm} ({ArgSettingsUpdate})) |";
-
+            msg += $"[{ParamHelp} |" + Environment.NewLine;
+            msg += $"[{ParamExportFile} drive:path\\*.ksx drive:path\\*.txt |" + Environment.NewLine;
+            msg += $"[{ParamImportFile} drive:path\\*.txt drive:path\\*.ksx |" + Environment.NewLine;
+            msg += $"[{ParamEditFile} drive:path\\*.ksx" + Environment.NewLine;
+            msg += "(" + Environment.NewLine;
+            msg += $"   {ParamSettings} {ArgSettingsDisplay} [yes | no] (drive:path\\*.json ({ArgSettingsUpdate} [yes | no]))" + Environment.NewLine;
+            msg += $"   {ParamForeGndColour} {ArgColourText} COLOUR {ArgColourMsgError} COLOUR {ArgColourMsgWarn} COLOUR {ArgColourMsgInfo} {ArgColourCmds} COLOUR {ArgColourStatus} COLOUR {ArgColourRule} COLOUR" + Environment.NewLine;
+            msg += $"   {ParamBackGndColour} {ArgColourText} COLOUR {ArgColourMsgError} COLOUR {ArgColourMsgWarn} COLOUR {ArgColourMsgInfo} {ArgColourCmds} COLOUR {ArgColourStatus} COLOUR {ArgColourRule} COLOUR" + Environment.NewLine;
+            msg += $"   {ParamAudio} {ArgAudioVol} {ArgAudioVolDefault} <min {ArgAudioVolMin} max {ArgAudioVolMax}>" + Environment.NewLine;
             msg += Environment.NewLine;
-            msg += $" {ParamExportFile} {EditFileNameForm} {ExportFileNameForm} |";
-
+            msg += $"   {ParamTextEditorRulers} {ArgTextEditorRulersShow} [yes | no] {ArgTextEditorRulersUnitChar} '.'" + Environment.NewLine;
+            msg += $"   {ParamTextEditorCursor} {ArgTextEditorCursorSize} {ArgTextEditorCursorSizeDefault} <min {ArgTextEditorCursorSizeMin} max {ArgTextEditorCursorSizeMax}>" + Environment.NewLine;
+            msg += $"   {ParamTextEditorDisplay} {ArgTextEditorDisplayRows} {ArgTextEditorDisplayRowsDefault} <min {ArgTextEditorDisplayRowsMin} max {ArgTextEditorDisplayRowsMax}> {ArgTextEditorDisplayCols} {ArgTextEditorDisplayColsDefault} <min {ArgTextEditorDisplayColsMin} max {ArgTextEditorDisplayColsMax}> {ArgTextEditorDisplayParaBreakDisplayChar} {ArgTextEditorDisplayParaBreakDisplayCharDefault}" + Environment.NewLine;
+            msg += $"   {ParamTextEditorLimits} {ArgTextEditorLimitEdit} {ArgTextEditorLimitEditDefault} <min {ArgTextEditorLimitEditMin} max {ArgTextEditorLimitEditMax}> {ArgTextEditorLimitScroll} {ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>" + Environment.NewLine;
+            msg += $"   {ParamTextEditorTabSize} {ArgTextEditorTabSizeDefault} <min {ArgTextEditorTabSizeMin} max {ArgTextEditorTabSizeMax}>" + Environment.NewLine;
+            msg += $"   {ParamTextEditorPauseWaitSecs} {ArgTextEditorPauseWaitSecsDefault} <min {ArgTextEditorPauseWaitSecsMin} max {ArgTextEditorPauseWaitSecsMax}>" + Environment.NewLine;
+            msg += $"   {ParamTextEditorAutoSave} [{ArgTextEditorAutoSaveCR} | {ArgTextEditorAutoSaveParaBreak} | {ArgTextEditorAutoSaveOff}]" + Environment.NewLine;
+            msg += $"   {ParamTextEditorAutoCorrect} [on | off]" + Environment.NewLine;
             msg += Environment.NewLine;
-            msg += $" {ParamEditFile} {EditFileNameForm}";
-            //msg += Environment.NewLine;
-            //msg += $"  ({ParamDisplayLastLines} {ArgDisplayLastLinesCntDefault} <min {ArgDisplayLastLinesCntMin} max {ArgDisplayLastLinesCntMax}>";
-            //msg += Environment.NewLine;
-            //msg += $"   {ParamAudioCR} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
-            //msg += Environment.NewLine;
-            //msg += $"   {ParamAudioKeyPress} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
-            //msg += Environment.NewLine;
-            //msg += $"   {ParamBackGndColour} {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
-            //msg += Environment.NewLine;
-            //msg += $"   {ParamForeGndColour} {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
-            //msg += Environment.NewLine;
-            //msg += $"   {ParamScrollReviewMode} [{ArgYes} | {ArgNo}]";
-            //msg += Environment.NewLine;
-            //msg += $"   {ParamEditLineMode} [{ArgYes} | {ArgNo}]";
-            //msg += Environment.NewLine;
-            //msg += $"   {ParamSpellCheckMode} [{ArgYes} | {ArgNo}]";
-            msg += Environment.NewLine;
-            msg += $"   {ParamSettings} {SettingsFileNameForm} ({ArgSettingsUpdate}))]";
-            msg += Environment.NewLine;
+            msg += $"   {ParamToolBrowser} {ArgToolBrowserExe} {ToolBrowserExe}" + Environment.NewLine;
+            msg += $"   {ParamToolHelp} {ArgToolBrowserUrl} {ToolHelpUrl} {ArgToolBrowserArg} {ToolHelpArg}" + Environment.NewLine;
+            msg += $"   {ParamToolSearch} {ArgToolBrowserUrl} {ToolSearchUrl} {ArgToolBrowserArg} {ToolSearchArg}" + Environment.NewLine;
+            msg += $"   {ParamToolThesaurus} {ArgToolBrowserUrl} {ToolThesaurusUrl} {ArgToolBrowserArg} {ToolThesaurusArg}" + Environment.NewLine;
+            msg += $"   {ParamToolSpell} {ArgToolBrowserUrl} {ToolSpellUrl} {ArgToolBrowserArg} {ToolSpellArg}" + Environment.NewLine;
+         // msg += $"   {ParamToolSvn} {ArgToolSvnUser} {ToolSvnUser} {ArgToolSvnPassword} {ToolSvnPasswordKey} {ArgToolSvnUrl} {ToolSvnUrl}" + Environment.NewLine;
+            msg += ")" + Environment.NewLine;
 
-            //msg += Environment.NewLine;
-            //msg += $"A permitted {ColourName} is {GetConsoleColourNames()}";
-
-            //msg += Environment.NewLine; 
             return msg;
         }
 
@@ -457,6 +504,7 @@ namespace KLineEdCmdApp.Utils
             SettingsUpdate = BoolValue.Unset;
 
             AudioFileKeyPress = null;
+            AudioFileBackSpace = null;
             AudioFileCr = null;
             AudioFileStartup = null;
             AudioFileEnd = null;
@@ -472,8 +520,8 @@ namespace KLineEdCmdApp.Utils
             ForeGndColourMsgError = UnsetColour;
             BackGndColourMsgWarn = UnsetColour;
             ForeGndColourMsgWarn = UnsetColour;
-            BackGndColourMsgNote = UnsetColour;
-            ForeGndColourMsgNote = UnsetColour;
+            BackGndColourMsgInfo = UnsetColour;
+            ForeGndColourMsgInfo = UnsetColour;
             BackGndColourCmds = UnsetColour;
             ForeGndColourCmds = UnsetColour;
             BackGndColourStatus = UnsetColour;
@@ -481,16 +529,20 @@ namespace KLineEdCmdApp.Utils
             BackGndColourRule = UnsetColour;
             ForeGndColourRule = UnsetColour;
 
-            BrowserExe = null;
-            BrowserHelpUrl = null;
-            BrowserHelpArg = null;
-            BrowserSearchUrl = null;
-            BrowserSearchArg = null;
-            BrowserThesaurusUrl = null;
-            BrowserThesaurusArg = null;
-            BrowserSpellUrl = null;
-            BrowserSpellArg = null;
             AudioVol = Program.PosIntegerNotSet;
+
+            ToolBrowserExe = null;
+            ToolHelpUrl = null;
+            ToolHelpArg = null;
+            ToolSearchUrl = null;
+            ToolSearchArg = null;
+            ToolThesaurusUrl = null;
+            ToolThesaurusArg = null;
+            ToolSpellUrl = null;
+            ToolSpellArg = null;
+            ToolSvnUser = null;
+            ToolSvnPasswordKey = null;
+            ToolSvnUrl = null;
 
             TextEditorRulersShow = BoolValue.Unset;
             TextEditorRulersUnitChar = Program.NullChar;
@@ -518,6 +570,7 @@ namespace KLineEdCmdApp.Utils
             SettingsUpdate = BoolValue.No;
 
             AudioFileKeyPress = ArgAudioFileKeyPressDefault;
+            AudioFileBackSpace = ArgAudioFileBackSpaceDefault;
             AudioFileCr = ArgAudioFileCrDefault;
             AudioFileStartup = ArgAudioFileStartupDefault;
             AudioFileEnd = ArgAudioFileEndDefault;
@@ -527,42 +580,44 @@ namespace KLineEdCmdApp.Utils
             DictionaryVersion = DictionaryVersionDefault;
             SettingsDisplay = BoolValue.No;
 
-
             BackGndColourText = XlatStringToConsoleColour(ArgBackGndColourTextDefault);
             ForeGndColourText = XlatStringToConsoleColour(ArgForeGndColourTextDefault);
             BackGndColourMsgError = XlatStringToConsoleColour(ArgBackGndColourMsgErrorDefault);
             ForeGndColourMsgError = XlatStringToConsoleColour(ArgForeGndColourMsgErrorDefault);
             BackGndColourMsgWarn = XlatStringToConsoleColour(ArgBackGndColourMsgWarnDefault);
             ForeGndColourMsgWarn = XlatStringToConsoleColour(ArgForeGndColourMsgWarnDefault);
-            BackGndColourMsgNote = XlatStringToConsoleColour(ArgBackGndColourMsgNoteDefault);
-            ForeGndColourMsgNote = XlatStringToConsoleColour(ArgForeGndColourMsgNoteDefault);
+            BackGndColourMsgInfo = XlatStringToConsoleColour(ArgBackGndColourMsgInfoDefault);
+            ForeGndColourMsgInfo = XlatStringToConsoleColour(ArgForeGndColourMsgInfoDefault);
             BackGndColourCmds = XlatStringToConsoleColour(ArgBackGndColourCmdsDefault);
             ForeGndColourCmds = XlatStringToConsoleColour(ArgForeGndColourCmdsDefault);
             BackGndColourStatus = XlatStringToConsoleColour(ArgBackGndColourStatusDefault);
             ForeGndColourStatus = XlatStringToConsoleColour(ArgForeGndColourStatusDefault);
             BackGndColourRule = XlatStringToConsoleColour(ArgBackGndColourRuleDefault);
             ForeGndColourRule = XlatStringToConsoleColour(ArgForeGndColourRuleDefault);
+            AudioVol = ArgAudioVolDefault;
 
-            BrowserExe = ArgBrowserExeDefault;
-            BrowserHelpUrl = ArgBrowserHelpUrlDefault;
-            BrowserHelpArg = ArgBrowserHelpArgDefault;
-            BrowserSearchUrl = ArgBrowserSearchUrlDefault;
-            BrowserSearchArg = ArgBrowserSearchArgDefault;
-            BrowserThesaurusUrl = ArgBrowserThesaurusUrlDefault;
-            BrowserThesaurusArg = ArgBrowserThesaurusArgDefault;
-            BrowserSpellUrl = ArgBrowserSpellUrlDefault;
-            BrowserSpellArg = ArgBrowserSpellArgDefault;
-            AudioVol = Program.PosIntegerNotSet;
+            ToolBrowserExe = ArgToolBrowserExeDefault;
+            ToolHelpUrl = ArgToolHelpUrlDefault;
+            ToolHelpArg = ArgToolHelpArgDefault;
+            ToolSearchUrl = ArgToolSearchUrlDefault;
+            ToolSearchArg = ArgToolSearchArgDefault;
+            ToolThesaurusUrl = ArgToolThesaurusUrlDefault;
+            ToolThesaurusArg = ArgToolThesaurusArgDefault;
+            ToolSpellUrl = ArgToolSpellUrlDefault;
+            ToolSpellArg = ArgToolSpellArgDefault;
+            ToolSvnUser = Program.ValueNotSet;
+            ToolSvnPasswordKey = Program.ValueNotSet;
+            ToolSvnUrl = Program.ValueNotSet;
 
             TextEditorRulersShow = BoolValue.Yes;
             TextEditorRulersUnitChar = ArgTextEditorRulersUnitCharDefault;
             TextEditorCursorSize = ArgTextEditorCursorSizeDefault;
             TextEditorDisplayRows = ArgTextEditorDisplayRowsDefault;
             TextEditorDisplayCols = ArgTextEditorDisplayColsDefault;
-            TextEditorParaBreakDisplayChar = ArgTextEditorParaBreakDisplayCharDefault;
+            TextEditorParaBreakDisplayChar = ArgTextEditorDisplayParaBreakDisplayCharDefault;
             TextEditorPauseWaitSecs = ArgTextEditorPauseWaitSecsDefault;
-            TextEditorScrollLimit = ArgTextEditorScrollLimitDefault;
-            TextEditorEditLimit = ArgTextEditorEditLimitDefault;
+            TextEditorScrollLimit = ArgTextEditorLimitScrollDefault;
+            TextEditorEditLimit = ArgTextEditorLimitEditDefault;
             TextEditorTabSize = ArgTextEditorTabSizeDefault;
             TextEditorAutoSave = ArgTextEditorAutoSaveDefault;
             TextEditorAutoCorrect = BoolValue.No;
@@ -687,19 +742,19 @@ namespace KLineEdCmdApp.Utils
             if (help == Param.Help)
             {
                 msg += $"{ParamHelp}";
-                msg += GetHelpNotes();
+                msg += GetAppHelpNotes();
                 rc = msg;
             }
             else if (help == Param.ExportFile)
             {
                 msg += $"{ParamExportFile} {EditFileNameForm} {ExportFileNameForm}";
-                msg += GetHelpNotes();
+                msg += GetAppHelpNotes();
                 rc = msg;
             }
             else if (help == Param.EditFile)
             {
                 msg += $"{ParamEditFile} {EditFileNameForm}";
-                msg += GetHelpNotes();
+                msg += GetAppHelpNotes();
                 rc = msg;
             }
             //else if (help == Param.AudioCR)
@@ -749,13 +804,37 @@ namespace KLineEdCmdApp.Utils
             else if (help == Param.Settings)
             {
                 msg += $"{ParamSettings} 'drive:path\\filename' ({ArgSettingsUpdate})";
-                msg += GetHelpNotes();
+                msg += GetAppHelpNotes();
                 rc = msg;
             }
             else
             {
                 rc = GetFullHelpInfo();
             }
+
+            return rc;
+        }
+
+        public string GetAppHelpNotes()
+        {
+            var rc = Environment.NewLine + GetHelpNotes() + Environment.NewLine + Environment.NewLine;
+
+            //{word} is the word currently selected by the cursor
+            //{version} is the current help documentation version(typically the app version major.minor)
+            //COLOUR is any of the defined colour words; ArgBlack = "black"; ArgBlue = "blue"; ArgCyan = "cyan"; ArgDarkBlue = "darkblue";
+            //ArgDarkCyan = "darkcyan"; ArgDarkGray = "darkgray"; ArgDarkGreen = "darkgreen"; ArgDarkMagenta = "darkmagenta";
+            //ArgDarkRed = "darkred"; ArgDarkYellow = "darkyellow"; ArgGray = "gray"; ArgGreen = "green"; ArgMagenta = "magenta";
+            //ArgRed = "red"; ArgWhite = "white"; ArgYellow = "yellow";
+            //    > is any displayable character
+            //    . is any displayable character
+            //drive:path\ is any valid full path
+            //    [secret manager key] lookup value in secret manager using key value
+
+            //darkmagenta is reserved for NotSet
+            rc += "File: drive:path\\*.ksx is any valid path and filename for ksx file" + Environment.NewLine;
+            rc += "Application Variables: {word} word at cursor, {HelpVer} help version" + Environment.NewLine;
+            rc += "COLOUR; white,black,blue,cyan,gray,green,magenta,red,yellow" + Environment.NewLine;
+            rc += "  darkblue,darkcyan,darkgray,darkgreen,darkred,darkyellow," + Environment.NewLine;
 
             return rc;
         }
@@ -994,6 +1073,8 @@ namespace KLineEdCmdApp.Utils
             //accordingly the final properties are those in the setting file together with any changes found from the cmd line for this run
             if (AudioFileKeyPress == null)
                 AudioFileKeyPress = savedSettings.AudioFileKeyPress;
+            if (AudioFileBackSpace == null)
+                AudioFileBackSpace = savedSettings.AudioFileBackSpace;
             if (AudioFileCr == null)
                 AudioFileCr = savedSettings.AudioFileCr;
             if (AudioFileStartup == null)
@@ -1026,10 +1107,10 @@ namespace KLineEdCmdApp.Utils
                 BackGndColourMsgWarn = savedSettings.BackGndColourMsgWarn;
             if (ForeGndColourMsgWarn == UnsetColour)
                 ForeGndColourMsgWarn = savedSettings.ForeGndColourMsgWarn;
-            if (BackGndColourMsgNote == UnsetColour)
-                BackGndColourMsgNote = savedSettings.BackGndColourMsgNote;
-            if (ForeGndColourMsgNote == UnsetColour)
-                ForeGndColourMsgNote = savedSettings.ForeGndColourMsgNote;
+            if (BackGndColourMsgInfo == UnsetColour)
+                BackGndColourMsgInfo = savedSettings.BackGndColourMsgInfo;
+            if (ForeGndColourMsgInfo == UnsetColour)
+                ForeGndColourMsgInfo = savedSettings.ForeGndColourMsgInfo;
             if (BackGndColourCmds == UnsetColour)
                 BackGndColourCmds = savedSettings.BackGndColourCmds;
             if (ForeGndColourCmds == UnsetColour)
@@ -1040,28 +1121,33 @@ namespace KLineEdCmdApp.Utils
                 ForeGndColourStatus = savedSettings.ForeGndColourStatus;
             if (BackGndColourRule == UnsetColour)
                 ForeGndColourRule = savedSettings.ForeGndColourRule;
-
-            if (BrowserExe == null)
-                BrowserExe = savedSettings.BrowserExe;
-            if (BrowserHelpUrl == null)
-                BrowserHelpUrl = savedSettings.BrowserHelpUrl;
-            if (BrowserHelpArg == null)
-                BrowserHelpArg = savedSettings.BrowserHelpArg;
-            if (BrowserSearchUrl == null)
-                BrowserSearchUrl = savedSettings.BrowserSearchUrl;
-            if (BrowserSearchArg == null)
-                BrowserSearchArg = savedSettings.BrowserSearchArg;
-            if (BrowserThesaurusUrl == null)
-                BrowserThesaurusUrl = savedSettings.BrowserThesaurusUrl;
-            if (BrowserThesaurusArg == null)
-                BrowserThesaurusArg = savedSettings.BrowserThesaurusArg;
-            if (BrowserSpellUrl == null)
-                BrowserSpellUrl = savedSettings.BrowserSpellUrl;
-            if (BrowserSpellArg == null)
-                BrowserSpellArg = savedSettings.BrowserSpellArg;
-
             if (AudioVol == Program.PosIntegerNotSet)
                 AudioVol = savedSettings.AudioVol;
+
+            if (ToolBrowserExe == null)
+                ToolBrowserExe = savedSettings.ToolBrowserExe;
+            if (ToolHelpUrl == null)
+                ToolHelpUrl = savedSettings.ToolHelpUrl;
+            if (ToolHelpArg == null)
+                ToolHelpArg = savedSettings.ToolHelpArg;
+            if (ToolSearchUrl == null)
+                ToolSearchUrl = savedSettings.ToolSearchUrl;
+            if (ToolSearchArg == null)
+                ToolSearchArg = savedSettings.ToolSearchArg;
+            if (ToolThesaurusUrl == null)
+                ToolThesaurusUrl = savedSettings.ToolThesaurusUrl;
+            if (ToolThesaurusArg == null)
+                ToolThesaurusArg = savedSettings.ToolThesaurusArg;
+            if (ToolSpellUrl == null)
+                ToolSpellUrl = savedSettings.ToolSpellUrl;
+            if (ToolSpellArg == null)
+                ToolSpellArg = savedSettings.ToolSpellArg;
+            if (ToolSvnUser == null)
+                ToolSvnUser = savedSettings.ToolSvnUser;
+            if (ToolSvnPasswordKey == null)
+                ToolSvnPasswordKey = savedSettings.ToolSvnPasswordKey;
+            if (ToolSvnUrl == null)
+                ToolSvnUrl = savedSettings.ToolSvnUrl;
 
             if (TextEditorRulersShow == BoolValue.Unset)
                 TextEditorRulersShow = savedSettings.TextEditorRulersShow;

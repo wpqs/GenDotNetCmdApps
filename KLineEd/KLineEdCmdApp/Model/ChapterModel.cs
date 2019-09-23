@@ -72,7 +72,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, char paraBreakChar = CmdLineParamsApp.ArgTextEditorParaBreakDisplayCharDefault)
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, string pathFilename, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, char paraBreakChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 

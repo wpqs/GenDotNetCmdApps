@@ -75,7 +75,7 @@ namespace KLineEdCmdApp
             Height = Program.PosIntegerNotSet;
             EditAreaLineWidth = Program.PosIntegerNotSet;
             Report = Program.ValueNotSet;
-            BrowserExe = CmdLineParamsApp.ArgBrowserExeDefault;
+            BrowserExe = CmdLineParamsApp.ArgToolBrowserExeDefault;
             Ready = false;
 
 
@@ -143,7 +143,7 @@ namespace KLineEdCmdApp
             {
                 try
                 {
-                    //BrowserExe = param.BrowserExe;
+                    //ToolBrowserExe = param.ToolBrowserExe;
                     EditAreaLineWidth = param.TextEditorDisplayCols;
                     Width = EditAreaMarginLeft + EditAreaLineWidth + EditAreaMarginRight;  //there is actually an additional column used by cursor when at end of line
                     Height = HelpLineRowCount +  EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + param.TextEditorDisplayRows + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount;

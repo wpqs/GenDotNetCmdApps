@@ -89,7 +89,7 @@ namespace KLineEdCmdApp.Model
 
             WordCount = Program.PosIntegerNotSet;
             SetTabSpaces(CmdLineParamsApp.ArgTextEditorTabSizeDefault);
-            ParaBreakDisplayChar = CmdLineParamsApp.ArgTextEditorParaBreakDisplayCharDefault;
+            ParaBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault;
 
             Error = true;
         }
@@ -110,7 +110,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorParaBreakDisplayCharDefault)
+        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault)
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
