@@ -33,7 +33,8 @@ namespace KLineEdCmdApp.Utils
     // d) add item enum Param (Settings)
     // e) update ParamProc() and create new private method like SettingsParamProc()
     // f) optionally update ValidateParams()
-    // g) update GetParamHelp()
+    // g) add GetHelpInfoxxx() for new parameter
+    // g) update GetParamHelp(), GetHelpInfoAll()
     // h) update unit tests
 
 
@@ -43,10 +44,14 @@ namespace KLineEdCmdApp.Utils
         public static readonly string EditFileType = ".ksx"; //text file in XML format with custom elements
         public static readonly ConsoleColor UnsetColour = ConsoleColor.DarkMagenta;
         public static readonly string ColourName = "COLOUR";
-        public static readonly string EditFileNameForm = "'drive:path\\edit'" + EditFileType;
-        public static readonly string ExportFileNameForm = "'drive:path\\export.txt'";
-        public static readonly string AudioFileNameForm = "'drive:path\\audio.wav'";
-        public static readonly string SettingsFileNameForm = $"'drive:path\\{Program.CmdAppName}.json'";
+        public static readonly string EditFileNameForm = "'drive:path\\*" + EditFileType + "'";
+        public static readonly string TextFileNameForm = "'drive:path\\*.txt'";
+        public static readonly string AudioFileNameForm = "'drive:path\\*.mp3'";
+        public static readonly string SettingsFileNameForm = $"'drive:path\\*.json'";
+        public static readonly string ExeFileNameForm = $"'drive:path\\*.exe'";
+        public static readonly string UrlForm = $"https://domain.xxx/args?name1=value&name2=value";
+        public static readonly string UsernameForm = $"name";
+        public static readonly string PasswordKeyForm = $"key";
 
         public static readonly string DictionaryFileDefault = Program.ValueNotSet;
         public static readonly string DictionaryUrlDefault = Program.ValueNotSet;
@@ -83,7 +88,7 @@ namespace KLineEdCmdApp.Utils
 
  //edit operational parameters - general
 
-        public static readonly string ParamSettings = "--settings";
+        public static readonly string ParamGeneralSettings = "--settings";
 
             public static readonly string ArgSettingsDisplay = "display";
             public static readonly bool   ArgSettingsDisplayDefault = false;
@@ -92,8 +97,8 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgSettingsPathFileName = "file";
             public static readonly string ArgSettingsPathFileNameDefault = $"{Program.CmdAppName}.json";
 
-        public static readonly string ParamBackGndColour = "--backgnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
-        public static readonly string ParamForeGndColour = "--foregnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
+        public static readonly string ParamGeneralBackGndColour = "--backgnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
+        public static readonly string ParamGeneralForeGndColour = "--foregnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
 
             public static readonly string ArgColourText = "text";
             public static readonly string ArgBackGndColourTextDefault = ArgBlack;
@@ -129,27 +134,22 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgToolBrowserExeDefault = "explorer.exe";
 
             public static readonly string ArgToolBrowserUrl = "url";
-            public static readonly string ArgToolBrowserArg = "arg";
 
-        public static readonly string ParamToolHelp = "--toolhelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0'
+        public static readonly string ParamToolHelp = "--toolhelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}'
 
-            public static readonly string ArgToolHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual";
-            public static readonly string ArgToolHelpArgDefault = "{HelpVer}";
+        public static readonly string ArgToolHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/{HelpVer}";
 
-        public static readonly string ParamToolSearch = "--toolsearch";         // url 'https://www.google.com/' arg 'search/{word}'
+        public static readonly string ParamToolSearch = "--toolsearch";         // url 'https://www.google.com/search?q=%22{word}%22'
 
-            public static readonly string ArgToolSearchUrlDefault = " https://www.google.com/";
-            public static readonly string ArgToolSearchArgDefault = "search/{word}";
+        public static readonly string ArgToolSearchUrlDefault = "https://www.google.com/search?q=%22{word}%22";
 
-        public static readonly string ParamToolThesaurus = "--toolthesaurus";   // url https://www.thesaurus.com/ arg '/search/{word}'
+        public static readonly string ParamToolThesaurus = "--toolthesaurus";   // url https://www.thesaurus.com/browse/{word}
 
-            public static readonly string ArgToolThesaurusUrlDefault = "https://www.thesaurus.com/";
-            public static readonly string ArgToolThesaurusArgDefault = "search/{word}";
+        public static readonly string ArgToolThesaurusUrlDefault = "https://www.thesaurus.com/browse/{word}";
 
-        public static readonly string ParamToolSpell = "--toolspell";           // url https://www.spell.com/ arg '/search/{word}'
+        public static readonly string ParamToolSpell = "--toolspell";           // url http://www.spellcheck.net/{word}
 
-            public static readonly string ArgToolSpellUrlDefault = "https://www.spell.com/";
-            public static readonly string ArgToolSpellArgDefault = "search/{word}";
+        public static readonly string ArgToolSpellUrlDefault = "http://www.spellcheck.net/{word}";
 
         public static readonly string ParamToolSvn = "--toolsvn";                   // username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
 
@@ -160,7 +160,7 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgToolSvnUrl = "url";
             public static readonly string ArgToolSvnUrlDefault = Program.ValueNotSet;
 
-        public static readonly string ParamAudio = "--audio";         
+        public static readonly string ParamGeneralAudio = "--audio";         
         
             public static readonly string ArgAudioVol = "vol";      //  0  <min 1 max 10> //(0 is off)
             public static readonly int ArgAudioVolDefault = 0;
@@ -204,11 +204,11 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgTextEditorDisplayParaBreakDisplayChar = "parabreak";
             public const char             ArgTextEditorDisplayParaBreakDisplayCharDefault = '>';
 
-        public static readonly string ParamTextEditorPauseWaitSecs = "--typingpause"; // 60 <min 5 max 36000>
+        public static readonly string ParamTextEditorPauseTimeout = "--typingpause"; // 60 <min 5 max 36000>
 
-            public static readonly int ArgTextEditorPauseWaitSecsDefault = 60;
-            public static readonly int ArgTextEditorPauseWaitSecsMin = 0;
-            public static readonly int ArgTextEditorPauseWaitSecsMax = 86400;     //24 * 60 * 60 - 24 hours
+            public static readonly int ArgTextEditorPauseTimeoutDefault = 60;
+            public static readonly int ArgTextEditorPauseTimeoutMin = 0;
+            public static readonly int ArgTextEditorPauseTimeoutMax = 86400;     //24 * 60 * 60 - 24 hours
 
         public static readonly string ParamTextEditorLimits = "--limits";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
 
@@ -295,14 +295,9 @@ namespace KLineEdCmdApp.Utils
         public string ToolBrowserExe { set; get; }
 
         public string ToolHelpUrl { set; get; }
-        public string ToolHelpArg { set; get; }
         public string ToolSearchUrl { set; get; }
-        public string ToolSearchArg { set; get; }
         public string ToolThesaurusUrl { set; get; }
-        public string ToolThesaurusArg { set; get; }
         public string ToolSpellUrl { set; get; }
-        public string ToolSpellArg {  set; get; }
-
         public string ToolSvnUser { set; get; }
         public string ToolSvnPasswordKey { set; get; }
         public string ToolSvnUrl { set; get; }
@@ -315,7 +310,7 @@ namespace KLineEdCmdApp.Utils
         public int TextEditorDisplayRows {  set; get; }
         public int TextEditorDisplayCols {  set; get; }
         public char TextEditorParaBreakDisplayChar {  set; get; }
-        public int TextEditorPauseWaitSecs {set; get; }
+        public int TextEditorPauseTimeout {set; get; }
         public int TextEditorScrollLimit {  set; get; }
         public int TextEditorEditLimit { set; get; }
         public int TextEditorTabSize { set; get; }
@@ -414,11 +409,11 @@ namespace KLineEdCmdApp.Utils
                 rc += "ForeGndColourRule=" + XlatConsoleColourToString(ForeGndColourRule) + Environment.NewLine;
                 rc += Environment.NewLine;
                 rc += "ToolBrowserExe=" + (ToolBrowserExe ?? "[null]") + Environment.NewLine;
-                rc += "ToolHelpUrl=" + (ToolHelpUrl ?? "[null]") + " ToolHelpArg=" + (ToolHelpArg ?? "[null]") + Environment.NewLine;
-                rc += "ToolSearchUrl=" + (ToolSearchUrl ?? "[null]") + " ToolSearchArg=" + (ToolSearchArg ?? "[null]") + Environment.NewLine;
-                rc += "ToolThesaurusUrl=" + (ToolThesaurusUrl ?? "[null]") + " ToolThesaurusArg=" + (ToolThesaurusArg ?? "[null]") + Environment.NewLine;
-                rc += "ToolSpellUrl=" + (ToolSpellUrl ?? "[null]") + " ToolSpellArg=" + (ToolSpellArg ?? "[null]") + Environment.NewLine;
-              //  rc += "ToolSvnUser=" + (ToolSvnUser ?? "[null]" ) + " ToolSvnPasswordKey=" + (ToolSvnPasswordKey ?? "[null]") + " ToolSvnUrl=" + (ToolSvnUrl ?? "[null]") + Environment.NewLine;
+                rc += "ToolHelpUrl=" + (ToolHelpUrl ?? "[null]") + Environment.NewLine;
+                rc += "ToolSearchUrl=" + (ToolSearchUrl ?? "[null]") + Environment.NewLine;
+                rc += "ToolThesaurusUrl=" + (ToolThesaurusUrl ?? "[null]") + Environment.NewLine;
+                rc += "ToolSpellUrl=" + (ToolSpellUrl ?? "[null]") + Environment.NewLine;
+                rc += "ToolSvnUser=" + (ToolSvnUser ?? "[null]" ) + " ToolSvnPasswordKey=" + (ToolSvnPasswordKey ?? "[null]") + " ToolSvnUrl=" + (ToolSvnUrl ?? "[null]") + Environment.NewLine;
                 rc += "AudioVol=" + AudioVol + Environment.NewLine;
                 rc += "TextEditorRulersShow=" + EnumOps.XlatToString(ReportMxErrors) + Environment.NewLine;
                 rc += "TextEditorRulersUnitChar=" + TextEditorRulersUnitChar.ToString() + Environment.NewLine;
@@ -426,7 +421,7 @@ namespace KLineEdCmdApp.Utils
                 rc += "TextEditorDisplayRows=" + TextEditorDisplayRows + Environment.NewLine;
                 rc += "TextEditorDisplayCols=" + TextEditorDisplayCols + Environment.NewLine;
                 rc += "TextEditorParaBreakDisplayChar=" + TextEditorParaBreakDisplayChar.ToString() + Environment.NewLine;
-                rc += "TextEditorPauseWaitSecs=" + TextEditorPauseWaitSecs + Environment.NewLine;
+                rc += "TextEditorPauseTimeout=" + TextEditorPauseTimeout + Environment.NewLine;
                 rc += "TextEditorScrollLimit=" + TextEditorScrollLimit + Environment.NewLine;
                 rc += "TextEditorEditLimit=" + TextEditorEditLimit + Environment.NewLine;
                 rc += "TextEditorTabSize=" + TextEditorTabSize + Environment.NewLine;
@@ -456,42 +451,7 @@ namespace KLineEdCmdApp.Utils
             }
             return rc;
         }
-
-        public string GetFullHelpInfo()
-        {
-            var msg = $"{Environment.NewLine}Hint: retry using program's expected parameters and their arguments which are:{Environment.NewLine}";
-
-            msg += Environment.NewLine;
-            msg += $"[{ParamHelp} |" + Environment.NewLine;
-            msg += $"[{ParamExportFile} drive:path\\*.ksx drive:path\\*.txt |" + Environment.NewLine;
-            msg += $"[{ParamImportFile} drive:path\\*.txt drive:path\\*.ksx |" + Environment.NewLine;
-            msg += $"[{ParamEditFile} drive:path\\*.ksx" + Environment.NewLine;
-            msg += "(" + Environment.NewLine;
-            msg += $"   {ParamSettings} {ArgSettingsDisplay} [yes | no] (drive:path\\*.json ({ArgSettingsUpdate} [yes | no]))" + Environment.NewLine;
-            msg += $"   {ParamForeGndColour} {ArgColourText} COLOUR {ArgColourMsgError} COLOUR {ArgColourMsgWarn} COLOUR {ArgColourMsgInfo} {ArgColourCmds} COLOUR {ArgColourStatus} COLOUR {ArgColourRule} COLOUR" + Environment.NewLine;
-            msg += $"   {ParamBackGndColour} {ArgColourText} COLOUR {ArgColourMsgError} COLOUR {ArgColourMsgWarn} COLOUR {ArgColourMsgInfo} {ArgColourCmds} COLOUR {ArgColourStatus} COLOUR {ArgColourRule} COLOUR" + Environment.NewLine;
-            msg += $"   {ParamAudio} {ArgAudioVol} {ArgAudioVolDefault} <min {ArgAudioVolMin} max {ArgAudioVolMax}>" + Environment.NewLine;
-            msg += Environment.NewLine;
-            msg += $"   {ParamTextEditorRulers} {ArgTextEditorRulersShow} [yes | no] {ArgTextEditorRulersUnitChar} '.'" + Environment.NewLine;
-            msg += $"   {ParamTextEditorCursor} {ArgTextEditorCursorSize} {ArgTextEditorCursorSizeDefault} <min {ArgTextEditorCursorSizeMin} max {ArgTextEditorCursorSizeMax}>" + Environment.NewLine;
-            msg += $"   {ParamTextEditorDisplay} {ArgTextEditorDisplayRows} {ArgTextEditorDisplayRowsDefault} <min {ArgTextEditorDisplayRowsMin} max {ArgTextEditorDisplayRowsMax}> {ArgTextEditorDisplayCols} {ArgTextEditorDisplayColsDefault} <min {ArgTextEditorDisplayColsMin} max {ArgTextEditorDisplayColsMax}> {ArgTextEditorDisplayParaBreakDisplayChar} {ArgTextEditorDisplayParaBreakDisplayCharDefault}" + Environment.NewLine;
-            msg += $"   {ParamTextEditorLimits} {ArgTextEditorLimitEdit} {ArgTextEditorLimitEditDefault} <min {ArgTextEditorLimitEditMin} max {ArgTextEditorLimitEditMax}> {ArgTextEditorLimitScroll} {ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>" + Environment.NewLine;
-            msg += $"   {ParamTextEditorTabSize} {ArgTextEditorTabSizeDefault} <min {ArgTextEditorTabSizeMin} max {ArgTextEditorTabSizeMax}>" + Environment.NewLine;
-            msg += $"   {ParamTextEditorPauseWaitSecs} {ArgTextEditorPauseWaitSecsDefault} <min {ArgTextEditorPauseWaitSecsMin} max {ArgTextEditorPauseWaitSecsMax}>" + Environment.NewLine;
-            msg += $"   {ParamTextEditorAutoSave} [{ArgTextEditorAutoSaveCR} | {ArgTextEditorAutoSaveParaBreak} | {ArgTextEditorAutoSaveOff}]" + Environment.NewLine;
-            msg += $"   {ParamTextEditorAutoCorrect} [on | off]" + Environment.NewLine;
-            msg += Environment.NewLine;
-            msg += $"   {ParamToolBrowser} {ArgToolBrowserExe} {ToolBrowserExe}" + Environment.NewLine;
-            msg += $"   {ParamToolHelp} {ArgToolBrowserUrl} {ToolHelpUrl} {ArgToolBrowserArg} {ToolHelpArg}" + Environment.NewLine;
-            msg += $"   {ParamToolSearch} {ArgToolBrowserUrl} {ToolSearchUrl} {ArgToolBrowserArg} {ToolSearchArg}" + Environment.NewLine;
-            msg += $"   {ParamToolThesaurus} {ArgToolBrowserUrl} {ToolThesaurusUrl} {ArgToolBrowserArg} {ToolThesaurusArg}" + Environment.NewLine;
-            msg += $"   {ParamToolSpell} {ArgToolBrowserUrl} {ToolSpellUrl} {ArgToolBrowserArg} {ToolSpellArg}" + Environment.NewLine;
-         // msg += $"   {ParamToolSvn} {ArgToolSvnUser} {ToolSvnUser} {ArgToolSvnPassword} {ToolSvnPasswordKey} {ArgToolSvnUrl} {ToolSvnUrl}" + Environment.NewLine;
-            msg += ")" + Environment.NewLine;
-
-            return msg;
-        }
-
+   
         protected override void SetDefaultValues() //called from base class as values may be overwritten by values passed from cmdLine
         {
             Op = OpMode.Unknown;
@@ -533,13 +493,9 @@ namespace KLineEdCmdApp.Utils
 
             ToolBrowserExe = null;
             ToolHelpUrl = null;
-            ToolHelpArg = null;
             ToolSearchUrl = null;
-            ToolSearchArg = null;
             ToolThesaurusUrl = null;
-            ToolThesaurusArg = null;
             ToolSpellUrl = null;
-            ToolSpellArg = null;
             ToolSvnUser = null;
             ToolSvnPasswordKey = null;
             ToolSvnUrl = null;
@@ -550,7 +506,7 @@ namespace KLineEdCmdApp.Utils
             TextEditorDisplayRows = Program.PosIntegerNotSet;
             TextEditorDisplayCols = Program.PosIntegerNotSet;
             TextEditorParaBreakDisplayChar = Program.NullChar;
-            TextEditorPauseWaitSecs = Program.PosIntegerNotSet;
+            TextEditorPauseTimeout = Program.PosIntegerNotSet;
             TextEditorScrollLimit = Program.PosIntegerNotSet;
             TextEditorEditLimit = Program.PosIntegerNotSet;
             TextEditorTabSize = Program.PosIntegerNotSet;
@@ -598,13 +554,9 @@ namespace KLineEdCmdApp.Utils
 
             ToolBrowserExe = ArgToolBrowserExeDefault;
             ToolHelpUrl = ArgToolHelpUrlDefault;
-            ToolHelpArg = ArgToolHelpArgDefault;
             ToolSearchUrl = ArgToolSearchUrlDefault;
-            ToolSearchArg = ArgToolSearchArgDefault;
             ToolThesaurusUrl = ArgToolThesaurusUrlDefault;
-            ToolThesaurusArg = ArgToolThesaurusArgDefault;
             ToolSpellUrl = ArgToolSpellUrlDefault;
-            ToolSpellArg = ArgToolSpellArgDefault;
             ToolSvnUser = Program.ValueNotSet;
             ToolSvnPasswordKey = Program.ValueNotSet;
             ToolSvnUrl = Program.ValueNotSet;
@@ -615,7 +567,7 @@ namespace KLineEdCmdApp.Utils
             TextEditorDisplayRows = ArgTextEditorDisplayRowsDefault;
             TextEditorDisplayCols = ArgTextEditorDisplayColsDefault;
             TextEditorParaBreakDisplayChar = ArgTextEditorDisplayParaBreakDisplayCharDefault;
-            TextEditorPauseWaitSecs = ArgTextEditorPauseWaitSecsDefault;
+            TextEditorPauseTimeout = ArgTextEditorPauseTimeoutDefault;
             TextEditorScrollLimit = ArgTextEditorLimitScrollDefault;
             TextEditorEditLimit = ArgTextEditorLimitEditDefault;
             TextEditorTabSize = ArgTextEditorTabSizeDefault;
@@ -639,7 +591,7 @@ namespace KLineEdCmdApp.Utils
                 var rcParam = GetParamType(paramLine);
                 rc += rcParam;
                 if (rcParam.IsError(true))
-                    HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\"{Environment.NewLine}" + GetFullHelpInfo();
+                    HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\"{Environment.NewLine}" + GetHelpInfoAll();
                 else
                 {
                     switch (rcParam.GetResult())
@@ -703,7 +655,7 @@ namespace KLineEdCmdApp.Utils
                 else
                 {
                     if (string.IsNullOrEmpty(ExportOutputFile))
-                        rc.SetError(1020303, MxError.Source.User, $"{ExportFileNameForm} argument missing");
+                        rc.SetError(1020303, MxError.Source.User, $"{TextFileNameForm} argument missing");
                     else
                     {
                         rc.SetResult(true);
@@ -729,113 +681,6 @@ namespace KLineEdCmdApp.Utils
                 HelpHint = $"{Environment.NewLine}No further information{Environment.NewLine}";
                 rc.SetError(1020305, MxError.Source.Program, $"Unsupported parameter={EnumOps.XlatToString(Op)}", MxMsgs.MxErrUnknownParam);
             }
-            return rc;
-        }
-
-        protected override string GetParamHelp(int paramId = 0) // paramId = KLineEditor.PosIntegerNotSet 
-        {
-            var rc = "";
-
-            var msg = $"{Environment.NewLine}Hint: retry using expected arguments for the parameter.{Environment.NewLine}";
-
-            Param help = (Param) paramId;
-            if (help == Param.Help)
-            {
-                msg += $"{ParamHelp}";
-                msg += GetAppHelpNotes();
-                rc = msg;
-            }
-            else if (help == Param.ExportFile)
-            {
-                msg += $"{ParamExportFile} {EditFileNameForm} {ExportFileNameForm}";
-                msg += GetAppHelpNotes();
-                rc = msg;
-            }
-            else if (help == Param.EditFile)
-            {
-                msg += $"{ParamEditFile} {EditFileNameForm}";
-                msg += GetAppHelpNotes();
-                rc = msg;
-            }
-            //else if (help == Param.AudioCR)
-            //{
-            //    msg += $"{ParamAudioCR} {FileNameForm} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.AudioKey)
-            //{
-            //    msg += $"{ParamAudioKeyPress} {FileNameForm} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.BackGndColour)
-            //{
-            //    msg += $"{ParamBackGndColour}  {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
-            //    msg += Environment.NewLine + $"A permitted '{ColourName}' is:" + Environment.NewLine + " " + GetColourNames() + Environment.NewLine;
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.ForeGndColour)
-            //{
-            //    msg += $"{ParamForeGndColour}  {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
-            //    msg += Environment.NewLine + $"A permitted '{ColourName}' is:" + Environment.NewLine + " " + GetColourNames() + Environment.NewLine;
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.ScrollReview)
-            //{
-            //    msg += $"{ParamScrollReviewMode}  [{ArgYes} | {ArgNo}]";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.EditLine)
-            //{
-            //    msg += $"{ParamEditLineMode}  [{ArgYes} | {ArgNo}]";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.TextEditorAutoCorrect)
-            //{
-            //    msg += $"{ParamSpellCheckMode}  [{ArgYes} | {ArgNo}]";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            else if (help == Param.Settings)
-            {
-                msg += $"{ParamSettings} 'drive:path\\filename' ({ArgSettingsUpdate})";
-                msg += GetAppHelpNotes();
-                rc = msg;
-            }
-            else
-            {
-                rc = GetFullHelpInfo();
-            }
-
-            return rc;
-        }
-
-        public string GetAppHelpNotes()
-        {
-            var rc = Environment.NewLine + GetHelpNotes() + Environment.NewLine + Environment.NewLine;
-
-            //{word} is the word currently selected by the cursor
-            //{version} is the current help documentation version(typically the app version major.minor)
-            //COLOUR is any of the defined colour words; ArgBlack = "black"; ArgBlue = "blue"; ArgCyan = "cyan"; ArgDarkBlue = "darkblue";
-            //ArgDarkCyan = "darkcyan"; ArgDarkGray = "darkgray"; ArgDarkGreen = "darkgreen"; ArgDarkMagenta = "darkmagenta";
-            //ArgDarkRed = "darkred"; ArgDarkYellow = "darkyellow"; ArgGray = "gray"; ArgGreen = "green"; ArgMagenta = "magenta";
-            //ArgRed = "red"; ArgWhite = "white"; ArgYellow = "yellow";
-            //    > is any displayable character
-            //    . is any displayable character
-            //drive:path\ is any valid full path
-            //    [secret manager key] lookup value in secret manager using key value
-
-            //darkmagenta is reserved for NotSet
-            rc += "File: drive:path\\*.ksx is any valid path and filename for ksx file" + Environment.NewLine;
-            rc += "Application Variables: {word} word at cursor, {HelpVer} help version" + Environment.NewLine;
-            rc += "COLOUR; white,black,blue,cyan,gray,green,magenta,red,yellow" + Environment.NewLine;
-            rc += "  darkblue,darkcyan,darkgray,darkgreen,darkred,darkyellow," + Environment.NewLine;
-
             return rc;
         }
 
@@ -928,7 +773,7 @@ namespace KLineEdCmdApp.Utils
                 else
                 {
                     Op = OpMode.Help;
-                    HelpHint = $"Help request:{Environment.NewLine}{GetFullHelpInfo()}";
+                    HelpHint = $"Help request:{Environment.NewLine}{GetHelpInfoAll()}";
                     rc.SetResult(true);
                 }
             }
@@ -1005,16 +850,16 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessSettingsParam", false);
 
-            var rcCnt = GetArgCount(paramLine, ParamSettings);
+            var rcCnt = GetArgCount(paramLine, ParamGeneralSettings);
             rc += rcCnt;
             if (rcCnt.IsSuccess())
             {
                 int argCnt = rcCnt.GetResult();
                 if ((argCnt != 1) && (argCnt != 2))
-                    rc.SetError(1022001, MxError.Source.User, $"parameter {ParamSettings} has incorrect number of arguments; found {argCnt} should be 1 or 2");
+                    rc.SetError(1022001, MxError.Source.User, $"parameter {ParamGeneralSettings} has incorrect number of arguments; found {argCnt} should be 1 or 2");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamSettings}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamGeneralSettings}");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess())
                     {
@@ -1023,13 +868,13 @@ namespace KLineEdCmdApp.Utils
                             rc.SetResult(true);
                         else
                         {
-                            var rcArg2 = GetArgValue(paramLine, 2, false, $"parameter {ParamSettings}");
+                            var rcArg2 = GetArgValue(paramLine, 2, false, $"parameter {ParamGeneralSettings}");
                             rc += rcArg2;
                             if (rcArg2.IsSuccess())
                             {
                                 var update = rcArg2.GetResult();
                                 if ((update != null) && (update != ArgSettingsUpdate))
-                                    rc.SetError(1022002, MxError.Source.User, $"parameter {ParamSettings} has incorrect second argument {update}; it should be {ArgSettingsUpdate}");
+                                    rc.SetError(1022002, MxError.Source.User, $"parameter {ParamGeneralSettings} has incorrect second argument {update}; it should be {ArgSettingsUpdate}");
                                 else
                                 {
                                     SettingsUpdate = BoolValue.Yes;
@@ -1128,20 +973,12 @@ namespace KLineEdCmdApp.Utils
                 ToolBrowserExe = savedSettings.ToolBrowserExe;
             if (ToolHelpUrl == null)
                 ToolHelpUrl = savedSettings.ToolHelpUrl;
-            if (ToolHelpArg == null)
-                ToolHelpArg = savedSettings.ToolHelpArg;
             if (ToolSearchUrl == null)
                 ToolSearchUrl = savedSettings.ToolSearchUrl;
-            if (ToolSearchArg == null)
-                ToolSearchArg = savedSettings.ToolSearchArg;
             if (ToolThesaurusUrl == null)
                 ToolThesaurusUrl = savedSettings.ToolThesaurusUrl;
-            if (ToolThesaurusArg == null)
-                ToolThesaurusArg = savedSettings.ToolThesaurusArg;
             if (ToolSpellUrl == null)
                 ToolSpellUrl = savedSettings.ToolSpellUrl;
-            if (ToolSpellArg == null)
-                ToolSpellArg = savedSettings.ToolSpellArg;
             if (ToolSvnUser == null)
                 ToolSvnUser = savedSettings.ToolSvnUser;
             if (ToolSvnPasswordKey == null)
@@ -1161,8 +998,8 @@ namespace KLineEdCmdApp.Utils
                 TextEditorDisplayCols = savedSettings.TextEditorDisplayCols;
             if (TextEditorParaBreakDisplayChar == Program.NullChar)
                 TextEditorParaBreakDisplayChar = savedSettings.TextEditorParaBreakDisplayChar;
-            if (TextEditorPauseWaitSecs == Program.PosIntegerNotSet)
-                TextEditorPauseWaitSecs = savedSettings.TextEditorPauseWaitSecs;
+            if (TextEditorPauseTimeout == Program.PosIntegerNotSet)
+                TextEditorPauseTimeout = savedSettings.TextEditorPauseTimeout;
             if (TextEditorScrollLimit == Program.PosIntegerNotSet)
                 TextEditorScrollLimit = savedSettings.TextEditorScrollLimit;
             if (TextEditorEditLimit == Program.PosIntegerNotSet)
@@ -1338,5 +1175,176 @@ namespace KLineEdCmdApp.Utils
 
             return rc;
         }
+
+        protected override string GetParamHelp(int paramId = 0) // paramId = KLineEditor.PosIntegerNotSet 
+        {
+            var rc = "";
+
+            var msg = $"{Environment.NewLine}Hint: retry using expected arguments for the parameter.{Environment.NewLine}";
+
+            Param help = (Param)paramId;
+            if (help == Param.Help)
+            {
+                msg += $"{ParamHelp}";
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ExportFile)
+            {
+                msg += $"{ParamExportFile} {EditFileNameForm} {TextFileNameForm}";
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.EditFile)
+            {
+                msg += $"{ParamEditFile} {EditFileNameForm}";
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            //else if (help == Param.AudioCR)
+            //{
+            //    msg += $"{ParamAudioCR} {FileNameForm} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
+            //else if (help == Param.AudioKey)
+            //{
+            //    msg += $"{ParamAudioKeyPress} {FileNameForm} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
+            //else if (help == Param.BackGndColour)
+            //{
+            //    msg += $"{ParamGeneralBackGndColour}  {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
+            //    msg += Environment.NewLine + $"A permitted '{ColourName}' is:" + Environment.NewLine + " " + GetColourNames() + Environment.NewLine;
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
+            //else if (help == Param.ForeGndColour)
+            //{
+            //    msg += $"{ParamGeneralForeGndColour}  {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
+            //    msg += Environment.NewLine + $"A permitted '{ColourName}' is:" + Environment.NewLine + " " + GetColourNames() + Environment.NewLine;
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
+            //else if (help == Param.ScrollReview)
+            //{
+            //    msg += $"{ParamScrollReviewMode}  [{ArgYes} | {ArgNo}]";
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
+            //else if (help == Param.EditLine)
+            //{
+            //    msg += $"{ParamEditLineMode}  [{ArgYes} | {ArgNo}]";
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
+            //else if (help == Param.TextEditorAutoCorrect)
+            //{
+            //    msg += $"{ParamSpellCheckMode}  [{ArgYes} | {ArgNo}]";
+            //    msg += GetHelpNotes();
+            //    rc = msg;
+            //}
+            else if (help == Param.Settings)
+            {
+                msg += GetAppHelpNotes();
+                msg += $"{ParamGeneralSettings} 'drive:path\\filename' ({ArgSettingsUpdate})";
+
+                rc = msg;
+            }
+            else
+            {
+                rc = GetHelpInfoAll();
+            }
+
+            return rc;
+        }
+
+        private static string GetHelpInfoHelp() { return $"{ParamHelp}"; }
+        private static string GetHelpInfoExport() { return $"{ParamExportFile} {EditFileNameForm} {TextFileNameForm}"; }
+        private static string GetHelpInfoImport() { return $"{ParamImportFile} {TextFileNameForm} {EditFileNameForm}"; }
+        private static string GetHelpInfoEdit() { return $"{ParamEditFile} {EditFileNameForm}"; }
+        private static string GetHelpInfoGeneralSettings() { return $"{ParamGeneralSettings} {ArgSettingsDisplay} [yes | no] ({SettingsFileNameForm} ({ArgSettingsUpdate} [yes | no]))"; }
+        private static string GetHelpInfoGeneralForeGndColour() { return $"{ParamGeneralForeGndColour} ({ArgColourText} COLOR) ({ArgColourMsgError} COLOR) ({ArgColourMsgWarn} COLOR) ({ArgColourMsgInfo} COLOUR) ({ArgColourCmds} COLOR) ({ArgColourStatus} COLOR) ({ArgColourRule} COLOR)"; }
+        private static string GetHelpInfoGeneralBackGndColour() { return $"{ParamGeneralBackGndColour} ({ArgColourText} COLOR) ({ArgColourMsgError} COLOR) ({ArgColourMsgWarn} COLOR) ({ArgColourMsgInfo} COLOUR) ({ArgColourCmds} COLOR) ({ArgColourStatus} COLOR) ({ArgColourRule} COLOR)"; }
+        private static string GetHelpInfoGeneralAudio() { return $"{ParamGeneralAudio} {ArgAudioVol} {ArgAudioVolDefault} <min {ArgAudioVolMin} max {ArgAudioVolMax}>"; }
+        private static string GetHelpInfoTextEditorRulers() { return $"{ParamTextEditorRulers} {ArgTextEditorRulersShow} [yes | no] {ArgTextEditorRulersUnitChar} '.'"; }
+        private static string GetHelpInfoTextEditorCursor() { return $"{ParamTextEditorCursor} {ArgTextEditorCursorSize} {ArgTextEditorCursorSizeDefault} <min {ArgTextEditorCursorSizeMin} max {ArgTextEditorCursorSizeMax}>"; }
+        private static string GetHelpInfoTextEditorDisplay() { return $"{ParamTextEditorDisplay} ({ArgTextEditorDisplayRows} {ArgTextEditorDisplayRowsDefault} <min {ArgTextEditorDisplayRowsMin} max {ArgTextEditorDisplayRowsMax}>) ({ArgTextEditorDisplayCols} {ArgTextEditorDisplayColsDefault} <min {ArgTextEditorDisplayColsMin} max {ArgTextEditorDisplayColsMax}>) ({ArgTextEditorDisplayParaBreakDisplayChar} '{ArgTextEditorDisplayParaBreakDisplayCharDefault}')"; }
+        private static string GetHelpInfoTextEditorLimits() { return $"{ParamTextEditorLimits} ({ArgTextEditorLimitEdit} {ArgTextEditorLimitEditDefault} <min {ArgTextEditorLimitEditMin} max {ArgTextEditorLimitEditMax}>) ({ArgTextEditorLimitScroll} {ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>)"; }
+        private static string GetHelpInfoTextEditorTabSize() { return $"{ParamTextEditorTabSize} {ArgTextEditorTabSizeDefault} <min {ArgTextEditorTabSizeMin} max {ArgTextEditorTabSizeMax}>"; }
+        private static string GetHelpInfoTextEditorPauseTimeout() { return $"{ParamTextEditorPauseTimeout} {ArgTextEditorPauseTimeoutDefault} <min {ArgTextEditorPauseTimeoutMin} max {ArgTextEditorPauseTimeoutMax}>"; }
+        private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} [{ArgTextEditorAutoSaveCR} | {ArgTextEditorAutoSaveParaBreak} | {ArgTextEditorAutoSaveOff}]"; }
+        private static string GetHelpInfoTextEditorAutoCorrect() { return $"{ParamTextEditorAutoCorrect} [on | off]"; }
+        private static string GetHelpInfoToolBrowser() { return $"{ParamToolBrowser} {ArgToolBrowserExe} {ExeFileNameForm}"; }
+        private static string GetHelpInfoToolHelp() { return $"{ParamToolHelp} {ArgToolBrowserUrl} {UrlForm}"; }
+        private static string GetHelpInfoToolSearch() { return $"{ParamToolSearch} {ArgToolBrowserUrl} {UrlForm}"; }
+        private static string GetHelpInfoToolThesaurus() { return $"{ParamToolThesaurus} {ArgToolBrowserUrl} {UrlForm}"; }
+        private static string GetHelpInfoToolSpell() { return $"{ParamToolSpell} {ArgToolBrowserUrl} {UrlForm}"; }
+        private static string GetHelpInfoToolSvn() { return $"{ParamToolSvn} ({ArgToolSvnUser} {UsernameForm }) ({ArgToolSvnPassword} {PasswordKeyForm}) ({ArgToolSvnUrl} {UrlForm})"; }
+
+        private static string GetHelpInfoAll()
+        {
+            var msg = $"{Environment.NewLine}Hint: retry using program's expected parameters and their arguments which are:{Environment.NewLine}";
+
+            msg += Environment.NewLine;
+            msg += $"[{GetHelpInfoHelp()} |" + Environment.NewLine;
+            msg += $"{GetHelpInfoExport()} |" + Environment.NewLine;
+            msg += $"{GetHelpInfoImport()} |" + Environment.NewLine;
+            msg += $"{GetHelpInfoEdit()}" + Environment.NewLine;
+            msg += "(" + Environment.NewLine;
+            msg += $"   {GetHelpInfoGeneralSettings()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoGeneralForeGndColour()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoGeneralBackGndColour()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoGeneralAudio()}" + Environment.NewLine;
+            msg += Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorRulers()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorCursor()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorDisplay()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorLimits()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorTabSize()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorPauseTimeout()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorAutoSave()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorAutoCorrect()}" + Environment.NewLine;
+            msg += Environment.NewLine;
+            msg += $"   {GetHelpInfoToolBrowser()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoToolHelp()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoToolSearch()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoToolThesaurus()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoToolSpell()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoToolSvn()}" + Environment.NewLine;
+            msg += ")] " + Environment.NewLine;
+
+            msg += GetAppHelpNotes();
+
+            return msg;
+        }
+
+        private static string GetAppHelpNotes()
+        {
+            var rc = GetHelpNotes() + Environment.NewLine;
+
+            //{word} is the word currently selected by the cursor
+            //{version} is the current help documentation version(typically the app version major.minor)
+            //COLOUR is any of the defined colour words; ArgBlack = "black"; ArgBlue = "blue"; ArgCyan = "cyan"; ArgDarkBlue = "darkblue";
+            //ArgDarkCyan = "darkcyan"; ArgDarkGray = "darkgray"; ArgDarkGreen = "darkgreen"; ArgDarkMagenta = "darkmagenta";
+            //ArgDarkRed = "darkred"; ArgDarkYellow = "darkyellow"; ArgGray = "gray"; ArgGreen = "green"; ArgMagenta = "magenta";
+            //ArgRed = "red"; ArgWhite = "white"; ArgYellow = "yellow";
+            //    > is any displayable character
+            //    . is any displayable character
+            //drive:path\ is any valid full path
+            //    [secret manager key] lookup value in secret manager using key value
+
+            rc += $"File: {EditFileNameForm} is any valid path and filename for ksx file" + Environment.NewLine;
+            rc += $"Url: '{UrlForm}' is any valid url and arguments" + Environment.NewLine;
+            rc += "Characters: '>' or '.' replace with any displayable character not in quotes" + Environment.NewLine;
+            //rc += "Application Variables: 'word' is word at cursor, 'HelpVer' is help version" + Environment.NewLine;
+            //darkmagenta is reserved for NotSet
+            rc += "COLOR: white, black, blue, cyan, gray, green, magenta, red, yellow" + Environment.NewLine;
+            rc += "        darkblue, darkcyan, darkgray, darkgreen, darkred, darkyellow" + Environment.NewLine;
+
+            return rc;
+        }
+
     }
 }

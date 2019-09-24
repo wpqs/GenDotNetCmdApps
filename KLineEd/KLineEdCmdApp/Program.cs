@@ -110,7 +110,11 @@ namespace KLineEdCmdApp
 
             try
             {
-                terminal.WriteLine(cmdLineParams.HelpHint);
+                var lines = cmdLineParams.HelpHint.Split(Environment.NewLine);
+                foreach (var line in lines)
+                {
+                    terminal.WriteLine(line);
+                }
                 terminal.WriteLine("end of report");
                 cmdLineParams.HelpHint = "";
                 rc.SetResult("succeeded");

@@ -41,7 +41,7 @@ namespace KLineEdCmdApp.Model
             Sessions = new List<HeaderSession>();
             PauseState = false;
             LastKeyPress = DateTime.UtcNow;
-            PauseWaitSeconds = CmdLineParamsApp.ArgTextEditorPauseWaitSecsDefault;
+            PauseWaitSeconds = CmdLineParamsApp.ArgTextEditorPauseTimeoutDefault;
         }
 
         public bool SetDefaults(string pathFilename)
@@ -52,7 +52,7 @@ namespace KLineEdCmdApp.Model
         public bool SetPauseWaitSeconds(int pause)
         {
             var rc = false;
-            if ((pause >= CmdLineParamsApp.ArgTextEditorPauseWaitSecsMin) && (pause <= CmdLineParamsApp.ArgTextEditorPauseWaitSecsMax))
+            if ((pause >= CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) && (pause <= CmdLineParamsApp.ArgTextEditorPauseTimeoutMax))
             {
                 PauseWaitSeconds = pause;
                 rc = true;
@@ -137,7 +137,7 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1090201, MxError.Source.Data, $"Chapter is invalid={Properties}", MxMsgs.MxErrInvalidCondition);
             else
             {
-                if ((PauseWaitSeconds < CmdLineParamsApp.ArgTextEditorPauseWaitSecsMin) || (PauseWaitSeconds > CmdLineParamsApp.ArgTextEditorPauseWaitSecsMax))
+                if ((PauseWaitSeconds < CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) || (PauseWaitSeconds > CmdLineParamsApp.ArgTextEditorPauseTimeoutMax))
                     rc.SetError(1090202, MxError.Source.Data, $"PauseWaitSeconds={PauseWaitSeconds} is invalid", MxMsgs.MxErrInvalidCondition);
                 else
                 {

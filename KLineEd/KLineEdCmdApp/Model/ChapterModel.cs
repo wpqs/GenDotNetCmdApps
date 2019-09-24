@@ -110,7 +110,7 @@ namespace KLineEdCmdApp.Model
                             }
                             if (rcDone.IsSuccess(true))
                              {
-                                ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgTextEditorPauseWaitSecsDefault); //todo set from value
+                                ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgTextEditorPauseTimeoutDefault); //todo set from value
                                 Ready = true;
                                 rc.SetResult(true);
                             }

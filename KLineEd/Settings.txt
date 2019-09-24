@@ -62,10 +62,10 @@ Settings that can be set from command line
 
 Main operations 
 
---help														//display help info
---export 'drive:path\edit'.ksx 'drive:path\export.txt'		//export edit.ksx to export.txt 
---import 'drive:path\import.txt' 'drive:path\edit.ksx'		//import import.txt to edit.ksx
---edit 'drive:path\edit.ksx'								//edit specified .ksx file
+--help													//display help info
+--export 'drive:path\*'.ksx 'drive:path\*.txt'			//export edit.ksx to export.txt 
+--import 'drive:path\*.txt' 'drive:path\*.ksx'			//import import.txt to edit.ksx
+--edit 'drive:path\*.ksx'								//edit specified .ksx file
  
 Additional options for edit operation (--edit)
 
@@ -73,15 +73,15 @@ Additional options for edit operation (--edit)
 
   --settings display [yes |no] (file 'drive:path\xxx.json' (update [yes | no]))	//update saves setting changes in specified file
   --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-info COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
-  --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-info COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)//- was  ParamForeGndColour
+  --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-info COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamForeGndColour
   --audio vol 0  <min 0 max 10>								//(0 is off)
 
 	Text Editor options page
 
   --rulers show [yes | no] UnitChar '.'
   --cursor size 20 <min 1 max 100>
-  --display rows 10 <min 1 max 25> cols 80 <min 20 max 250> parabreak '>' //was displaylastlines, now EditAreaLinesCount was DisplayLineWidth, now EditAreaLineWidth
-  --limits scroll 0  <min 0 max 10000>	edit 0  <min 0 max 10000>		//number of lines you can scroll/edit back from end of chapter (0 is unlimited) - was scrollreview, ParamScrollReviewMode was editline (min current line) ParamEditLineMode
+  --display (rows 10 <min 1 max 25>) (cols 80 <min 20 max 250>) (parabreak '>')  //was displaylastlines, now EditAreaLinesCount was DisplayLineWidth, now EditAreaLineWidth
+  --limits (scroll 0  <min 0 max 10000>) (edit 0  <min 0 max 10000>)		     //number of lines you can scroll/edit back from end of chapter (0 is unlimited) - was scrollreview, ParamScrollReviewMode was editline (min current line) ParamEditLineMode
   --tabsize 3 <min 1 max 25>
   --typingpause 60 <min 5 max 36000>									//in seconds
   --autosave [CR | ParaBreak | off]							//was ParamSpellCheckMode, spellcheck
@@ -90,11 +90,11 @@ Additional options for edit operation (--edit)
 	Tools options page
 
   --toolbrowser exe 'explorer.exe'								//was ParamBrowser
-  --toolhelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual arg '{HelpVer}
-  --toolsearch url https://www.google.com/ arg 'search/{word}'
-  --toolthesaurus url https://www.thesaurus.com/ arg '/browse/{word}'
-  --toolspell ulr https://www.spell.com arg 'search/{word}'
-  --toolsvn username 'wills' password [secret manager key] url 'https//me.svnrepository.com/books'
+  --toolhelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}
+  --toolsearch url https://www.google.com/search?q=%22{word}%22
+  --toolthesaurus url https://www.thesaurus.com/browse/{word}
+  --toolspell ulr http://www.spellcheck.net/{word}
+  --toolsvn (username 'name') (password key) (url 'https//xxx.svnrepository.com/books)'
 
 Implemented v1.2
 
