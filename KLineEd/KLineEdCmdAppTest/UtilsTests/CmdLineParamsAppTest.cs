@@ -25,7 +25,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--xhelp" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1023002-user: the parameter --xhelp is invalid", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1023101-user: the parameter --xhelp is invalid", rcParam.GetErrorUserMsg());
             Assert.Contains("Hint: retry using program's expected parameters and their arguments which are:", cmdLineParams.HelpHint);
         }
 
@@ -146,7 +146,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--export" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1020601-user: parameter --export has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
@@ -157,7 +157,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--export", "test.txt" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1020601-user: parameter --export has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
@@ -168,7 +168,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.ksx", "Export.txt", "extra" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1020601-user: parameter --export has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
