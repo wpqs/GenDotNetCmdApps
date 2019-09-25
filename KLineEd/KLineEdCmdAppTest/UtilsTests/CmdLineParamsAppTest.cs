@@ -36,6 +36,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(StdParamsHelp);
 
             Assert.True(rcParam.GetResult());
+            Assert.Equal(CmdLineParamsApp.OpMode.Help, cmdLineParams.Op);
             Assert.StartsWith("Help request", cmdLineParams.HelpHint);
             Assert.Contains("Hint: retry using program's expected parameters and their arguments which are:", cmdLineParams.HelpHint);
         }
@@ -132,6 +133,9 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.ksx", "Export.txt" });
 
             Assert.True(rcParam.GetResult());
+            Assert.Equal("Export.txt", cmdLineParams.ExportOutputFile);
+            Assert.Equal("Edit.ksx", cmdLineParams.EditFile);
+            Assert.Equal(CmdLineParamsApp.OpMode.Export, cmdLineParams.Op);
             Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
         }
 
@@ -167,6 +171,54 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.StartsWith("error 1020701-user: parameter --export has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
+
+        [Fact]
+        public void TestImportParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--import", "Import.txt", "Edit.ksx" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("Import.txt", cmdLineParams.ImportInputFile);
+            Assert.Equal("Edit.ksx", cmdLineParams.EditFile);
+            Assert.Equal(CmdLineParamsApp.OpMode.Import, cmdLineParams.Op);
+            Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestImportParamNoArg()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--import" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.StartsWith("error 1020701-user: parameter --import has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
+            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--import", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestImportParamNoSecondArg()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--import", "test.ksx" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.StartsWith("error 1020701-user: parameter --import has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
+            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--import", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestImportParamExtraArg()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--import", "Edit.txt", "Export.ksx", "extra" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.StartsWith("error 1020701-user: parameter --import has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
+            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--import", cmdLineParams.HelpHint);
+        }
+
+
 
         [Fact]
         public void TestEditParam()

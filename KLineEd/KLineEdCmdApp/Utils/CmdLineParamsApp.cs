@@ -349,7 +349,7 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = "--toolsearch")] ToolSearch,
             [EnumMember(Value = "--toolthesaurus")] ToolThesaurus,
             [EnumMember(Value = "--toolspell")] ToolSpell,
-            [EnumMember(Value = "--toolsvn")] Svn,
+            [EnumMember(Value = "--toolsvn")] ToolSvn,
             [EnumMember(Value = "--audio")] Audio,
             [EnumMember(Value = "--rulers")] Rulers,
             [EnumMember(Value = "--cursor")] Cursor,
@@ -602,32 +602,176 @@ namespace KLineEdCmdApp.Utils
                             rc += rcHelp;
                             if (rcHelp.IsSuccess())
                                 rc.SetResult(true);
+                            break;
                         }
-                        break;
                         case Param.ExportFile:
                         {
                             var rcReset = ProcessExportParam(paramLine);
                             rc += rcReset;
                             if (rcReset.IsSuccess())
                                 rc.SetResult(true);
+                            break;
                         }
-                        break;
+                        case Param.ImportFile:
+                        {
+                            var rcReset = ProcessImportParam(paramLine);
+                            rc += rcReset;
+                            if (rcReset.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
                         case Param.EditFile:
                         {
                             var rcReset = ProcessEditParam(paramLine);
                             rc += rcReset;
                             if (rcReset.IsSuccess())
                                 rc.SetResult(true);
+                            break;
                         }
-                        break;
                         case Param.Settings:
                         {
-                            var rcSettings = ProcessSettingsParam(paramLine); //change to be part of EditFile
+                            var rcSettings = ProcessSettingsParam(paramLine); 
                             rc += rcSettings;
                             if (rcSettings.IsSuccess())
                                 rc.SetResult(true);
+                            break;
                         }
-                        break;
+                        case Param.BackGnd:
+                        {
+                            var rcSettings = ProcessGeneralBackGndParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.ForeGnd:
+                        {
+                            var rcSettings = ProcessGeneralForeGndParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.Audio:
+                        {
+                            var rcSettings = ProcessGeneralAudioParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.ToolBrowser:
+                        {
+                            var rcSettings = ProcessToolBrowserParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.ToolHelp:
+                        {
+                            var rcSettings = ProcessToolHelpParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.ToolSearch:
+                        {
+                            var rcSettings = ProcessToolSearchParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.ToolThesaurus:
+                        {
+                            var rcSettings = ProcessToolThesaurusParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.ToolSpell:
+                        {
+                            var rcSettings = ProcessToolSpellParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.ToolSvn:
+                        {
+                            var rcSettings = ProcessToolSvnParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.Rulers:
+                        {
+                            var rcSettings = ProcessTextEditorRulersParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.Cursor:
+                        {
+                            var rcSettings = ProcessTextEditorCursorParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.Display:
+                        {
+                            var rcSettings = ProcessTextEditorDisplayParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.Limits:
+                        {
+                            var rcSettings = ProcessTextEditorLimitsParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.TabSize:
+                        {
+                            var rcSettings = ProcessTextEditorTabSizeParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.TypingPause:
+                        {
+                            var rcSettings = ProcessTextEditorPauseTimeoutParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.AutoSave:
+                        {
+                            var rcSettings = ProcessTextEditorAutoSaveParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.AutoCorrect:
+                        {
+                            var rcSettings = ProcessTextEditorAutoCorrectParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
                         default: //case Param.Unknown:
                         {
                             HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\"{Environment.NewLine}{Environment.NewLine}No further information{Environment.NewLine}";
@@ -664,12 +808,28 @@ namespace KLineEdCmdApp.Utils
                 if (rc.IsError())
                     HelpHint = $"{GetParamHelp((int)Param.ExportFile)}";
             }
+            else if (Op == OpMode.Import)
+            {
+                if (string.IsNullOrEmpty(EditFile))
+                    rc.SetError(1020304, MxError.Source.User, $"{EditFileNameForm} argument missing");
+                else
+                {
+                    if (string.IsNullOrEmpty(ImportInputFile))
+                        rc.SetError(1020305, MxError.Source.User, $"{TextFileNameForm} argument missing");
+                    else
+                    {
+                        rc.SetResult(true);
+                    }
+                }
+                if (rc.IsError())
+                    HelpHint = $"{GetParamHelp((int)Param.ImportFile)}";
+            }
             else if (Op == OpMode.Edit)
             {
                 if (string.IsNullOrEmpty(EditFile))
                 {
                     HelpHint = $"{GetParamHelp((int) Param.EditFile)}";
-                    rc.SetError(1020304, MxError.Source.User, $"{EditFileNameForm} argument missing");
+                    rc.SetError(1020306, MxError.Source.User, $"{EditFileNameForm} argument missing");
                 }
                 else
                 {
@@ -679,7 +839,7 @@ namespace KLineEdCmdApp.Utils
             else
             {
                 HelpHint = $"{Environment.NewLine}No further information{Environment.NewLine}";
-                rc.SetError(1020305, MxError.Source.Program, $"Unsupported parameter={EnumOps.XlatToString(Op)}", MxMsgs.MxErrUnknownParam);
+                rc.SetError(1020307, MxError.Source.Program, $"Unsupported parameter={EnumOps.XlatToString(Op)}", MxMsgs.MxErrUnknownParam);
             }
             return rc;
         }
@@ -816,6 +976,42 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
+        private MxReturnCode<bool> ProcessImportParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessImportParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamImportFile);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 2)
+                    rc.SetError(1020701, MxError.Source.User, $"parameter {ParamImportFile} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamImportFile}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        ImportInputFile = rcArg1.GetResult();
+                        var rcArg2 = GetArgValue(paramLine, 2, true, $"parameter {ParamEditFile}");
+                        rc += rcArg2;
+                        if (rcArg2.IsSuccess(true))
+                        {
+                            EditFile = rcArg2.GetResult();
+                            Op = OpMode.Import;
+                            rc.SetResult(true);
+                        }
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ImportFile)}";
+            return rc;
+        }
+
         private MxReturnCode<bool> ProcessEditParam(string paramLine)
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessEditParam", false);
@@ -889,7 +1085,501 @@ namespace KLineEdCmdApp.Utils
                 HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int) Param.Settings)}";
             return rc;
         }
-        
+
+        private MxReturnCode<bool> ProcessGeneralBackGndParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessGeneralBackGndParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamGeneralBackGndColour);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamGeneralBackGndColour}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                       // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.BackGnd)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessGeneralForeGndParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessGeneralForeGndParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamGeneralForeGndColour);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamGeneralForeGndColour} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamGeneralForeGndColour}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ForeGnd)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessGeneralAudioParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessAudioParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamGeneralAudio);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamGeneralAudio} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamGeneralAudio}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.Audio)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessToolBrowserParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolBrowserParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamToolBrowser);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamToolBrowser} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolBrowser}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ToolBrowser)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessToolHelpParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolHelpParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamToolHelp);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamToolHelp} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolHelp}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ToolHelp)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessToolSearchParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSearchParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamToolHelp);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamToolSearch} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolSearch}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ToolSearch)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessToolThesaurusParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSearchParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamToolThesaurus);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamToolThesaurus} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolThesaurus}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ToolThesaurus)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessToolSpellParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSpellParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamToolSpell);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamToolSpell} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolSpell}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ToolSpell)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessToolSvnParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSvnParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamToolSvn);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamToolSvn} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolSvn}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.ToolSvn)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessTextEditorRulersParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorRulersParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorRulers);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorRulers} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorRulers}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.Rulers)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessTextEditorCursorParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorCursorParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorCursor);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorCursor} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorCursor}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.Cursor)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessTextEditorDisplayParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorDisplayParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorDisplay);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorDisplay} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorDisplay}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.Display)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessTextEditorLimitsParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorLimitsParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorLimits);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorLimits} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorLimits}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.Limits)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessTextEditorTabSizeParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorTabSizeParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorTabSize);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorTabSize} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorTabSize}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.TabSize)}";
+            return rc;
+        }
+
+
+        private MxReturnCode<bool> ProcessTextEditorPauseTimeoutParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorPauseTimeoutParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorPauseTimeout);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorPauseTimeout} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorPauseTimeout}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.TypingPause)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessTextEditorAutoSaveParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorAutoSaveParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorAutoSave);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorAutoSave} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorAutoSave}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.AutoSave)}";
+            return rc;
+        }
+
+        private MxReturnCode<bool> ProcessTextEditorAutoCorrectParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorAutoCorrectParam", false);
+
+            HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorAutoCorrect);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1020801, MxError.Source.User, $"parameter {ParamTextEditorAutoCorrect} has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorAutoCorrect}");
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        // EditFile = rcArg1.GetResult();
+                        rc.SetResult(true);
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.AutoCorrect)}";
+            return rc;
+        }
+
         private MxReturnCode<Param> GetParamType(string paramLine)
         {
             var rc = new MxReturnCode<Param>("CmdLineParamsApp.GetParamType", Param.Unknown);
@@ -1185,78 +1875,140 @@ namespace KLineEdCmdApp.Utils
             Param help = (Param)paramId;
             if (help == Param.Help)
             {
-                msg += $"{ParamHelp}";
+                msg += GetHelpInfoHelp() + Environment.NewLine;
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
             else if (help == Param.ExportFile)
             {
-                msg += $"{ParamExportFile} {EditFileNameForm} {TextFileNameForm}";
+                msg += GetHelpInfoExport() + Environment.NewLine; ;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ImportFile)
+            {
+                msg += GetHelpInfoImport() + Environment.NewLine; ;
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
             else if (help == Param.EditFile)
             {
-                msg += $"{ParamEditFile} {EditFileNameForm}";
+                msg += GetHelpInfoEdit() + Environment.NewLine;
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
-            //else if (help == Param.AudioCR)
-            //{
-            //    msg += $"{ParamAudioCR} {FileNameForm} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.AudioKey)
-            //{
-            //    msg += $"{ParamAudioKeyPress} {FileNameForm} {FileNameForm} {ArgVolDefault} <min {ArgVolMin} max {ArgVolMax}>";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.BackGndColour)
-            //{
-            //    msg += $"{ParamGeneralBackGndColour}  {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
-            //    msg += Environment.NewLine + $"A permitted '{ColourName}' is:" + Environment.NewLine + " " + GetColourNames() + Environment.NewLine;
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.ForeGndColour)
-            //{
-            //    msg += $"{ParamGeneralForeGndColour}  {ArgText} {ColourName} {ArgDetails} {ColourName} {ArgCmds} {ColourName} {ArgSpell} {ColourName}";
-            //    msg += Environment.NewLine + $"A permitted '{ColourName}' is:" + Environment.NewLine + " " + GetColourNames() + Environment.NewLine;
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.ScrollReview)
-            //{
-            //    msg += $"{ParamScrollReviewMode}  [{ArgYes} | {ArgNo}]";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.EditLine)
-            //{
-            //    msg += $"{ParamEditLineMode}  [{ArgYes} | {ArgNo}]";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
-            //else if (help == Param.TextEditorAutoCorrect)
-            //{
-            //    msg += $"{ParamSpellCheckMode}  [{ArgYes} | {ArgNo}]";
-            //    msg += GetHelpNotes();
-            //    rc = msg;
-            //}
             else if (help == Param.Settings)
             {
+                msg += GetHelpInfoGeneralSettings() + Environment.NewLine;
                 msg += GetAppHelpNotes();
-                msg += $"{ParamGeneralSettings} 'drive:path\\filename' ({ArgSettingsUpdate})";
-
+                rc = msg;
+            }
+            else if (help == Param.BackGnd)
+            {
+                msg += GetHelpInfoGeneralBackGndColour() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ForeGnd)
+            {
+                msg += GetHelpInfoGeneralForeGndColour() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.Audio)
+            {
+                msg += GetHelpInfoGeneralAudio() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ToolBrowser)
+            {
+                msg += GetHelpInfoToolBrowser() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ToolHelp)
+            {
+                msg += GetHelpInfoToolHelp() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ToolSearch)
+            {
+                msg += GetHelpInfoToolSearch() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ToolThesaurus)
+            {
+                msg += GetHelpInfoToolThesaurus() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ToolSpell)
+            {
+                msg += GetHelpInfoToolSpell() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.ToolSvn)
+            {
+                msg += GetHelpInfoToolSvn() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.Rulers)
+            {
+                msg += GetHelpInfoTextEditorRulers() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.Cursor)
+            {
+                msg += GetHelpInfoTextEditorCursor() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.Display)
+            {
+                msg += GetHelpInfoTextEditorDisplay() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.Limits)
+            {
+                msg += GetHelpInfoTextEditorLimits() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.TabSize)
+            {
+                msg += GetHelpInfoTextEditorTabSize() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.TypingPause)
+            {
+                msg += GetHelpInfoTextEditorPauseTimeout() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.AutoSave)
+            {
+                msg += GetHelpInfoTextEditorAutoSave() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
+            else if (help == Param.AutoCorrect)
+            {
+                msg += GetHelpInfoTextEditorAutoCorrect() + Environment.NewLine;
+                msg += GetAppHelpNotes();
                 rc = msg;
             }
             else
             {
                 rc = GetHelpInfoAll();
             }
-
             return rc;
         }
 

@@ -71,6 +71,10 @@ namespace KLineEdCmdApp
                     {
                         rcOp = ExportProcessing(cmdLineParams: cmdLineParams, terminal);
                     }
+                    else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Import)
+                    {
+                        rcOp = ImportProcessing(cmdLineParams: cmdLineParams, terminal);
+                    }
                     else
                     {
                         rc.SetError(errorCode: 1010101, errType: MxError.Source.Program, errorMsg: $"invalid Op={cmdLineParams.Op} not supported", MxMsgs.MxErrInvalidCondition);
@@ -226,6 +230,41 @@ namespace KLineEdCmdApp
                 catch (Exception e)
                 {
                     rc.SetError(1010504, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                }
+            }
+            return rc;
+        }
+
+        private static MxReturnCode<string> ImportProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
+        {
+            var rc = new MxReturnCode<string>("Program.ImportProcessing");
+
+            if ((cmdLineParams.EditFile == null) || (cmdLineParams.ImportInputFile == null))
+                rc.SetError(1010601, MxError.Source.Program, $"EditFile={cmdLineParams.EditFile ?? "[null]"}, ImportInputFile={cmdLineParams.ImportInputFile ?? "[null]"}", MxMsgs.MxErrInvalidParamArg);
+            else
+            {
+                try
+                {
+                    if (File.Exists(cmdLineParams.ImportInputFile) == false)
+                        rc.SetError(1010602, MxError.Source.User, $"ImportInputFile={cmdLineParams.ImportInputFile ?? "[null]"} not found");
+                    else
+                    {
+                        var folder = Path.GetDirectoryName(cmdLineParams.ImportInputFile);
+                        if ((String.IsNullOrEmpty(folder) == false) && (Directory.Exists(folder) == false))
+                            rc.SetError(1010603, MxError.Source.User, $"folder for input file {cmdLineParams.ImportInputFile} does not exist. Create folder and try again.");
+                        else
+                        {
+                            terminal.WriteLine($"importing {cmdLineParams.ImportInputFile} to {cmdLineParams.EditFile}...");
+
+                            //File.Copy(cmdLineParams.EditFile, cmdLineParams.ExportOutputFile, true);
+                            cmdLineParams.HelpHint = "";
+                            rc.SetResult("succeeded");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    rc.SetError(1010604, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
             return rc;
