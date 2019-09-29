@@ -71,34 +71,34 @@ Additional options for edit operation (--edit)
 
 	General options page
 
-  --settings display [yes |no] (file 'drive:path\xxx.json' (update [yes | no]))	//update saves setting changes in specified file
-  --backgnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-info COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamBackGndColour
-  --foregnd (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-info COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR) //- was  ParamForeGndColour
-  --audio vol 0  <min 0 max 10>								//(0 is off)
+  --settings (display=[yes|no]) (file='drive:path\xxx.json' (update=[yes|no]))	//update saves setting changes in specified file
+  --backgnd (text=COLOUR) (msg-error=COLOUR) (msg-warn=COLOUR) (msg-info=COLOUR) (cmds=COLOUR) (status=COLOUR) (rule=COLOUR) //- was  ParamBackGndColour
+  --foregnd (text=COLOUR) (msg-error=COLOUR) (msg-warn=COLOUR) (msg-info COLOUR) (cmds=COLOUR) (status=COLOUR) (rule=COLOUR) //- was  ParamForeGndColour
+  --audio vol=0  <min 0 max 10>								//(0 is off)
 
 	Text Editor options page
 
-  --rulers show [yes | no] UnitChar '.'
-  --cursor size 20 <min 1 max 100>
-  --display (rows 10 <min 1 max 25>) (cols 80 <min 20 max 250>) (parabreak '>')  //was displaylastlines, now EditAreaLinesCount was DisplayLineWidth, now EditAreaLineWidth
-  --limits (scroll 0  <min 0 max 10000>) (edit 0  <min 0 max 10000>)		     //number of lines you can scroll/edit back from end of chapter (0 is unlimited) - was scrollreview, ParamScrollReviewMode was editline (min current line) ParamEditLineMode
+  --rulers show=[yes|no] UnitChar=.
+  --cursor size=20 <min 1 max 100>
+  --display (rows=10 <min 1 max 25>) (cols=80 <min 20 max 250>) (parabreak=>)  //was displaylastlines, now EditAreaLinesCount was DisplayLineWidth, now EditAreaLineWidth
+  --limits (scroll=0  <min 0 max 10000>) (edit=0  <min 0 max 10000>)		     //number of lines you can scroll/edit back from end of chapter (0 is unlimited) - was scrollreview, ParamScrollReviewMode was editline (min current line) ParamEditLineMode
   --tabsize 3 <min 1 max 25>
-  --typingpause 60 <min 5 max 36000>									//in seconds
-  --autosave [CR | ParaBreak | off]							//was ParamSpellCheckMode, spellcheck
-  --autocorrect [on | off] 
+  --typingpause 60 <min 5 max 36000>							//in seconds
+  --autosave [CR|ParaBreak|off]									//was ParamSpellCheckMode, spellcheck
+  --autocorrect [on|off] 
 
 	Tools options page
 
-  --toolbrowser exe 'explorer.exe'								//was ParamBrowser
-  --toolhelp url https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}
-  --toolsearch url https://www.google.com/search?q=%22{word}%22
-  --toolthesaurus url https://www.thesaurus.com/browse/{word}
-  --toolspell ulr http://www.spellcheck.net/{word}
-  --toolsvn (username 'name') (password key) (url 'https//xxx.svnrepository.com/books)'
+  --toolbrowser exe='explorer.exe'								//was ParamBrowser
+  --toolhelp url=https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}
+  --toolsearch url=https://www.google.com/search?q=%22{word}%22
+  --toolthesaurus url=https://www.thesaurus.com/browse/{word}
+  --toolspell ulr=http://www.spellcheck.net/{word}
+  --toolsvn (username='name') (password=key) (url='https//xxx.svnrepository.com/books)'
 
 Implemented v1.2
 
-  --updatedict 'drive:path\dictionary.qqq' (--settings 'drive:path\xxx.json')		//updates dictionary and ver setting - determines Ctrl+K list - see  
+  --updatedict file='drive:path\dictionary.qqq' (--settings file='drive:path\xxx.json')		//updates dictionary and ver setting - determines Ctrl+K list - see  
 
 Settings that cannot be set from command line
 ---------------------------------------------

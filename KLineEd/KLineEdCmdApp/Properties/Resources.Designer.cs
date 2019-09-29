@@ -133,6 +133,33 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error:  duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        /// </summary>
+        internal static string MxErrParamArgNameDuplicateFound {
+            get {
+                return ResourceManager.GetString("MxErrParamArgNameDuplicateFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error:  argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        /// </summary>
+        internal static string MxErrParamArgNameNotFound {
+            get {
+                return ResourceManager.GetString("MxErrParamArgNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        /// </summary>
+        internal static string MxErrParamArgValueNotFound {
+            get {
+                return ResourceManager.GetString("MxErrParamArgValueNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
         /// </summary>
         internal static string MxErrSystemFailure {

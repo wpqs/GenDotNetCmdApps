@@ -17,6 +17,10 @@ namespace KLineEdCmdApp
         public const string MxErrInvalidSettingsFile = "MxErrInvalidSettingsFile"; //"Error: your settings file is invalid. The file used for saving your program parameters and arguments is corrupt. Delete KLineEdApp.json and try again"
         public const string MxErrUnknownParam = "MxErrUnsupportedParam"; //"Error: parameter not supported. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application"
         public const string MxErrInvalidParamArg = "MxErrInvalidParamArg"; //"Error: parameter or argument is not correctly set. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application"
+        public const string MxErrParamArgValueNotFound = "MxErrParamArgValueNotFound"; //"Error: value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
+        public const string MxErrParamArgNameNotFound = "MxErrParamArgNameNotFound"; //"Error:  argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
+        public const string MxErrParamArgNameDuplicateFound = "MxErrParamArgNameDuplicateFound"; //"Error:  duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
+
         public const string MxErrBadMethodParam = "MxErrBadMethodParam";  //Error: internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed.
         public const string MxErrInvalidCondition = "MxErrInvalidCondition"; //Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed.
         public const string MxErrLineTooLong = "MxErrLineTooLong"; //Error: line is too long. You have reached the end of the line. Press the Enter key to continue

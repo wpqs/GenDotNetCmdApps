@@ -141,6 +141,15 @@
   <data name="MxErrLineTooLong" xml:space="preserve">
     <value>Error: line is too long. You have reached the end of the line. Press the Enter key to continue</value>
   </data>
+  <data name="MxErrParamArgNameDuplicateFound" xml:space="preserve">
+    <value>Error:  duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments</value>
+  </data>
+  <data name="MxErrParamArgNameNotFound" xml:space="preserve">
+    <value>Error:  argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments</value>
+  </data>
+  <data name="MxErrParamArgValueNotFound" xml:space="preserve">
+    <value>Error: value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments</value>
+  </data>
   <data name="MxErrSystemFailure" xml:space="preserve">
     <value>Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again</value>
   </data>

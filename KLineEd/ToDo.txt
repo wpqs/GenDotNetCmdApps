@@ -71,14 +71,17 @@ Development work v1.0.45.0
 	- Move to MxDotNetUtils MxConsoleColour, general MVC and factory stuff as well as Terminal.cs, ITerminal.cs and UIElements.cs 
     - Update KScribe for new version of MxDotNetUtils
 
+5. Implement 
+    --settings and use any settings found in the specified file to override those given in the default (global) .json
+	- use updated MxDotNetUtils to call SettingsFileProc() appropriately
+
+
 Development work v1.0.46.0
 --------------------------
 
-1. Implement --settings and use any settings found in the specified file to override those given in the default (global) .json
+1. Implement Secret Manager lookup for json settings (SVN)
 
-2. Implement Secret Manager lookup for json settings (SVN)
-
-3. Refactor
+2. Refactor
     - Update KScribe for new version of MxReturnCode (C++ interop)
 
 Development work v1.0.47.0
