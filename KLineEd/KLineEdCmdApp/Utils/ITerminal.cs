@@ -31,6 +31,9 @@ namespace KLineEdCmdApp.Utils
         void SetCursorInsertMode(bool insertMode = false);
 
         string WriteLine(string line, params object[] args);
+
+        string WriteLines(string[] lines);
+
         string Write(string line, params object[] args);
 
         char GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar);

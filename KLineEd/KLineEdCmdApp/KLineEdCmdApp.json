@@ -8,7 +8,7 @@
   "DictionaryFile": null,
   "DictionaryUrl": "[not set]",
   "DictionaryVersion": "[not set]",
-  "SettingsDisplay": 0,
+  "SettingsDisplay": 1,
   "BackGndColourText": 0,
   "ForeGndColourText": 10,
   "BackGndColourMsgError": 0,
@@ -21,9 +21,9 @@
   "ForeGndColourCmds": 1,
   "BackGndColourStatus": 0,
   "ForeGndColourStatus": 7,
-  "BackGndColourRule": 5,
+  "BackGndColourRule": 0,
   "ForeGndColourRule": 7,
-  "AudioVol": -1,
+  "AudioVol": 0,
   "ToolBrowserExe": "explorer.exe",
   "ToolHelpUrl": "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/{HelpVer}",
   "ToolSearchUrl": "https://www.google.com/search?q=%22{word}%22",
@@ -43,5 +43,5 @@
   "TextEditorEditLimit": 0,
   "TextEditorTabSize": 3,
   "TextEditorAutoSave": 0,
-  "TextEditorAutoCorrect": 0
+  "TextEditorAutoCorrect":0
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http.Headers;
+using System.Numerics;
 using System.Runtime.Serialization;
 
 using Newtonsoft.Json;
@@ -86,7 +87,10 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
         public static readonly string ParamImportFile = "--import"; // exportfilename.txt editfilename.ksx
 
- //edit operational parameters - general
+        public static readonly string ArgFileFrom = "from";
+        public static readonly string ArgFileTo = "to";
+
+        //edit operational parameters - general
 
         public static readonly string ParamGeneralSettings = "--settings";
 
@@ -372,13 +376,17 @@ namespace KLineEdCmdApp.Utils
 
         public override string ToString()
         {
-            var rc = "SettingsFile=" + (SettingsPathFileName ?? "[null]") + (SettingsUpdate == BoolValue.Unset ? " [not set]" : ((SettingsUpdate == BoolValue.Yes) ? " update" : " no update")) + Environment.NewLine;
+            var rc = Environment.NewLine;
 
+            rc += "Program settings:" + Environment.NewLine;
             rc += Environment.NewLine;
+            rc += "SettingsDisplay=" + ((SettingsDisplay == BoolValue.Yes) ? "yes" : "no") + Environment.NewLine;
+            rc += "SettingsUpdate=" + (SettingsUpdate == BoolValue.Unset ? "[not set]" : ((SettingsUpdate == BoolValue.Yes) ? "yes" : "no")) + Environment.NewLine;
+            rc += "SettingsFile=" + (SettingsPathFileName ?? "[null]") + Environment.NewLine;
             rc += "ReportMxErrors=" + EnumOps.XlatToString(ReportMxErrors) + Environment.NewLine;
             rc += Environment.NewLine;
-
             rc +=  "Op=" + EnumOps.XlatToString(Op) + Environment.NewLine;
+            rc += Environment.NewLine;
 
             if (Op == OpMode.Import)
             {
@@ -390,23 +398,27 @@ namespace KLineEdCmdApp.Utils
                 rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
                 rc += "ExportOutputFile=" + (ExportOutputFile ?? "[null]") + Environment.NewLine;
             }
-            else if (Op == OpMode.Edit)
+            else if ((Op == OpMode.Edit) || (Op == OpMode.Help))
             {
-                rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
-                rc += Environment.NewLine;
-                rc += "BackGndColourText=" + XlatConsoleColourToString(BackGndColourText) + Environment.NewLine;
-                rc += "ForeGndColourText=" + XlatConsoleColourToString(ForeGndColourText) + Environment.NewLine;
-                rc += "BackGndColourMsgError=" + XlatConsoleColourToString(BackGndColourMsgError) + Environment.NewLine;
-                rc += "ForeGndColourMsgError=" + XlatConsoleColourToString(ForeGndColourMsgError) + Environment.NewLine;
-                rc += "BackGndColourMsgWarn=" + XlatConsoleColourToString(BackGndColourMsgWarn) + Environment.NewLine;
-                rc += "BackGndColourMsgInfo=" + XlatConsoleColourToString(BackGndColourMsgInfo) + Environment.NewLine;
-                rc += "ForeGndColourMsgInfo=" + XlatConsoleColourToString(ForeGndColourMsgInfo) + Environment.NewLine;
-                rc += "BackGndColourCmds=" + XlatConsoleColourToString(BackGndColourCmds) + Environment.NewLine;
-                rc += "ForeGndColourCmds=" + XlatConsoleColourToString(ForeGndColourCmds) + Environment.NewLine;
-                rc += "BackGndColourStatus=" + XlatConsoleColourToString(BackGndColourStatus) + Environment.NewLine;
-                rc += "ForeGndColourStatus=" + XlatConsoleColourToString(ForeGndColourStatus) + Environment.NewLine;
-                rc += "BackGndColourRule=" + XlatConsoleColourToString(BackGndColourRule) + Environment.NewLine;
-                rc += "ForeGndColourRule=" + XlatConsoleColourToString(ForeGndColourRule) + Environment.NewLine;
+                if (Op == OpMode.Edit)
+                {
+                    rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
+                    rc += Environment.NewLine;
+                }
+                rc += "BackGndColourText=" + XlatConsoleColourToString(BackGndColourText) + $" ({(int)BackGndColourText})" + Environment.NewLine;
+                rc += "ForeGndColourText=" + XlatConsoleColourToString(ForeGndColourText) + $" ({(int)ForeGndColourText})" + Environment.NewLine;
+                rc += "BackGndColourMsgError=" + XlatConsoleColourToString(BackGndColourMsgError) + $" ({(int)BackGndColourMsgError})" + Environment.NewLine;
+                rc += "ForeGndColourMsgError=" + XlatConsoleColourToString(ForeGndColourMsgError) + $" ({(int)ForeGndColourMsgError})" + Environment.NewLine;
+                rc += "BackGndColourMsgWarn=" + XlatConsoleColourToString(BackGndColourMsgWarn) + $" ({(int)BackGndColourMsgWarn})" + Environment.NewLine;
+                rc += "ForeGndColourMsgWarn=" + XlatConsoleColourToString(ForeGndColourMsgWarn) + $" ({(int)ForeGndColourMsgWarn})" + Environment.NewLine;
+                rc += "BackGndColourMsgInfo=" + XlatConsoleColourToString(BackGndColourMsgInfo) + $" ({(int)BackGndColourMsgInfo})" + Environment.NewLine;
+                rc += "ForeGndColourMsgInfo=" + XlatConsoleColourToString(ForeGndColourMsgInfo) + $" ({(int)ForeGndColourMsgInfo})" + Environment.NewLine;
+                rc += "BackGndColourCmds=" + XlatConsoleColourToString(BackGndColourCmds) + $" ({(int)BackGndColourCmds})" + Environment.NewLine;
+                rc += "ForeGndColourCmds=" + XlatConsoleColourToString(ForeGndColourCmds) + $" ({(int)ForeGndColourCmds})" + Environment.NewLine;
+                rc += "BackGndColourStatus=" + XlatConsoleColourToString(BackGndColourStatus) + $" ({(int)BackGndColourStatus})" + Environment.NewLine;
+                rc += "ForeGndColourStatus=" + XlatConsoleColourToString(ForeGndColourStatus) + $" ({(int)ForeGndColourStatus})" + Environment.NewLine;
+                rc += "BackGndColourRule=" + XlatConsoleColourToString(BackGndColourRule) + $" ({(int)BackGndColourRule})" + Environment.NewLine;
+                rc += "ForeGndColourRule=" + XlatConsoleColourToString(ForeGndColourRule) + $" ({(int)ForeGndColourRule})" + Environment.NewLine;
                 rc += Environment.NewLine;
                 rc += "ToolBrowserExe=" + (ToolBrowserExe ?? "[null]") + Environment.NewLine;
                 rc += "ToolHelpUrl=" + (ToolHelpUrl ?? "[null]") + Environment.NewLine;
@@ -434,10 +446,6 @@ namespace KLineEdCmdApp.Utils
                 rc += "AudioFileStartup=" + (AudioFileStartup ?? "[null]") + Environment.NewLine;
                 rc += "AudioFileEnd=" + (AudioFileEnd ?? "[null]") + Environment.NewLine;
 
-            }
-            else if (Op == OpMode.Help)
-            {
-                    
             }
             //else if ((Op == OpMode.UpdateDictionary) || (Op == OpMode.GetDictionarySettings))
             //{       //--updatedict 
@@ -788,11 +796,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ValidateParams", false);
 
-            if (Op == OpMode.Help)
-            {
-                rc.SetResult(true);
-            }
-            else if (Op == OpMode.Export)
+            if (Op == OpMode.Export)
             {
                 if (string.IsNullOrEmpty(EditFile))
                    rc.SetError(1020301, MxError.Source.User, $"{EditFileNameForm} argument missing");
@@ -824,22 +828,25 @@ namespace KLineEdCmdApp.Utils
                 if (rc.IsError())
                     HelpHint = $"{GetParamHelp((int)Param.ImportFile)}";
             }
-            else if (Op == OpMode.Edit)
+            else if ((Op == OpMode.Edit) || (Op == OpMode.Help))
             {
-                if (string.IsNullOrEmpty(EditFile))
+                if (((Op == OpMode.Edit)) && (string.IsNullOrEmpty(EditFile)))
                 {
                     HelpHint = $"{GetParamHelp((int) Param.EditFile)}";
                     rc.SetError(1020305, MxError.Source.User, $"{EditFileNameForm} argument missing");
                 }
-                else
+                if ((AudioVol < ArgAudioVolMin) || (AudioVol > ArgAudioVolMax))
                 {
-                    rc.SetResult(true);
+                    HelpHint = $"{GetParamHelp((int)Param.Audio)}";
+                    rc.SetError(1020306, MxError.Source.User, $"{ArgAudioVol}: {AudioVol} is invalid");
                 }
+                if (rc.IsSuccess())  
+                    rc.SetResult(true);
             }
             else
             {
-                HelpHint = $"{Environment.NewLine}No further information{Environment.NewLine}";
-                rc.SetError(1020306, MxError.Source.Program, $"Unsupported parameter={EnumOps.XlatToString(Op)}", MxMsgs.MxErrUnknownParam);
+                HelpHint = $"{GetParamHelp((int)Param.Help)}";
+                rc.SetError(1020307, MxError.Source.User, $"{ParamHelp} is missing. It must be provided in conjunction with the other parameters you have given.");
             }
             return rc;
         }
@@ -875,7 +882,7 @@ namespace KLineEdCmdApp.Utils
                     else
                     {
                         UpdateProperties(savedSettings);
-                        if (SettingsUpdate == BoolValue.No)
+                        if ((SettingsUpdate == BoolValue.No) || (SettingsUpdate == BoolValue.Unset))
                             rc.SetResult(true);
                         else
                         {
@@ -980,12 +987,12 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1021601, MxError.Source.User, $"parameter {ParamExportFile} has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamEditFile}");
+                    var rcArg1 = GetArgNameValue(ParamExportFile, ArgFileFrom, paramLine, true); 
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
                         EditFile = rcArg1.GetResult();
-                        var rcArg2 = GetArgValue(paramLine, 2, true, $"parameter {ParamExportFile}");
+                        var rcArg2 = GetArgNameValue(ParamExportFile, ArgFileTo, paramLine, true);
                         rc += rcArg2;
                         if (rcArg2.IsSuccess(true))
                         {
@@ -1016,12 +1023,12 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1021701, MxError.Source.User, $"parameter {ParamImportFile} has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamImportFile}");
+                    var rcArg1 = GetArgNameValue(ParamImportFile, ArgFileFrom, paramLine, true);
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
                         ImportInputFile = rcArg1.GetResult();
-                        var rcArg2 = GetArgValue(paramLine, 2, true, $"parameter {ParamEditFile}");
+                        var rcArg2 = GetArgNameValue(ParamImportFile, ArgFileTo, paramLine, true);
                         rc += rcArg2;
                         if (rcArg2.IsSuccess(true))
                         {
@@ -1087,7 +1094,7 @@ namespace KLineEdCmdApp.Utils
                         var rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsDisplay, paramLine, false);
                         rc += rcArg;
                         if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                            SettingsDisplay = (rcArg.GetResult() == "on") ? BoolValue.Yes : BoolValue.No;
+                            SettingsDisplay = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
 
                        rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsPathFileName, paramLine, false);
                        rc += rcArg;
@@ -1171,7 +1178,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessAudioParam", false);
 
-            HelpHint = Environment.NewLine;
+        //    HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamGeneralAudio);
             rc += rcCnt;
@@ -1182,12 +1189,17 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1022201, MxError.Source.User, $"parameter {ParamGeneralAudio} has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamGeneralAudio}");
+                    var rcArg1 = GetArgNameValue(ParamGeneralAudio, ArgAudioVol, paramLine, true);
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if(Int32.TryParse(rcArg1.GetResult(), out var vol) == false)
+                            rc.SetError(1022202, MxError.Source.User, $"parameter {ParamGeneralAudio} arg {ArgAudioVol} is invalid. It must be a number between {ArgAudioVolMin} and {ArgAudioVolMax}");
+                        else
+                        {
+                            AudioVol = vol;
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }
@@ -1753,6 +1765,8 @@ namespace KLineEdCmdApp.Utils
             if (ForeGndColourStatus == UnsetColour)
                 ForeGndColourStatus = savedSettings.ForeGndColourStatus;
             if (BackGndColourRule == UnsetColour)
+                BackGndColourRule = savedSettings.BackGndColourRule;
+            if (ForeGndColourRule == UnsetColour)
                 ForeGndColourRule = savedSettings.ForeGndColourRule;
             if (AudioVol == Program.PosIntegerNotSet)
                 AudioVol = savedSettings.AudioVol;
@@ -2111,8 +2125,8 @@ namespace KLineEdCmdApp.Utils
         }
 
         private static string GetHelpInfoHelp() { return $"{ParamHelp}"; }
-        private static string GetHelpInfoExport() { return $"{ParamExportFile} {EditFileNameForm} {TextFileNameForm}"; }
-        private static string GetHelpInfoImport() { return $"{ParamImportFile} {TextFileNameForm} {EditFileNameForm}"; }
+        private static string GetHelpInfoExport() { return $"{ParamExportFile} {ArgFileFrom}={EditFileNameForm} {ArgFileTo}={TextFileNameForm}"; }
+        private static string GetHelpInfoImport() { return $"{ParamImportFile} {ArgFileFrom}={TextFileNameForm} {ArgFileTo}={EditFileNameForm}"; }
         private static string GetHelpInfoEdit() { return $"{ParamEditFile} {EditFileNameForm}"; }
         private static string GetHelpInfoGeneralSettings() { return $"{ParamGeneralSettings} ({ArgSettingsDisplay}=[yes|no]) ({ArgSettingsPathFileName}={SettingsFileNameForm}) ({ArgSettingsUpdate}=[yes|no]))"; }
         private static string GetHelpInfoGeneralForeGndColour() { return $"{ParamGeneralForeGndColour} ({ArgColourText}=COLOR) ({ArgColourMsgError}=COLOR) ({ArgColourMsgWarn}=COLOR) ({ArgColourMsgInfo}=COLOUR) ({ArgColourCmds}=COLOR) ({ArgColourStatus}=COLOR) ({ArgColourRule}=COLOR)"; }
@@ -2185,9 +2199,9 @@ namespace KLineEdCmdApp.Utils
             //drive:path\ is any valid full path
             //    [secret manager key] lookup value in secret manager using key value
 
-            rc += $"File: {EditFileNameForm} is any valid path and filename for ksx file" + Environment.NewLine;
+            rc += $"File: {EditFileNameForm} is any valid drive, path, and filename for ksx file" + Environment.NewLine;
             rc += $"Url: '{UrlForm}' is any valid url and arguments" + Environment.NewLine;
-            rc += "Characters: '>' or '.' replace with any displayable character" + Environment.NewLine;
+            rc += "Characters: '>' or '.' are any displayable character" + Environment.NewLine;
             //rc += "Application Variables: 'word' is word at cursor, 'HelpVer' is help version" + Environment.NewLine;
             //darkmagenta is reserved for NotSet
             rc += "COLOR: white, black, blue, cyan, gray, green, magenta, red, yellow" + Environment.NewLine;

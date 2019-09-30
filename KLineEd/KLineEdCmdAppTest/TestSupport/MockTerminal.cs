@@ -118,6 +118,14 @@ namespace KLineEdCmdAppTest.TestSupport
             return rc;
         }
 
+        public string WriteLines(string[] lines)
+        {
+            string rc = null;
+            foreach (var line in lines)
+                rc = WriteLine(line);
+            return rc;
+        }
+
         public string Write(string msg, params object[] args)
         {
             // ReSharper disable once RedundantAssignment

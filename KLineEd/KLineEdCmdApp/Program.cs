@@ -102,7 +102,8 @@ namespace KLineEdCmdApp
                 terminal.WriteLine(cmdLineParams.HelpHint);
             }
 
-           // terminal.WriteLine(cmdLineParams.ToString());
+            if (cmdLineParams.SettingsDisplay == CmdLineParamsApp.BoolValue.Yes)
+                terminal.WriteLines(cmdLineParams.ToString().Split(Environment.NewLine));
 
             terminal.WriteLine((rc.IsSuccess()) ? $"program ends - bye-bye :-) return code {rc.GetResult()} - success" : $"program abends: return code {rc.GetResult()} - failure");
             return rc.GetResult();

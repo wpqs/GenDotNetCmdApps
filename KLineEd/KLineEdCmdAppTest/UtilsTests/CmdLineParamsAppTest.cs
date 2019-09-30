@@ -53,84 +53,11 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--help", cmdLineParams.HelpHint);
         }
 
-        //[Fact]
-        //public void TestResetColoursParam()
-        //{
-        //    var cmdLineParams = new CmdLineParamsApp();
-        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "colours"}); 
-
-        //    Assert.True(rcParam.GetResult());
-        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        //}
-
-        //[Fact]
-        //public void TestResetFactoryParam()
-        //{
-        //    var cmdLineParams = new CmdLineParamsApp();
-        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults" }); 
-
-        //    Assert.True(rcParam.GetResult());
-        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        //}
-
-        //[Fact]
-        //public void TestResetFactoryParamWithSettingsParam()
-        //{
-        //    var cmdLineParams = new CmdLineParamsApp();
-        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json" });
-
-        //    Assert.True(rcParam.GetResult());
-        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        //}
-
-        //[Fact]
-        //public void TestResetFactoryParamWithSettingsUpdateParams()
-        //{
-        //    var cmdLineParams = new CmdLineParamsApp();
-        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "--settings", "KLineEdCmdApp.json", "update" });
-
-        //    Assert.True(rcParam.GetResult());
-        //    Assert.Equal(Environment.NewLine, cmdLineParams.HelpHint);
-        //}
-
-        //[Fact]
-        //public void TestResetParamNoArg()
-        //{
-        //    var cmdLineParams = new CmdLineParamsApp();
-        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset" });
-
-        //    Assert.False(rcParam.GetResult());
-        //    Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
-        //    Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
-        //}
-
-        //[Fact]
-        //public void TestResetParamUnknownArg()
-        //{
-        //    var cmdLineParams = new CmdLineParamsApp();
-        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "test" });
-
-        //    Assert.False(rcParam.GetResult());
-        //    Assert.StartsWith("error 1020602-user: parameter --reset has invalid argument; found test should be [colours | factory-defaults]", rcParam.GetErrorUserMsg());
-        //    Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
-        //}
-
-        //[Fact]
-        //public void TestResetParamExtraArg()
-        //{
-        //    var cmdLineParams = new CmdLineParamsApp();
-        //    var rcParam = cmdLineParams.Initialise(new [] { "--reset", "factory-defaults", "KLineEdApp.json", "update", "extra" });
-
-        //    Assert.False(rcParam.GetResult());
-        //    Assert.StartsWith("error 1020601-user: parameter --reset has incorrect number of arguments; found 4", rcParam.GetErrorUserMsg());
-        //    Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--reset", cmdLineParams.HelpHint);
-        //}
-
         [Fact]
         public void TestExportParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.ksx", "Export.txt" });
+            var rcParam = cmdLineParams.Initialise(new [] { "--export", "from=Edit.ksx", "to=Export.txt" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal("Export.txt", cmdLineParams.ExportOutputFile);
@@ -176,7 +103,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestImportParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new[] { "--import", "Import.txt", "Edit.ksx" });
+            var rcParam = cmdLineParams.Initialise(new[] { "--import", "from=Import.txt", "to=Edit.ksx" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal("Import.txt", cmdLineParams.ImportInputFile);
@@ -218,7 +145,83 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--import", cmdLineParams.HelpHint);
         }
 
+        [Fact]
+        public void TestSettingsParamsAll()
+        {     
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] {"--help", "--settings", "display=yes", "file='KLineEdCmdApp.json'", "update=yes" });
 
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
+            Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.SettingsDisplay);
+            Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.SettingsUpdate);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+        }
+
+
+        [Fact]
+        public void TestSettingsParamsNone()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestAudiosParams()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=1" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(1, cmdLineParams.AudioVol);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestAudiosParamsMin()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=0" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(0, cmdLineParams.AudioVol);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestAudiosParamsMax()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=10" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(10, cmdLineParams.AudioVol);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestAudiosParamsFailTooBig()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=11" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020306-user: vol: 11 is invalid", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestAudiosParamsFailTooSmall()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=-2" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020306-user: vol: -2 is invalid", rcParam.GetErrorTechMsg());
+        }
 
         [Fact]
         public void TestEditParam()
