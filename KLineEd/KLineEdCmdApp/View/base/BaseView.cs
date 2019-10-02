@@ -120,12 +120,12 @@ namespace KLineEdCmdApp.View.Base
                 EditAreaWidth = param.TextEditorDisplayCols;                    //todo rename param.DisplayLineWidth 
                 EditAreaHeight = param.TextEditorDisplayRows;                //todo rename param.DisplayLastLinesCnt  
 
-                //MsgLineErrorForeGndColour = param.ForeGndColourStatus;     //todo rename param.MsgLineErrorForeGndColour   
-                //MsgLineErrorBackGndColour = param.BackGndColourStatus;     //todo rename param.MsgLineErrorForeGndColour 
-                //MsgLineWarnForeGndColour = ConsoleColor.Yellow;           //todo add param.MsgLineWarnForeGndColour
-                //MsgLineWarnBackGndColour = ConsoleColor.Black;            //todo add param.MsgLineWarnBackGndColour
-                //MsgLineInfoForeGndColour = ConsoleColor.Gray;             //todo add param.MsgLineInfoForeGndColour
-                //MsgLineInfoBackGndColour = ConsoleColor.Black;            //todo add param.MsgLineInfoBackGndColour 
+                MsgLineErrorForeGndColour = param.ForeGndColourMsgError;      
+                MsgLineErrorBackGndColour = param.BackGndColourMsgError;    
+                MsgLineWarnForeGndColour = param.ForeGndColourMsgWarn; 
+                MsgLineWarnBackGndColour = param.BackGndColourMsgWarn;
+                MsgLineInfoForeGndColour = param.ForeGndColourMsgInfo;
+                MsgLineInfoBackGndColour = param.BackGndColourMsgInfo;
 
                 WindowHeight = KLineEditor.HelpLineRowCount + KLineEditor.MsgLineRowCount + KLineEditor.EditAreaMarginTopRowCount + KLineEditor.EditAreaMarginTopRuleRowCount + EditAreaHeight + KLineEditor.EditAreaMarginBottomRowCount + KLineEditor.EditAreaMarginTopRuleRowCount + KLineEditor.StatusLineRowCount;
                 WindowWidth = KLineEditor.EditAreaMarginLeft + EditAreaWidth + KLineEditor.EditAreaMarginRight;

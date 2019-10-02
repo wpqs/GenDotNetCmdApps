@@ -2211,8 +2211,7 @@ namespace KLineEdCmdApp.Utils
             rc += $"Url: '{UrlForm}' is any valid url and arguments" + Environment.NewLine;
             rc += "Characters: '>' or '.' are any displayable character" + Environment.NewLine;
             //rc += "Application Variables: 'word' is word at cursor, 'HelpVer' is help version" + Environment.NewLine;
-            rc += "COLOR: white, black, blue, cyan, gray, green, magenta, red, yellow" + Environment.NewLine;
-            rc += "        darkblue, darkcyan, darkgray, darkgreen, darkmagenta, darkred, darkyellow" + Environment.NewLine;
+            rc += "COLOR: " + MxConsole.GetMxConsoleColorNameList(Environment.NewLine + "       ") + Environment.NewLine;
 
             return rc;
         }

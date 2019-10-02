@@ -128,6 +128,9 @@ namespace KLineEdCmdApp.Utils
                 case ConsoleColor.DarkYellow:
                     rc = MxConsole.Color.DarkYellow;
                     break;
+                case ConsoleColor.DarkGray:
+                    rc = MxConsole.Color.DarkGray;
+                    break;
                 case ConsoleColor.Gray:
                     rc = MxConsole.Color.Gray;
                     break;
@@ -186,6 +189,9 @@ namespace KLineEdCmdApp.Utils
                 case MxConsole.Color.DarkYellow:
                     rc = MxConsole.DarkYellow;
                     break;
+                case MxConsole.Color.DarkGray:
+                    rc = MxConsole.DarkGray;
+                    break;
                 case MxConsole.Color.Gray:
                     rc = MxConsole.Gray;
                     break;
@@ -238,6 +244,8 @@ namespace KLineEdCmdApp.Utils
                     rc = MxConsole.Color.DarkRed;
                 else if (color == MxConsole.DarkYellow)
                     rc = MxConsole.Color.DarkYellow;
+                else if (color == MxConsole.DarkGray)
+                    rc = MxConsole.Color.DarkGray;
                 else if (color == MxConsole.Gray)
                     rc = MxConsole.Color.Gray;
                 else if (color == MxConsole.Green)
@@ -257,26 +265,27 @@ namespace KLineEdCmdApp.Utils
             }
             return rc;
         }
-        public static string GetConsoleColorNames()
+        public static string GetMxConsoleColorNameList(string separator=null)
         {           //see https://docs.microsoft.com/en-us/dotnet/api/system.consolecolor?view=netframework-4.8
             string rc = "";
 
-            rc += MxConsole.Black + " | ";
-            rc += MxConsole.Blue + " | ";
-            rc += MxConsole.Cyan + " | ";
-            rc += MxConsole.DarkBlue + " | ";
-            rc += MxConsole.DarkCyan + " | ";
-            rc += MxConsole.DarkGray + " | ";
-            rc += MxConsole.DarkGreen + " | ";
-            rc += MxConsole.DarkMagenta + " | ";  
-            rc += MxConsole.DarkRed + " | ";
-            rc += MxConsole.DarkYellow + " | ";
-            rc += MxConsole.Gray + " | ";
-            rc += MxConsole.Green + " | ";
-            rc += MxConsole.Magenta + " | ";
-            rc += MxConsole.Red + " | ";
-            rc += MxConsole.White + " | ";
+            rc += MxConsole.White + ", ";
+            rc += MxConsole.Black + ", ";
+            rc += MxConsole.Blue + ", ";
+            rc += MxConsole.Cyan + ", ";
+            rc += MxConsole.Gray + ", ";
+            rc += MxConsole.Green + ", ";
+            rc += MxConsole.Magenta + ", ";
+            rc += MxConsole.Red + ", ";
             rc += MxConsole.Yellow;
+            rc += separator ?? ", ";
+            rc += MxConsole.DarkBlue + ", ";
+            rc += MxConsole.DarkCyan + ", ";
+            rc += MxConsole.DarkGray + ", ";
+            rc += MxConsole.DarkGreen + ", ";
+            rc += MxConsole.DarkMagenta + ", ";
+            rc += MxConsole.DarkRed + ", ";
+            rc += MxConsole.DarkYellow;
 
             return rc;
         }
