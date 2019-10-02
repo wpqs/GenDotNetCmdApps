@@ -1,12 +1,20 @@
 ﻿using System;
 using KLineEdCmdApp.Utils;
+using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
 namespace KLineEdCmdAppTest.UtilsTests
 {
-    public class CmdLineParamsAppTest
+    public class CmdLineParamsAppTest : IClassFixture<UtilsCmdLineParamsAppFixture>
     {
         public static readonly string[] StdParamsHelp = { "--Help" };
+
+        private readonly UtilsCmdLineParamsAppFixture _fixture;
+
+        public CmdLineParamsAppTest(UtilsCmdLineParamsAppFixture fixture)
+        {
+            _fixture = fixture;
+        }
 
         [Fact]
         public void TestNoParam()
@@ -171,6 +179,145 @@ namespace KLineEdCmdAppTest.UtilsTests
         }
 
         [Fact]
+        public void TestSettingsParamsNameFail()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings", "diXplay=yes" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1021904-user: parameter --settings has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
+        }
+        [Fact]
+        public void TestSettingsParamsDisplayValueFail()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings", "display=yXs" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1021902-user: parameter --settings argument display value is not 'yes' or 'no'; yXs", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestSettingsParamsUpdateValueFail()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings", "update=yXs" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1021903-user: parameter --settings argument update value is not 'yes' or 'no'; yXs", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestBackGndParamsAll()
+        {       
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--backgnd", "text=black", "msg-error=white", "msg-warn=gray", "msg-info=red", "cmds=green", "status=blue", "rule=yellow" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(MxConsole.Color.Black, cmdLineParams.BackGndColourText);
+            Assert.Equal(MxConsole.Color.White, cmdLineParams.BackGndColourMsgError);
+            Assert.Equal(MxConsole.Color.Gray, cmdLineParams.BackGndColourMsgWarn);
+            Assert.Equal(MxConsole.Color.Red, cmdLineParams.BackGndColourMsgInfo);
+            Assert.Equal(MxConsole.Color.Green, cmdLineParams.BackGndColourCmds);
+            Assert.Equal(MxConsole.Color.Blue, cmdLineParams.BackGndColourStatus);
+            Assert.Equal(MxConsole.Color.Yellow, cmdLineParams.BackGndColourRule);
+        }
+
+        [Fact]
+        public void TestBackGndParamsNone()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--backgnd" });
+
+            Assert.True(rcParam.GetResult());
+        }
+
+        [Fact]
+        public void TestBackGndParamsMin()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--backgnd", "cmds=green" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(MxConsole.Color.Green, cmdLineParams.BackGndColourCmds);
+        }
+
+        [Fact]
+        public void TestBackGndParamsNameFail()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--backgnd", "cXds=green" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022002-user: parameter --backgnd has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestBackGndParamsValueFail()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--backgnd", "cmds=grXen" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020306-user: Parameter --backgnd has a bad argument; value of 'cmds' is not a valid COLOR", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestForeGndParamsAll()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--foregnd", "text=black", "msg-error=white", "msg-warn=gray", "msg-info=red", "cmds=green", "status=blue", "rule=yellow" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(MxConsole.Color.Black, cmdLineParams.ForeGndColourText);
+            Assert.Equal(MxConsole.Color.White, cmdLineParams.ForeGndColourMsgError);
+            Assert.Equal(MxConsole.Color.Gray, cmdLineParams.ForeGndColourMsgWarn);
+            Assert.Equal(MxConsole.Color.Red, cmdLineParams.ForeGndColourMsgInfo);
+            Assert.Equal(MxConsole.Color.Green, cmdLineParams.ForeGndColourCmds);
+            Assert.Equal(MxConsole.Color.Blue, cmdLineParams.ForeGndColourStatus);
+            Assert.Equal(MxConsole.Color.Yellow, cmdLineParams.ForeGndColourRule);
+        }
+
+        [Fact]
+        public void TestForeGndParamsNone()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--foregnd" });
+
+            Assert.True(rcParam.GetResult());
+        }
+
+        [Fact]
+        public void TestForeGndParamsMin()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--foregnd", "cmds=green" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(MxConsole.Color.Green, cmdLineParams.ForeGndColourCmds);
+        }
+
+        [Fact]
+        public void TestForeGndParamsNameFail()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--foregnd", "cXds=green" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022101-user: parameter --foregnd has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestForeGndParamsValueFail()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--foregnd", "cmds=grXen" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020307-user: Parameter --foregnd has a bad argument; value of 'cmds' is not a valid COLOR", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
         public void TestAudiosParams()
         {
             var cmdLineParams = new CmdLineParamsApp();
@@ -259,7 +406,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestEditSettingsParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new[] { "--edit", "Test.ksx", "--settings display=off file='KLineEdCmdApp.json' update=yes" });
+            var rcParam = cmdLineParams.Initialise(new[] { "--edit", "Test.ksx", "--settings display=no file='KLineEdCmdApp.json' update=yes" });
             Assert.True(rcParam.GetResult());
             Assert.Equal(CmdLineParamsApp.BoolValue.No, cmdLineParams.SettingsDisplay);
             Assert.Equal("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);

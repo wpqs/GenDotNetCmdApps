@@ -38,6 +38,10 @@ namespace KLineEdCmdApp.Utils
     // g) add GetHelpInfoxxx() for new parameter
     // g) update GetParamHelp(), GetHelpInfoAll()
     // h) update unit tests
+    // i) run with invalid values/names and check error report
+    // j) check that the settings file is correctly updated
+    // k) implement in application
+    // l) test with max and min values in range (if appropriate)
 
 
 
@@ -320,6 +324,8 @@ namespace KLineEdCmdApp.Utils
         public int TextEditorTabSize { set; get; }
         public AutoSaveMode TextEditorAutoSave { set; get; }
         public BoolValue TextEditorAutoCorrect { set; get; }
+
+        public bool IsValidForSettingBoolValue(string val){ return ((val == ArgNo) || (val == ArgYes)) ? true : false;  }
 
         public enum BoolValue
         {
@@ -1133,23 +1139,45 @@ namespace KLineEdCmdApp.Utils
                         rc.SetResult(true); //do nothing - no args found
                     else
                     {
+                        var argProc = 0;
                         var rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsDisplay, paramLine, false);
                         rc += rcArg;
                         if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                            SettingsDisplay = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
-
-                       rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsPathFileName, paramLine, false);
-                       rc += rcArg;
-                       if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                           SettingsPathFileName = ArgSettingsPathFileNameDefault; //todo v1.0.45.0 rcArg.GetResult();
-
-                       rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsUpdate, paramLine, false);
-                       rc += rcArg;
-                       if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                           SettingsUpdate = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
-
+                        {
+                            if (IsValidForSettingBoolValue(rcArg.GetResult()) == false)
+                                rc.SetError(1021902, MxError.Source.User, $"parameter {ParamGeneralSettings} argument {ArgSettingsDisplay} value is not '{ArgYes}' or '{ArgNo}'; {rcArg.GetResult()}");
+                            else
+                            {
+                                SettingsDisplay = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
+                                argProc++;
+                            }
+                        }
+                        rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsPathFileName, paramLine, false);
+                        rc += rcArg;
+                        if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        {
+                            SettingsPathFileName = ArgSettingsPathFileNameDefault; //todo v1.0.45.0 rcArg.GetResult();
+                            argProc++;
+                        }
+                        rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsUpdate, paramLine, false);
+                        rc += rcArg;
+                        if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        {
+                            if (IsValidForSettingBoolValue(rcArg.GetResult()) == false)
+                                rc.SetError(1021903, MxError.Source.User, $"parameter {ParamGeneralSettings} argument {ArgSettingsUpdate} value is not '{ArgYes}' or '{ArgNo}'; {rcArg.GetResult()}");
+                            else
+                            {
+                                SettingsUpdate = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
+                                argProc++;
+                            }
+                        }
                         if (rc.IsSuccess())
-                            rc.SetResult(true);
+                        {
+                           if (argProc < argCnt)
+                               rc.SetError(1021904, MxError.Source.User, $"parameter {ParamGeneralSettings} has invalid argument(s); processed {argProc} but found {argCnt}");
+                           else
+                               rc.SetResult(true);
+                        }
                     }
                 }
             }
@@ -1169,47 +1197,67 @@ namespace KLineEdCmdApp.Utils
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt > 7)
+                if ((argCnt < 0) || (argCnt > 7))
                     rc.SetError(1022001, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has incorrect number of arguments; found {argCnt} should be less than 7");
                 else
                 {
+                    var argProc = 0;
                     var rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourText, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         BackGndColourText = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgError, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         BackGndColourMsgError = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgWarn, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         BackGndColourMsgWarn = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgInfo, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         BackGndColourMsgInfo = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourCmds, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         BackGndColourCmds = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourStatus, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         BackGndColourStatus = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourRule, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         BackGndColourRule = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     if (rc.IsSuccess())
-                        rc.SetResult(true);
+                    {
+                        if (argProc < argCnt)
+                            rc.SetError(1022002, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has invalid argument(s); processed {argProc} but found {argCnt}");
+                        else
+                            rc.SetResult(true);
+                    }
                 }
             }
             if (rc.IsError())
@@ -1221,54 +1269,74 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessGeneralForeGndParam", false);
 
-            HelpHint = Environment.NewLine;
+           // HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamGeneralForeGndColour);
             rc += rcCnt;
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
+                if ((argCnt < 0) || (argCnt > 7))
                     rc.SetError(1022101, MxError.Source.User, $"parameter {ParamGeneralForeGndColour} has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
+                    var argProc = 0;
                     var rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourText, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         ForeGndColourText = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgError, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         ForeGndColourMsgError = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgWarn, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         ForeGndColourMsgWarn = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgInfo, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         ForeGndColourMsgInfo = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourCmds, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         ForeGndColourCmds = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourStatus, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         ForeGndColourStatus = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourRule, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                    {
                         ForeGndColourRule = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
-
+                        argProc++;
+                    }
                     if (rc.IsSuccess())
-                        rc.SetResult(true);
+                    {
+                        if (argProc < argCnt)
+                            rc.SetError(1022101, MxError.Source.User, $"parameter {ParamGeneralForeGndColour} has invalid argument(s); processed {argProc} but found {argCnt}");
+                        else
+                            rc.SetResult(true);
+                    }
                 }
             }
             if (rc.IsError())
