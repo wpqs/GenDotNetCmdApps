@@ -44,7 +44,6 @@ namespace KLineEdCmdApp.Utils
     public class CmdLineParamsApp : CmdLineParams
     {
         public static readonly string EditFileType = ".ksx"; //text file in XML format with custom elements
-        public static readonly ConsoleColor UnsetColour = ConsoleColor.DarkMagenta;
         public static readonly string ColourName = "COLOUR";
         public static readonly string EditFileNameForm = "'drive:path\\*" + EditFileType + "'";
         public static readonly string TextFileNameForm = "'drive:path\\*.txt'";
@@ -59,11 +58,11 @@ namespace KLineEdCmdApp.Utils
         public static readonly string DictionaryUrlDefault = Program.ValueNotSet;
         public static readonly string DictionaryVersionDefault = Program.ValueNotSet;
 
-        public static readonly string ArgOn = "on";
-        public static readonly string ArgOff = "off";
+        public const string ArgOn = "on";
+        public const string ArgOff = "off";
 
-        public static readonly string ArgYes = "yes";
-        public static readonly string ArgNo = "no";
+        public const string ArgYes = "yes";
+        public const string ArgNo = "no";
 
         public static readonly string ArgBlack = MxConsole.Black;
         public static readonly string ArgBlue = MxConsole.Blue;
@@ -72,7 +71,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ArgDarkCyan = MxConsole.DarkCyan;
         public static readonly string ArgDarkGray = MxConsole.DarkGray;
         public static readonly string ArgDarkGreen = MxConsole.DarkGreen;
-     //   public static readonly string ArgDarkMagenta = MxConsole.DarkMagenta; //used as unset colour
+        public static readonly string ArgDarkMagenta = MxConsole.DarkMagenta; 
         public static readonly string ArgDarkRed = MxConsole.DarkRed;
         public static readonly string ArgDarkYellow = MxConsole.DarkYellow;
         public static readonly string ArgGray = MxConsole.Gray;
@@ -83,17 +82,17 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ArgYellow = MxConsole.Yellow;
 
         //main operational parameters
-        public static readonly string ParamHelp = "--help";
-        public static readonly string ParamEditFile = "--edit";     // filename.ksx 
-        public static readonly string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
-        public static readonly string ParamImportFile = "--import"; // exportfilename.txt editfilename.ksx
+        public const string ParamHelp = "--help";
+        public const string ParamEditFile = "--edit";     // filename.ksx 
+        public const string ParamExportFile = "--export"; // editfilename.ksx exportfilename.txt
+        public const string ParamImportFile = "--import"; // exportfilename.txt editfilename.ksx
 
         public static readonly string ArgFileFrom = "from";
         public static readonly string ArgFileTo = "to";
 
         //edit operational parameters - general
 
-        public static readonly string ParamGeneralSettings = "--settings";
+        public const string ParamGeneralSettings = "--settings";
 
             public static readonly string ArgSettingsDisplay = "display";
             public static readonly bool   ArgSettingsDisplayDefault = false;
@@ -102,8 +101,8 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgSettingsPathFileName = "file";
             public static readonly string ArgSettingsPathFileNameDefault = $"{Program.CmdAppName}.json";
 
-        public static readonly string ParamGeneralBackGndColour = "--backgnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
-        public static readonly string ParamGeneralForeGndColour = "--foregnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
+        public const string ParamGeneralBackGndColour = "--backgnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
+        public const string ParamGeneralForeGndColour = "--foregnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
 
             public static readonly string ArgColourText = "text";
             public static readonly string ArgBackGndColourTextDefault = ArgBlack;
@@ -133,30 +132,30 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgBackGndColourRuleDefault = ArgBlack;
             public static readonly string ArgForeGndColourRuleDefault = ArgGray;
 
-       public static readonly string ParamToolBrowser = "--toolbrowser";
+       public const string ParamToolBrowser = "--toolbrowser";
 
             public static readonly string ArgToolBrowserExe = "exe";
             public static readonly string ArgToolBrowserExeDefault = "explorer.exe";
 
             public static readonly string ArgToolBrowserUrl = "url";
 
-        public static readonly string ParamToolHelp = "--toolhelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}'
+        public const string ParamToolHelp = "--toolhelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}'
 
-        public static readonly string ArgToolHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/{HelpVer}";
+            public static readonly string ArgToolHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/{HelpVer}";
 
-        public static readonly string ParamToolSearch = "--toolsearch";         // url 'https://www.google.com/search?q=%22{word}%22'
+        public const string ParamToolSearch = "--toolsearch";         // url 'https://www.google.com/search?q=%22{word}%22'
 
-        public static readonly string ArgToolSearchUrlDefault = "https://www.google.com/search?q=%22{word}%22";
+            public static readonly string ArgToolSearchUrlDefault = "https://www.google.com/search?q=%22{word}%22";
 
-        public static readonly string ParamToolThesaurus = "--toolthesaurus";   // url https://www.thesaurus.com/browse/{word}
+        public const string ParamToolThesaurus = "--toolthesaurus";   // url https://www.thesaurus.com/browse/{word}
 
-        public static readonly string ArgToolThesaurusUrlDefault = "https://www.thesaurus.com/browse/{word}";
+            public static readonly string ArgToolThesaurusUrlDefault = "https://www.thesaurus.com/browse/{word}";
 
-        public static readonly string ParamToolSpell = "--toolspell";           // url http://www.spellcheck.net/{word}
+        public const string ParamToolSpell = "--toolspell";           // url http://www.spellcheck.net/{word}
 
-        public static readonly string ArgToolSpellUrlDefault = "http://www.spellcheck.net/{word}";
+            public static readonly string ArgToolSpellUrlDefault = "http://www.spellcheck.net/{word}";
 
-        public static readonly string ParamToolSvn = "--toolsvn";                   // username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
+        public const string ParamToolSvn = "--toolsvn";                   // username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
 
             public static readonly string ArgToolSvnUser = "username";
             public static readonly string ArgToolSvnUserDefault = Program.ValueNotSet;
@@ -165,7 +164,7 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgToolSvnUrl = "url";
             public static readonly string ArgToolSvnUrlDefault = Program.ValueNotSet;
 
-        public static readonly string ParamGeneralAudio = "--audio";         
+        public const string ParamGeneralAudio = "--audio";         
         
             public static readonly string ArgAudioVol = "vol";      //  0  <min 1 max 10> //(0 is off)
             public static readonly int ArgAudioVolDefault = 0;
@@ -180,21 +179,21 @@ namespace KLineEdCmdApp.Utils
 
                 //edit operational parameters - text editor
 
-        public static readonly string ParamTextEditorRulers = "--rulers";             //  show [yes | no] unitchar '.'
+        public const string ParamTextEditorRulers = "--rulers";             //  show [yes | no] unitchar '.'
 
             public static readonly string ArgTextEditorRulersShow = "show";
             public static readonly string ArgTextEditorRulersShowDefault = ArgYes;
             public static readonly string ArgTextEditorRulersUnitChar = "UnitChar";
             public static readonly char ArgTextEditorRulersUnitCharDefault = '.';
 
-        public static readonly string ParamTextEditorCursor = "--cursor";     
+        public const string ParamTextEditorCursor = "--cursor";     
 
             public static readonly string ArgTextEditorCursorSize = "size";     // 20 <min 1 max 100>
             public static readonly int ArgTextEditorCursorSizeDefault = 20;
             public static readonly int ArgTextEditorCursorSizeMax = 100;
             public static readonly int ArgTextEditorCursorSizeMin = 1;
 
-        public static readonly string ParamTextEditorDisplay = "--display";   
+        public const string ParamTextEditorDisplay = "--display";   
 
             public static readonly string ArgTextEditorDisplayRows = "rows";      // 10 <min 1 max 25>	    //was displaylastlines, now TextEditorDisplayRows
             public static readonly int ArgTextEditorDisplayRowsDefault = 10;      //was ArgEditAreaLinesCountDefault
@@ -209,13 +208,13 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgTextEditorDisplayParaBreakDisplayChar = "parabreak";
             public const char             ArgTextEditorDisplayParaBreakDisplayCharDefault = '>';
 
-        public static readonly string ParamTextEditorPauseTimeout = "--typingpause"; // 60 <min 5 max 36000>
+        public const string ParamTextEditorPauseTimeout = "--typingpause"; // 60 <min 5 max 36000>
 
             public static readonly int ArgTextEditorPauseTimeoutDefault = 60;
             public static readonly int ArgTextEditorPauseTimeoutMin = 0;
             public static readonly int ArgTextEditorPauseTimeoutMax = 86400;     //24 * 60 * 60 - 24 hours
 
-        public static readonly string ParamTextEditorLimits = "--limits";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
+        public const string ParamTextEditorLimits = "--limits";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
 
             public static readonly string ArgTextEditorLimitScroll = "scrollrows";
             public static readonly int ArgTextEditorLimitScrollDefault = 0;
@@ -227,20 +226,20 @@ namespace KLineEdCmdApp.Utils
             public static readonly int ArgTextEditorLimitEditMax = 10000;
             public static readonly int ArgTextEditorLimitEditMin = 0;              //0 is unlimited
 
-        public static readonly string ParamTextEditorTabSize = "--tabsize";           // 3  <min 1 max 25>	
+        public const string ParamTextEditorTabSize = "--tabsize";           // 3  <min 1 max 25>	
 
             public const int           ArgTextEditorTabSizeDefault = 3;
             public static readonly int ArgTextEditorTabSizeMax = 25;
             public static readonly int ArgTextEditorTabSizeMin = 1;
 
-        public static readonly string ParamTextEditorAutoSave = "--autosave";         // [CR | ParaBreak | off]
+        public const string ParamTextEditorAutoSave = "--autosave";         // [CR | ParaBreak | off]
 
-            public static readonly string ArgTextEditorAutoSaveCR = "CR";
-            public static readonly string ArgTextEditorAutoSaveParaBreak = "ParaBreak";
-            public static readonly string ArgTextEditorAutoSaveOff = ArgOff;
+            public const string ArgTextEditorAutoSaveCR = "CR";
+            public const string ArgTextEditorAutoSaveParaBreak = "ParaBreak";
+            public const string ArgTextEditorAutoSaveOff = ArgOff;
             public static readonly AutoSaveMode ArgTextEditorAutoSaveDefault = AutoSaveMode.Off;
 
-        public static readonly string ParamTextEditorAutoCorrect = "--autocorrect";           // [on | off]
+        public const string ParamTextEditorAutoCorrect = "--autocorrect";           // [on | off]
 
             public static readonly bool ArgTextEditorAutoCorrectDefault = false;
 
@@ -278,20 +277,20 @@ namespace KLineEdCmdApp.Utils
 
         public BoolValue SettingsDisplay { set; get; }
 
-        public ConsoleColor BackGndColourText {  set; get; }
-        public ConsoleColor ForeGndColourText {  set; get; }
-        public ConsoleColor BackGndColourMsgError {  set; get; }
-        public ConsoleColor ForeGndColourMsgError {  set; get; }
-        public ConsoleColor BackGndColourMsgWarn {  set; get; }
-        public ConsoleColor ForeGndColourMsgWarn { set; get; }
-        public ConsoleColor BackGndColourMsgInfo {  set; get; }
-        public ConsoleColor ForeGndColourMsgInfo { set; get; }
-        public ConsoleColor BackGndColourCmds { set; get; }
-        public ConsoleColor ForeGndColourCmds { set; get; }
-        public ConsoleColor BackGndColourStatus { set; get; }
-        public ConsoleColor ForeGndColourStatus { set; get; }
-        public ConsoleColor BackGndColourRule { set; get; }
-        public ConsoleColor ForeGndColourRule { set; get; }
+        public MxConsole.Color BackGndColourText {  set; get; }
+        public MxConsole.Color ForeGndColourText {  set; get; }
+        public MxConsole.Color BackGndColourMsgError {  set; get; }
+        public MxConsole.Color ForeGndColourMsgError {  set; get; }
+        public MxConsole.Color BackGndColourMsgWarn {  set; get; }
+        public MxConsole.Color ForeGndColourMsgWarn { set; get; }
+        public MxConsole.Color BackGndColourMsgInfo {  set; get; }
+        public MxConsole.Color ForeGndColourMsgInfo { set; get; }
+        public MxConsole.Color BackGndColourCmds { set; get; }
+        public MxConsole.Color ForeGndColourCmds { set; get; }
+        public MxConsole.Color BackGndColourStatus { set; get; }
+        public MxConsole.Color ForeGndColourStatus { set; get; }
+        public MxConsole.Color BackGndColourRule { set; get; }
+        public MxConsole.Color ForeGndColourRule { set; get; }
 
         public int AudioVol { set; get; }
 
@@ -324,9 +323,9 @@ namespace KLineEdCmdApp.Utils
 
         public enum BoolValue
         {
-            [EnumMember(Value = "unset")] Unset = Program.PosIntegerNotSet,
-            [EnumMember(Value = "no")] No = 0,
-            [EnumMember(Value = "yes")] Yes = 1,
+            [EnumMember(Value = Program.ValueNotSet)] Unset = Program.PosIntegerNotSet,
+            [EnumMember(Value = ArgNo)] No = 0,
+            [EnumMember(Value = ArgYes)] Yes = 1,
 
         }
 
@@ -337,42 +336,42 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = "Export")] Export,
             [EnumMember(Value = "Edit")] Edit,
             [EnumMember(Value = "Abort")] Abort,
-            [EnumMember(Value = "[unknown]")] Unknown
+            [EnumMember(Value = Program.ValueUnknown)] Unknown
         }
 
         public enum Param
         {
-            [EnumMember(Value = "--help")] Help = 0,
-            [EnumMember(Value = "--edit")] EditFile,
-            [EnumMember(Value = "--export")] ExportFile,
-            [EnumMember(Value = "--import")] ImportFile,
-            [EnumMember(Value = "--settings")] Settings,
-            [EnumMember(Value = "--backgnd")] BackGnd,
-            [EnumMember(Value = "--foregnd")] ForeGnd,
-            [EnumMember(Value = "--toolbrowser")] ToolBrowser,
-            [EnumMember(Value = "--toolhelp")] ToolHelp,
-            [EnumMember(Value = "--toolsearch")] ToolSearch,
-            [EnumMember(Value = "--toolthesaurus")] ToolThesaurus,
-            [EnumMember(Value = "--toolspell")] ToolSpell,
-            [EnumMember(Value = "--toolsvn")] ToolSvn,
-            [EnumMember(Value = "--audio")] Audio,
-            [EnumMember(Value = "--rulers")] Rulers,
-            [EnumMember(Value = "--cursor")] Cursor,
-            [EnumMember(Value = "--display")] Display,
-            [EnumMember(Value = "--limits")] Limits,
-            [EnumMember(Value = "--tabsize")] TabSize,
-            [EnumMember(Value = "--typingpause")] TypingPause,
-            [EnumMember(Value = "--autosave")] AutoSave,
-            [EnumMember(Value = "--autocorrect")] AutoCorrect,
-            [EnumMember(Value = "[unknown]")] Unknown
+            [EnumMember(Value = ParamHelp)] Help = 0,
+            [EnumMember(Value = ParamEditFile)] EditFile,
+            [EnumMember(Value = ParamExportFile)] ExportFile,
+            [EnumMember(Value = ParamImportFile)] ImportFile,
+            [EnumMember(Value = ParamGeneralSettings)] Settings,
+            [EnumMember(Value = ParamGeneralBackGndColour)] BackGnd,
+            [EnumMember(Value = ParamGeneralForeGndColour)] ForeGnd,
+            [EnumMember(Value = ParamToolBrowser)] ToolBrowser,
+            [EnumMember(Value = ParamToolHelp)] ToolHelp,
+            [EnumMember(Value = ParamToolSearch)] ToolSearch,
+            [EnumMember(Value = ParamToolThesaurus)] ToolThesaurus,
+            [EnumMember(Value = ParamToolSpell)] ToolSpell,
+            [EnumMember(Value = ParamToolSvn)] ToolSvn,
+            [EnumMember(Value =ParamGeneralAudio)] Audio,
+            [EnumMember(Value = ParamTextEditorRulers)] Rulers,
+            [EnumMember(Value = ParamTextEditorCursor)] Cursor,
+            [EnumMember(Value = ParamTextEditorDisplay)] Display,
+            [EnumMember(Value = ParamTextEditorLimits)] Limits,
+            [EnumMember(Value = ParamTextEditorTabSize)] TabSize,
+            [EnumMember(Value = ParamTextEditorPauseTimeout)] TypingPause,
+            [EnumMember(Value = ParamTextEditorAutoSave)] AutoSave,
+            [EnumMember(Value = ParamTextEditorAutoCorrect)] AutoCorrect,
+            [EnumMember(Value = Program.ValueUnknown)] Unknown
         }
 
         public enum AutoSaveMode
         {
-            [EnumMember(Value = "Off")] Off = 0,
-            [EnumMember(Value = "CR")] CR,
-            [EnumMember(Value = "ParaBreak")] ParaBreak,
-            [EnumMember(Value = "[unknown]")] Unknown
+            [EnumMember(Value = ArgOff)] Off = 0,
+            [EnumMember(Value = ArgTextEditorAutoSaveCR)] CR,
+            [EnumMember(Value = ArgTextEditorAutoSaveParaBreak)] ParaBreak,
+            [EnumMember(Value = Program.ValueUnknown)] Unknown
         }
 
         public override string ToString()
@@ -406,20 +405,20 @@ namespace KLineEdCmdApp.Utils
                     rc += "EditFile=" + (EditFile ?? "[null]") + Environment.NewLine;
                     rc += Environment.NewLine;
                 }
-                rc += "BackGndColourText=" + XlatConsoleColourToString(BackGndColourText) + $" ({(int)BackGndColourText})" + Environment.NewLine;
-                rc += "ForeGndColourText=" + XlatConsoleColourToString(ForeGndColourText) + $" ({(int)ForeGndColourText})" + Environment.NewLine;
-                rc += "BackGndColourMsgError=" + XlatConsoleColourToString(BackGndColourMsgError) + $" ({(int)BackGndColourMsgError})" + Environment.NewLine;
-                rc += "ForeGndColourMsgError=" + XlatConsoleColourToString(ForeGndColourMsgError) + $" ({(int)ForeGndColourMsgError})" + Environment.NewLine;
-                rc += "BackGndColourMsgWarn=" + XlatConsoleColourToString(BackGndColourMsgWarn) + $" ({(int)BackGndColourMsgWarn})" + Environment.NewLine;
-                rc += "ForeGndColourMsgWarn=" + XlatConsoleColourToString(ForeGndColourMsgWarn) + $" ({(int)ForeGndColourMsgWarn})" + Environment.NewLine;
-                rc += "BackGndColourMsgInfo=" + XlatConsoleColourToString(BackGndColourMsgInfo) + $" ({(int)BackGndColourMsgInfo})" + Environment.NewLine;
-                rc += "ForeGndColourMsgInfo=" + XlatConsoleColourToString(ForeGndColourMsgInfo) + $" ({(int)ForeGndColourMsgInfo})" + Environment.NewLine;
-                rc += "BackGndColourCmds=" + XlatConsoleColourToString(BackGndColourCmds) + $" ({(int)BackGndColourCmds})" + Environment.NewLine;
-                rc += "ForeGndColourCmds=" + XlatConsoleColourToString(ForeGndColourCmds) + $" ({(int)ForeGndColourCmds})" + Environment.NewLine;
-                rc += "BackGndColourStatus=" + XlatConsoleColourToString(BackGndColourStatus) + $" ({(int)BackGndColourStatus})" + Environment.NewLine;
-                rc += "ForeGndColourStatus=" + XlatConsoleColourToString(ForeGndColourStatus) + $" ({(int)ForeGndColourStatus})" + Environment.NewLine;
-                rc += "BackGndColourRule=" + XlatConsoleColourToString(BackGndColourRule) + $" ({(int)BackGndColourRule})" + Environment.NewLine;
-                rc += "ForeGndColourRule=" + XlatConsoleColourToString(ForeGndColourRule) + $" ({(int)ForeGndColourRule})" + Environment.NewLine;
+                rc += "BackGndColourText=" + MxConsole.XlatMxConsoleColorToString(BackGndColourText) + $" ({(int)BackGndColourText})" + Environment.NewLine;
+                rc += "ForeGndColourText=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourText) + $" ({(int)ForeGndColourText})" + Environment.NewLine;
+                rc += "BackGndColourMsgError=" + MxConsole.XlatMxConsoleColorToString(BackGndColourMsgError) + $" ({(int)BackGndColourMsgError})" + Environment.NewLine;
+                rc += "ForeGndColourMsgError=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourMsgError) + $" ({(int)ForeGndColourMsgError})" + Environment.NewLine;
+                rc += "BackGndColourMsgWarn=" + MxConsole.XlatMxConsoleColorToString(BackGndColourMsgWarn) + $" ({(int)BackGndColourMsgWarn})" + Environment.NewLine;
+                rc += "ForeGndColourMsgWarn=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourMsgWarn) + $" ({(int)ForeGndColourMsgWarn})" + Environment.NewLine;
+                rc += "BackGndColourMsgInfo=" + MxConsole.XlatMxConsoleColorToString(BackGndColourMsgInfo) + $" ({(int)BackGndColourMsgInfo})" + Environment.NewLine;
+                rc += "ForeGndColourMsgInfo=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourMsgInfo) + $" ({(int)ForeGndColourMsgInfo})" + Environment.NewLine;
+                rc += "BackGndColourCmds=" + MxConsole.XlatMxConsoleColorToString(BackGndColourCmds) + $" ({(int)BackGndColourCmds})" + Environment.NewLine;
+                rc += "ForeGndColourCmds=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourCmds) + $" ({(int)ForeGndColourCmds})" + Environment.NewLine;
+                rc += "BackGndColourStatus=" + MxConsole.XlatMxConsoleColorToString(BackGndColourStatus) + $" ({(int)BackGndColourStatus})" + Environment.NewLine;
+                rc += "ForeGndColourStatus=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourStatus) + $" ({(int)ForeGndColourStatus})" + Environment.NewLine;
+                rc += "BackGndColourRule=" + MxConsole.XlatMxConsoleColorToString(BackGndColourRule) + $" ({(int)BackGndColourRule})" + Environment.NewLine;
+                rc += "ForeGndColourRule=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourRule) + $" ({(int)ForeGndColourRule})" + Environment.NewLine;
                 rc += Environment.NewLine;
                 rc += "ToolBrowserExe=" + (ToolBrowserExe ?? "[null]") + Environment.NewLine;
                 rc += "ToolHelpUrl=" + (ToolHelpUrl ?? "[null]") + Environment.NewLine;
@@ -483,20 +482,20 @@ namespace KLineEdCmdApp.Utils
             DictionaryVersion = null;
             SettingsDisplay = BoolValue.Unset;
 
-            BackGndColourText = UnsetColour;
-            ForeGndColourText = UnsetColour;
-            BackGndColourMsgError = UnsetColour;
-            ForeGndColourMsgError = UnsetColour;
-            BackGndColourMsgWarn = UnsetColour;
-            ForeGndColourMsgWarn = UnsetColour;
-            BackGndColourMsgInfo = UnsetColour;
-            ForeGndColourMsgInfo = UnsetColour;
-            BackGndColourCmds = UnsetColour;
-            ForeGndColourCmds = UnsetColour;
-            BackGndColourStatus = UnsetColour;
-            ForeGndColourStatus = UnsetColour;
-            BackGndColourRule = UnsetColour;
-            ForeGndColourRule = UnsetColour;
+            BackGndColourText = MxConsole.Color.NotSet;
+            ForeGndColourText = MxConsole.Color.NotSet;
+            BackGndColourMsgError = MxConsole.Color.NotSet;
+            ForeGndColourMsgError = MxConsole.Color.NotSet;
+            BackGndColourMsgWarn = MxConsole.Color.NotSet;
+            ForeGndColourMsgWarn = MxConsole.Color.NotSet;
+            BackGndColourMsgInfo = MxConsole.Color.NotSet;
+            ForeGndColourMsgInfo = MxConsole.Color.NotSet;
+            BackGndColourCmds = MxConsole.Color.NotSet;
+            ForeGndColourCmds = MxConsole.Color.NotSet;
+            BackGndColourStatus = MxConsole.Color.NotSet;
+            ForeGndColourStatus = MxConsole.Color.NotSet;
+            BackGndColourRule = MxConsole.Color.NotSet;
+            ForeGndColourRule = MxConsole.Color.NotSet;
 
             AudioVol = Program.PosIntegerNotSet;
 
@@ -545,20 +544,20 @@ namespace KLineEdCmdApp.Utils
             DictionaryVersion = DictionaryVersionDefault;
             SettingsDisplay = BoolValue.No;
 
-            BackGndColourText = XlatStringToConsoleColour(ArgBackGndColourTextDefault);
-            ForeGndColourText = XlatStringToConsoleColour(ArgForeGndColourTextDefault);
-            BackGndColourMsgError = XlatStringToConsoleColour(ArgBackGndColourMsgErrorDefault);
-            ForeGndColourMsgError = XlatStringToConsoleColour(ArgForeGndColourMsgErrorDefault);
-            BackGndColourMsgWarn = XlatStringToConsoleColour(ArgBackGndColourMsgWarnDefault);
-            ForeGndColourMsgWarn = XlatStringToConsoleColour(ArgForeGndColourMsgWarnDefault);
-            BackGndColourMsgInfo = XlatStringToConsoleColour(ArgBackGndColourMsgInfoDefault);
-            ForeGndColourMsgInfo = XlatStringToConsoleColour(ArgForeGndColourMsgInfoDefault);
-            BackGndColourCmds = XlatStringToConsoleColour(ArgBackGndColourCmdsDefault);
-            ForeGndColourCmds = XlatStringToConsoleColour(ArgForeGndColourCmdsDefault);
-            BackGndColourStatus = XlatStringToConsoleColour(ArgBackGndColourStatusDefault);
-            ForeGndColourStatus = XlatStringToConsoleColour(ArgForeGndColourStatusDefault);
-            BackGndColourRule = XlatStringToConsoleColour(ArgBackGndColourRuleDefault);
-            ForeGndColourRule = XlatStringToConsoleColour(ArgForeGndColourRuleDefault);
+            BackGndColourText = MxConsole.XlatStringToMxConsoleColor(ArgBackGndColourTextDefault);
+            ForeGndColourText = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourTextDefault);
+            BackGndColourMsgError = MxConsole.XlatStringToMxConsoleColor(ArgBackGndColourMsgErrorDefault);
+            ForeGndColourMsgError = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourMsgErrorDefault);
+            BackGndColourMsgWarn = MxConsole.XlatStringToMxConsoleColor(ArgBackGndColourMsgWarnDefault);
+            ForeGndColourMsgWarn = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourMsgWarnDefault);
+            BackGndColourMsgInfo = MxConsole.XlatStringToMxConsoleColor(ArgBackGndColourMsgInfoDefault);
+            ForeGndColourMsgInfo = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourMsgInfoDefault);
+            BackGndColourCmds = MxConsole.XlatStringToMxConsoleColor(ArgBackGndColourCmdsDefault);
+            ForeGndColourCmds = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourCmdsDefault);
+            BackGndColourStatus = MxConsole.XlatStringToMxConsoleColor(ArgBackGndColourStatusDefault);
+            ForeGndColourStatus = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourStatusDefault);
+            BackGndColourRule = MxConsole.XlatStringToMxConsoleColor(ArgBackGndColourRuleDefault);
+            ForeGndColourRule = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourRuleDefault);
             AudioVol = ArgAudioVolDefault;
 
             ToolBrowserExe = ArgToolBrowserExeDefault;
@@ -837,46 +836,47 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1020305, MxError.Source.User, $"Parameter {ParamEditFile} has missing first argument; {EditFileNameForm}");
                 }
 
-                //var argBad = Program.ValueNotSet;
-                //if (XlatConsoleColourToString(BackGndColourText) == Program.ValueUnknown)
-                //    argBad = ArgColourText;
-                //if (XlatConsoleColourToString(BackGndColourMsgError) == Program.ValueUnknown)
-                //    argBad = ArgColourMsgError;
-                //if (XlatConsoleColourToString(BackGndColourMsgWarn) == Program.ValueUnknown)
-                //    argBad = ArgColourMsgWarn;
-                //if (XlatConsoleColourToString(BackGndColourMsgInfo) == Program.ValueUnknown)
-                //    argBad = ArgColourMsgInfo;
-                //if (XlatConsoleColourToString(BackGndColourCmds) == Program.ValueUnknown)
-                //    argBad = ArgColourCmds;
-                //if (XlatConsoleColourToString(BackGndColourStatus) == Program.ValueUnknown)
-                //   argBad = ArgColourStatus;
-                //if (XlatConsoleColourToString(BackGndColourRule) == Program.ValueUnknown)
-                //    argBad = ArgColourStatus;
-                //if (argBad != Program.ValueNotSet)
-                //{
-                //    HelpHint = $"{GetParamHelp((int)Param.BackGnd)}";
-                //    rc.SetError(1020306, MxError.Source.User, $"Parameter {ParamGeneralBackGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
-                //}
-                //argBad = Program.ValueNotSet;
-                //if (XlatConsoleColourToString(ForeGndColourText) == Program.ValueUnknown)
-                //    argBad = ArgColourText;
-                //if (XlatConsoleColourToString(ForeGndColourMsgError) == Program.ValueUnknown)
-                //    argBad = ArgColourMsgError;
-                //if (XlatConsoleColourToString(ForeGndColourMsgWarn) == Program.ValueUnknown)
-                //    argBad = ArgColourMsgWarn;
-                //if (XlatConsoleColourToString(ForeGndColourMsgInfo) == Program.ValueUnknown)
-                //    argBad = ArgColourMsgInfo;
-                //if (XlatConsoleColourToString(ForeGndColourCmds) == Program.ValueUnknown)
-                //    argBad = ArgColourCmds;
-                //if (XlatConsoleColourToString(ForeGndColourStatus) == Program.ValueUnknown)
-                //    argBad = ArgColourStatus;
-                //if (XlatConsoleColourToString(ForeGndColourRule) == Program.ValueUnknown)
-                //    argBad = ArgColourStatus;
-                //if (argBad != Program.ValueNotSet)
-                //{
-                //    HelpHint = $"{GetParamHelp((int)Param.ForeGnd)}";
-                //    rc.SetError(1020307, MxError.Source.User, $"Parameter {ParamGeneralForeGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
-                //}
+                var argBad = Program.ValueNotSet;
+                if (MxConsole.XlatMxConsoleColorToString(BackGndColourText) == Program.ValueUnknown)
+                    argBad = ArgColourText;
+                if (MxConsole.XlatMxConsoleColorToString(BackGndColourMsgError) == Program.ValueUnknown)
+                    argBad = ArgColourMsgError;
+                if (MxConsole.XlatMxConsoleColorToString(BackGndColourMsgWarn) == Program.ValueUnknown)
+                    argBad = ArgColourMsgWarn;
+                if (MxConsole.XlatMxConsoleColorToString(BackGndColourMsgInfo) == Program.ValueUnknown)
+                    argBad = ArgColourMsgInfo;
+                if (MxConsole.XlatMxConsoleColorToString(BackGndColourCmds) == Program.ValueUnknown)
+                    argBad = ArgColourCmds;
+                if (MxConsole.XlatMxConsoleColorToString(BackGndColourStatus) == Program.ValueUnknown)
+                    argBad = ArgColourStatus;
+                if (MxConsole.XlatMxConsoleColorToString(BackGndColourRule) == Program.ValueUnknown)
+                    argBad = ArgColourStatus;
+                if (argBad != Program.ValueNotSet)
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.BackGnd)}";
+                    rc.SetError(1020306, MxError.Source.User, $"Parameter {ParamGeneralBackGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
+                }
+                argBad = Program.ValueNotSet;
+                if (MxConsole.XlatMxConsoleColorToString(ForeGndColourText) == Program.ValueUnknown)
+                    argBad = ArgColourText;
+                if (MxConsole.XlatMxConsoleColorToString(ForeGndColourMsgError) == Program.ValueUnknown)
+                    argBad = ArgColourMsgError;
+                if (MxConsole.XlatMxConsoleColorToString(ForeGndColourMsgWarn) == Program.ValueUnknown)
+                    argBad = ArgColourMsgWarn;
+                if (MxConsole.XlatMxConsoleColorToString(ForeGndColourMsgInfo) == Program.ValueUnknown)
+                    argBad = ArgColourMsgInfo;
+                if (MxConsole.XlatMxConsoleColorToString(ForeGndColourCmds) == Program.ValueUnknown)
+                    argBad = ArgColourCmds;
+                if (MxConsole.XlatMxConsoleColorToString(ForeGndColourStatus) == Program.ValueUnknown)
+                    argBad = ArgColourStatus;
+                if (MxConsole.XlatMxConsoleColorToString(ForeGndColourRule) == Program.ValueUnknown)
+                    argBad = ArgColourStatus;
+                if (argBad != Program.ValueNotSet)
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.ForeGnd)}";
+                    rc.SetError(1020307, MxError.Source.User, $"Parameter {ParamGeneralForeGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
+                }
+
                 if ((AudioVol < ArgAudioVolMin) || (AudioVol > ArgAudioVolMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Audio)}";
@@ -1176,37 +1176,37 @@ namespace KLineEdCmdApp.Utils
                     var rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourText, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        BackGndColourText = XlatStringToConsoleColour(rcArg.GetResult());
+                        BackGndColourText = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgError, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        BackGndColourMsgError = XlatStringToConsoleColour(rcArg.GetResult());
+                        BackGndColourMsgError = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgWarn, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        BackGndColourMsgWarn = XlatStringToConsoleColour(rcArg.GetResult());
+                        BackGndColourMsgWarn = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgInfo, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        BackGndColourMsgInfo = XlatStringToConsoleColour(rcArg.GetResult());
+                        BackGndColourMsgInfo = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourCmds, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        BackGndColourCmds = XlatStringToConsoleColour(rcArg.GetResult());
+                        BackGndColourCmds = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourStatus, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        BackGndColourStatus = XlatStringToConsoleColour(rcArg.GetResult());
+                        BackGndColourStatus = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourRule, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        BackGndColourRule = XlatStringToConsoleColour(rcArg.GetResult());
+                        BackGndColourRule = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     if (rc.IsSuccess())
                         rc.SetResult(true);
@@ -1235,37 +1235,37 @@ namespace KLineEdCmdApp.Utils
                     var rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourText, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        ForeGndColourText = XlatStringToConsoleColour(rcArg.GetResult());
+                        ForeGndColourText = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgError, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        ForeGndColourMsgError = XlatStringToConsoleColour(rcArg.GetResult());
+                        ForeGndColourMsgError = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgWarn, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        ForeGndColourMsgWarn = XlatStringToConsoleColour(rcArg.GetResult());
+                        ForeGndColourMsgWarn = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgInfo, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        ForeGndColourMsgInfo = XlatStringToConsoleColour(rcArg.GetResult());
+                        ForeGndColourMsgInfo = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourCmds, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        ForeGndColourCmds = XlatStringToConsoleColour(rcArg.GetResult());
+                        ForeGndColourCmds = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourStatus, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        ForeGndColourStatus = XlatStringToConsoleColour(rcArg.GetResult());
+                        ForeGndColourStatus = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourRule, paramLine, false);
                     rc += rcArg;
                     if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
-                        ForeGndColourRule = XlatStringToConsoleColour(rcArg.GetResult());
+                        ForeGndColourRule = MxConsole.XlatStringToMxConsoleColor(rcArg.GetResult());
 
                     if (rc.IsSuccess())
                         rc.SetResult(true);
@@ -1843,33 +1843,33 @@ namespace KLineEdCmdApp.Utils
             if (SettingsUpdate == BoolValue.Unset)
                 SettingsUpdate = savedSettings.SettingsUpdate;
 
-            if (BackGndColourText == UnsetColour)
+            if (BackGndColourText == MxConsole.Color.NotSet)
                 BackGndColourText = savedSettings.BackGndColourText;
-            if (ForeGndColourText == UnsetColour)
+            if (ForeGndColourText == MxConsole.Color.NotSet)
                 ForeGndColourText = savedSettings.ForeGndColourText;
-            if (BackGndColourMsgError == UnsetColour)
+            if (BackGndColourMsgError == MxConsole.Color.NotSet)
                 BackGndColourMsgError = savedSettings.BackGndColourMsgError;
-            if (ForeGndColourMsgError == UnsetColour)
+            if (ForeGndColourMsgError == MxConsole.Color.NotSet)
                 ForeGndColourMsgError = savedSettings.ForeGndColourMsgError;
-            if (BackGndColourMsgWarn == UnsetColour)
+            if (BackGndColourMsgWarn == MxConsole.Color.NotSet)
                 BackGndColourMsgWarn = savedSettings.BackGndColourMsgWarn;
-            if (ForeGndColourMsgWarn == UnsetColour)
+            if (ForeGndColourMsgWarn == MxConsole.Color.NotSet)
                 ForeGndColourMsgWarn = savedSettings.ForeGndColourMsgWarn;
-            if (BackGndColourMsgInfo == UnsetColour)
+            if (BackGndColourMsgInfo == MxConsole.Color.NotSet)
                 BackGndColourMsgInfo = savedSettings.BackGndColourMsgInfo;
-            if (ForeGndColourMsgInfo == UnsetColour)
+            if (ForeGndColourMsgInfo == MxConsole.Color.NotSet)
                 ForeGndColourMsgInfo = savedSettings.ForeGndColourMsgInfo;
-            if (BackGndColourCmds == UnsetColour)
+            if (BackGndColourCmds == MxConsole.Color.NotSet)
                 BackGndColourCmds = savedSettings.BackGndColourCmds;
-            if (ForeGndColourCmds == UnsetColour)
+            if (ForeGndColourCmds == MxConsole.Color.NotSet)
                  ForeGndColourCmds = savedSettings.ForeGndColourCmds;
-            if (BackGndColourStatus == UnsetColour)
+            if (BackGndColourStatus == MxConsole.Color.NotSet)
                 BackGndColourStatus = savedSettings.BackGndColourStatus;
-            if (ForeGndColourStatus == UnsetColour)
+            if (ForeGndColourStatus == MxConsole.Color.NotSet)
                 ForeGndColourStatus = savedSettings.ForeGndColourStatus;
-            if (BackGndColourRule == UnsetColour)
+            if (BackGndColourRule == MxConsole.Color.NotSet)
                 BackGndColourRule = savedSettings.BackGndColourRule;
-            if (ForeGndColourRule == UnsetColour)
+            if (ForeGndColourRule == MxConsole.Color.NotSet)
                 ForeGndColourRule = savedSettings.ForeGndColourRule;
             if (AudioVol == Program.PosIntegerNotSet)
                 AudioVol = savedSettings.AudioVol;
@@ -1917,128 +1917,7 @@ namespace KLineEdCmdApp.Utils
                 TextEditorAutoCorrect = savedSettings.TextEditorAutoCorrect;
         }
 
-
-        public string XlatConsoleColourToString(ConsoleColor colour)
-        {
-            var rc = Program.ValueUnknown;
-
-            switch (colour)
-            {
-                case ConsoleColor.Black:
-                    rc = ArgBlack;
-                    break;
-                case ConsoleColor.Blue:
-                    rc = ArgBlue;
-                    break;
-                case ConsoleColor.Cyan:
-                    rc = ArgCyan;
-                    break;
-                case ConsoleColor.DarkBlue:
-                    rc = ArgDarkBlue;
-                    break;
-                case ConsoleColor.DarkCyan:
-                    rc = ArgDarkCyan;
-                    break;
-                case ConsoleColor.DarkGreen:
-                    rc = ArgDarkGreen;
-                    break;
-                //case ConsoleColor.DarkMagenta: //used as unset colour
-                //    rc = ArgDarkMagenta;
-                //    break;
-                case ConsoleColor.DarkRed:
-                    rc = ArgDarkRed;
-                    break;
-                case ConsoleColor.DarkYellow:
-                    rc = ArgDarkYellow;
-                    break;
-                case ConsoleColor.Gray:
-                    rc = ArgGray;
-                    break;
-                case ConsoleColor.Green:
-                    rc = ArgGreen;
-                    break;
-                case ConsoleColor.Magenta:
-                    rc = ArgMagenta;
-                    break;
-                case ConsoleColor.Red:
-                    rc = ArgRed;
-                    break;
-                case ConsoleColor.White:
-                    rc = ArgWhite;
-                    break;
-                case ConsoleColor.Yellow:
-                    rc = ArgYellow;
-                    break;
-                default:
-                    rc = Program.ValueUnknown;
-                    break;
-            }
-            return rc;
-        }
-
-        public ConsoleColor XlatStringToConsoleColour(string colour)
-        {
-            var rc = UnsetColour;
-
-            if (colour == ArgBlack)
-                rc = ConsoleColor.Black;
-            else if (colour == ArgBlue)
-                rc = ConsoleColor.Blue;
-            else if (colour == ArgCyan)
-                rc = ConsoleColor.Cyan;
-            else if (colour == ArgDarkBlue)
-                rc = ConsoleColor.DarkBlue;
-            else if (colour == ArgDarkCyan)
-                rc = ConsoleColor.DarkCyan;
-            else if (colour == ArgDarkGreen)
-                rc = ConsoleColor.DarkGreen;
-            //   else if (colour == ArgDarkMagenta) //used as unset colour
-            //    rc = ConsoleColor.DarkMagenta;
-            else if (colour == ArgDarkRed)
-                rc = ConsoleColor.DarkRed;
-            else if (colour == ArgDarkYellow)
-                rc = ConsoleColor.DarkYellow;
-            else if (colour == ArgGray)
-                rc = ConsoleColor.Gray;
-            else if (colour == ArgGreen)
-                rc = ConsoleColor.Green;
-            else if (colour == ArgMagenta)
-                rc = ConsoleColor.Magenta;
-            else if (colour == ArgRed)
-                rc = ConsoleColor.Red;
-            else if (colour == ArgWhite)
-                rc = ConsoleColor.White;
-            else if (colour == ArgYellow)
-                rc = ConsoleColor.Yellow;
-            else
-                rc = UnsetColour;
-
-            return rc;
-        }
-        public string GetConsoleColourNames()
-        {           //see https://docs.microsoft.com/en-us/dotnet/api/system.consolecolor?view=netframework-4.8
-            string rc = "";
-
-            rc += ArgBlack + " | ";
-            rc += ArgBlue + " | ";
-            rc += ArgCyan + " | ";
-            rc += ArgDarkBlue + " | ";
-            rc += ArgDarkCyan + " | ";
-            rc += ArgDarkGray + " | ";
-            rc += ArgDarkGreen + " | ";
-         //   rc += ArgDarkMagenta + " | ";  //used as unset colour
-            rc += ArgDarkRed + " | ";
-            rc += ArgDarkYellow + " | ";
-            rc += ArgGray + " | ";
-            rc += ArgGreen + " | ";
-            rc += ArgMagenta + " | ";
-            rc += ArgRed + " | ";
-            rc += ArgWhite + " | ";
-            rc += ArgYellow;
-
-            return rc;
-        }
-
+        
         protected override string GetParamHelp(int paramId = 0) // paramId = KLineEditor.PosIntegerNotSet 
         {
             var rc = "";
@@ -2264,9 +2143,8 @@ namespace KLineEdCmdApp.Utils
             rc += $"Url: '{UrlForm}' is any valid url and arguments" + Environment.NewLine;
             rc += "Characters: '>' or '.' are any displayable character" + Environment.NewLine;
             //rc += "Application Variables: 'word' is word at cursor, 'HelpVer' is help version" + Environment.NewLine;
-            //darkmagenta is reserved for NotSet
             rc += "COLOR: white, black, blue, cyan, gray, green, magenta, red, yellow" + Environment.NewLine;
-            rc += "        darkblue, darkcyan, darkgray, darkgreen, darkred, darkyellow" + Environment.NewLine;
+            rc += "        darkblue, darkcyan, darkgray, darkgreen, darkmagenta, darkred, darkyellow" + Environment.NewLine;
 
             return rc;
         }

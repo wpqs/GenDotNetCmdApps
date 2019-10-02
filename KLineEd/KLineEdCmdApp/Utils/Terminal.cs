@@ -69,8 +69,8 @@ namespace KLineEdCmdApp.Utils
                     Console.WindowLeft = props.WindowLeft;
                     Console.CursorTop = props.CursorTop;
                     Console.CursorLeft = props.CursorLeft;
-                    Console.ForegroundColor = props.ForegroundColor;
-                    Console.BackgroundColor = props.BackgroundColor;
+                    Console.ForegroundColor = MxConsole.GetConsoleColor(props.ForegroundColor);
+                    Console.BackgroundColor = MxConsole.GetConsoleColor(props.BackgroundColor);
                     Console.TreatControlCAsInput = props.TreateCtrlCAsInput;
 
                     if (Clear() == false)
@@ -104,8 +104,8 @@ namespace KLineEdCmdApp.Utils
                 WindowLeft = Console.WindowLeft,
                 CursorTop = Console.CursorTop,
                 CursorLeft = Console.CursorLeft,
-                ForegroundColor = Console.ForegroundColor,
-                BackgroundColor = Console.BackgroundColor,
+                ForegroundColor = MxConsole.XlatConsoleColorToMxConsoleColor(Console.ForegroundColor),
+                BackgroundColor = MxConsole.XlatConsoleColorToMxConsoleColor(Console.BackgroundColor),
                 TreateCtrlCAsInput = Console.TreatControlCAsInput
         };
             if (props.Validate() == false)
@@ -123,12 +123,12 @@ namespace KLineEdCmdApp.Utils
             return Console.KeyAvailable;
         }
 
-        public bool SetColour(ConsoleColor foreGndColour, ConsoleColor backGndColour)
+        public bool SetColour(MxConsole.Color foreGndColour, MxConsole.Color backGndColour)
         {
             try
             {
-                Console.ForegroundColor = foreGndColour;
-                Console.BackgroundColor = backGndColour;
+                Console.ForegroundColor = MxConsole.GetConsoleColor(foreGndColour);
+                Console.BackgroundColor = MxConsole.GetConsoleColor(backGndColour);
                 _mxErrorCode.SetResult(true);
             }
             catch (Exception e)

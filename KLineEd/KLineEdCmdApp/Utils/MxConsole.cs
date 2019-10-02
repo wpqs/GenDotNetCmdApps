@@ -52,7 +52,7 @@ namespace KLineEdCmdApp.Utils
         }
 
 
-        public bool IsValidMxConsoleColorName(string name)
+        public static bool IsValidMxConsoleColorName(string name)
         {           //see https://docs.microsoft.com/en-us/dotnet/api/system.consolecolor?view=netframework-4.8
             bool rc = false;
 
@@ -91,6 +91,64 @@ namespace KLineEdCmdApp.Utils
             else
             {
                 rc = false;
+            }
+            return rc;
+        }
+
+        public static MxConsole.Color XlatConsoleColorToMxConsoleColor(ConsoleColor color)
+        {
+            var rc = MxConsole.Color.Unknown;
+
+            switch (color)
+            {
+                case ConsoleColor.Black:
+                    rc = MxConsole.Color.Black;
+                    break;
+                case ConsoleColor.Blue:
+                    rc = MxConsole.Color.Blue;
+                    break;
+                case ConsoleColor.Cyan:
+                    rc = MxConsole.Color.Cyan;
+                    break;
+                case ConsoleColor.DarkBlue:
+                    rc = MxConsole.Color.DarkBlue;
+                    break;
+                case ConsoleColor.DarkCyan:
+                    rc = MxConsole.Color.DarkCyan;
+                    break;
+                case ConsoleColor.DarkGreen:
+                    rc = MxConsole.Color.DarkGreen;
+                    break;
+                case ConsoleColor.DarkMagenta:
+                    rc = MxConsole.Color.DarkMagenta;
+                    break;
+                case ConsoleColor.DarkRed:
+                    rc = MxConsole.Color.DarkRed;
+                    break;
+                case ConsoleColor.DarkYellow:
+                    rc = MxConsole.Color.DarkYellow;
+                    break;
+                case ConsoleColor.Gray:
+                    rc = MxConsole.Color.Gray;
+                    break;
+                case ConsoleColor.Green:
+                    rc = MxConsole.Color.Green;
+                    break;
+                case ConsoleColor.Magenta:
+                    rc = MxConsole.Color.Magenta;
+                    break;
+                case ConsoleColor.Red:
+                    rc = MxConsole.Color.Red;
+                    break;
+                case ConsoleColor.White:
+                    rc = MxConsole.Color.White;
+                    break;
+                case ConsoleColor.Yellow:
+                    rc = MxConsole.Color.Yellow;
+                    break;
+                default:
+                    rc = MxConsole.Color.Unknown;
+                    break;
             }
             return rc;
         }
@@ -156,7 +214,7 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
-        public MxConsole.Color XlatStringToMxConsoleColor(string color)
+        public static MxConsole.Color XlatStringToMxConsoleColor(string color)
         {
             var rc = MxConsole.Color.Unknown;
 
@@ -199,7 +257,7 @@ namespace KLineEdCmdApp.Utils
             }
             return rc;
         }
-        public string GetConsoleColorNames()
+        public static string GetConsoleColorNames()
         {           //see https://docs.microsoft.com/en-us/dotnet/api/system.consolecolor?view=netframework-4.8
             string rc = "";
 

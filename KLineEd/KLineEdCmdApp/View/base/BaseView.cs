@@ -44,16 +44,16 @@ namespace KLineEdCmdApp.View.Base
         protected bool CursorOn { set; get; }
         protected string BlankLine { set; get; }
 
-        protected ConsoleColor MsgLineErrorForeGndColour { private set; get; }
-        protected ConsoleColor MsgLineErrorBackGndColour { private set; get; }
+        protected MxConsole.Color MsgLineErrorForeGndColour { private set; get; }
+        protected MxConsole.Color MsgLineErrorBackGndColour { private set; get; }
         // ReSharper disable once MemberCanBePrivate.Global
-        protected ConsoleColor MsgLineWarnForeGndColour { set; get; }
+        protected MxConsole.Color MsgLineWarnForeGndColour { set; get; }
         // ReSharper disable once MemberCanBePrivate.Global
-        protected ConsoleColor MsgLineWarnBackGndColour { private set; get; }
+        protected MxConsole.Color MsgLineWarnBackGndColour { private set; get; }
         // ReSharper disable once MemberCanBePrivate.Global
-        protected ConsoleColor MsgLineInfoForeGndColour { private set; get; }
+        protected MxConsole.Color MsgLineInfoForeGndColour { private set; get; }
         // ReSharper disable once MemberCanBePrivate.Global
-        protected ConsoleColor MsgLineInfoBackGndColour { private set; get; }
+        protected MxConsole.Color MsgLineInfoBackGndColour { private set; get; }
 
         private MxReturnCode<bool> _mxErrorCode;
 
@@ -74,12 +74,12 @@ namespace KLineEdCmdApp.View.Base
             WindowHeight = Program.PosIntegerNotSet;
             WindowWidth = Program.PosIntegerNotSet;
 
-            MsgLineErrorForeGndColour = ConsoleColor.Red;
-            MsgLineErrorBackGndColour = ConsoleColor.Black;
-            MsgLineWarnForeGndColour = ConsoleColor.Yellow;
-            MsgLineWarnBackGndColour = ConsoleColor.Black;
-            MsgLineInfoForeGndColour = ConsoleColor.Gray;
-            MsgLineInfoBackGndColour = ConsoleColor.Black;
+            MsgLineErrorForeGndColour = MxConsole.Color.Red;
+            MsgLineErrorBackGndColour = MxConsole.Color.Black;
+            MsgLineWarnForeGndColour = MxConsole.Color.Yellow;
+            MsgLineWarnBackGndColour = MxConsole.Color.Black;
+            MsgLineInfoForeGndColour = MxConsole.Color.Gray;
+            MsgLineInfoBackGndColour = MxConsole.Color.Black;
 
             BlankLine = "";
             CursorOn = false;

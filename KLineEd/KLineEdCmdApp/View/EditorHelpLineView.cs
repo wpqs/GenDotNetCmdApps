@@ -14,13 +14,13 @@ namespace KLineEdCmdApp.View
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class EditorHelpLineView : BaseView
     {
-        public ConsoleColor EditorHelpLineForeGndColour { private set; get; }
-        public ConsoleColor EditorHelpLineBackGndColour { private set; get; }
+        public MxConsole.Color EditorHelpLineForeGndColour { private set; get; }
+        public MxConsole.Color EditorHelpLineBackGndColour { private set; get; }
 
         public EditorHelpLineView(ITerminal terminal) : base(terminal)
         {
-            EditorHelpLineForeGndColour = ConsoleColor.Gray;
-            EditorHelpLineBackGndColour = ConsoleColor.Black;
+            EditorHelpLineForeGndColour = MxConsole.Color.Gray;
+            EditorHelpLineBackGndColour = MxConsole.Color.Black;
         }
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
@@ -35,8 +35,8 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    EditorHelpLineForeGndColour = ConsoleColor.Blue;// param.ForeGndColourCmds; //todo rename ForeGndCmdsHelpColour
-                    EditorHelpLineBackGndColour = ConsoleColor.Black;// param.BackGndColourCmds; //todo rename BackGndCmdsHelpColour
+                    EditorHelpLineForeGndColour = MxConsole.Color.Blue;// param.ForeGndColourCmds; //todo rename ForeGndCmdsHelpColour
+                    EditorHelpLineBackGndColour = MxConsole.Color.Black;// param.BackGndColourCmds; //todo rename BackGndCmdsHelpColour
 
                     if (Terminal.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
                         rc.SetError(1120102, Terminal.GetErrorSource(), $"EditHelpLineView. {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());

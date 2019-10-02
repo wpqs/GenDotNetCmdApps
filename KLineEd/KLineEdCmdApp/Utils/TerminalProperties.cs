@@ -18,8 +18,8 @@ namespace KLineEdCmdApp.Utils
         public const int DefaultWindowLeft = 0;
         public const int DefaultCursorTop = 0;
         public const int DefaultCursorLeft = 0;
-        public const ConsoleColor DefaultForegroundColor = ConsoleColor.Gray;
-        public const ConsoleColor DefaultBackgroundColor = ConsoleColor.Black;
+        public const MxConsole.Color DefaultForegroundColor = MxConsole.Color.Gray;
+        public const MxConsole.Color DefaultBackgroundColor = MxConsole.Color.Black;
 
         public string Title { set; get; }
         public int BufferHeight {set; get; }
@@ -31,8 +31,8 @@ namespace KLineEdCmdApp.Utils
         public int WindowLeft  { set; get; }
         public int CursorTop  {  set; get; }
         public int CursorLeft  {  set; get; }
-        public ConsoleColor ForegroundColor  { set; get; }
-        public ConsoleColor BackgroundColor  { set; get; }
+        public MxConsole.Color ForegroundColor  { set; get; }
+        public MxConsole.Color BackgroundColor  { set; get; }
 
         public bool TreateCtrlCAsInput { set; get; }
 

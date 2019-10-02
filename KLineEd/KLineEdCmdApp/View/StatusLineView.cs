@@ -12,14 +12,14 @@ namespace KLineEdCmdApp.View
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class StatusLineView : BaseView
     {
-        public ConsoleColor StatusLineForeGndColour { private set; get; }
-        public ConsoleColor StatusLineBackGndColour { private set; get; }
+        public MxConsole.Color StatusLineForeGndColour { private set; get; }
+        public MxConsole.Color StatusLineBackGndColour { private set; get; }
 
         private int StatusLineRow { set; get; }
         public StatusLineView(ITerminal terminal) : base(terminal)
         {
-            StatusLineForeGndColour = ConsoleColor.Gray;
-            StatusLineBackGndColour = ConsoleColor.Black;
+            StatusLineForeGndColour = MxConsole.Color.Gray;
+            StatusLineBackGndColour = MxConsole.Color.Black;
             StatusLineRow = Program.PosIntegerNotSet;
         }
 

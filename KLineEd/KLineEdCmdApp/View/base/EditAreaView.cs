@@ -11,21 +11,21 @@ namespace KLineEdCmdApp.View.Base
         public bool DisplayRulers { private set; get; }
         public string TopRule { protected set; get; }
         public string BottomRule { protected set; get; }
-        public ConsoleColor RuleForeGndColour { private set; get; }
-        public ConsoleColor RuleBackGndColour { private set; get; }
-        public ConsoleColor TextForeGndColour { private set; get; }
-        public ConsoleColor TextBackGndColour { private set; get; }
+        public MxConsole.Color RuleForeGndColour { private set; get; }
+        public MxConsole.Color RuleBackGndColour { private set; get; }
+        public MxConsole.Color TextForeGndColour { private set; get; }
+        public MxConsole.Color TextBackGndColour { private set; get; }
 
         public EditAreaView(ITerminal terminal) : base(terminal)
         {
             TopRule = "";
             BottomRule = "";
 
-            RuleForeGndColour = ConsoleColor.Gray;
-            RuleBackGndColour = ConsoleColor.Black;
+            RuleForeGndColour = MxConsole.Color.Gray;
+            RuleBackGndColour = MxConsole.Color.Black;
 
-            TextForeGndColour = ConsoleColor.Gray;
-            TextBackGndColour = ConsoleColor.Black;
+            TextForeGndColour = MxConsole.Color.Gray;
+            TextBackGndColour = MxConsole.Color.Black;
         }
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
@@ -40,11 +40,11 @@ namespace KLineEdCmdApp.View.Base
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {       //todo apply ResetResult()
-                    TextForeGndColour = ConsoleColor.Green; // param.ForeGndColourText; //todo rename param.EditAreaForeGndColour  
-                    TextBackGndColour = ConsoleColor.Black; // param.BackGndColourText; //todo rename param.EditAreaBackGndColour 
+                    TextForeGndColour = MxConsole.Color.Green; // param.ForeGndColourText; //todo rename param.EditAreaForeGndColour  
+                    TextBackGndColour = MxConsole.Color.Black; // param.BackGndColourText; //todo rename param.EditAreaBackGndColour 
 
-                    RuleForeGndColour = ConsoleColor.DarkGreen; // param.ForeGndColourText; //todo rename param.RuleForeGndColour  
-                    RuleBackGndColour = ConsoleColor.Black; // param.BackGndColourText; //todo rename param.RuleBackGndColour 
+                    RuleForeGndColour = MxConsole.Color.DarkGreen; // param.ForeGndColourText; //todo rename param.RuleForeGndColour  
+                    RuleBackGndColour = MxConsole.Color.Black; // param.BackGndColourText; //todo rename param.RuleBackGndColour 
                     DisplayRulers = true;  //param.EditAreaRulersDisplay;
 
                     if (SetRulers(EditAreaWidth-1))

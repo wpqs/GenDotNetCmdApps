@@ -21,7 +21,7 @@ namespace KLineEdCmdApp.Utils
 
         bool Clear();
 
-        bool SetColour(ConsoleColor foreGndColour, ConsoleColor msgLineErrorBackGndColour);
+        bool SetColour(MxConsole.Color foreGndColour, MxConsole.Color msgLineErrorBackGndColour);
 
         bool SetCursorPosition(int row, int column);
         int GetCursorColumn();

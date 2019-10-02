@@ -18,7 +18,10 @@ Development work v1.0.43.0
 	 --import create new .KSX file and read into body.TextLines; replace double CRLF with ParaBreak and remove any remaining CRLF
 
 4. General improvements
-    - replace ConsoleColor with MxConsoleColour - same but with UnsetColour= -1
+    - done replace ConsoleColor with MxConsole.Colour - same but with UnsetColour= -1
+	- create tests for MxConsole.Colour
+	- move Terminal into MxConsole and rename ITerminal as IMxConsole
+	- rename TerminalTests to MxConsoleTests
     - clear entire window after abend or reset
 	- Detect any change in the Command Window Size and restore 
 	- Autosave and manual save
@@ -68,7 +71,7 @@ Development work v1.0.45.0
 	- Modal Dialog box
 
 4. Refactor
-	- Move to MxDotNetUtils MxConsoleColour, general MVC and factory stuff as well as Terminal.cs, ITerminal.cs and UIElements.cs 
+	- Move to MxDotNetUtils MxConsole, general MVC and factory stuff as well as UIElements.cs 
     - Update KScribe for new version of MxDotNetUtils
 
 5. Implement 

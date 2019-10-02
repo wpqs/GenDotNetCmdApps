@@ -15,8 +15,8 @@ namespace KLineEdCmdAppTest.TestSupport
         public int CursorRow { get; private set; }
         public int CursorColumn { get; private set; }
 
-        public ConsoleColor ForeGndColour { get; private set; }
-        public ConsoleColor BackGndColour { get; private set; }
+        public MxConsole.Color ForeGndColour { get; private set; }
+        public MxConsole.Color BackGndColour { get; private set; }
 
         public MockTerminal()
         {
@@ -24,8 +24,8 @@ namespace KLineEdCmdAppTest.TestSupport
             _mxErrorCode.SetError(9210201, MxError.Source.Program, "Terminal.Setup not called");
             CursorRow = 0;
             CursorColumn = 0;
-            ForeGndColour = ConsoleColor.Gray;
-            BackGndColour = ConsoleColor.Black;
+            ForeGndColour = MxConsole.Color.Gray;
+            BackGndColour = MxConsole.Color.Black;
         }
 
         public MxReturnCode<MxReturnCode<bool>> GetMxError()
@@ -101,7 +101,7 @@ namespace KLineEdCmdAppTest.TestSupport
             return true;
         }
 
-        public bool SetColour(ConsoleColor foreGndColour, ConsoleColor msgLineErrorBackGndColour)
+        public bool SetColour(MxConsole.Color foreGndColour, MxConsole.Color msgLineErrorBackGndColour)
         {
             ForeGndColour = foreGndColour;
             BackGndColour = msgLineErrorBackGndColour;
