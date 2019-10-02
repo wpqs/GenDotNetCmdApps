@@ -50,7 +50,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021501-user: parameter --help has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--help", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--help", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021601-user: parameter --export has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--export", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021601-user: parameter --export has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--export", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -96,7 +96,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021601-user: parameter --export has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--export", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021701-user: parameter --import has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--import", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--import", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -131,7 +131,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021701-user: parameter --import has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--import", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--import", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021701-user: parameter --import has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--import", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--import", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -210,7 +210,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=11" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020306-user: vol: 11 is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020308-user: vol: 11 is invalid", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -220,7 +220,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=-2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020306-user: vol: -2 is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020308-user: vol: -2 is invalid", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -241,7 +241,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021801-user: parameter --edit has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--edit", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--edit", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -252,7 +252,7 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.StartsWith("error 1021801-user: parameter --edit has incorrect number of arguments; found 2", rcParam.GetErrorUserMsg());
-            Assert.Contains($"Hint: retry using expected arguments for the parameter.{Environment.NewLine}--edit", cmdLineParams.HelpHint);
+            Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--edit", cmdLineParams.HelpHint);
         }
 
         [Fact]
@@ -313,6 +313,14 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings display=off file='KLineEdCmdApp.json' update=yes display=off");
             Assert.False(rc.IsSuccess());
             Assert.Equal("error 1023903-user: parameter --settings, arg display; duplicate name found", rc.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestGetArgValueNameDuplicatedInValue()
+        {
+            var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings display=off file=display update=yes");
+            Assert.True(rc.IsSuccess());
+            Assert.Equal("display", CmdLineParamsApp.GetArgNameValue("--settings", "file", "--settings file=display update=yes display=off").GetResult());
         }
 
         [Fact]

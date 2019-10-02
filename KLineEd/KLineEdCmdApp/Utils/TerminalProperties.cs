@@ -78,7 +78,7 @@ namespace KLineEdCmdApp.Utils
         public string GetValidationError()
         {
             // ReSharper disable once RedundantAssignment
-            var rc = $"[unknown]";
+            var rc = Program.ValueUnknown;
 
             if (Title == null)
                 rc = $"Title is null";

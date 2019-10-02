@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net.Http.Headers;
@@ -64,22 +65,22 @@ namespace KLineEdCmdApp.Utils
         public static readonly string ArgYes = "yes";
         public static readonly string ArgNo = "no";
 
-        public static readonly string ArgBlack = "black";
-        public static readonly string ArgBlue = "blue";
-        public static readonly string ArgCyan = "cyan";
-        public static readonly string ArgDarkBlue = "darkblue";
-        public static readonly string ArgDarkCyan = "darkcyan";
-        public static readonly string ArgDarkGray = "darkgray";
-        public static readonly string ArgDarkGreen = "darkgreen";
-        // public static readonly string ArgDarkMagenta = "darkmagenta"; //used as unset colour
-        public static readonly string ArgDarkRed = "darkred";
-        public static readonly string ArgDarkYellow = "darkyellow";
-        public static readonly string ArgGray = "gray";
-        public static readonly string ArgGreen = "green";
-        public static readonly string ArgMagenta = "magenta";
-        public static readonly string ArgRed = "red";
-        public static readonly string ArgWhite = "white";
-        public static readonly string ArgYellow = "yellow";
+        public static readonly string ArgBlack = MxConsole.Black;
+        public static readonly string ArgBlue = MxConsole.Blue;
+        public static readonly string ArgCyan = MxConsole.Cyan;
+        public static readonly string ArgDarkBlue = MxConsole.DarkBlue;
+        public static readonly string ArgDarkCyan = MxConsole.DarkCyan;
+        public static readonly string ArgDarkGray = MxConsole.DarkGray;
+        public static readonly string ArgDarkGreen = MxConsole.DarkGreen;
+     //   public static readonly string ArgDarkMagenta = MxConsole.DarkMagenta; //used as unset colour
+        public static readonly string ArgDarkRed = MxConsole.DarkRed;
+        public static readonly string ArgDarkYellow = MxConsole.DarkYellow;
+        public static readonly string ArgGray = MxConsole.Gray;
+        public static readonly string ArgGreen = MxConsole.Green;
+        public static readonly string ArgMagenta = MxConsole.Magenta;
+        public static readonly string ArgRed = MxConsole.Red;
+        public static readonly string ArgWhite = MxConsole.White;
+        public static readonly string ArgYellow = MxConsole.Yellow;
 
         //main operational parameters
         public static readonly string ParamHelp = "--help";
@@ -336,7 +337,7 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = "Export")] Export,
             [EnumMember(Value = "Edit")] Edit,
             [EnumMember(Value = "Abort")] Abort,
-            [EnumMember(Value = "Unknown")] Unknown
+            [EnumMember(Value = "[unknown]")] Unknown
         }
 
         public enum Param
@@ -371,7 +372,7 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = "Off")] Off = 0,
             [EnumMember(Value = "CR")] CR,
             [EnumMember(Value = "ParaBreak")] ParaBreak,
-            [EnumMember(Value = "Unknown")] Unknown
+            [EnumMember(Value = "[unknown]")] Unknown
         }
 
         public override string ToString()
@@ -799,11 +800,11 @@ namespace KLineEdCmdApp.Utils
             if (Op == OpMode.Export)
             {
                 if (string.IsNullOrEmpty(EditFile))
-                   rc.SetError(1020301, MxError.Source.User, $"{EditFileNameForm} argument missing");
+                   rc.SetError(1020301, MxError.Source.User, $"Paramter {ParamExportFile} has missing first argument; {EditFileNameForm}");
                 else
                 {
                     if (string.IsNullOrEmpty(ExportOutputFile))
-                        rc.SetError(1020302, MxError.Source.User, $"{TextFileNameForm} argument missing");
+                        rc.SetError(1020302, MxError.Source.User, $"Paramter {ParamExportFile} has missing second argument; {TextFileNameForm}");
                     else
                     {
                         rc.SetResult(true);
@@ -815,11 +816,11 @@ namespace KLineEdCmdApp.Utils
             else if (Op == OpMode.Import)
             {
                 if (string.IsNullOrEmpty(EditFile))
-                    rc.SetError(1020303, MxError.Source.User, $"{EditFileNameForm} argument missing");
+                    rc.SetError(1020303, MxError.Source.User, $"Paramter {ParamImportFile} has missing first argument; {EditFileNameForm}");
                 else
                 {
                     if (string.IsNullOrEmpty(ImportInputFile))
-                        rc.SetError(1020304, MxError.Source.User, $"{TextFileNameForm} argument missing");
+                        rc.SetError(1020304, MxError.Source.User, $"Paramter {ParamImportFile} has missing second argument; {TextFileNameForm}");
                     else
                     {
                         rc.SetResult(true);
@@ -833,12 +834,53 @@ namespace KLineEdCmdApp.Utils
                 if (((Op == OpMode.Edit)) && (string.IsNullOrEmpty(EditFile)))
                 {
                     HelpHint = $"{GetParamHelp((int) Param.EditFile)}";
-                    rc.SetError(1020305, MxError.Source.User, $"{EditFileNameForm} argument missing");
+                    rc.SetError(1020305, MxError.Source.User, $"Parameter {ParamEditFile} has missing first argument; {EditFileNameForm}");
                 }
+
+                //var argBad = Program.ValueNotSet;
+                //if (XlatConsoleColourToString(BackGndColourText) == Program.ValueUnknown)
+                //    argBad = ArgColourText;
+                //if (XlatConsoleColourToString(BackGndColourMsgError) == Program.ValueUnknown)
+                //    argBad = ArgColourMsgError;
+                //if (XlatConsoleColourToString(BackGndColourMsgWarn) == Program.ValueUnknown)
+                //    argBad = ArgColourMsgWarn;
+                //if (XlatConsoleColourToString(BackGndColourMsgInfo) == Program.ValueUnknown)
+                //    argBad = ArgColourMsgInfo;
+                //if (XlatConsoleColourToString(BackGndColourCmds) == Program.ValueUnknown)
+                //    argBad = ArgColourCmds;
+                //if (XlatConsoleColourToString(BackGndColourStatus) == Program.ValueUnknown)
+                //   argBad = ArgColourStatus;
+                //if (XlatConsoleColourToString(BackGndColourRule) == Program.ValueUnknown)
+                //    argBad = ArgColourStatus;
+                //if (argBad != Program.ValueNotSet)
+                //{
+                //    HelpHint = $"{GetParamHelp((int)Param.BackGnd)}";
+                //    rc.SetError(1020306, MxError.Source.User, $"Parameter {ParamGeneralBackGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
+                //}
+                //argBad = Program.ValueNotSet;
+                //if (XlatConsoleColourToString(ForeGndColourText) == Program.ValueUnknown)
+                //    argBad = ArgColourText;
+                //if (XlatConsoleColourToString(ForeGndColourMsgError) == Program.ValueUnknown)
+                //    argBad = ArgColourMsgError;
+                //if (XlatConsoleColourToString(ForeGndColourMsgWarn) == Program.ValueUnknown)
+                //    argBad = ArgColourMsgWarn;
+                //if (XlatConsoleColourToString(ForeGndColourMsgInfo) == Program.ValueUnknown)
+                //    argBad = ArgColourMsgInfo;
+                //if (XlatConsoleColourToString(ForeGndColourCmds) == Program.ValueUnknown)
+                //    argBad = ArgColourCmds;
+                //if (XlatConsoleColourToString(ForeGndColourStatus) == Program.ValueUnknown)
+                //    argBad = ArgColourStatus;
+                //if (XlatConsoleColourToString(ForeGndColourRule) == Program.ValueUnknown)
+                //    argBad = ArgColourStatus;
+                //if (argBad != Program.ValueNotSet)
+                //{
+                //    HelpHint = $"{GetParamHelp((int)Param.ForeGnd)}";
+                //    rc.SetError(1020307, MxError.Source.User, $"Parameter {ParamGeneralForeGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
+                //}
                 if ((AudioVol < ArgAudioVolMin) || (AudioVol > ArgAudioVolMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Audio)}";
-                    rc.SetError(1020306, MxError.Source.User, $"{ArgAudioVol}: {AudioVol} is invalid");
+                    rc.SetError(1020308, MxError.Source.User, $"{ArgAudioVol}: {AudioVol} is invalid");
                 }
                 if (rc.IsSuccess())  
                     rc.SetResult(true);
@@ -1101,7 +1143,7 @@ namespace KLineEdCmdApp.Utils
                        if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
                            SettingsPathFileName = ArgSettingsPathFileNameDefault; //todo v1.0.45.0 rcArg.GetResult();
 
-                        rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsUpdate, paramLine, false);
+                       rcArg = GetArgNameValue(ParamGeneralSettings, ArgSettingsUpdate, paramLine, false);
                        rc += rcArg;
                        if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
                            SettingsUpdate = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
@@ -1120,24 +1162,54 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessGeneralBackGndParam", false);
 
-            HelpHint = Environment.NewLine;
+           // HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamGeneralBackGndColour);
             rc += rcCnt;
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022001, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has incorrect number of arguments; found {argCnt} should be two");
+                if (argCnt > 7)
+                    rc.SetError(1022001, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has incorrect number of arguments; found {argCnt} should be less than 7");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamGeneralBackGndColour}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
-                    {
-                       // EditFile = rcArg1.GetResult();
+                    var rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourText, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        BackGndColourText = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgError, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        BackGndColourMsgError = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgWarn, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        BackGndColourMsgWarn = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourMsgInfo, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        BackGndColourMsgInfo = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourCmds, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        BackGndColourCmds = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourStatus, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        BackGndColourStatus = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralBackGndColour, ArgColourRule, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        BackGndColourRule = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    if (rc.IsSuccess())
                         rc.SetResult(true);
-                    }
                 }
             }
             if (rc.IsError())
@@ -1160,13 +1232,43 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1022101, MxError.Source.User, $"parameter {ParamGeneralForeGndColour} has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamGeneralForeGndColour}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
-                    {
-                        // EditFile = rcArg1.GetResult();
+                    var rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourText, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        ForeGndColourText = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgError, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        ForeGndColourMsgError = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgWarn, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        ForeGndColourMsgWarn = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourMsgInfo, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        ForeGndColourMsgInfo = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourCmds, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        ForeGndColourCmds = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourStatus, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        ForeGndColourStatus = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    rcArg = GetArgNameValue(ParamGeneralForeGndColour, ArgColourRule, paramLine, false);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
+                        ForeGndColourRule = XlatStringToConsoleColour(rcArg.GetResult());
+
+                    if (rc.IsSuccess())
                         rc.SetResult(true);
-                    }
                 }
             }
             if (rc.IsError())
@@ -1615,6 +1717,7 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
+        //argName is case sensitive and should be a unique argument name in the paraLine
         public static MxReturnCode<string> GetArgNameValue(string paramName, string argName, string paramLine, bool mandatory=true)
         {
             var rc = new MxReturnCode<string>("CmdLineParamsApp.GetArgNameValue");
@@ -1649,7 +1752,7 @@ namespace KLineEdCmdApp.Utils
                             if (name == argName)
                             {
                                 var value = args.Snip(startValueIndex, endValueIndex);
-                                if ((value == null) && (mandatory == true))
+                                if (value == null)
                                     rc.SetError(1023904, MxError.Source.User, $"parameter {paramName}, arg {argName}; value not found", MxMsgs.MxErrParamArgValueNotFound);
                                 else
                                     rc.SetResult(value);
@@ -1814,52 +1917,10 @@ namespace KLineEdCmdApp.Utils
                 TextEditorAutoCorrect = savedSettings.TextEditorAutoCorrect;
         }
 
-        public bool IsValidColourName(string name)
-        {           //see https://docs.microsoft.com/en-us/dotnet/api/system.consolecolor?view=netframework-4.8
-            bool rc = false;
-
-            if (name == ArgBlack)
-                rc = true;
-            else if (name == ArgBlue)
-                rc = true;
-            else if (name == ArgCyan)
-                rc = true;
-            else if (name == ArgDarkBlue)
-                rc = true;
-            else if (name == ArgDarkCyan)
-                rc = true;
-            else if (name == ArgDarkGray)
-                rc = true;
-            else if (name == ArgDarkGreen)
-                rc = true;
-            //else if (name == ArgDarkMagenta)  //used as unset colour
-            //    rc = true;
-            else if (name == ArgDarkRed)
-                rc = true;
-            else if (name == ArgDarkYellow)
-                rc = true;
-            else if (name == ArgGray)
-                rc = true;
-            else if (name == ArgGreen)
-                rc = true;
-            else if (name == ArgMagenta)
-                rc = true;
-            else if (name == ArgRed)
-                rc = true;
-            else if (name == ArgWhite)
-                rc = true;
-            else if (name == ArgYellow)
-                rc = true;
-            else
-            {
-                rc = false;
-            }
-            return rc;
-        }
 
         public string XlatConsoleColourToString(ConsoleColor colour)
         {
-            var rc = "[unknown]";
+            var rc = Program.ValueUnknown;
 
             switch (colour)
             {
@@ -1909,7 +1970,7 @@ namespace KLineEdCmdApp.Utils
                     rc = ArgYellow;
                     break;
                 default:
-                    rc = "[unknown]";
+                    rc = Program.ValueUnknown;
                     break;
             }
             return rc;
@@ -1982,7 +2043,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = "";
 
-            var msg = $"{Environment.NewLine}Hint: retry using expected arguments for the parameter.{Environment.NewLine}";
+            var msg = $"{Environment.NewLine}Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}";
 
             Param help = (Param)paramId;
             if (help == Param.Help)
