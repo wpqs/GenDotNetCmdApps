@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace KLineEdCmdApp.Utils
 {
+    [SuppressMessage("ReSharper", "RedundantNameQualifier")]
+    [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
     public class MxConsole
     {
         public const string Black = "black";

@@ -41,12 +41,12 @@ namespace KLineEdCmdApp.View
                         {
                             var tick = (index / 10).ToString();
                             TopRule += (tick.Length > 1) ? tick.Substring(1) : tick;
-                            BottomRule += "_";
+                            BottomRule += BottomRuleChar;
                         }
                         else
                         {
-                            TopRule += ".";
-                            BottomRule += "_";
+                            TopRule += TopRuleUnitChar;
+                            BottomRule += BottomRuleChar;
                         }
                     }
                     rc = true;

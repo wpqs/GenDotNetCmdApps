@@ -1,7 +1,6 @@
 ﻿using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdAppTest.TestSupport;
-using Microsoft.Azure.Services.AppAuthentication;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Net.Http.Headers;
-using System.Numerics;
 using System.Runtime.Serialization;
 
 using Newtonsoft.Json;
@@ -187,8 +184,10 @@ namespace KLineEdCmdApp.Utils
 
             public static readonly string ArgTextEditorRulersShow = "show";
             public static readonly string ArgTextEditorRulersShowDefault = ArgYes;
-            public static readonly string ArgTextEditorRulersUnitChar = "UnitChar";
+            public static readonly string ArgTextEditorRulersUnitChar = "unitchar";
             public static readonly char ArgTextEditorRulersUnitCharDefault = '.';
+            public static readonly string ArgTextEditorRulersBotChar = "botchar";
+            public static readonly char ArgTextEditorRulersBotCharDefault = '_';
 
         public const string ParamTextEditorCursor = "--cursor";     
 
@@ -314,6 +313,7 @@ namespace KLineEdCmdApp.Utils
 
         public BoolValue TextEditorRulersShow { set; get; }
         public char TextEditorRulersUnitChar { set; get; }
+        public char TextEditorRulersBotChar { set; get; }
         public int TextEditorCursorSize { set; get; }
         public int TextEditorDisplayRows {  set; get; }
         public int TextEditorDisplayCols {  set; get; }
@@ -435,6 +435,7 @@ namespace KLineEdCmdApp.Utils
                 rc += "AudioVol=" + AudioVol + Environment.NewLine;
                 rc += "TextEditorRulersShow=" + EnumOps.XlatToString(ReportMxErrors) + Environment.NewLine;
                 rc += "TextEditorRulersUnitChar=" + TextEditorRulersUnitChar.ToString() + Environment.NewLine;
+                rc += "TextEditorRulersBotChar=" + TextEditorRulersBotChar.ToString() + Environment.NewLine;
                 rc += "TextEditorCursorSize=" + TextEditorCursorSize + Environment.NewLine;
                 rc += "TextEditorDisplayRows=" + TextEditorDisplayRows + Environment.NewLine;
                 rc += "TextEditorDisplayCols=" + TextEditorDisplayCols + Environment.NewLine;
@@ -516,6 +517,7 @@ namespace KLineEdCmdApp.Utils
 
             TextEditorRulersShow = BoolValue.Unset;
             TextEditorRulersUnitChar = Program.NullChar;
+            TextEditorRulersBotChar = Program.NullChar;
             TextEditorCursorSize = Program.PosIntegerNotSet;
             TextEditorDisplayRows = Program.PosIntegerNotSet;
             TextEditorDisplayCols = Program.PosIntegerNotSet;
@@ -577,6 +579,7 @@ namespace KLineEdCmdApp.Utils
 
             TextEditorRulersShow = BoolValue.Yes;
             TextEditorRulersUnitChar = ArgTextEditorRulersUnitCharDefault;
+            TextEditorRulersBotChar = ArgTextEditorRulersBotCharDefault;
             TextEditorCursorSize = ArgTextEditorCursorSizeDefault;
             TextEditorDisplayRows = ArgTextEditorDisplayRowsDefault;
             TextEditorDisplayCols = ArgTextEditorDisplayColsDefault;
@@ -887,6 +890,15 @@ namespace KLineEdCmdApp.Utils
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Audio)}";
                     rc.SetError(1020308, MxError.Source.User, $"{ArgAudioVol}: {AudioVol} is invalid");
+                }
+
+                if ((TextEditorRulersShow == BoolValue.Unset) || (TextEditorRulersUnitChar == Program.NullChar) || ((TextEditorRulersBotChar == Program.NullChar)))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.Rulers)}";
+                    if (TextEditorRulersShow == BoolValue.Unset)
+                        rc.SetError(1020309, MxError.Source.User, $"{ArgTextEditorRulersShow}: is not set");
+                    else
+                        rc.SetError(1020310, MxError.Source.User, $"{((TextEditorRulersUnitChar == Program.NullChar) ? ArgTextEditorRulersUnitChar : ArgTextEditorRulersBotChar)}: is not set");
                 }
                 if (rc.IsSuccess())  
                     rc.SetResult(true);
@@ -1556,23 +1568,73 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorRulersParam", false);
 
-            HelpHint = Environment.NewLine;
+            //HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorRulers);
             rc += rcCnt;
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022901, MxError.Source.User, $"parameter {ParamTextEditorRulers} has incorrect number of arguments; found {argCnt} should be two");
+                if ((argCnt < 0) || (argCnt > 3))
+                    rc.SetError(1022901, MxError.Source.User, $"parameter {ParamTextEditorRulers} has incorrect number of arguments; found {argCnt} should be 0-3");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorRulers}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var argProc = 0;
+                    var show = BoolValue.Unset;
+                    var rcArgShow = GetArgNameValue(ParamTextEditorRulers, ArgTextEditorRulersShow, paramLine, false);
+                    rc += rcArgShow;
+                    if (rcArgShow.IsSuccess(true) && (rcArgShow.GetResult() != null))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (IsValidForSettingBoolValue(rcArgShow.GetResult()) == false)
+                            rc.SetError(1022902, MxError.Source.User, $"parameter {ParamTextEditorRulers} argument {ArgTextEditorRulersShow} value is not '{ArgYes}' or '{ArgNo}'; {rcArgShow.GetResult()}");
+                        else
+                        {
+                            show = (rcArgShow.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
+                            argProc++;
+                        }
+                    }
+                    string unitChar = null;
+                    var rcArgCharUnit = GetArgNameValue(ParamTextEditorRulers, ArgTextEditorRulersUnitChar, paramLine, false);
+                    rc += rcArgCharUnit;
+                    if (rcArgCharUnit.IsSuccess(true) && (rcArgCharUnit.GetResult() != null))
+                    {
+                        unitChar = rcArgCharUnit.GetResult();
+                        if ((string.IsNullOrEmpty(unitChar) == false) && (unitChar.Length == 1))
+                            argProc++;
+                        else
+                        {
+                            rc.SetError(1022903, MxError.Source.User, $"parameter {ParamTextEditorRulers} argument {ArgTextEditorRulersUnitChar} value is not a single displayable character; {unitChar ?? Program.ValueNotSet}");
+                            unitChar = null;
+                        }
+                    }
+                    string botChar = null;
+                    var rcArgCharBot = GetArgNameValue(ParamTextEditorRulers, ArgTextEditorRulersBotChar, paramLine, false);
+                    rc += rcArgCharBot;
+                    if (rcArgCharBot.IsSuccess(true) && (rcArgCharBot.GetResult() != null))
+                    {
+                        botChar = rcArgCharBot.GetResult();
+                        if ((string.IsNullOrEmpty(botChar) == false) && (botChar.Length == 1))
+                            argProc++;
+                        else
+                        {
+                            rc.SetError(1022904, MxError.Source.User, $"parameter {ParamTextEditorRulers} argument {ArgTextEditorRulersBotChar} value is not a single displayable character; {botChar ?? Program.ValueNotSet}");
+                            botChar = null;
+                        }
+                    }
+                    if (rc.IsSuccess())
+                    {
+                        if (argProc < argCnt)
+                            rc.SetError(1022905, MxError.Source.User, $"parameter {ParamTextEditorRulers} has invalid argument(s); processed {argProc} but found {argCnt}");
+                        else
+                        { 
+                            if (show != BoolValue.Unset)
+                                TextEditorRulersShow = show;
+                            if (unitChar != null)
+                                TextEditorRulersUnitChar = unitChar[0];
+                            if (botChar != null)
+                                TextEditorRulersBotChar = botChar[0];
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }
@@ -1807,7 +1869,7 @@ namespace KLineEdCmdApp.Utils
                     {
                         while (args[startArgNameIndex] == ' ')
                             startArgNameIndex++;
-                        if ((argValueSeperatorIndex = args.IndexOfAny(new char [] {'=',' '}, startArgNameIndex)) > 0)
+                        if ((argValueSeperatorIndex = args.IndexOfAny(new[] {'=',' '}, startArgNameIndex)) > 0)
                         {
                             var startValueIndex = GetArgValueIndex(true, args, argValueSeperatorIndex+1);
                             var endValueIndex = GetArgValueIndex(false, args, argValueSeperatorIndex+1);
@@ -1963,6 +2025,8 @@ namespace KLineEdCmdApp.Utils
                 TextEditorRulersShow = savedSettings.TextEditorRulersShow;
             if (TextEditorRulersUnitChar == Program.NullChar)
                 TextEditorRulersUnitChar = savedSettings.TextEditorRulersUnitChar;
+            if (TextEditorRulersBotChar == Program.NullChar)
+                TextEditorRulersBotChar = savedSettings.TextEditorRulersBotChar;
             if (TextEditorCursorSize == Program.PosIntegerNotSet)
                 TextEditorCursorSize = savedSettings.TextEditorCursorSize;
             if (TextEditorDisplayRows == Program.PosIntegerNotSet)
@@ -2001,13 +2065,13 @@ namespace KLineEdCmdApp.Utils
             }
             else if (help == Param.ExportFile)
             {
-                msg += GetHelpInfoExport() + Environment.NewLine; ;
+                msg += GetHelpInfoExport() + Environment.NewLine; 
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
             else if (help == Param.ImportFile)
             {
-                msg += GetHelpInfoImport() + Environment.NewLine; ;
+                msg += GetHelpInfoImport() + Environment.NewLine; 
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
@@ -2140,7 +2204,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoGeneralForeGndColour() { return $"{ParamGeneralForeGndColour} ({ArgColourText}=COLOR) ({ArgColourMsgError}=COLOR) ({ArgColourMsgWarn}=COLOR) ({ArgColourMsgInfo}=COLOUR) ({ArgColourCmds}=COLOR) ({ArgColourStatus}=COLOR) ({ArgColourRule}=COLOR)"; }
         private static string GetHelpInfoGeneralBackGndColour() { return $"{ParamGeneralBackGndColour} ({ArgColourText}=COLOR) ({ArgColourMsgError}=COLOR) ({ArgColourMsgWarn}=COLOR) ({ArgColourMsgInfo}=COLOUR) ({ArgColourCmds}=COLOR) ({ArgColourStatus}=COLOR) ({ArgColourRule}=COLOR)"; }
         private static string GetHelpInfoGeneralAudio() { return $"{ParamGeneralAudio} {ArgAudioVol}={ArgAudioVolDefault} <min {ArgAudioVolMin} max {ArgAudioVolMax}>"; }
-        private static string GetHelpInfoTextEditorRulers() { return $"{ParamTextEditorRulers} {ArgTextEditorRulersShow}=[yes|no] {ArgTextEditorRulersUnitChar}=."; }
+        private static string GetHelpInfoTextEditorRulers() { return $"{ParamTextEditorRulers} ({ArgTextEditorRulersShow}=[yes|no]) ({ArgTextEditorRulersUnitChar}=.) ({ArgTextEditorRulersBotChar}=_)"; }
         private static string GetHelpInfoTextEditorCursor() { return $"{ParamTextEditorCursor} {ArgTextEditorCursorSize}={ArgTextEditorCursorSizeDefault} <min {ArgTextEditorCursorSizeMin} max {ArgTextEditorCursorSizeMax}>"; }
         private static string GetHelpInfoTextEditorDisplay() { return $"{ParamTextEditorDisplay} ({ArgTextEditorDisplayRows}={ArgTextEditorDisplayRowsDefault} <min {ArgTextEditorDisplayRowsMin} max {ArgTextEditorDisplayRowsMax}>) ({ArgTextEditorDisplayCols}={ArgTextEditorDisplayColsDefault} <min {ArgTextEditorDisplayColsMin} max {ArgTextEditorDisplayColsMax}>) ({ArgTextEditorDisplayParaBreakDisplayChar}={ArgTextEditorDisplayParaBreakDisplayCharDefault})"; }
         private static string GetHelpInfoTextEditorLimits() { return $"{ParamTextEditorLimits} ({ArgTextEditorLimitEdit}={ArgTextEditorLimitEditDefault} <min {ArgTextEditorLimitEditMin} max {ArgTextEditorLimitEditMax}>) ({ArgTextEditorLimitScroll}={ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>)"; }

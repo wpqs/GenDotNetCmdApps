@@ -298,6 +298,7 @@ namespace KLineEdCmdApp.Model
         }
 
 
+        [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         public static string GetLineUpdateText(string existingText, string updateText, int updateIndex, int maxLength, bool insert)
         {
             string rc = null;   //typically returns null if updatedText cannot fit into the line or updateText contains invalid characters

@@ -371,6 +371,80 @@ namespace KLineEdCmdAppTest.UtilsTests
         }
 
         [Fact]
+        public void TestRuleParamsAll()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "show=yes", "unitchar=x", "botchar=y" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal('x', cmdLineParams.TextEditorRulersUnitChar);
+            Assert.Equal('y', cmdLineParams.TextEditorRulersBotChar);
+            Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.TextEditorRulersShow);
+        }
+
+        [Fact]
+        public void TestRuleParamsNoParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.TextEditorRulersShow);
+            Assert.Equal('.', cmdLineParams.TextEditorRulersUnitChar);
+            Assert.Equal('_', cmdLineParams.TextEditorRulersBotChar);
+        }
+
+        [Fact]
+        public void TestRuleParamsShowParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "show=no" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(CmdLineParamsApp.BoolValue.No, cmdLineParams.TextEditorRulersShow);
+        }
+
+        [Fact]
+        public void TestRuleParamsUnitCharParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "unitchar=z" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal('z', cmdLineParams.TextEditorRulersUnitChar);
+        }
+
+        [Fact]
+        public void TestRuleParamsBotCharParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "botchar=z" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal('z', cmdLineParams.TextEditorRulersBotChar);
+        }
+
+        [Fact]
+        public void TestRuleParamsFailBadArg()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "show=yes", "uniXchar=x", "botchar=y" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022905-user: parameter --rulers has invalid argument(s); processed 2 but found 3", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestRuleParamsFailExcessArg()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "show=yes", "unitchar=x", "botchar=y", "extra=x" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022901-user: parameter --rulers has incorrect number of arguments; found 4 should be 0-3", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
         public void TestEditParam()
         {
             var cmdLineParams = new CmdLineParamsApp();

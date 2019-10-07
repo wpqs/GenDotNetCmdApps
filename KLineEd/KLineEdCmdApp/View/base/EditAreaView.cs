@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Utils;
 using MxReturnCode;
 
@@ -9,6 +8,9 @@ namespace KLineEdCmdApp.View.Base
     public abstract class EditAreaView : BaseView
     {
         public bool DisplayRulers { private set; get; }
+        public char TopRuleUnitChar { protected set; get; }
+        public char BottomRuleChar { protected set; get; }
+
         public string TopRule { protected set; get; }
         public string BottomRule { protected set; get; }
         public MxConsole.Color RuleForeGndColour { private set; get; }
@@ -18,6 +20,10 @@ namespace KLineEdCmdApp.View.Base
 
         public EditAreaView(ITerminal terminal) : base(terminal)
         {
+            DisplayRulers = false;
+            TopRuleUnitChar = CmdLineParamsApp.ArgTextEditorRulersUnitCharDefault;
+            BottomRuleChar = CmdLineParamsApp.ArgTextEditorRulersBotCharDefault;
+
             TopRule = "";
             BottomRule = "";
 
@@ -45,7 +51,9 @@ namespace KLineEdCmdApp.View.Base
 
                     RuleForeGndColour = param.ForeGndColourRule;   
                     RuleBackGndColour = param.BackGndColourRule; 
-                    DisplayRulers = true;  //param.EditAreaRulersDisplay;
+                    DisplayRulers = (param.TextEditorRulersShow == CmdLineParamsApp.BoolValue.Yes) ? true : false;
+                    TopRuleUnitChar = param.TextEditorRulersUnitChar;
+                    BottomRuleChar = param.TextEditorRulersBotChar;
 
                     if (SetRulers(EditAreaWidth-1))
                     {
