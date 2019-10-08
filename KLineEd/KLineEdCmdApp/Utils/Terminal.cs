@@ -17,14 +17,16 @@ namespace KLineEdCmdApp.Utils
     {
         public static readonly ConsoleKey InvalidKey = ConsoleKey.F24;
         public static readonly int StdCursorSize = TerminalProperties.DefaultCursorSize;
-        public static readonly int InserModeCursorSize = 100;
+        public static readonly int InsertModeCursorSize = 100;
 
         private readonly MxReturnCode<bool> _mxErrorCode;
+        private int CursorSize { set; get; }
 
         public Terminal()
         {
             _mxErrorCode = new MxReturnCode<bool>($"Terminal.Ctor", false); //SetResult(true) on error
             _mxErrorCode.SetError(1210101, MxError.Source.Program, "Terminal.Setup not called");
+            CursorSize = TerminalProperties.DefaultCursorSize;
         }
 
         public bool IsError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
@@ -64,6 +66,7 @@ namespace KLineEdCmdApp.Utils
                     Console.SetWindowSize(props.WindowWidth, props.WindowHeight); //must set window before buffer
                     Console.SetBufferSize(props.BufferWidth, props.BufferHeight);
 
+                    CursorSize = props.CursorSize;
                     Console.CursorSize = props.CursorSize;
                     Console.WindowTop = props.WindowTop;
                     Console.WindowLeft = props.WindowLeft;
@@ -99,7 +102,7 @@ namespace KLineEdCmdApp.Utils
                 BufferHeight = Console.BufferHeight,
                 WindowWidth = Console.WindowWidth,
                 WindowHeight = Console.WindowHeight,
-                CursorSize = Console.CursorSize,
+                CursorSize = CursorSize,
                 WindowTop = Console.WindowTop,
                 WindowLeft = Console.WindowLeft,
                 CursorTop = Console.CursorTop,
@@ -198,11 +201,27 @@ namespace KLineEdCmdApp.Utils
             }
         }
 
+        public void SetCursorSize(int size)
+        {
+            try
+            {
+                if ((size > 0) && (size <= 100))
+                {
+                    CursorSize = size;
+                    Console.CursorSize = CursorSize;
+                }
+            }
+            catch (Exception e)
+            {
+                _mxErrorCode.SetError(1210802, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+            }
+        }
+
         public void SetCursorInsertMode(bool insertMode = false)
         {
             try
             {
-                Console.CursorSize = ((insertMode) ? InserModeCursorSize : StdCursorSize);
+                Console.CursorSize = ((insertMode) ? InsertModeCursorSize : CursorSize);
             }
             catch (Exception e)
             {

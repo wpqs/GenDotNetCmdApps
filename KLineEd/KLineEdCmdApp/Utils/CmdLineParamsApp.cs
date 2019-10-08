@@ -206,9 +206,9 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgTextEditorDisplayCols = "cols";      //68 <min 5 max 250> 
             public static readonly int ArgTextEditorDisplayColsDefault = 68;      //was ArgEditAreaLineWidthDefault - counted from Jack Kerouac's book 'On the Road'
             public static readonly int ArgTextEditorDisplayColsMax = 250;         //was ArgEditAreaLineWidthMax - see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
-            public static readonly int ArgTextEditorDisplayColsMin = 5;           //was ArgEditAreaLineWidthMin
+            public static readonly int ArgTextEditorDisplayColsMin = 5;          //PropsEditView.LongestLabelLength was ArgEditAreaLineWidthMin
 
-            public static readonly string ArgTextEditorDisplayParaBreakDisplayChar = "parabreak";
+        public static readonly string ArgTextEditorDisplayParaBreakDisplayChar = "parabreak";
             public const char             ArgTextEditorDisplayParaBreakDisplayCharDefault = '>';
 
         public const string ParamTextEditorPauseTimeout = "--typingpause"; // 60 <min 5 max 36000>
@@ -808,11 +808,11 @@ namespace KLineEdCmdApp.Utils
             if (Op == OpMode.Export)
             {
                 if (string.IsNullOrEmpty(EditFile))
-                   rc.SetError(1020301, MxError.Source.User, $"Paramter {ParamExportFile} has missing first argument; {EditFileNameForm}");
+                   rc.SetError(1020301, MxError.Source.User, $"paramter {ParamExportFile} has missing first argument; {EditFileNameForm}");
                 else
                 {
                     if (string.IsNullOrEmpty(ExportOutputFile))
-                        rc.SetError(1020302, MxError.Source.User, $"Paramter {ParamExportFile} has missing second argument; {TextFileNameForm}");
+                        rc.SetError(1020302, MxError.Source.User, $"paramter {ParamExportFile} has missing second argument; {TextFileNameForm}");
                     else
                     {
                         rc.SetResult(true);
@@ -824,11 +824,11 @@ namespace KLineEdCmdApp.Utils
             else if (Op == OpMode.Import)
             {
                 if (string.IsNullOrEmpty(EditFile))
-                    rc.SetError(1020303, MxError.Source.User, $"Paramter {ParamImportFile} has missing first argument; {EditFileNameForm}");
+                    rc.SetError(1020303, MxError.Source.User, $"paramter {ParamImportFile} has missing first argument; {EditFileNameForm}");
                 else
                 {
                     if (string.IsNullOrEmpty(ImportInputFile))
-                        rc.SetError(1020304, MxError.Source.User, $"Paramter {ParamImportFile} has missing second argument; {TextFileNameForm}");
+                        rc.SetError(1020304, MxError.Source.User, $"paramter {ParamImportFile} has missing second argument; {TextFileNameForm}");
                     else
                     {
                         rc.SetResult(true);
@@ -842,7 +842,7 @@ namespace KLineEdCmdApp.Utils
                 if (((Op == OpMode.Edit)) && (string.IsNullOrEmpty(EditFile)))
                 {
                     HelpHint = $"{GetParamHelp((int) Param.EditFile)}";
-                    rc.SetError(1020305, MxError.Source.User, $"Parameter {ParamEditFile} has missing first argument; {EditFileNameForm}");
+                    rc.SetError(1020305, MxError.Source.User, $"parameter {ParamEditFile} has missing first argument; {EditFileNameForm}");
                 }
 
                 var argBad = Program.ValueNotSet;
@@ -863,7 +863,7 @@ namespace KLineEdCmdApp.Utils
                 if (argBad != Program.ValueNotSet)
                 {
                     HelpHint = $"{GetParamHelp((int)Param.BackGnd)}";
-                    rc.SetError(1020306, MxError.Source.User, $"Parameter {ParamGeneralBackGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
+                    rc.SetError(1020306, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
                 }
                 argBad = Program.ValueNotSet;
                 if (MxConsole.XlatMxConsoleColorToString(ForeGndColourText) == Program.ValueUnknown)
@@ -883,23 +883,51 @@ namespace KLineEdCmdApp.Utils
                 if (argBad != Program.ValueNotSet)
                 {
                     HelpHint = $"{GetParamHelp((int)Param.ForeGnd)}";
-                    rc.SetError(1020307, MxError.Source.User, $"Parameter {ParamGeneralForeGndColour} has a bad argument; value of '{argBad}' is not a valid COLOR");
+                    rc.SetError(1020307, MxError.Source.User, $"parameter '{ParamGeneralForeGndColour}' has a bad argument; value of '{argBad}' is not a valid COLOR");
                 }
 
                 if ((AudioVol < ArgAudioVolMin) || (AudioVol > ArgAudioVolMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Audio)}";
-                    rc.SetError(1020308, MxError.Source.User, $"{ArgAudioVol}: {AudioVol} is invalid");
+                    rc.SetError(1020308, MxError.Source.User, $"parameter '{ParamGeneralAudio}' has a bad argument; value {AudioVol} is invalid for '{ArgAudioVol}'");
                 }
 
                 if ((TextEditorRulersShow == BoolValue.Unset) || (TextEditorRulersUnitChar == Program.NullChar) || ((TextEditorRulersBotChar == Program.NullChar)))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Rulers)}";
                     if (TextEditorRulersShow == BoolValue.Unset)
-                        rc.SetError(1020309, MxError.Source.User, $"{ArgTextEditorRulersShow}: is not set");
+                        rc.SetError(1020309, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has a bad argument; '{ArgTextEditorRulersShow}' is not set");
                     else
-                        rc.SetError(1020310, MxError.Source.User, $"{((TextEditorRulersUnitChar == Program.NullChar) ? ArgTextEditorRulersUnitChar : ArgTextEditorRulersBotChar)}: is not set");
+                        rc.SetError(1020310, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has a bad argument; '{((TextEditorRulersUnitChar == Program.NullChar) ? ArgTextEditorRulersUnitChar : ArgTextEditorRulersBotChar)}' is not set");
                 }
+
+                if ((TextEditorCursorSize < ArgTextEditorCursorSizeMin) || (TextEditorCursorSize > ArgTextEditorCursorSizeMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.Cursor)}";
+                    rc.SetError(1020311, MxError.Source.User, $"parameter '{ParamTextEditorCursor}' has a bad argument; value '{TextEditorCursorSize}' is invalid for '{ArgTextEditorCursorSize}'");
+                }
+
+                if ((TextEditorDisplayRows < ArgTextEditorDisplayRowsMin) || (TextEditorDisplayRows > ArgTextEditorDisplayRowsMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.Display)}";
+                    rc.SetError(1020312, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayRows}' is invalid for '{ArgTextEditorDisplayRows}'");
+                }
+                if ((TextEditorDisplayCols < ArgTextEditorDisplayColsMin) || (TextEditorDisplayCols > ArgTextEditorDisplayColsMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.Display)}";
+                    rc.SetError(1020313, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayCols}' is invalid for '{ArgTextEditorDisplayCols}'");
+                }
+                if (TerminalProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols()) != null)
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.Display)}";
+                    rc.SetError(1020314, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; {TerminalProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols())}");
+                }
+                if (TextEditorParaBreakDisplayChar == Program.NullChar)
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.Display)}";
+                    rc.SetError(1020315, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; '{ArgTextEditorDisplayParaBreakDisplayChar}' is not set");
+                }
+
                 if (rc.IsSuccess())  
                     rc.SetResult(true);
             }
@@ -1289,7 +1317,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if ((argCnt < 0) || (argCnt > 7))
-                    rc.SetError(1022101, MxError.Source.User, $"parameter {ParamGeneralForeGndColour} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022101, MxError.Source.User, $"parameter '{ParamGeneralForeGndColour}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
                     var argProc = 0;
@@ -1345,7 +1373,7 @@ namespace KLineEdCmdApp.Utils
                     if (rc.IsSuccess())
                     {
                         if (argProc < argCnt)
-                            rc.SetError(1022101, MxError.Source.User, $"parameter {ParamGeneralForeGndColour} has invalid argument(s); processed {argProc} but found {argCnt}");
+                            rc.SetError(1022102, MxError.Source.User, $"parameter '{ParamGeneralForeGndColour}' has invalid argument(s); processed {argProc} but found {argCnt}");
                         else
                             rc.SetResult(true);
                     }
@@ -1576,7 +1604,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if ((argCnt < 0) || (argCnt > 3))
-                    rc.SetError(1022901, MxError.Source.User, $"parameter {ParamTextEditorRulers} has incorrect number of arguments; found {argCnt} should be 0-3");
+                    rc.SetError(1022901, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has incorrect number of arguments; found {argCnt} should be 0-3");
                 else
                 {
                     var argProc = 0;
@@ -1586,7 +1614,7 @@ namespace KLineEdCmdApp.Utils
                     if (rcArgShow.IsSuccess(true) && (rcArgShow.GetResult() != null))
                     {
                         if (IsValidForSettingBoolValue(rcArgShow.GetResult()) == false)
-                            rc.SetError(1022902, MxError.Source.User, $"parameter {ParamTextEditorRulers} argument {ArgTextEditorRulersShow} value is not '{ArgYes}' or '{ArgNo}'; {rcArgShow.GetResult()}");
+                            rc.SetError(1022902, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' argument '{ArgTextEditorRulersShow}' value is not '{ArgYes}' or '{ArgNo}'; {rcArgShow.GetResult()}");
                         else
                         {
                             show = (rcArgShow.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
@@ -1603,7 +1631,7 @@ namespace KLineEdCmdApp.Utils
                             argProc++;
                         else
                         {
-                            rc.SetError(1022903, MxError.Source.User, $"parameter {ParamTextEditorRulers} argument {ArgTextEditorRulersUnitChar} value is not a single displayable character; {unitChar ?? Program.ValueNotSet}");
+                            rc.SetError(1022903, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' argument '{ArgTextEditorRulersUnitChar}' value is not a single displayable character; {unitChar ?? Program.ValueNotSet}");
                             unitChar = null;
                         }
                     }
@@ -1617,14 +1645,14 @@ namespace KLineEdCmdApp.Utils
                             argProc++;
                         else
                         {
-                            rc.SetError(1022904, MxError.Source.User, $"parameter {ParamTextEditorRulers} argument {ArgTextEditorRulersBotChar} value is not a single displayable character; {botChar ?? Program.ValueNotSet}");
+                            rc.SetError(1022904, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' argument '{ArgTextEditorRulersBotChar}' value is not a single displayable character; {botChar ?? Program.ValueNotSet}");
                             botChar = null;
                         }
                     }
                     if (rc.IsSuccess())
                     {
                         if (argProc < argCnt)
-                            rc.SetError(1022905, MxError.Source.User, $"parameter {ParamTextEditorRulers} has invalid argument(s); processed {argProc} but found {argCnt}");
+                            rc.SetError(1022905, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has invalid argument(s); processed {argProc} but found {argCnt}");
                         else
                         { 
                             if (show != BoolValue.Unset)
@@ -1647,7 +1675,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorCursorParam", false);
 
-            HelpHint = Environment.NewLine;
+           // HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorCursor);
             rc += rcCnt;
@@ -1655,15 +1683,20 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023001, MxError.Source.User, $"parameter {ParamTextEditorCursor} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1023001, MxError.Source.User, $"parameter '{ParamTextEditorCursor}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorCursor}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamTextEditorCursor, ArgTextEditorCursorSize, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (Int32.TryParse(rcArg.GetResult(), out var size) == false)
+                            rc.SetError(1023001, MxError.Source.User, $"parameter '{ParamTextEditorCursor}' argument '{ArgTextEditorCursorSize}' is invalid. It must be a number between {ArgTextEditorCursorSizeMin} and {ArgTextEditorCursorSizeMax}");
+                        else
+                        {
+                            TextEditorCursorSize = size;
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }
@@ -1676,23 +1709,72 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorDisplayParam", false);
 
-            HelpHint = Environment.NewLine;
+           // HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorDisplay);
             rc += rcCnt;
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1023101, MxError.Source.User, $"parameter {ParamTextEditorDisplay} has incorrect number of arguments; found {argCnt} should be two");
+                if ((argCnt < 0) || (argCnt > 3))
+                    rc.SetError(1023101, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has incorrect number of arguments; found {argCnt} should be 0-3");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorDisplay}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var argProc = 0;
+                    int rows = Program.PosIntegerNotSet;
+                    var rcArgRows = GetArgNameValue(ParamTextEditorDisplay, ArgTextEditorDisplayRows, paramLine, false);
+                    rc += rcArgRows;
+                    if (rcArgRows.IsSuccess(true) && (rcArgRows.GetResult() != null))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (Int32.TryParse(rcArgRows.GetResult(), out var rowNum) == false)
+                            rc.SetError(1023102, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' argument '{ArgTextEditorDisplayRows}' value {rcArgRows.GetResult()} is invalid. It must be a number between {ArgTextEditorDisplayRowsMin} and {ArgTextEditorDisplayRowsMax}");
+                        else
+                        {
+                            rows = rowNum;
+                            argProc++;
+                        }
+                    }
+                    int cols = Program.PosIntegerNotSet;
+                    var rcArgCols = GetArgNameValue(ParamTextEditorDisplay, ArgTextEditorDisplayCols, paramLine, false);
+                    rc += rcArgCols;
+                    if (rcArgCols.IsSuccess(true) && (rcArgCols.GetResult() != null))
+                    {
+                        if (Int32.TryParse(rcArgCols.GetResult(), out var colNum) == false)
+                            rc.SetError(1023103, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' argument '{ArgTextEditorDisplayCols}' value {rcArgCols.GetResult()} is invalid. It must be a number between {ArgTextEditorDisplayColsMin} and {ArgTextEditorDisplayColsMax}");
+                        else
+                        {
+                            cols = colNum;
+                            argProc++;
+                        }
+                    }
+                    string paraBreakChar = null;
+                    var rcArgBreak = GetArgNameValue(ParamTextEditorDisplay, ArgTextEditorDisplayParaBreakDisplayChar, paramLine, false);
+                    rc += rcArgBreak;
+                    if (rcArgBreak.IsSuccess(true) && (rcArgBreak.GetResult() != null))
+                    {
+                        paraBreakChar = rcArgBreak.GetResult();
+                        if ((string.IsNullOrEmpty(paraBreakChar) == false) && (paraBreakChar.Length == 1))
+                            argProc++;
+                        else
+                        {
+                            rc.SetError(1023104, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' argument '{ArgTextEditorDisplayParaBreakDisplayChar}' value is not a single displayable character; {paraBreakChar ?? Program.ValueNotSet}");
+                            paraBreakChar = null;
+                        }
+                    }
+                    if (rc.IsSuccess())
+                    {
+                        if (argProc < argCnt)
+                            rc.SetError(1023105, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has invalid argument(s); processed {argProc} but found {argCnt}");
+                        else
+                        {
+                            if (rows > Program.PosIntegerNotSet)
+                                TextEditorDisplayRows = rows;
+                            if (cols > Program.PosIntegerNotSet)
+                                TextEditorDisplayCols = cols;
+                            if (paraBreakChar != null)
+                                TextEditorParaBreakDisplayChar = paraBreakChar[0];
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }

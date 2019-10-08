@@ -66,6 +66,9 @@ namespace KLineEdCmdApp
 
         private List<BaseView> ViewList { set; get; }
 
+        public static int GetWindowFrameRows() { return HelpLineRowCount + EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount;}
+        public static int GetWindowFrameCols() { return EditAreaMarginLeft + EditAreaMarginRight;}
+
         public KLineEditor()
         {
             Controller = null;
@@ -133,6 +136,7 @@ namespace KLineEdCmdApp
             return rc;
         }
 
+
         private MxReturnCode<bool> Initialise(CmdLineParamsApp param, ChapterModel model, ITerminal terminal)
         {
             var rc = new MxReturnCode<bool>("KLineEditor. Initialise");
@@ -144,9 +148,9 @@ namespace KLineEdCmdApp
                 try
                 {
                     //ToolBrowserExe = param.ToolBrowserExe;
-                    EditAreaLineWidth = param.TextEditorDisplayCols;
-                    Width = EditAreaMarginLeft + EditAreaLineWidth + EditAreaMarginRight;  //there is actually an additional column used by cursor when at end of line
-                    Height = HelpLineRowCount +  EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + param.TextEditorDisplayRows + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount;
+                    EditAreaLineWidth = param.TextEditorDisplayCols; //there is actually an additional column used by cursor when at end of line
+                    Width = GetWindowFrameCols() + param.TextEditorDisplayCols;  
+                    Height = GetWindowFrameRows() + param.TextEditorDisplayRows;
 
                     var settings = new TerminalProperties
                     {
@@ -154,10 +158,11 @@ namespace KLineEdCmdApp
                         BufferHeight = Height,
                         BufferWidth = Width,
                         WindowHeight = Height,
-                        WindowWidth = Width
+                        WindowWidth = Width,
+                        CursorSize = param.TextEditorCursorSize
                     };
                     if (settings.Validate() == false) 
-                        rc.SetError(1030202, MxError.Source.User, $"settings.Validate() failed; {settings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
+                        rc.SetError(1030202, MxError.Source.Sys, $"settings.Validate() failed; {settings.GetValidationError()}");
                     else
                     {
                         if (terminal.Setup(settings) == false)
@@ -210,7 +215,7 @@ namespace KLineEdCmdApp
             {
                 var terminalSettings = Terminal.GetSettings();
                 if (terminalSettings.Validate() == false)
-                    rc.SetError(1030402, MxError.Source.User, $"settings.Validate() failed; {terminalSettings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
+                    rc.SetError(1030402, MxError.Source.Sys, $"settings.Validate() failed; {terminalSettings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
                 else
                 {
                     if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserExe)) == null) || Controller.IsError())

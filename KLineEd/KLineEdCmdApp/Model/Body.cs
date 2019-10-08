@@ -110,20 +110,20 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int editAreaLinesCount, int editAreaLineWidth, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault)
+        public MxReturnCode<bool> Initialise(int TextEditorDisplayRows, int TextEditorDisplayCols, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault)
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if ((editAreaLineWidth == Program.PosIntegerNotSet) || (editAreaLinesCount == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (paraBreakDisplayChar == NullChar))
-                rc.SetError(1100201, MxError.Source.Param, $"editAreaLinesCount={editAreaLinesCount} not set, editAreaLineWidth={editAreaLineWidth} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgTextEditorTabSizeMin}, paraBreak is 0", MxMsgs.MxErrBadMethodParam);
+            if ((TextEditorDisplayCols == Program.PosIntegerNotSet) || (TextEditorDisplayRows == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (paraBreakDisplayChar == NullChar))
+                rc.SetError(1100201, MxError.Source.Param, $"TextEditorDisplayRows={TextEditorDisplayRows} not set, TextEditorDisplayCols={TextEditorDisplayCols} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgTextEditorTabSizeMin}, paraBreak is 0", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if ((TextLines == null) || (Cursor == null) || (EditAreaViewCursorLimit == null))
                     rc.SetError(1100202, MxError.Source.Program, $"TextLines, Cursor or EditAreaViewCursorLimit is null", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    EditAreaViewCursorLimit.RowIndex = editAreaLinesCount - 1;
-                    EditAreaViewCursorLimit.ColIndex = editAreaLineWidth - 1;
+                    EditAreaViewCursorLimit.RowIndex = TextEditorDisplayRows - 1;
+                    EditAreaViewCursorLimit.ColIndex = TextEditorDisplayCols - 1;
 
                     SetTabSpaces(spacesForTab);
                     ParaBreakDisplayChar = paraBreakDisplayChar;
@@ -774,15 +774,18 @@ namespace KLineEdCmdApp.Model
                         rowIndex++;
                     }
                 }
-                if ((endRowIndex == rowIndex - 1 ) || (endRowIndex == Program.PosIntegerNotSet))
-                {
-                    var rcCursor = SetCursorInChapter(cursorRowIndex, cursorColIndex);
-                    rc += rcCursor;
-                    if (rcCursor.IsSuccess(true))
+                //if (rc.IsSuccess())
+                //{
+                    if ((endRowIndex == rowIndex - 1) || (endRowIndex == Program.PosIntegerNotSet))
                     {
-                        rc.SetResult(hint); 
+                        var rcCursor = SetCursorInChapter(cursorRowIndex, cursorColIndex);
+                        rc += rcCursor;
+                        if (rcCursor.IsSuccess(true))
+                        {
+                            rc.SetResult(hint);
+                        }
                     }
-                }
+               // }
             }
             return rc;
         }

@@ -261,7 +261,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             Assert.False(body.SplitLongLine(0, 0, -1, out var updatedCursorIndex).GetResult());
@@ -277,7 +277,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "0123 56789ABC";
@@ -305,7 +305,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "0123 56789ABC";
@@ -333,7 +333,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "0123 5678";
@@ -352,7 +352,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "0123 5678";
@@ -371,7 +371,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "0123456789A";
@@ -396,7 +396,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "0123456789A";
@@ -421,7 +421,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "01234 6789A";
@@ -446,7 +446,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line = "01234 6789";
@@ -471,7 +471,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0 0123456789";
@@ -514,7 +514,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123  0123456789";
@@ -539,7 +539,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             Assert.False(body.FillShortLine(0, 0, -1, out var updatedCursorColIndex).GetResult());
@@ -558,7 +558,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123";
@@ -586,7 +586,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123";
@@ -614,7 +614,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -643,7 +643,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -672,7 +672,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -701,7 +701,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -730,7 +730,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -760,7 +760,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -789,7 +789,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -817,7 +817,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "012345";
@@ -845,7 +845,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(ChapterModel.ChangeHint.Unknown, body.LeftJustifyLinesInParagraph(0, -1).GetResult());
@@ -857,7 +857,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123";
@@ -886,7 +886,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.WordCount);
@@ -905,7 +905,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "01 3456 89A12";
@@ -931,7 +931,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "01 3456 89A12" + Body.ParaBreak;
@@ -957,7 +957,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123 56789";
@@ -982,7 +982,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123 56789" + Body.ParaBreak;
@@ -1007,7 +1007,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123 56789 A23";
@@ -1038,7 +1038,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123 56789 123";
@@ -1069,7 +1069,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "456";
@@ -1101,7 +1101,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "0123 56789 123";
@@ -1133,7 +1133,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 9;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "01234" + Body.ParaBreak;
@@ -1165,7 +1165,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 67;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "A123456789 123456789 123456789 123456789 123456789 123456789";
@@ -1215,7 +1215,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 67;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "A123456789 123456789 123456789 123456789 123456789 123456789";
@@ -1268,7 +1268,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var maxColIndex = 67;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, maxColIndex + 1).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
             var line1 = "A123456789 123456789 123456789 123456789 123456789 123456789";

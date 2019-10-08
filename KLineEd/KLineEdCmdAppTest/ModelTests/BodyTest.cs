@@ -14,7 +14,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void RemoveAllLinesTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -99,7 +99,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetWordCountNoLineTest()
         {
             var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -111,7 +111,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetWordCountOneLineTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -124,7 +124,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetWordCountThreeLineTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -178,7 +178,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetCharInLineTest()
         {
             var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -196,7 +196,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetCharInLineNoneTest()
         {
             var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -209,7 +209,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetCharInLineEmptyTest()
         {
             var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -222,7 +222,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetCharInLineThreeTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -252,7 +252,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetCharacterCountInLineTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
             Assert.Equal(Program.PosIntegerNotSet, body.GetCharacterCountInRow(0));

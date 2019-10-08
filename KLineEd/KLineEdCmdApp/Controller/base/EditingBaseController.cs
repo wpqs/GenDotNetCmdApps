@@ -69,7 +69,7 @@ namespace KLineEdCmdApp.Controller.Base
             var rc = new MxReturnCode<bool>("EditingBaseController.Initialise");
 
             if ((model?.Ready ?? false) == false)
-                rc.SetError(1030101, MxError.Source.Param, $"model null, not ready, or browserExe null", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1250101, MxError.Source.Param, $"model null, not ready, or browserExe null", MxMsgs.MxErrBadMethodParam);
             else
             {
 
@@ -133,7 +133,7 @@ namespace KLineEdCmdApp.Controller.Base
             ResetError();
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if ((model == null) || (keyInfo == null))
-                _mxErrorCode.SetError(1030201, MxError.Source.Param, $"model is null or keyInfo null", MxMsgs.MxErrBadMethodParam);
+                _mxErrorCode.SetError(1250201, MxError.Source.Param, $"model is null or keyInfo null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if ((keyInfo.Modifiers == ConsoleModifiers.Control) && (keyInfo.Key == ConsoleKey.Q))
@@ -146,7 +146,7 @@ namespace KLineEdCmdApp.Controller.Base
                     }
                     catch (Exception e)
                     {
-                        _mxErrorCode?.SetError(1030202, MxError.Source.User, e.Message); //, MxMsgs.MxErrBrowserFailed);
+                        _mxErrorCode?.SetError(1250202, MxError.Source.User, e.Message); //, MxMsgs.MxErrBrowserFailed);
                     }
                 }
                 else if (keyInfo.Key == ConsoleKey.Escape)

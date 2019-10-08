@@ -259,7 +259,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--backgnd", "cmds=grXen" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020306-user: Parameter --backgnd has a bad argument; value of 'cmds' is not a valid COLOR", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020306-user: parameter --backgnd has a bad argument; value of 'cmds' is not a valid COLOR", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -304,7 +304,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--foregnd", "cXds=green" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1022101-user: parameter --foregnd has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1022102-user: parameter '--foregnd' has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -314,7 +314,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--foregnd", "cmds=grXen" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020307-user: Parameter --foregnd has a bad argument; value of 'cmds' is not a valid COLOR", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020307-user: parameter '--foregnd' has a bad argument; value of 'cmds' is not a valid COLOR", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -357,7 +357,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=11" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020308-user: vol: 11 is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020308-user: parameter '--audio' has a bad argument; value 11 is invalid for 'vol'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -367,7 +367,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--audio", "vol=-2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020308-user: vol: -2 is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020308-user: parameter '--audio' has a bad argument; value -2 is invalid for 'vol'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -431,7 +431,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "show=yes", "uniXchar=x", "botchar=y" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1022905-user: parameter --rulers has invalid argument(s); processed 2 but found 3", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1022905-user: parameter '--rulers' has invalid argument(s); processed 2 but found 3", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -441,8 +441,210 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--rulers", "show=yes", "unitchar=x", "botchar=y", "extra=x" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1022901-user: parameter --rulers has incorrect number of arguments; found 4 should be 0-3", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1022901-user: parameter '--rulers' has incorrect number of arguments; found 4 should be 0-3", rcParam.GetErrorTechMsg());
         }
+
+        [Fact]
+        public void TestCursorParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "size=20" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(20, cmdLineParams.TextEditorCursorSize);
+        }
+
+        [Fact]
+        public void TestCursorParamFailTooBig()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "size=101" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020311-user: parameter '--cursor' has a bad argument; value '101' is invalid for 'size'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestCursorParamFailTooSmall()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "size=0" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020311-user: parameter '--cursor' has a bad argument; value '0' is invalid for 'size'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestCursorParamFailInvalidName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "sXze=1" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter --cursor, arg size; name not found", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestCursorParamFailInvalidValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "size=X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023001-user: parameter '--cursor' argument 'size' is invalid. It must be a number between 1 and 100", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamAll()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=10", "cols=50", "parabreak=." });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(10, cmdLineParams.TextEditorDisplayRows);
+            Assert.Equal(50, cmdLineParams.TextEditorDisplayCols);
+            Assert.Equal('.', cmdLineParams.TextEditorParaBreakDisplayChar);
+        }
+
+        [Fact]
+        public void TestDisplayParamNone()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal( CmdLineParamsApp.ArgTextEditorDisplayRowsDefault, cmdLineParams.TextEditorDisplayRows);
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayColsDefault, cmdLineParams.TextEditorDisplayCols);
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, cmdLineParams.TextEditorParaBreakDisplayChar);
+        }
+
+        [Fact]
+        public void TestDisplayParamRows()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=15" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(15, cmdLineParams.TextEditorDisplayRows);
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayColsDefault, cmdLineParams.TextEditorDisplayCols);
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, cmdLineParams.TextEditorParaBreakDisplayChar);
+        }
+
+        [Fact]
+        public void TestDisplayParamCols()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=51" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(51, cmdLineParams.TextEditorDisplayCols);
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayRowsDefault, cmdLineParams.TextEditorDisplayRows);
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, cmdLineParams.TextEditorParaBreakDisplayChar);
+        }
+
+        [Fact]
+        public void TestDisplayParamParaBreak()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "parabreak=>" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayRowsDefault, cmdLineParams.TextEditorDisplayRows);
+            Assert.Equal(CmdLineParamsApp.ArgTextEditorDisplayColsDefault, cmdLineParams.TextEditorDisplayCols);
+            Assert.Equal('>', cmdLineParams.TextEditorParaBreakDisplayChar);
+        }
+
+        [Fact]
+        public void TestDisplayParamFailParaBreakValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "parabreak=>>" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023104-user: parameter '--display' argument 'parabreak' value is not a single displayable character; >>", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamFailMinCols()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=1" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020313-user: parameter '--display' has a bad argument; value '1' is invalid for 'cols'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamFailMaxCols()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=500" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020313-user: parameter '--display' has a bad argument; value '500' is invalid for 'cols'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamFailColValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023103-user: parameter '--display' argument 'cols' value X is invalid. It must be a number between 5 and 250", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamFailRowValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023102-user: parameter '--display' argument 'rows' value X is invalid. It must be a number between 5 and 50", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamFailMinRows()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=0" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020312-user: parameter '--display' has a bad argument; value '0' is invalid for 'rows'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamFailMaxRows()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=500" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020312-user: parameter '--display' has a bad argument; value '500' is invalid for 'rows'", rcParam.GetErrorTechMsg());
+        }
+
+
+        [Fact]
+        public void TestDisplayParamFailName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "coXs=1" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("1023105-user: parameter '--rulers' has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestDisplayParamFailExtra()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=10", "cols=50", "parabreak=.", "extra=1" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023101-user: parameter '--display' has incorrect number of arguments; found 4 should be 0-3", rcParam.GetErrorTechMsg());
+        }
+
 
         [Fact]
         public void TestEditParam()

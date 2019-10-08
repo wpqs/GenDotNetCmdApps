@@ -75,6 +75,20 @@ namespace KLineEdCmdApp.Utils
             return (Error) ? false : true;
         }
 
+        public static string GetSettingsError(string argRowsName, int argRowsValue, int windowSpacingHeight, string argColsName, int argColsValue, int windowSpacingWidth)
+        {
+            string rc = null;
+
+            if ((windowSpacingHeight+argRowsValue+1) > Console.LargestWindowHeight)
+                rc = $"'{argRowsName}={argRowsValue}' is invalid on this machine; max value is {Console.LargestWindowHeight-windowSpacingHeight-1}";
+            else if ((windowSpacingWidth+argColsValue+1) > Console.LargestWindowWidth)
+                rc = $"'{argColsName}={argColsValue}' is invalid on this machine; max value is { Console.LargestWindowWidth-windowSpacingWidth-1}";
+            else
+                rc = null;
+
+            return rc;
+        }
+
         public string GetValidationError()
         {
             // ReSharper disable once RedundantAssignment

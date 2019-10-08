@@ -11,7 +11,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetLastLinesTest()
         {
             var body = new Body();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
             Assert.NotNull(body.GetEditAreaLinesForDisplay(CmdLineParamsApp.ArgTextEditorDisplayRowsDefault).GetResult());
         }
@@ -28,7 +28,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetLastLinesOneTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -42,7 +42,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetLastLinesMaxTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(CmdLineParamsApp.ArgTextEditorDisplayRowsMax, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(CmdLineParamsApp.ArgTextEditorDisplayRowsMax, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -58,7 +58,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void GetLastLinesMoreThanMaxTest()
         {
             var body = new MockModelBody();
-            Assert.True(body.Initialise(TestConst.UnitTestEditAreaLines, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
 
             Assert.Equal(0, body.GetLineCount());
@@ -73,7 +73,7 @@ namespace KLineEdCmdAppTest.ModelTests
         {
             var displayHt = 5;
             var body = new MockModelBody();
-            Assert.True(body.Initialise(displayHt, TestConst.UnitTestEditAreaWidth).GetResult());
+            Assert.True(body.Initialise(displayHt, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
             Assert.Equal(4, body.EditAreaViewCursorLimit.RowIndex);

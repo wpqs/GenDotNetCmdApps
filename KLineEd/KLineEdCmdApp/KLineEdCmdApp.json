@@ -22,7 +22,7 @@
   "BackGndColourStatus": 0,
   "ForeGndColourStatus": 7,
   "BackGndColourRule": 0,
-  "ForeGndColourRule": 7,
+  "ForeGndColourRule": 8,
   "AudioVol": 0,
   "ToolBrowserExe": "explorer.exe",
   "ToolHelpUrl": "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/{HelpVer}",
