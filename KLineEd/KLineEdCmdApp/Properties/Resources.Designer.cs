@@ -88,7 +88,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again.
+        ///   Looks up a localized string similar to Error: Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again.
         /// </summary>
         internal static string MxErrInvalidChapterFile {
             get {

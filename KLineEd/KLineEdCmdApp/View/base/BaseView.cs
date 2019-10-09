@@ -14,7 +14,7 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "SimplifyConditionalTernaryExpression")]
     public abstract class BaseView : ObserverView
     {
-        public static readonly string ErrorMsgPrecursor = "error";
+        public static readonly string ErrorMsgPrecursor = "error:";
         public static readonly string WarnMsgPrecursor = "warn:";
         public static readonly string InfoMsgPrecursor = "info:";
 
@@ -282,8 +282,12 @@ namespace KLineEdCmdApp.View.Base
             if (msg == null)
                 DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, $"{ BaseView.ErrorMsgPrecursor} {1110201}-{ErrorType.program}: DisplayMsg is null", true);
             else
-                DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, MsgSetup(msgType, msg), true);
-
+            {
+                if (string.IsNullOrEmpty(msg))
+                    ClearLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
+                else
+                    DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, MsgSetup(msgType, msg), true);
+            }
             return true;
         }
 

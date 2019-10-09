@@ -127,7 +127,7 @@
     <value>Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed.</value>
   </data>
   <data name="MxErrInvalidChapterFile" xml:space="preserve">
-    <value>Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again</value>
+    <value>Error: Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again</value>
   </data>
   <data name="MxErrInvalidCondition" xml:space="preserve">
     <value>Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed.</value>

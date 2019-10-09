@@ -21,7 +21,7 @@ namespace KLineEdCmdAppTest.ViewTests
 
             _fixture.Model.SetMsgLine("test msg");
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
-            Assert.Equal("info: test msg", _fixture.View.LastTerminalOutput);
+            Assert.Equal("error: test msg", _fixture.View.LastTerminalOutput);
         }
     }
 }

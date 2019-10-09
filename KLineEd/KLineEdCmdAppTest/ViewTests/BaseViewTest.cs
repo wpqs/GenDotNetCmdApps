@@ -45,13 +45,13 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.Equal($"{BaseView.ErrorMsgPrecursor} testy", _fixture.View.LastTerminalOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Error, null));
-            Assert.Equal($"error 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Warning, null));
-            Assert.Equal($"error 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Info, null));
-            Assert.Equal($"error 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
         }
 
 

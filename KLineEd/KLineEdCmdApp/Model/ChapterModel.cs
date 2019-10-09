@@ -214,9 +214,12 @@ namespace KLineEdCmdApp.Model
         }
         public void SetMsgLine(string msg, bool update = true)
         {
-            MsgLine = msg;
-            if (update)
-                UpdateAllViews((int)ChangeHint.MsgLine);
+            if (MsgLine != msg)
+            {
+                MsgLine = msg;
+                if (update)
+                    UpdateAllViews((int) ChangeHint.MsgLine);
+            }
         }
 
         public void SetErrorMsg(int errorNo, string msg, bool update = true)
