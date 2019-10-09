@@ -934,6 +934,12 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1020316, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' has a bad argument; value '{TextEditorScrollLimit}' is invalid for '{ArgTextEditorLimitScroll}'");
                 }
 
+                if ((TextEditorTabSize < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (TextEditorTabSize > CmdLineParamsApp.ArgTextEditorTabSizeMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.TabSize)}";
+                    rc.SetError(1020317, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' value '{TextEditorTabSize}' is invalid");
+                }
+
                 if (rc.IsSuccess())  
                     rc.SetResult(true);
             }
@@ -1835,15 +1841,20 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023301, MxError.Source.User, $"parameter {ParamTextEditorTabSize} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1023301, MxError.Source.User, $"parameter {ParamTextEditorTabSize} has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorTabSize}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorTabSize}");
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (Int32.TryParse(rcArg.GetResult(), out var count) == false)
+                            rc.SetError(1023302, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' value {rcArg.GetResult()} is invalid. It must be a number between {ArgTextEditorTabSizeMin} and {ArgTextEditorTabSizeMax}");
+                        else
+                        {
+                            TextEditorTabSize = count;
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }

@@ -29,8 +29,7 @@ Development work v1.0.43.0
 	- Implement search - pass word at cursor
 	- Implement thesaurus - pass word at cursor
 	- Implement spelling checking - pass word at cursor (but don't implement autocorrect)
-	- Implement max scroll back - maximum number of lines that the user can scroll back from end of chapter (Home, PgUp, up)
-	- Implement max edit back - maximum number of lines that the user can edit from end of chapter
+	- done Implement max scroll back - maximum number of lines that the user can scroll back from end of chapter (Home, PgUp, up)
 	- Check Chapter/Session stats are correct
 
 6. Publish and Test

@@ -145,7 +145,7 @@ namespace KLineEdCmdApp
                     terminal.WriteLine($"{Environment.NewLine}Opening file: {cmdLineParams?.EditFile ?? ValueNotSet}");
 
                     var editModel = new ChapterModel();
-                    var rcInitModel = editModel.Initialise(cmdLineParams.TextEditorDisplayRows, cmdLineParams.TextEditorDisplayCols, cmdLineParams.EditFile, cmdLineParams.TextEditorParaBreakDisplayChar, 3, cmdLineParams.TextEditorScrollLimit); //todo CmdLineParams.SpacesForTab,
+                    var rcInitModel = editModel.Initialise(cmdLineParams.TextEditorDisplayRows, cmdLineParams.TextEditorDisplayCols, cmdLineParams.EditFile, cmdLineParams.TextEditorParaBreakDisplayChar, cmdLineParams.TextEditorTabSize, cmdLineParams.TextEditorScrollLimit); 
                     rc += rcInitModel;
                     if (rcInitModel.IsSuccess(true))
                     {

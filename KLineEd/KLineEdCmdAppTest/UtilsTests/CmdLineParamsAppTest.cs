@@ -728,6 +728,63 @@ namespace KLineEdCmdAppTest.UtilsTests
 
 
         [Fact]
+        public void TestTabSizeParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "1" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(1, cmdLineParams.TextEditorTabSize);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "25" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(25, cmdLineParams.TextEditorTabSize);
+        }
+
+        [Fact]
+        public void TestTabSizeParamFailOutOfRange()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "0" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020317-user: parameter '--tabsize' value '0' is invalid", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "26" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020317-user: parameter '--tabsize' value '26' is invalid", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestTabSizeParamFailBadValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023302-user: parameter '--tabsize' value X is invalid. It must be a number between 1 and 25", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestTabSizeParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023301-user: parameter --tabsize has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "12", "9" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023301-user: parameter --tabsize has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+
+        }
+
+
+        [Fact]
         public void TestEditParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
