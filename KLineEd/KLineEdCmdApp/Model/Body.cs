@@ -37,8 +37,8 @@ namespace KLineEdCmdApp.Model
         public const char NullChar = (char)0;
         public const char SpaceChar = ' ';
 
-        public static readonly int TextLinesPerPage = 36;                   //counted from Jack Kerouac's book 'On the Road'
-        public static readonly int MaxTextLines = TextLinesPerPage * 2500;  //twice the number of pages in Tolstoy's 'War and Peace'
+        public const int TextLinesPerPage = 36;                   //counted from Jack Kerouac's book 'On the Road'
+        public const int MaxTextLines = TextLinesPerPage * 2500;  //twice the number of pages in Tolstoy's 'War and Peace'
 
 
         public enum Scroll
@@ -75,6 +75,7 @@ namespace KLineEdCmdApp.Model
         public int WordCount { protected set; get; }
         public string TabSpaces { private set; get; }
         public char ParaBreakDisplayChar { private set; get; }
+        public int ScrollLimitChapter { private set; get; }                 //maximum number of lines you can scroll back from the end of the chapter (0=unlimited)
 
         private bool Error { set; get; }
         public bool IsError(){ return Error; }
@@ -90,6 +91,7 @@ namespace KLineEdCmdApp.Model
             WordCount = Program.PosIntegerNotSet;
             SetTabSpaces(CmdLineParamsApp.ArgTextEditorTabSizeDefault);
             ParaBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault;
+            ScrollLimitChapter = CmdLineParamsApp.ArgTextEditorLimitScrollDefault;
 
             Error = true;
         }
@@ -110,23 +112,24 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int TextEditorDisplayRows, int TextEditorDisplayCols, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault)
+        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault)
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if ((TextEditorDisplayCols == Program.PosIntegerNotSet) || (TextEditorDisplayRows == Program.PosIntegerNotSet) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (paraBreakDisplayChar == NullChar))
-                rc.SetError(1100201, MxError.Source.Param, $"TextEditorDisplayRows={TextEditorDisplayRows} not set, TextEditorDisplayCols={TextEditorDisplayCols} not set, or spacesForTab={spacesForTab} < min={CmdLineParamsApp.ArgTextEditorTabSizeMin}, paraBreak is 0", MxMsgs.MxErrBadMethodParam);
+            if ((textEditorDisplayCols == Program.PosIntegerNotSet) || (textEditorDisplayRows == Program.PosIntegerNotSet) || (paraBreakDisplayChar == NullChar) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax))
+                rc.SetError(1100201, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols}, paraBreak is 0, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin}, {CmdLineParamsApp.ArgTextEditorTabSizeMax}, scrollLimit={scrollLimit} < {CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if ((TextLines == null) || (Cursor == null) || (EditAreaViewCursorLimit == null))
                     rc.SetError(1100202, MxError.Source.Program, $"TextLines, Cursor or EditAreaViewCursorLimit is null", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    EditAreaViewCursorLimit.RowIndex = TextEditorDisplayRows - 1;
-                    EditAreaViewCursorLimit.ColIndex = TextEditorDisplayCols - 1;
+                    EditAreaViewCursorLimit.RowIndex = textEditorDisplayRows - 1;
+                    EditAreaViewCursorLimit.ColIndex = textEditorDisplayCols - 1;
 
                     SetTabSpaces(spacesForTab);
                     ParaBreakDisplayChar = paraBreakDisplayChar;
+                    ScrollLimitChapter = scrollLimit;
 
                     var rcRemove = RemoveAllLines();
                     rc += rcRemove;
@@ -247,6 +250,8 @@ namespace KLineEdCmdApp.Model
                 rc.SetError(1100501, MxError.Source.Program, $"TextLines is null", MxMsgs.MxErrInvalidCondition);
             else
             {
+                var limitTemp = ScrollLimitChapter;
+                ScrollLimitChapter = 0;
                 var rowCountIndex = 0;
                 while (rowCountIndex < TextLines.Count)
                 {
@@ -260,6 +265,7 @@ namespace KLineEdCmdApp.Model
                         break;
                     rowCountIndex++;
                 }
+                ScrollLimitChapter = limitTemp;
 
                 if (rc.IsSuccess())
                 {
@@ -456,18 +462,23 @@ namespace KLineEdCmdApp.Model
                                 rc.SetError(1100704, MxError.Source.User, Resources.MxWarnStartOfChapter);
                             else
                             {
-                                var lastColIndex = GetMaxColCursorIndexForRow(rowIndex);
-                                if ((lastColIndex == Program.PosIntegerNotSet) || (colIndex > lastColIndex))
-                                {     //this will result in split line so move cursor to column on next row which is at end of word where split happened
-                                    var lastSpaceIndex = TextLines[rowIndex].LastIndexOf(' '); 
-                                    var lastWordLen = (lastSpaceIndex > -1) ? TextLines[rowIndex].Length - (lastSpaceIndex + 1) : 1;
-                                    Cursor.ColIndex = (lastWordLen <= 1) ? 0 : lastWordLen-1;
-                                    Cursor.RowIndex = rowIndex;
-                                }
+                                if (IsCursorBeyondScrollLimit(rowIndex))
+                                    rc.SetError(1100705, MxError.Source.User, Resources.MxWarnScrollLimit);
                                 else
                                 {
-                                    Cursor.RowIndex = rowIndex;
-                                    Cursor.ColIndex = colIndex;
+                                    var lastColIndex = GetMaxColCursorIndexForRow(rowIndex);
+                                    if ((lastColIndex == Program.PosIntegerNotSet) || (colIndex > lastColIndex))
+                                    { //this will result in split line so move cursor to column on next row which is at end of word where split happened
+                                        var lastSpaceIndex = TextLines[rowIndex].LastIndexOf(' ');
+                                        var lastWordLen = (lastSpaceIndex > -1) ? TextLines[rowIndex].Length - (lastSpaceIndex + 1) : 1;
+                                        Cursor.ColIndex = (lastWordLen <= 1) ? 0 : lastWordLen - 1;
+                                        Cursor.RowIndex = rowIndex;
+                                    }
+                                    else
+                                    {
+                                        Cursor.RowIndex = rowIndex;
+                                        Cursor.ColIndex = colIndex;
+                                    }
                                 }
                             }
                         }
@@ -483,7 +494,6 @@ namespace KLineEdCmdApp.Model
             }
             return rc;
         }
-
 
         public MxReturnCode<ChapterModel.ChangeHint> SetEditAreaTopLineChapterIndex(Body.Scroll scroll = Body.Scroll.Bottom)
         {
@@ -1246,6 +1256,22 @@ namespace KLineEdCmdApp.Model
                     rc = TextLines[rowIndex].Length - 1; //allow cursor to ParaBreakChar character
                 else
                     rc = TextLines[rowIndex].Length;     //allow cursor one space beyond last character
+            }
+            return rc;
+        }
+
+        private bool IsCursorBeyondScrollLimit(int rowIndex)
+        {
+            var rc = false;
+            if ((ScrollLimitChapter > 0) && (TextLines.Count > 0))
+            {
+                // if (((TextLines.Count - 1) - rowIndex) > (ScrollLimitChapter - 1))
+                if (((TextLines.Count - 1) - rowIndex) <= (ScrollLimitChapter - 1))
+                    rc = false;
+                else
+                {
+                    rc = true;
+                }
             }
             return rc;
         }

@@ -99,11 +99,11 @@ namespace KLineEdCmdApp.View
                         {
                             var msg = msgLine.Substring(startTextIndex + errorPartTerminator.Length);
                             if (msg.StartsWith(MxMsgs.ErrorMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
-                                rc = $"{errorCode} - {msg.Substring(MxMsgs.ErrorMsgPrecursor.Length + 1)}";
+                                rc = $"#{errorCode} - {msg.Substring(MxMsgs.ErrorMsgPrecursor.Length + 1)}";
                             else if (msg.StartsWith(MxMsgs.WarningMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
-                                rc = $"{errorCode} - {msg.Substring(MxMsgs.WarningMsgPrecursor.Length + 1)}";
+                                rc = $"#{errorCode} - {msg.Substring(MxMsgs.WarningMsgPrecursor.Length + 1)}";
                             else if (msg.StartsWith(MxMsgs.InfoMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
-                                rc = $"{errorCode} - {msg.Substring(MxMsgs.InfoMsgPrecursor.Length + 1)}";
+                                rc = $"#{errorCode} - {msg.Substring(MxMsgs.InfoMsgPrecursor.Length + 1)}";
                             else
                                 rc = msgLine;
                         }

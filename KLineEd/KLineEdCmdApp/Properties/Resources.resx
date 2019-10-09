@@ -180,6 +180,9 @@
   <data name="MxWarnNoCharToDelete" xml:space="preserve">
     <value>Warning: no character to delete.</value>
   </data>
+  <data name="MxWarnScrollLimit" xml:space="preserve">
+    <value>Warning: you cannot scroll back any further. Change --limits parameter and try again.</value>
+  </data>
   <data name="MxWarnStartOfChapter" xml:space="preserve">
     <value>Warning: you cannot move beyond the start of the chapter</value>
   </data>

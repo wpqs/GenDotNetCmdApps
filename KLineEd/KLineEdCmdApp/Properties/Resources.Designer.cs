@@ -250,6 +250,15 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Warning: you cannot scroll back any further. Change --limits parameter and try again..
+        /// </summary>
+        internal static string MxWarnScrollLimit {
+            get {
+                return ResourceManager.GetString("MxWarnScrollLimit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Warning: you cannot move beyond the start of the chapter.
         /// </summary>
         internal static string MxWarnStartOfChapter {

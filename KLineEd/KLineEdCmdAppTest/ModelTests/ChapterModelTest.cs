@@ -45,7 +45,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var rc = manuscript.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols, null);
 
             Assert.False(rc.GetResult());
-            Assert.Equal($"error 1050101-param: TextEditorDisplayRows={TestConst.TextEditorDisplayRows}, TextEditorDisplayCols={TestConst.TextEditorDisplayCols} is invalid, pathFilename=[null], spacesForTab=3 (min=1)", rc.GetErrorTechMsg());
+            Assert.Equal($"error 1050101-param: textEditorDisplayRows={TestConst.TextEditorDisplayRows}, textEditorDisplayCols={TestConst.TextEditorDisplayCols} is invalid, pathFilename=[null], spacesForTab=3 <1,25>, scrollLimit=0 <0, 90000>", rc.GetErrorTechMsg());
             Assert.False(manuscript.Ready);
         }
 
@@ -57,7 +57,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var rc = manuscript.Initialise(TestConst.TextEditorDisplayRows, Program.PosIntegerNotSet,  _instancePathFileName);
 
             Assert.False(rc.GetResult());
-            Assert.StartsWith($"error 1050101-param: TextEditorDisplayRows={TestConst.TextEditorDisplayRows}, TextEditorDisplayCols={Program.PosIntegerNotSet} is invalid", rc.GetErrorTechMsg());
+            Assert.StartsWith($"error 1050101-param: textEditorDisplayRows={TestConst.TextEditorDisplayRows}, textEditorDisplayCols={Program.PosIntegerNotSet} is invalid", rc.GetErrorTechMsg());
             Assert.False(manuscript.Ready);
         }
 
@@ -68,7 +68,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var rc = manuscript.Initialise(Program.PosIntegerNotSet, TestConst.TextEditorDisplayCols, _instancePathFileName);
 
             Assert.False(rc.GetResult());
-            Assert.StartsWith($"error 1050101-param: TextEditorDisplayRows={Program.PosIntegerNotSet}, TextEditorDisplayCols={TestConst.TextEditorDisplayCols} is invalid", rc.GetErrorTechMsg());
+            Assert.StartsWith($"error 1050101-param: textEditorDisplayRows={Program.PosIntegerNotSet}, textEditorDisplayCols={TestConst.TextEditorDisplayCols} is invalid", rc.GetErrorTechMsg());
             Assert.False(manuscript.Ready);
         }
 

@@ -645,6 +645,87 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.Contains("error 1023101-user: parameter '--display' has incorrect number of arguments; found 4 should be 0-3", rcParam.GetErrorTechMsg());
         }
 
+        [Fact]
+        public void TestLimitsParamScrollBack()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=10" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(10, cmdLineParams.TextEditorScrollLimit);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=0" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(0, cmdLineParams.TextEditorScrollLimit);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=90000" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(90000, cmdLineParams.TextEditorScrollLimit);
+
+        }
+
+        [Fact]
+        public void TestLimitsParamScrollBackFailOutOfRange()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=-2" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020316-user: parameter '--limits' has a bad argument; value '-2' is invalid for 'scrollback'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=90001" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020316-user: parameter '--limits' has a bad argument; value '90001' is invalid for 'scrollback'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestLimitsParamScrollBackFailBadName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrolXback=2" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter --limits, arg scrollback; name not found", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestLimitsParamScrollBackFailBadValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023202-user: parameter '--limits' argument 'scrollback' value X is invalid. It must be a number between 0 and 90000", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestLimitsParamScrollBackFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=1", "extra=x" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023201-user: parameter --limits has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023201-user: parameter --limits has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestLimitsParamScrollBackMax()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=90000" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(90000, cmdLineParams.TextEditorScrollLimit);
+        }
+
 
         [Fact]
         public void TestEditParam()

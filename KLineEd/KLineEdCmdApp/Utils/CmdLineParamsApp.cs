@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
-
+using KLineEdCmdApp.Model;
 using Newtonsoft.Json;
 using MxDotNetUtilsLib;
 using MxReturnCode;
@@ -219,10 +219,10 @@ namespace KLineEdCmdApp.Utils
 
         public const string ParamTextEditorLimits = "--limits";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
 
-            public static readonly string ArgTextEditorLimitScroll = "scrollrows";
-            public static readonly int ArgTextEditorLimitScrollDefault = 0;
-            public static readonly int ArgTextEditorLimitScrollMax = 10000;
-            public static readonly int ArgTextEditorLimitScrollMin = 0;            //0 is unlimited
+            public static readonly string ArgTextEditorLimitScroll = "scrollback";
+            public const int ArgTextEditorLimitScrollDefault = 0;
+            public const int ArgTextEditorLimitScrollMax = Body.MaxTextLines;
+            public const int ArgTextEditorLimitScrollMin = 0;            //0 is unlimited
 
             public static readonly string ArgTextEditorLimitEdit = "editrows";
             public static readonly int ArgTextEditorLimitEditDefault = 0;
@@ -928,13 +928,19 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1020315, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; '{ArgTextEditorDisplayParaBreakDisplayChar}' is not set");
                 }
 
+                if ((TextEditorScrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (TextEditorScrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.Limits)}";
+                    rc.SetError(1020316, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' has a bad argument; value '{TextEditorScrollLimit}' is invalid for '{ArgTextEditorLimitScroll}'");
+                }
+
                 if (rc.IsSuccess())  
                     rc.SetResult(true);
             }
             else
             {
                 HelpHint = $"{GetParamHelp((int)Param.Help)}";
-                rc.SetError(1020307, MxError.Source.User, $"{ParamHelp} is missing. It must be provided in conjunction with the other parameters you have given.");
+                rc.SetError(1020330, MxError.Source.User, $"{ParamHelp} is missing. It must be provided in conjunction with the other parameters you have given.");
             }
             return rc;
         }
@@ -1795,15 +1801,20 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023201, MxError.Source.User, $"parameter {ParamTextEditorLimits} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1023201, MxError.Source.User, $"parameter {ParamTextEditorLimits} has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorLimits}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamTextEditorLimits, ArgTextEditorLimitScroll, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (Int32.TryParse(rcArg.GetResult(), out var rows) == false)
+                            rc.SetError(1023202, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' argument '{ArgTextEditorLimitScroll}' value {rcArg.GetResult()} is invalid. It must be a number between {ArgTextEditorLimitScrollMin} and {ArgTextEditorLimitScrollMax}");
+                        else
+                        {
+                            TextEditorScrollLimit = rows;
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }
@@ -2289,7 +2300,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoTextEditorRulers() { return $"{ParamTextEditorRulers} ({ArgTextEditorRulersShow}=[yes|no]) ({ArgTextEditorRulersUnitChar}=.) ({ArgTextEditorRulersBotChar}=_)"; }
         private static string GetHelpInfoTextEditorCursor() { return $"{ParamTextEditorCursor} {ArgTextEditorCursorSize}={ArgTextEditorCursorSizeDefault} <min {ArgTextEditorCursorSizeMin} max {ArgTextEditorCursorSizeMax}>"; }
         private static string GetHelpInfoTextEditorDisplay() { return $"{ParamTextEditorDisplay} ({ArgTextEditorDisplayRows}={ArgTextEditorDisplayRowsDefault} <min {ArgTextEditorDisplayRowsMin} max {ArgTextEditorDisplayRowsMax}>) ({ArgTextEditorDisplayCols}={ArgTextEditorDisplayColsDefault} <min {ArgTextEditorDisplayColsMin} max {ArgTextEditorDisplayColsMax}>) ({ArgTextEditorDisplayParaBreakDisplayChar}={ArgTextEditorDisplayParaBreakDisplayCharDefault})"; }
-        private static string GetHelpInfoTextEditorLimits() { return $"{ParamTextEditorLimits} ({ArgTextEditorLimitEdit}={ArgTextEditorLimitEditDefault} <min {ArgTextEditorLimitEditMin} max {ArgTextEditorLimitEditMax}>) ({ArgTextEditorLimitScroll}={ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>)"; }
+        private static string GetHelpInfoTextEditorLimits() { return $"{ParamTextEditorLimits} {ArgTextEditorLimitScroll}={ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>"; }
         private static string GetHelpInfoTextEditorTabSize() { return $"{ParamTextEditorTabSize} {ArgTextEditorTabSizeDefault} <min {ArgTextEditorTabSizeMin} max {ArgTextEditorTabSizeMax}>"; }
         private static string GetHelpInfoTextEditorPauseTimeout() { return $"{ParamTextEditorPauseTimeout} {ArgTextEditorPauseTimeoutDefault} <min {ArgTextEditorPauseTimeoutMin} max {ArgTextEditorPauseTimeoutMax}>"; }
         private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} [{ArgTextEditorAutoSaveCR}|{ArgTextEditorAutoSaveParaBreak}|{ArgTextEditorAutoSaveOff}]"; }

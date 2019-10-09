@@ -44,6 +44,7 @@ Development work v1.0.44.0
 
 1. Refactor Application structure
     - resolve const / readonly issue
+	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
 	- Rename KLineEdCmdApp Project, KLineEditor.cs and KLineEdCmdApp.json to KScribeCmdApp, KScribeEditor.cs, KScribe.json
 	- Rename KLineEdCmdAppTest to KScribeCmdAppTest (KLineEditorTests) 
 	- Create KScribeLib Class Library 
@@ -71,7 +72,7 @@ Development work v1.0.45.0
 	- Modal Dialog box
 
 4. Refactor
-	- Move to MxDotNetUtils MxConsole, general MVC and factory stuff as well as UIElements.cs 
+	- Move to MxDotNetUtils CmdLineParamApp parameter base class, MxConsole, general MVC and factory stuff as well as UIElements.cs 
     - Update KScribe for new version of MxDotNetUtils
 
 5. Implement 

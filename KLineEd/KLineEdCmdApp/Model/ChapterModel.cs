@@ -72,18 +72,18 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int TextEditorDisplayRows, int TextEditorDisplayCols, string pathFilename, char paraBreakChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault)
+        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, string pathFilename, char paraBreakChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 
-            if ((TextEditorDisplayRows == Program.PosIntegerNotSet) || (TextEditorDisplayCols == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin))
-                rc.SetError(1050101, MxError.Source.Param, $"TextEditorDisplayRows={TextEditorDisplayRows}, TextEditorDisplayCols={TextEditorDisplayCols} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} (min={CmdLineParamsApp.ArgTextEditorTabSizeMin})", MxMsgs.MxErrBadMethodParam);
+            if ((textEditorDisplayRows == Program.PosIntegerNotSet) || (textEditorDisplayCols == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax))
+                rc.SetError(1050101, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin},{CmdLineParamsApp.ArgTextEditorTabSizeMax}>, scrollLimit={scrollLimit} <{CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
-                    ChapterHeader.Properties.SetMaxPropertyLength(TextEditorDisplayCols - PropsEditView.LongestLabelLength);
-                    var rcInit = ChapterBody.Initialise(TextEditorDisplayRows, TextEditorDisplayCols, paraBreakChar, spacesForTab);
+                    ChapterHeader.Properties.SetMaxPropertyLength(textEditorDisplayCols - PropsEditView.LongestLabelLength);
+                    var rcInit = ChapterBody.Initialise(textEditorDisplayRows, textEditorDisplayCols, paraBreakChar, spacesForTab, scrollLimit);
                     rc += rcInit;
                     if (rcInit.IsSuccess(true))
                     {
