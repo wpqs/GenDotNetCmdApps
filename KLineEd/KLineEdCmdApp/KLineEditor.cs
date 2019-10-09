@@ -17,6 +17,7 @@ namespace KLineEdCmdApp
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class KLineEditor
     {
+        public static readonly int MaxSplitLineLength = 25000;  //500 words per page * 5 chars per word * 10 pages - see https://stackoverflow.com/questions/140468/what-is-the-maximum-possible-length-of-a-net-string
         public static readonly int StatusLineUpdateMilliSecs = 200;
 
         public static readonly int MaxWindowHeight = Console.LargestWindowHeight;  

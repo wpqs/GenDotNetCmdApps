@@ -204,9 +204,9 @@ namespace KLineEdCmdApp.Utils
             public static readonly int ArgTextEditorDisplayRowsMin = 5;           //was ArgEditAreaLinesCountMin
 
             public static readonly string ArgTextEditorDisplayCols = "cols";      //68 <min 5 max 250> 
-            public static readonly int ArgTextEditorDisplayColsDefault = 68;      //was ArgEditAreaLineWidthDefault - counted from Jack Kerouac's book 'On the Road'
+            public static readonly int ArgTextEditorDisplayColsDefault = 65;      //was ArgEditAreaLineWidthDefault - counted from Jack Kerouac's book 'On the Road'
             public static readonly int ArgTextEditorDisplayColsMax = 250;         //was ArgEditAreaLineWidthMax - see EditFile.Create() default StreamBuffer size is 1024, Console.Stream is 256 - length CRLF = 254
-            public static readonly int ArgTextEditorDisplayColsMin = 5;          //PropsEditView.LongestLabelLength was ArgEditAreaLineWidthMin
+            public static readonly int ArgTextEditorDisplayColsMin = 25;          //PropsEditView.LongestLabelLength was ArgEditAreaLineWidthMin
 
         public static readonly string ArgTextEditorDisplayParaBreakDisplayChar = "parabreak";
             public const char             ArgTextEditorDisplayParaBreakDisplayCharDefault = '>';

@@ -250,20 +250,20 @@ namespace KLineEdCmdApp.Model
                 var rowCountIndex = 0;
                 while (rowCountIndex < TextLines.Count)
                 {
-                    if ((rowCountIndex = GetNextParaBreakRowIndex(rowCountIndex)) == Program.PosIntegerNotSet)
-                        break;
                     var rcJustify = LeftJustifyLinesInParagraph(rowCountIndex, 0);
                     if (rcJustify.IsError(true))
                     {
                         rc += rcJustify;
                         break;
                     }
+                    if ((rowCountIndex = GetNextParaBreakRowIndex(rowCountIndex)) == Program.PosIntegerNotSet)
+                        break;
                     rowCountIndex++;
                 }
 
                 if (rc.IsSuccess())
                 {
-                    var rcCursor = SetCursorInChapter(rowIndex, colIndex);
+                    var rcCursor = SetCursorInChapter(TextLines.Count-1, colIndex);
                     rc += rcCursor;
                     if (rcCursor.IsSuccess(true))
                     {
@@ -735,7 +735,7 @@ namespace KLineEdCmdApp.Model
                 var endRowIndex = GetNextParaBreakRowIndex(startRowIndex);
                 if (endRowIndex > Program.PosIntegerNotSet) //rc.SetError(1101302, MxError.Source.Program, $"GetNextParaBreakRowIndex({startRowIndex}) failed; TextLines.Count={TextLines?.Count ?? Program.PosIntegerNotSet}", MxMsgs.MxErrInvalidCondition);
                 {
-                    while (rowIndex <= endRowIndex)
+                    while (rc.IsSuccess() && (rowIndex <= endRowIndex))
                     {
                         var linesCount = TextLines.Count;
                         var line = TextLines[rowIndex];
@@ -754,6 +754,10 @@ namespace KLineEdCmdApp.Model
                                     cursorColIndex = (updatedCursorColIndex < maxColIndex) ? updatedCursorColIndex : maxColIndex;
                                 }
                             }
+                            else
+                            {
+                                rowIndex++;
+                            }
                         }
                         else
                         {
@@ -770,12 +774,12 @@ namespace KLineEdCmdApp.Model
                                     cursorColIndex = (updatedCursorColIndex < maxColIndex) ? updatedCursorColIndex : maxColIndex;
                                 }
                             }
+                            rowIndex++;
                         }
-                        rowIndex++;
                     }
                 }
-                //if (rc.IsSuccess())
-                //{
+                if (rc.IsSuccess())
+                {
                     if ((endRowIndex == rowIndex - 1) || (endRowIndex == Program.PosIntegerNotSet))
                     {
                         var rcCursor = SetCursorInChapter(cursorRowIndex, cursorColIndex);
@@ -785,7 +789,7 @@ namespace KLineEdCmdApp.Model
                             rc.SetResult(hint);
                         }
                     }
-               // }
+                }
             }
             return rc;
         }
@@ -847,7 +851,7 @@ namespace KLineEdCmdApp.Model
             updatedCursorColIndex = Program.PosIntegerNotSet;
 
             var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((TextLines == null) || (maxColIndex < CmdLineParamsApp.ArgTextEditorDisplayColsMin) || (rowIndex < 0) || (rowIndex >= lineCount) || (colIndex < 0))
+            if ((TextLines == null) ||  (rowIndex < 0) || (rowIndex >= lineCount) || (colIndex < 0)) //(maxColIndex < CmdLineParamsApp.ArgTextEditorDisplayColsMin) ||
                 rc.SetError(1101601, MxError.Source.Param, $"rowIndex={rowIndex}; colIndex={colIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -1019,8 +1023,8 @@ namespace KLineEdCmdApp.Model
                 rc = $"{lineNoText}unexpected text (null). This is a program error. Please save your work and restart the program.";
             else
             {
-                if (text.Length > CmdLineParamsApp.ArgTextEditorDisplayColsMax)
-                    rc = $"{lineNoText}attempt to enter {text.Length} characters, but only {CmdLineParamsApp.ArgTextEditorDisplayColsMax} allowed.";
+                if (text.Length > KLineEditor.MaxSplitLineLength)
+                    rc = $"{lineNoText}attempt to enter {text.Length} characters, but only {KLineEditor.MaxSplitLineLength} allowed.";
                 else
                 {
                     var index = text.IndexOf(Environment.NewLine, StringComparison.Ordinal);
@@ -1197,8 +1201,8 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.InsertLine");
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((string.IsNullOrEmpty(line)) || (line.Length - 1 > CmdLineParamsApp.ArgTextEditorDisplayColsMax))
-                rc.SetError(1103001, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than { CmdLineParamsApp.ArgTextEditorDisplayColsMax}");
+            if ((string.IsNullOrEmpty(line)) || (line.Length - 1 > KLineEditor.MaxSplitLineLength))
+                rc.SetError(1103001, MxError.Source.User, $"line {GetLineNumberFromCursor()} has {line?.Length ?? -1} characters; permitted range more than 0 and less than {KLineEditor.MaxSplitLineLength}");
             else
             {
                 if (IsError() || (linesCount == Program.PosIntegerNotSet))

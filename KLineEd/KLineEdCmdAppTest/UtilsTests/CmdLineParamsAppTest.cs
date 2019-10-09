@@ -591,7 +591,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023103-user: parameter '--display' argument 'cols' value X is invalid. It must be a number between 5 and 250", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023103-user: parameter '--display' argument 'cols' value X is invalid. It must be a number between 25 and 250", rcParam.GetErrorTechMsg());
         }
 
         [Fact]

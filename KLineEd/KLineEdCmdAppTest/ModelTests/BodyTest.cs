@@ -62,10 +62,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.StartsWith("attempt to enter the disallowed character '<' at column 8", Body.GetErrorsInText($"hello .<hi"));
             Assert.StartsWith("attempt to enter the disallowed character '>' at column 9", Body.GetErrorsInText($"hello hi>"));
 
-            var line = "0123456789112345678921234567893123456789412345678951234567896123456789712345678981234567899123456789";
-            line += "0123456789112345678921234567893123456789412345678951234567896123456789712345678981234567899123456789";
-            line += "012345678911234567892123456789312345678941234567895";
-            Assert.StartsWith("line 7: attempt to enter 251 characters, but only 250 allowed", Body.GetErrorsInText(line, 7));
+            var line = new String('x', KLineEditor.MaxSplitLineLength+1);
+
+            Assert.StartsWith($"line 7: attempt to enter {KLineEditor.MaxSplitLineLength + 1} characters, but only {KLineEditor.MaxSplitLineLength} allowed", Body.GetErrorsInText(line, 7));
 
         }
 
