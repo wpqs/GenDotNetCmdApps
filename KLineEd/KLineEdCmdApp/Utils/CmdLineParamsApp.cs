@@ -236,12 +236,12 @@ namespace KLineEdCmdApp.Utils
             public static readonly int ArgTextEditorTabSizeMax = 25;
             public static readonly int ArgTextEditorTabSizeMin = 1;
 
-        public const string ParamTextEditorAutoSave = "--autosave";         // [CR | ParaBreak | off]
+        public const string ParamTextEditorAutoSave = "--autosave";         
 
-            public const string ArgTextEditorAutoSaveCR = "CR";
-            public const string ArgTextEditorAutoSaveParaBreak = "ParaBreak";
-            public const string ArgTextEditorAutoSaveOff = ArgOff;
-            public static readonly AutoSaveMode ArgTextEditorAutoSaveDefault = AutoSaveMode.Off;
+            public const string ArgTextEditorAutoSave = "minutes";
+            public const int    ArgTextEditorAutoSaveMin = 0;              //0 is disabled
+            public const int    ArgTextEditorAutoSaveMax = 1440;           //24 * 60 is 24 hours
+            public const int    ArgTextEditorAutoSaveDefault = 5;
 
         public const string ParamTextEditorAutoCorrect = "--autocorrect";           // [on | off]
 
@@ -323,7 +323,7 @@ namespace KLineEdCmdApp.Utils
         public int TextEditorScrollLimit {  set; get; }
         public int TextEditorEditLimit { set; get; }
         public int TextEditorTabSize { set; get; }
-        public AutoSaveMode TextEditorAutoSave { set; get; }
+        public int TextEditorAutoSavePeriod { set; get; }
         public BoolValue TextEditorAutoCorrect { set; get; }
 
         public bool IsValidForSettingBoolValue(string val){ return ((val == ArgNo) || (val == ArgYes)) ? true : false;  }
@@ -370,14 +370,6 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = ParamTextEditorPauseTimeout)] TypingPause,
             [EnumMember(Value = ParamTextEditorAutoSave)] AutoSave,
             [EnumMember(Value = ParamTextEditorAutoCorrect)] AutoCorrect,
-            [EnumMember(Value = Program.ValueUnknown)] Unknown
-        }
-
-        public enum AutoSaveMode
-        {
-            [EnumMember(Value = ArgOff)] Off = 0,
-            [EnumMember(Value = ArgTextEditorAutoSaveCR)] CR,
-            [EnumMember(Value = ArgTextEditorAutoSaveParaBreak)] ParaBreak,
             [EnumMember(Value = Program.ValueUnknown)] Unknown
         }
 
@@ -445,7 +437,7 @@ namespace KLineEdCmdApp.Utils
                 rc += "TextEditorScrollLimit=" + TextEditorScrollLimit + Environment.NewLine;
                 rc += "TextEditorEditLimit=" + TextEditorEditLimit + Environment.NewLine;
                 rc += "TextEditorTabSize=" + TextEditorTabSize + Environment.NewLine;
-                rc += "TextEditorAutoSave=" + EnumOps.XlatToString(TextEditorAutoSave) + Environment.NewLine;
+                rc += "TextEditorAutoSavePeriod=" + EnumOps.XlatToString(TextEditorAutoSavePeriod) + Environment.NewLine;
                 rc += "TextEditorAutoCorrect=" + EnumOps.XlatToString(TextEditorAutoCorrect) + Environment.NewLine;
                 rc += Environment.NewLine;
                 rc += "AudioFileKeyPress=" + (AudioFileKeyPress ?? "[null]") + Environment.NewLine;
@@ -527,7 +519,7 @@ namespace KLineEdCmdApp.Utils
             TextEditorScrollLimit = Program.PosIntegerNotSet;
             TextEditorEditLimit = Program.PosIntegerNotSet;
             TextEditorTabSize = Program.PosIntegerNotSet;
-            TextEditorAutoSave = AutoSaveMode.Unknown;
+            TextEditorAutoSavePeriod = Program.PosIntegerNotSet;
             TextEditorAutoCorrect = BoolValue.Unset;
         }
 
@@ -589,7 +581,7 @@ namespace KLineEdCmdApp.Utils
             TextEditorScrollLimit = ArgTextEditorLimitScrollDefault;
             TextEditorEditLimit = ArgTextEditorLimitEditDefault;
             TextEditorTabSize = ArgTextEditorTabSizeDefault;
-            TextEditorAutoSave = ArgTextEditorAutoSaveDefault;
+            TextEditorAutoSavePeriod = ArgTextEditorAutoSaveDefault;
             TextEditorAutoCorrect = BoolValue.No;
         }
 
@@ -947,6 +939,11 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1020318, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' has a bad argument; value '{TextEditorPauseTimeout}' is invalid for '{ArgTextEditorPauseTimeout}'");
                 }
 
+                if ((TextEditorAutoSavePeriod < CmdLineParamsApp.ArgTextEditorAutoSaveMin) || (TextEditorAutoSavePeriod > CmdLineParamsApp.ArgTextEditorAutoSaveMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.AutoSave)}";
+                    rc.SetError(1020319, MxError.Source.User, $"parameter '{ParamTextEditorAutoSave}' has a bad argument; value '{TextEditorAutoSavePeriod}' is invalid for '{ArgTextEditorAutoSave}'");
+                }
 
                 if (rc.IsSuccess())  
                     rc.SetResult(true);
@@ -1092,7 +1089,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 2)
-                    rc.SetError(1021601, MxError.Source.User, $"parameter {ParamExportFile} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1021601, MxError.Source.User, $"parameter '{ParamExportFile}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
                     var rcArg1 = GetArgNameValue(ParamExportFile, ArgFileFrom, paramLine, true); 
@@ -1128,7 +1125,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 2)
-                    rc.SetError(1021701, MxError.Source.User, $"parameter {ParamImportFile} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1021701, MxError.Source.User, $"parameter '{ParamImportFile}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
                     var rcArg1 = GetArgNameValue(ParamImportFile, ArgFileFrom, paramLine, true);
@@ -1164,10 +1161,10 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1021801, MxError.Source.User, $"parameter {ParamEditFile} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1021801, MxError.Source.User, $"parameter '{ParamEditFile}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamEditFile}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamEditFile}'");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
@@ -1192,7 +1189,7 @@ namespace KLineEdCmdApp.Utils
             {
                 int argCnt = rcCnt.GetResult();
                 if ((argCnt<  0) || (argCnt > 5 ))
-                    rc.SetError(1021901, MxError.Source.User, $"parameter {ParamGeneralSettings} has incorrect number of arguments; found {argCnt}");
+                    rc.SetError(1021901, MxError.Source.User, $"parameter '{ParamGeneralSettings}' has incorrect number of arguments; found {argCnt}");
                 else
                 {
                     if (argCnt == 0)
@@ -1205,7 +1202,7 @@ namespace KLineEdCmdApp.Utils
                         if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
                         {
                             if (IsValidForSettingBoolValue(rcArg.GetResult()) == false)
-                                rc.SetError(1021902, MxError.Source.User, $"parameter {ParamGeneralSettings} argument {ArgSettingsDisplay} value is not '{ArgYes}' or '{ArgNo}'; {rcArg.GetResult()}");
+                                rc.SetError(1021902, MxError.Source.User, $"parameter '{ParamGeneralSettings}' argument '{ArgSettingsDisplay}' value is not '{ArgYes}' or '{ArgNo}'; {rcArg.GetResult()}");
                             else
                             {
                                 SettingsDisplay = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
@@ -1224,7 +1221,7 @@ namespace KLineEdCmdApp.Utils
                         if (rcArg.IsSuccess() && (rcArg.GetResult() != null))
                         {
                             if (IsValidForSettingBoolValue(rcArg.GetResult()) == false)
-                                rc.SetError(1021903, MxError.Source.User, $"parameter {ParamGeneralSettings} argument {ArgSettingsUpdate} value is not '{ArgYes}' or '{ArgNo}'; {rcArg.GetResult()}");
+                                rc.SetError(1021903, MxError.Source.User, $"parameter '{ParamGeneralSettings}' argument '{ArgSettingsUpdate}' value is not '{ArgYes}' or '{ArgNo}'; {rcArg.GetResult()}");
                             else
                             {
                                 SettingsUpdate = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
@@ -1234,7 +1231,7 @@ namespace KLineEdCmdApp.Utils
                         if (rc.IsSuccess())
                         {
                            if (argProc < argCnt)
-                               rc.SetError(1021904, MxError.Source.User, $"parameter {ParamGeneralSettings} has invalid argument(s); processed {argProc} but found {argCnt}");
+                               rc.SetError(1021904, MxError.Source.User, $"parameter '{ParamGeneralSettings}' has invalid argument(s); processed {argProc} but found {argCnt}");
                            else
                                rc.SetResult(true);
                         }
@@ -1258,7 +1255,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if ((argCnt < 0) || (argCnt > 7))
-                    rc.SetError(1022001, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has incorrect number of arguments; found {argCnt} should be less than 7");
+                    rc.SetError(1022001, MxError.Source.User, $"parameter '{ParamGeneralBackGndColour}' has incorrect number of arguments; found {argCnt} should be less than 7");
                 else
                 {
                     var argProc = 0;
@@ -1314,7 +1311,7 @@ namespace KLineEdCmdApp.Utils
                     if (rc.IsSuccess())
                     {
                         if (argProc < argCnt)
-                            rc.SetError(1022002, MxError.Source.User, $"parameter {ParamGeneralBackGndColour} has invalid argument(s); processed {argProc} but found {argCnt}");
+                            rc.SetError(1022002, MxError.Source.User, $"parameter '{ParamGeneralBackGndColour}' has invalid argument(s); processed {argProc} but found {argCnt}");
                         else
                             rc.SetResult(true);
                     }
@@ -1416,7 +1413,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1022201, MxError.Source.User, $"parameter {ParamGeneralAudio} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022201, MxError.Source.User, $"parameter '{ParamGeneralAudio}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
                     var rcArg1 = GetArgNameValue(ParamGeneralAudio, ArgAudioVol, paramLine, true);
@@ -1424,7 +1421,7 @@ namespace KLineEdCmdApp.Utils
                     if (rcArg1.IsSuccess(true))
                     {
                         if(Int32.TryParse(rcArg1.GetResult(), out var vol) == false)
-                            rc.SetError(1022202, MxError.Source.User, $"parameter {ParamGeneralAudio} arg {ArgAudioVol} is invalid. It must be a number between {ArgAudioVolMin} and {ArgAudioVolMax}");
+                            rc.SetError(1022202, MxError.Source.User, $"parameter '{ParamGeneralAudio}' argument '{ArgAudioVol}' is invalid. It must be a number between {ArgAudioVolMin} and {ArgAudioVolMax}");
                         else
                         {
                             AudioVol = vol;
@@ -1442,7 +1439,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolBrowserParam", false);
 
-            HelpHint = Environment.NewLine;
+         //   HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamToolBrowser);
             rc += rcCnt;
@@ -1450,10 +1447,10 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1022301, MxError.Source.User, $"parameter {ParamToolBrowser} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022301, MxError.Source.User, $"parameter '{ParamToolBrowser}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolBrowser}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolBrowser}'");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
@@ -1471,7 +1468,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolHelpParam", false);
 
-            HelpHint = Environment.NewLine;
+           // HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamToolHelp);
             rc += rcCnt;
@@ -1479,10 +1476,10 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1022401, MxError.Source.User, $"parameter {ParamToolHelp} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022401, MxError.Source.User, $"parameter '{ParamToolHelp}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolHelp}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolHelp}'");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
@@ -1500,7 +1497,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSearchParam", false);
 
-            HelpHint = Environment.NewLine;
+           // HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamToolHelp);
             rc += rcCnt;
@@ -1508,10 +1505,10 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1022501, MxError.Source.User, $"parameter {ParamToolSearch} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022501, MxError.Source.User, $"parameter '{ParamToolSearch}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolSearch}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolSearch}'");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
@@ -1529,7 +1526,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSearchParam", false);
 
-            HelpHint = Environment.NewLine;
+          //  HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamToolThesaurus);
             rc += rcCnt;
@@ -1537,10 +1534,10 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1022601, MxError.Source.User, $"parameter {ParamToolThesaurus} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022601, MxError.Source.User, $"parameter '{ParamToolThesaurus}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolThesaurus}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolThesaurus}'");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
@@ -1558,7 +1555,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSpellParam", false);
 
-            HelpHint = Environment.NewLine;
+          //  HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamToolSpell);
             rc += rcCnt;
@@ -1566,10 +1563,10 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1022701, MxError.Source.User, $"parameter {ParamToolSpell} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022701, MxError.Source.User, $"parameter '{ParamToolSpell}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolSpell}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolSpell}'");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
@@ -1587,7 +1584,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessToolSvnParam", false);
 
-            HelpHint = Environment.NewLine;
+         //   HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamToolSvn);
             rc += rcCnt;
@@ -1595,10 +1592,10 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1022801, MxError.Source.User, $"parameter {ParamToolSvn} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1022801, MxError.Source.User, $"parameter '{ParamToolSvn}' has incorrect number of arguments; found {argCnt} should be two");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamToolSvn}");
+                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolSvn}'");
                     rc += rcArg1;
                     if (rcArg1.IsSuccess(true))
                     {
@@ -1711,7 +1708,7 @@ namespace KLineEdCmdApp.Utils
                     if (rcArg.IsSuccess(true))
                     {
                         if (Int32.TryParse(rcArg.GetResult(), out var size) == false)
-                            rc.SetError(1023001, MxError.Source.User, $"parameter '{ParamTextEditorCursor}' argument '{ArgTextEditorCursorSize}' is invalid. It must be a number between {ArgTextEditorCursorSizeMin} and {ArgTextEditorCursorSizeMax}");
+                            rc.SetError(1023001, MxError.Source.User, $"parameter '{ParamTextEditorCursor}' argument '{ArgTextEditorCursorSize}' value '{rcArg.GetResult()}' is invalid. It must be a number between {ArgTextEditorCursorSizeMin} and {ArgTextEditorCursorSizeMax}");
                         else
                         {
                             TextEditorCursorSize = size;
@@ -1747,7 +1744,7 @@ namespace KLineEdCmdApp.Utils
                     if (rcArgRows.IsSuccess(true) && (rcArgRows.GetResult() != null))
                     {
                         if (Int32.TryParse(rcArgRows.GetResult(), out var rowNum) == false)
-                            rc.SetError(1023102, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' argument '{ArgTextEditorDisplayRows}' value {rcArgRows.GetResult()} is invalid. It must be a number between {ArgTextEditorDisplayRowsMin} and {ArgTextEditorDisplayRowsMax}");
+                            rc.SetError(1023102, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' argument '{ArgTextEditorDisplayRows}' value '{rcArgRows.GetResult()}' is invalid. It must be a number between {ArgTextEditorDisplayRowsMin} and {ArgTextEditorDisplayRowsMax}");
                         else
                         {
                             rows = rowNum;
@@ -1760,7 +1757,7 @@ namespace KLineEdCmdApp.Utils
                     if (rcArgCols.IsSuccess(true) && (rcArgCols.GetResult() != null))
                     {
                         if (Int32.TryParse(rcArgCols.GetResult(), out var colNum) == false)
-                            rc.SetError(1023103, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' argument '{ArgTextEditorDisplayCols}' value {rcArgCols.GetResult()} is invalid. It must be a number between {ArgTextEditorDisplayColsMin} and {ArgTextEditorDisplayColsMax}");
+                            rc.SetError(1023103, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' argument '{ArgTextEditorDisplayCols}' value '{rcArgCols.GetResult()}' is invalid. It must be a number between {ArgTextEditorDisplayColsMin} and {ArgTextEditorDisplayColsMax}");
                         else
                         {
                             cols = colNum;
@@ -1807,7 +1804,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorLimitsParam", false);
 
-            HelpHint = Environment.NewLine;
+          //  HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorLimits);
             rc += rcCnt;
@@ -1815,7 +1812,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023201, MxError.Source.User, $"parameter {ParamTextEditorLimits} has incorrect number of arguments; found {argCnt} should be 1");
+                    rc.SetError(1023201, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
                     var rcArg = GetArgNameValue(ParamTextEditorLimits, ArgTextEditorLimitScroll, paramLine, true);
@@ -1823,7 +1820,7 @@ namespace KLineEdCmdApp.Utils
                     if (rcArg.IsSuccess(true))
                     {
                         if (Int32.TryParse(rcArg.GetResult(), out var rows) == false)
-                            rc.SetError(1023202, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' argument '{ArgTextEditorLimitScroll}' value {rcArg.GetResult()} is invalid. It must be a number between {ArgTextEditorLimitScrollMin} and {ArgTextEditorLimitScrollMax}");
+                            rc.SetError(1023202, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' argument '{ArgTextEditorLimitScroll}' value '{rcArg.GetResult()}' is invalid. It must be a number between {ArgTextEditorLimitScrollMin} and {ArgTextEditorLimitScrollMax}");
                         else
                         {
                             TextEditorScrollLimit = rows;
@@ -1841,7 +1838,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorTabSizeParam", false);
 
-            HelpHint = Environment.NewLine;
+          //  HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorTabSize);
             rc += rcCnt;
@@ -1849,15 +1846,15 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023301, MxError.Source.User, $"parameter {ParamTextEditorTabSize} has incorrect number of arguments; found {argCnt} should be 1");
+                    rc.SetError(1023301, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
-                    var rcArg = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorTabSize}");
+                    var rcArg = GetArgValue(paramLine, 1, true, $"parameter '{ParamTextEditorTabSize}'");
                     rc += rcArg;
                     if (rcArg.IsSuccess(true))
                     {
                         if (Int32.TryParse(rcArg.GetResult(), out var count) == false)
-                            rc.SetError(1023302, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' value {rcArg.GetResult()} is invalid. It must be a number between {ArgTextEditorTabSizeMin} and {ArgTextEditorTabSizeMax}");
+                            rc.SetError(1023302, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' value '{rcArg.GetResult()}' is invalid. It must be a number between {ArgTextEditorTabSizeMin} and {ArgTextEditorTabSizeMax}");
                         else
                         {
                             TextEditorTabSize = count;
@@ -1876,7 +1873,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorPauseTimeoutParam", false);
 
-            HelpHint = Environment.NewLine;
+          //  HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorPauseTimeout);
             rc += rcCnt;
@@ -1884,7 +1881,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023401, MxError.Source.User, $"parameter {ParamTextEditorPauseTimeout} has incorrect number of arguments; found {argCnt} should be 1");
+                    rc.SetError(1023401, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
                     var rcArg = GetArgNameValue(ParamTextEditorPauseTimeout, ArgTextEditorPauseTimeout, paramLine, true);
@@ -1892,7 +1889,7 @@ namespace KLineEdCmdApp.Utils
                     if (rcArg.IsSuccess(true))
                     {
                         if (Int32.TryParse(rcArg.GetResult(), out var timeout) == false)
-                            rc.SetError(1023402, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' argument '{ArgTextEditorPauseTimeout}' value {rcArg.GetResult()} is invalid. It must be a number between  {ArgTextEditorPauseTimeoutMin} and {ArgTextEditorPauseTimeoutMax}");
+                            rc.SetError(1023402, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' argument '{ArgTextEditorPauseTimeout}' value '{rcArg.GetResult()}' is invalid. It must be a number between  {ArgTextEditorPauseTimeoutMin} and {ArgTextEditorPauseTimeoutMax}");
                         else
                         {
                             TextEditorPauseTimeout = timeout;
@@ -1910,7 +1907,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorAutoSaveParam", false);
 
-            HelpHint = Environment.NewLine;
+           // HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorAutoSave);
             rc += rcCnt;
@@ -1918,15 +1915,20 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023501, MxError.Source.User, $"parameter {ParamTextEditorAutoSave} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1023501, MxError.Source.User, $"parameter '{ParamTextEditorAutoSave}' has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorAutoSave}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamTextEditorAutoSave, ArgTextEditorAutoSave, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (Int32.TryParse(rcArg.GetResult(), out var minutes) == false)
+                            rc.SetError(1023502, MxError.Source.User, $"parameter '{ParamTextEditorAutoSave}' argument '{ArgTextEditorAutoSave}' value '{rcArg.GetResult()}' is invalid. It must be a number between  {ArgTextEditorAutoSaveMin} and {ArgTextEditorAutoSaveMax}");
+                        else
+                        {
+                            TextEditorAutoSavePeriod = minutes;
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }
@@ -1939,7 +1941,7 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorAutoCorrectParam", false);
 
-            HelpHint = Environment.NewLine;
+          //  HelpHint = Environment.NewLine;
 
             var rcCnt = GetArgCount(paramLine, ParamTextEditorAutoCorrect);
             rc += rcCnt;
@@ -1975,7 +1977,7 @@ namespace KLineEdCmdApp.Utils
             {
                 var line = paramLine.Trim();
                 if (line.Snip(0, paramName.Length-1) != paramName)
-                    rc.SetError(1023902, MxError.Source.Program, $"parameter {paramName} not found or not at start of line", MxMsgs.MxErrInvalidCondition);
+                    rc.SetError(1023902, MxError.Source.Program, $"parameter '{paramName}' not found or not at start of line", MxMsgs.MxErrInvalidCondition);
                 else
                 {
 
@@ -1993,14 +1995,14 @@ namespace KLineEdCmdApp.Utils
                             var name = args.Snip(startArgNameIndex, argValueSeperatorIndex - 1)?.Trim();
                             if ((name != null) && (args.IndexOf(name + "=", argValueSeperatorIndex, StringComparison.Ordinal) != -1))
                             {
-                                rc.SetError(1023903, MxError.Source.User, $"parameter {paramName}, arg {argName}; duplicate name found", MxMsgs.MxErrParamArgNameDuplicateFound);
+                                rc.SetError(1023903, MxError.Source.User, $"parameter '{paramName}' has duplicate argument '{argName}'", MxMsgs.MxErrParamArgNameDuplicateFound);
                                 break;
                             }
                             if (name == argName)
                             {
                                 var value = args.Snip(startValueIndex, endValueIndex);
                                 if (value == null)
-                                    rc.SetError(1023904, MxError.Source.User, $"parameter {paramName}, arg {argName}; value not found", MxMsgs.MxErrParamArgValueNotFound);
+                                    rc.SetError(1023904, MxError.Source.User, $"parameter '{paramName}' is missing argument '{argName}'", MxMsgs.MxErrParamArgValueNotFound);
                                 else
                                     rc.SetResult(value);
                                 break;
@@ -2011,7 +2013,7 @@ namespace KLineEdCmdApp.Utils
                         }
                     }
                     if (rc.IsSuccess() && (rc.GetResult() == null) && (mandatory == true))
-                        rc.SetError(1023904, MxError.Source.User, $"parameter {paramName}, arg {argName}; name not found", MxMsgs.MxErrParamArgNameNotFound);
+                        rc.SetError(1023904, MxError.Source.User, $"parameter '{paramName}' is missing argument '{argName}'", MxMsgs.MxErrParamArgNameNotFound);
                 }
             }
             return rc;
@@ -2160,8 +2162,8 @@ namespace KLineEdCmdApp.Utils
                 TextEditorEditLimit = savedSettings.TextEditorEditLimit;
             if (TextEditorTabSize == Program.PosIntegerNotSet)
                 TextEditorTabSize = savedSettings.TextEditorTabSize;
-            if (TextEditorAutoSave == AutoSaveMode.Unknown)
-                TextEditorAutoSave = savedSettings.TextEditorAutoSave;
+            if (TextEditorAutoSavePeriod == Program.PosIntegerNotSet)
+                TextEditorAutoSavePeriod = savedSettings.TextEditorAutoSavePeriod;
             if (TextEditorAutoCorrect == BoolValue.Unset)
                 TextEditorAutoCorrect = savedSettings.TextEditorAutoCorrect;
         }
@@ -2327,7 +2329,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoTextEditorLimits() { return $"{ParamTextEditorLimits} {ArgTextEditorLimitScroll}={ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>"; }
         private static string GetHelpInfoTextEditorTabSize() { return $"{ParamTextEditorTabSize} {ArgTextEditorTabSizeDefault} <min {ArgTextEditorTabSizeMin} max {ArgTextEditorTabSizeMax}>"; }
         private static string GetHelpInfoTextEditorPauseTimeout() { return $"{ParamTextEditorPauseTimeout} {ArgTextEditorPauseTimeout}={ArgTextEditorPauseTimeoutDefault} <min {ArgTextEditorPauseTimeoutMin} max {ArgTextEditorPauseTimeoutMax}>"; }
-        private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} [{ArgTextEditorAutoSaveCR}|{ArgTextEditorAutoSaveParaBreak}|{ArgTextEditorAutoSaveOff}]"; }
+        private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} {ArgTextEditorAutoSave}={ArgTextEditorAutoSaveDefault} <min={ArgTextEditorAutoSaveMin} max={ArgTextEditorAutoSaveMax}>"; }
         private static string GetHelpInfoTextEditorAutoCorrect() { return $"{ParamTextEditorAutoCorrect} [on|off]"; }
         private static string GetHelpInfoToolBrowser() { return $"{ParamToolBrowser} {ArgToolBrowserExe}={ExeFileNameForm}"; }
         private static string GetHelpInfoToolHelp() { return $"{ParamToolHelp} {ArgToolBrowserUrl}={UrlForm}"; }

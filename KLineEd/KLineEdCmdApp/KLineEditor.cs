@@ -43,7 +43,7 @@ namespace KLineEdCmdApp
 
     //display horizontal layout:
         //TextEditingMode 
-        public const int EditAreaMarginLeft = 5;
+        public const int EditAreaMarginLeft = 15;
         //param.DisplayLineWidth
         public const int EditAreaMarginRight = 20;  //width = EditAreaMarginLeft + param.DisplayLineWidth + EditAreaMarginRight
         //ModeHelpLine, MsgLine, StatusLine
@@ -60,6 +60,7 @@ namespace KLineEdCmdApp
         public int Width { private set; get; }
         public int Height { private set; get; }
         public int EditAreaLineWidth { private set; get; }
+        public int AutoSavePeriod { private set; get; }
 
         public string Report { private set; get; }
         public string BrowserExe { private set; get; }
@@ -78,6 +79,7 @@ namespace KLineEdCmdApp
             Width = Program.PosIntegerNotSet;
             Height = Program.PosIntegerNotSet;
             EditAreaLineWidth = Program.PosIntegerNotSet;
+            AutoSavePeriod = 0;
             Report = Program.ValueNotSet;
             BrowserExe = CmdLineParamsApp.ArgToolBrowserExeDefault;
             Ready = false;
@@ -150,6 +152,7 @@ namespace KLineEdCmdApp
                 {
                     //ToolBrowserExe = param.ToolBrowserExe;
                     EditAreaLineWidth = param.TextEditorDisplayCols; //there is actually an additional column used by cursor when at end of line
+                    AutoSavePeriod = param.TextEditorAutoSavePeriod;
                     Width = GetWindowFrameCols() + param.TextEditorDisplayCols;  
                     Height = GetWindowFrameRows() + param.TextEditorDisplayRows;
 
@@ -226,16 +229,24 @@ namespace KLineEdCmdApp
                         try
                         {
                             Model.SetStatusLine();
-                            var nowUtc = DateTime.UtcNow;
-                            var lastKeyPress = nowUtc;
+                            var lastStatusUpdateUtc = DateTime.UtcNow;
+                            var lastAutoSaveUtc = DateTime.UtcNow;
+                            var lastKeyPress = lastStatusUpdateUtc;
 
                             while (rc.IsError() == false)
                             {
-                                if ((DateTime.UtcNow - nowUtc).TotalMilliseconds > StatusLineUpdateMilliSecs)
+                                if ((AutoSavePeriod > 0) && ((DateTime.UtcNow - lastAutoSaveUtc).TotalMinutes > AutoSavePeriod))
                                 {
-                                    nowUtc = DateTime.UtcNow;
+                                    lastAutoSaveUtc = DateTime.UtcNow;
+                                    var rcSave = Model.Save();
+                                    if (rcSave.IsError(true))
+                                        Model.SetMsgLine(rcSave.GetErrorTechMsg());
+                                }
+                                if ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusLineUpdateMilliSecs)
+                                {
+                                    lastStatusUpdateUtc = DateTime.UtcNow;
                                     Model.SetStatusLine();            //1. comment out to stop StatusLine refresh during debugging
-                                    if (Model.ChapterHeader.PauseProcessing(nowUtc, lastKeyPress, false) == false)
+                                    if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, false) == false)
                                     {
                                         rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
                                         break;
@@ -247,7 +258,7 @@ namespace KLineEdCmdApp
                                 if (Terminal.IsKeyAvailable())
                                 {
                                     lastKeyPress = DateTime.UtcNow;
-                                    if (Model.ChapterHeader.PauseProcessing(nowUtc, lastKeyPress, true) == false)
+                                    if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, true) == false)
                                     {
                                         rc.SetError(1030405, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
                                         break; 
@@ -273,7 +284,7 @@ namespace KLineEdCmdApp
                                 else
                                     Thread.Sleep(0);
                             }
-                            var rcDoneProc = Model.ChapterHeader.KLineEditorProcessDone(nowUtc, lastKeyPress);
+                            var rcDoneProc = Model.ChapterHeader.KLineEditorProcessDone(lastStatusUpdateUtc, lastKeyPress);
                             if (rc.IsSuccess())
                             {
                                 rc += rcDoneProc;       //keep any existing error

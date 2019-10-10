@@ -8,7 +8,7 @@ namespace KLineEdCmdApp.Controller
 {
     public class TextEditingController : EditingBaseController
     {
-        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Ctrl+Q=Quit Esc=Refresh F1=Help F2=Props F3=Spelling";
+        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F2=Props F3=Spelling";
         public override EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
             EditingBaseController controller = this;

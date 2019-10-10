@@ -136,8 +136,16 @@ namespace KLineEdCmdApp.Controller.Base
                 _mxErrorCode.SetError(1250201, MxError.Source.Param, $"model is null or keyInfo null", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if ((keyInfo.Modifiers == ConsoleModifiers.Control) && (keyInfo.Key == ConsoleKey.Q))
+                var ctrlKeyPressed = ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0);
+
+                if ((ctrlKeyPressed) && (keyInfo.Key == ConsoleKey.Q))
                     _ctrlQ = true;
+                else if (ctrlKeyPressed &&(keyInfo.Key == ConsoleKey.S))
+                {
+                    var rcSave = Chapter.Save();
+                    if (rcSave.IsError(true))
+                        SetupMxError(rcSave);
+                }
                 else if (keyInfo.Key == ConsoleKey.F1)
                 {
                     try
@@ -174,7 +182,7 @@ namespace KLineEdCmdApp.Controller.Base
 
         public virtual string GetEditorHelpLine()
         {
-            return $"Unsupported: Esc=Refresh F1=Help Ctrl+Q=Quit";
+            return $"Unsupported: Esc=Refresh F1=Help Ctrl+Q=Quit Ctrl+S=Save";
         }
     }
 }

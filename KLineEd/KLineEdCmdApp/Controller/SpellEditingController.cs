@@ -7,7 +7,7 @@ namespace KLineEdCmdApp.Controller
 {
     public class SpellEditingController : EditingBaseController
     {
-        public static readonly string EditorHelpText = $"{SpellEditView.SpellEditorMode} Ctrl+Q=Quit Esc=Refresh F1=Help F2=Text editing";
+        public static readonly string EditorHelpText = $"{SpellEditView.SpellEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F2=Text editing";
 
         public override EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {

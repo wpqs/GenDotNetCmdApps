@@ -81,7 +81,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--export" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021601-user: parameter --export has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021601-user: parameter '--export' has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
@@ -92,7 +92,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--export", "test.txt" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021601-user: parameter --export has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021601-user: parameter '--export' has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
@@ -103,7 +103,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--export", "Edit.ksx", "Export.txt", "extra" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021601-user: parameter --export has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021601-user: parameter '--export' has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--export", cmdLineParams.HelpHint);
         }
 
@@ -127,7 +127,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--import" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021701-user: parameter --import has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021701-user: parameter '--import' has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--import", cmdLineParams.HelpHint);
         }
 
@@ -138,7 +138,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--import", "test.ksx" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021701-user: parameter --import has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021701-user: parameter '--import' has incorrect number of arguments; found 1", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--import", cmdLineParams.HelpHint);
         }
 
@@ -149,7 +149,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--import", "Edit.txt", "Export.ksx", "extra" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021701-user: parameter --import has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021701-user: parameter '--import' has incorrect number of arguments; found 3", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--import", cmdLineParams.HelpHint);
         }
 
@@ -185,7 +185,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings", "diXplay=yes" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1021904-user: parameter --settings has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1021904-user: parameter '--settings' has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
         }
         [Fact]
         public void TestSettingsParamsDisplayValueFail()
@@ -194,7 +194,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings", "display=yXs" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1021902-user: parameter --settings argument display value is not 'yes' or 'no'; yXs", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1021902-user: parameter '--settings' argument 'display' value is not 'yes' or 'no'; yXs", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -204,7 +204,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings", "update=yXs" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1021903-user: parameter --settings argument update value is not 'yes' or 'no'; yXs", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1021903-user: parameter '--settings' argument 'update' value is not 'yes' or 'no'; yXs", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -249,7 +249,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--backgnd", "cXds=green" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1022002-user: parameter --backgnd has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1022002-user: parameter '--backgnd' has invalid argument(s); processed 0 but found 1", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -481,7 +481,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "sXze=1" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023904-user: parameter --cursor, arg size; name not found", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023904-user: parameter '--cursor' is missing argument 'size'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -491,7 +491,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "size=X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023001-user: parameter '--cursor' argument 'size' is invalid. It must be a number between 1 and 100", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023001-user: parameter '--cursor' argument 'size' value 'X' is invalid. It must be a number between 1 and 100", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -591,7 +591,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023103-user: parameter '--display' argument 'cols' value X is invalid. It must be a number between 25 and 250", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023103-user: parameter '--display' argument 'cols' value 'X' is invalid. It must be a number between 25 and 250", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -601,7 +601,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023102-user: parameter '--display' argument 'rows' value X is invalid. It must be a number between 5 and 50", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023102-user: parameter '--display' argument 'rows' value 'X' is invalid. It must be a number between 5 and 50", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -688,7 +688,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrolXback=2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023904-user: parameter --limits, arg scrollback; name not found", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023904-user: parameter '--limits' is missing argument 'scrollback'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -698,7 +698,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023202-user: parameter '--limits' argument 'scrollback' value X is invalid. It must be a number between 0 and 90000", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023202-user: parameter '--limits' argument 'scrollback' value 'X' is invalid. It must be a number between 0 and 90000", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -708,12 +708,12 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=1", "extra=x" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023201-user: parameter --limits has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023201-user: parameter '--limits' has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023201-user: parameter --limits has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023201-user: parameter '--limits' has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -764,7 +764,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023302-user: parameter '--tabsize' value X is invalid. It must be a number between 1 and 25", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023302-user: parameter '--tabsize' value 'X' is invalid. It must be a number between 1 and 25", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -774,12 +774,12 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023301-user: parameter --tabsize has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023301-user: parameter '--tabsize' has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "12", "9" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023301-user: parameter --tabsize has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023301-user: parameter '--tabsize' has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
 
         }
 
@@ -821,7 +821,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023402-user: parameter '--typingpause' argument 'seconds' value X is invalid. It must be a number between  5 and 86400", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023402-user: parameter '--typingpause' argument 'seconds' value 'X' is invalid. It must be a number between  5 and 86400", rcParam.GetErrorTechMsg());
         }
 
 
@@ -832,7 +832,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "secs=5" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023904-user: parameter --typingpause, arg seconds; name not found", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023904-user: parameter '--typingpause' is missing argument 'seconds'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -842,12 +842,78 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023401-user: parameter --typingpause has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023401-user: parameter '--typingpause' has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=12", "9"});
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023401-user: parameter --typingpause has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023401-user: parameter '--typingpause' has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestAutoSaveParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=0" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(0, cmdLineParams.TextEditorAutoSavePeriod);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=1440" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(1440, cmdLineParams.TextEditorAutoSavePeriod);
+        }
+
+        [Fact]
+        public void TestAutoSaveParamFailOutOfRange()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=-2" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020319-user: parameter '--autosave' has a bad argument; value '-2' is invalid for 'minutes'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=1441" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020319-user: parameter '--autosave' has a bad argument; value '1441' is invalid for 'minutes'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestAutoSaveParamFailBadValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023502-user: parameter '--autosave' argument 'minutes' value 'X' is invalid. It must be a number between  0 and 1440", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestAutoSaveParamFailBadName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "miXutes=0" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--autosave' is missing argument 'minutes'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestAutoSaveParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023501-user: parameter '--autosave' has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=0", "seconds" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023501-user: parameter '--autosave' has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+
         }
 
         [Fact]
@@ -867,7 +933,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--edit" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021801-user: parameter --edit has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021801-user: parameter '--edit' has incorrect number of arguments; found 0", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--edit", cmdLineParams.HelpHint);
         }
 
@@ -878,7 +944,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new [] { "--edit", "Test.ksx", "extra" });
 
             Assert.False(rcParam.GetResult());
-            Assert.StartsWith("error 1021801-user: parameter --edit has incorrect number of arguments; found 2", rcParam.GetErrorUserMsg());
+            Assert.StartsWith("error 1021801-user: parameter '--edit' has incorrect number of arguments; found 2", rcParam.GetErrorUserMsg());
             Assert.Contains($"Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}--edit", cmdLineParams.HelpHint);
         }
 
@@ -923,7 +989,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestGetArgValueNameCaseDifference()
         {
             var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings Display=off file='KLineEdCmdApp.json' update=yes");
-            Assert.Equal("error 1023904-user: parameter --settings, arg display; name not found", rc.GetErrorTechMsg());
+            Assert.Equal("error 1023904-user: parameter '--settings' is missing argument 'display'", rc.GetErrorTechMsg());
             Assert.False(rc.IsSuccess());
         }
 
@@ -939,7 +1005,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings display=off file='KLineEdCmdApp.json' update=yes display=off");
             Assert.False(rc.IsSuccess());
-            Assert.Equal("error 1023903-user: parameter --settings, arg display; duplicate name found", rc.GetErrorTechMsg());
+            Assert.Equal("error 1023903-user: parameter '--settings' has duplicate argument 'display'", rc.GetErrorTechMsg());
         }
 
         [Fact]
@@ -955,7 +1021,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var rc = CmdLineParamsApp.GetArgNameValue("--seXtings", "display", "--settings display=off file='KLineEdCmdApp.json' update=yes");
             Assert.False(rc.IsSuccess());
-            Assert.Contains("error 1023902-program: parameter --seXtings not found", rc.GetErrorTechMsg());
+            Assert.Contains("error 1023902-program: parameter '--seXtings' not found", rc.GetErrorTechMsg());
         }
 
 
@@ -964,7 +1030,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings file='KLineEdCmdApp.json' update=yes", true);
             Assert.False(rc.IsSuccess());
-            Assert.Equal("error 1023904-user: parameter --settings, arg display; name not found", rc.GetErrorTechMsg());
+            Assert.Equal("error 1023904-user: parameter '--settings' is missing argument 'display'", rc.GetErrorTechMsg());
         }
 
         [Fact]
@@ -980,7 +1046,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings display file='KLineEdCmdApp.json' update=yes");
             Assert.False(rc.IsSuccess());
-            Assert.Equal("error 1023904-user: parameter --settings, arg display; value not found", rc.GetErrorTechMsg());
+            Assert.Equal("error 1023904-user: parameter '--settings' is missing argument 'display'", rc.GetErrorTechMsg());
         }
 
         [Fact]
@@ -988,7 +1054,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var rc = CmdLineParamsApp.GetArgNameValue("--settings", "file", "--settings display=off file='' update=yes");
             Assert.False(rc.IsSuccess());
-            Assert.Equal("error 1023904-user: parameter --settings, arg file; value not found", rc.GetErrorTechMsg());
+            Assert.Equal("error 1023904-user: parameter '--settings' is missing argument 'file'", rc.GetErrorTechMsg());
         }
 
         [Fact]
@@ -996,7 +1062,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var rc = CmdLineParamsApp.GetArgNameValue("--settings", "file", "--settings display=off file='hello  update=yes");
             Assert.False(rc.IsSuccess());
-            Assert.Equal("error 1023904-user: parameter --settings, arg file; value not found", rc.GetErrorTechMsg());
+            Assert.Equal("error 1023904-user: parameter '--settings' is missing argument 'file'", rc.GetErrorTechMsg());
         }
     }
 }

@@ -12,6 +12,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KLineEdCmdAppTest", "KLineE
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{27E0A82D-1AE8-4D4A-AA63-8FACA27B106C}"
 	ProjectSection(SolutionItems) = preProject
+		BugList.txt = BugList.txt
 		Deployment.txt = Deployment.txt
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md

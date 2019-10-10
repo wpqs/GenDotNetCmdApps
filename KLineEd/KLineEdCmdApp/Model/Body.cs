@@ -1137,6 +1137,14 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public int GetPageCount()
+        {
+            var rc = Program.PosIntegerNotSet;
+            if (TextLines != null)
+                rc = TextLines.Count / Body.TextLinesPerPage;
+            return rc;
+        }
+
         public int GetLineCount()
         {
             return TextLines?.Count ?? Program.PosIntegerNotSet;

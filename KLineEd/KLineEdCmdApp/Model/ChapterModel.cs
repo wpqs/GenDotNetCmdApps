@@ -7,6 +7,7 @@ using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View;
 using KLineEdCmdApp.View.Base;
+using MxDotNetUtilsLib;
 
 namespace KLineEdCmdApp.Model
 {
@@ -45,6 +46,7 @@ namespace KLineEdCmdApp.Model
         public Header ChapterHeader { get; } 
         public Body ChapterBody { get; protected set; }
 
+        public DateTime? LastSaved { get; private set; }
         public string StatusLine { private set; get; }
         public string MsgLine { private set; get; }
         public string EditorHelpLine { private set; get; }
@@ -54,6 +56,7 @@ namespace KLineEdCmdApp.Model
         {
             ChapterHeader = new Header();
             ChapterBody = new Body();
+            LastSaved = null;
             StatusLine = "";
             MsgLine = "";
             EditorHelpLine = "";
@@ -166,6 +169,7 @@ namespace KLineEdCmdApp.Model
                 rc += rcWrite;
                 if (rcWrite.IsSuccess(true))
                 {
+                    LastSaved = DateTime.Now;   //don't give UTC as local time is more meaningful
                     rc.SetResult(true);
                 }
             }
@@ -199,11 +203,15 @@ namespace KLineEdCmdApp.Model
             else
                 line = $"{elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
 
+            line += (LastSaved != null) ? $"Saved:{LastSaved?.ToString(MxStdFrmt.ShortTime) ?? "00:00"} | " : "[not saved] | ";
+
             line += $"Line: {ChapterBody?.Cursor?.RowIndex+1 ?? Program.PosIntegerNotSet} ";
             line += $"Column: {ChapterBody?.Cursor?.ColIndex+1 ?? Program.PosIntegerNotSet} ";
-            line += $"Total words: {ChapterBody?.WordCount ?? Program.PosIntegerNotSet} ";
 
-            line += $"{(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)}";
+            line += $"| Words: {ChapterBody?.WordCount ?? Program.PosIntegerNotSet} ";
+            line += $"Pages: {ChapterBody?.GetPageCount() ?? Program.PosIntegerNotSet} ";  
+
+            line += $"| {(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)}";
 
             if (StatusLine != line)
             {

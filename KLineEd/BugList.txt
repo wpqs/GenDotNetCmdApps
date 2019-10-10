@@ -1,0 +1,4 @@
+BugList
+=======
+
+1. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()

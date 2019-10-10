@@ -68,11 +68,12 @@ namespace KLineEdCmdApp.Model
                 rc = "Pause info not available";
             else
             {
-                rc = $"Pauses: {GetLastSession()?.TypingPauseCount ?? Program.PosIntegerNotSet} ";
-                rc += $"({GetLastSession()?.TypingTime?.ToString(Header.MxStdFrmtTimeSpan) ?? "0.0"}) ";
                 if (PauseState == true)
+                    rc = $"Paused: {((DateTime.UtcNow - LastKeyPress)).ToString(MxStdFrmtTimeSpan)}";
+                else
                 {
-                    rc += $"Paused: {((DateTime.UtcNow - LastKeyPress)).ToString(MxStdFrmtTimeSpan)}";
+                    rc = $"Pauses: {GetLastSession()?.TypingPauseCount ?? Program.PosIntegerNotSet} ";
+                    rc += $"({GetLastSession()?.TypingTime?.ToString(Header.MxStdFrmtTimeSpan) ?? "0.0"}) ";
                 }
             }
             return rc;
