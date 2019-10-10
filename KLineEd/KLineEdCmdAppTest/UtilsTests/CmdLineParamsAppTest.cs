@@ -917,6 +917,62 @@ namespace KLineEdCmdAppTest.UtilsTests
         }
 
         [Fact]
+        public void TestLinesPerPageParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "1" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(1, cmdLineParams.TextEditorLinesPerPage);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "10000" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(10000, cmdLineParams.TextEditorLinesPerPage);
+        }
+
+        [Fact]
+        public void TestLinesPerPageParamFailOutOfRange()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "-2" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020320-user: parameter '--linesperpage' has bad argument; value '-2' is invalid", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "10001" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020320-user: parameter '--linesperpage' has bad argument; value '10001' is invalid", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestPerPageParamFailBadValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023502-user: parameter '--linesperpage' value 'X' is invalid. It must be a number between  1 and 10000", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestPerPageParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023701-user: parameter --linesperpage has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "12", "99" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023701-user: parameter --linesperpage has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+
+        }
+
+        [Fact]
         public void TestEditParam()
         {
             var cmdLineParams = new CmdLineParamsApp();

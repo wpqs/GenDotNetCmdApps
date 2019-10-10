@@ -307,11 +307,11 @@ namespace KLineEdCmdApp.Model
                 rc = Sessions[Sessions.Count - 1];
             return rc;
         }
-        public string GetChapterReport(int linesInChapter=0, int wordsInChapter=0)
+        public string GetChapterReport(int linesInChapter=0, int wordsInChapter=0, int linesPerPage=1)
         {
             var rc = Properties?.GetReport() ?? (Environment.NewLine + HeaderElementBase.ValueNotSet); //reports always start with newline, but don't end with one 
             rc += KLineEditor.ReportSectionDottedLine;
-            rc += SessionsTotal.GetReport(Sessions, linesInChapter, wordsInChapter);
+            rc += SessionsTotal.GetReport(Sessions, linesInChapter, wordsInChapter, linesPerPage);
 
             return rc;
         }

@@ -28,17 +28,24 @@ namespace KLineEdCmdApp.Utils
     //2. when adding a new parameter:
     // a) define static readonly for i) name (SettingsParam) ii) args (SettingsArgUpdate) iii) default value(s)(SettingsArgUpdateValueDefault)
     // b) add properties for args (SettingsPathFileName, UpdateSettingsFile) 
-    // c) update SetDefaultValues() SetFactoryDefaults() andUpdateProperties()
-    // d) add item enum Param (Settings)
-    // e) update ParamProc() and create new private method like SettingsParamProc()
-    // f) optionally update ValidateParams()
-    // g) add GetHelpInfoxxx() for new parameter
-    // g) update GetParamHelp(), GetHelpInfoAll()
-    // h) update unit tests
-    // i) run with invalid values/names and check error report
-    // j) check that the settings file is correctly updated
-    // k) implement in application
-    // l) test with max and min values in range (if appropriate)
+    // c) add ToString()
+    // d) update SetDefaultValues() SetFactoryDefaults() and UpdateProperties()
+    // e) add item enum Param (Settings)
+    // f) update ParamProc() and create new private method like SettingsParamProc()
+    // g) optionally update ValidateParams()
+    // h) add GetHelpInfoxxx() for new parameter
+    // i) update GetParamHelp(), GetHelpInfoAll()
+    // j) create nw KLineEdCmdApp.json
+    //     set KLineEdCmdApp.json property - don't copy
+    //     delete existing KLineEdCmdApp.json in bin directory,
+    //     run App (creates new file),
+    //     copy new KLineEdCmdApp.json (in bin directory) to KLineEdCmdApp directory,
+    //     restore property to copy if new
+    // k) update unit tests
+    // l) run with invalid values/names and check error report
+    // m) check that the settings file is correctly updated
+    // n) implement in application
+    // o) test with max and min values in range (if appropriate)
 
 
 
@@ -247,6 +254,12 @@ namespace KLineEdCmdApp.Utils
 
             public static readonly bool ArgTextEditorAutoCorrectDefault = false;
 
+        public const string ParamTextEditorLinesPerPage = "--linesperpage";
+
+            public const int ArgTextEditorLinesPerPageMin = 1;           
+            public const int ArgTextEditorLinesPerPageMax = 10000;           
+            public const int ArgTextEditorLinesPerPageDefault = 36;     //Counted from Jack Kerouac's book 'On the Road'
+
         //properties that are not set from command line
         [JsonIgnore]
         public OpMode Op { set; get; }
@@ -325,6 +338,7 @@ namespace KLineEdCmdApp.Utils
         public int TextEditorTabSize { set; get; }
         public int TextEditorAutoSavePeriod { set; get; }
         public BoolValue TextEditorAutoCorrect { set; get; }
+        public int TextEditorLinesPerPage { set; get; }
 
         public bool IsValidForSettingBoolValue(string val){ return ((val == ArgNo) || (val == ArgYes)) ? true : false;  }
 
@@ -370,6 +384,7 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = ParamTextEditorPauseTimeout)] TypingPause,
             [EnumMember(Value = ParamTextEditorAutoSave)] AutoSave,
             [EnumMember(Value = ParamTextEditorAutoCorrect)] AutoCorrect,
+            [EnumMember(Value = ParamTextEditorLinesPerPage)] LinesPerPage,
             [EnumMember(Value = Program.ValueUnknown)] Unknown
         }
 
@@ -437,8 +452,9 @@ namespace KLineEdCmdApp.Utils
                 rc += "TextEditorScrollLimit=" + TextEditorScrollLimit + Environment.NewLine;
                 rc += "TextEditorEditLimit=" + TextEditorEditLimit + Environment.NewLine;
                 rc += "TextEditorTabSize=" + TextEditorTabSize + Environment.NewLine;
-                rc += "TextEditorAutoSavePeriod=" + EnumOps.XlatToString(TextEditorAutoSavePeriod) + Environment.NewLine;
+                rc += "TextEditorAutoSavePeriod=" + TextEditorAutoSavePeriod + Environment.NewLine;
                 rc += "TextEditorAutoCorrect=" + EnumOps.XlatToString(TextEditorAutoCorrect) + Environment.NewLine;
+                rc += "TextEditorLinesPerPage=" + TextEditorLinesPerPage + Environment.NewLine;
                 rc += Environment.NewLine;
                 rc += "AudioFileKeyPress=" + (AudioFileKeyPress ?? "[null]") + Environment.NewLine;
                 rc += "AudioFileeBackSpace=" + (AudioFileBackSpace ?? "[null]") + Environment.NewLine;
@@ -521,6 +537,7 @@ namespace KLineEdCmdApp.Utils
             TextEditorTabSize = Program.PosIntegerNotSet;
             TextEditorAutoSavePeriod = Program.PosIntegerNotSet;
             TextEditorAutoCorrect = BoolValue.Unset;
+            TextEditorLinesPerPage = Program.PosIntegerNotSet;
         }
 
         protected  void SetFactoryDefaults() 
@@ -583,6 +600,7 @@ namespace KLineEdCmdApp.Utils
             TextEditorTabSize = ArgTextEditorTabSizeDefault;
             TextEditorAutoSavePeriod = ArgTextEditorAutoSaveDefault;
             TextEditorAutoCorrect = BoolValue.No;
+            TextEditorLinesPerPage = ArgTextEditorLinesPerPageDefault;
         }
 
         protected override bool IsSettingsUpdate()
@@ -782,6 +800,14 @@ namespace KLineEdCmdApp.Utils
                                 rc.SetResult(true);
                             break;
                         }
+                        case Param.LinesPerPage:
+                        {
+                            var rcSettings = ProcessTextEditorLinesPerPageParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
                         default: //case Param.Unknown:
                         {
                             HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\"{Environment.NewLine}{Environment.NewLine}No further information{Environment.NewLine}";
@@ -943,6 +969,12 @@ namespace KLineEdCmdApp.Utils
                 {
                     HelpHint = $"{GetParamHelp((int)Param.AutoSave)}";
                     rc.SetError(1020319, MxError.Source.User, $"parameter '{ParamTextEditorAutoSave}' has a bad argument; value '{TextEditorAutoSavePeriod}' is invalid for '{ArgTextEditorAutoSave}'");
+                }
+
+                if ((TextEditorLinesPerPage < CmdLineParamsApp.ArgTextEditorLinesPerPageMin) || (TextEditorLinesPerPage > CmdLineParamsApp.ArgTextEditorLinesPerPageMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.LinesPerPage)}";
+                    rc.SetError(1020320, MxError.Source.User, $"parameter '{ParamTextEditorLinesPerPage}' has bad argument; value '{TextEditorLinesPerPage}' is invalid");
                 }
 
                 if (rc.IsSuccess())  
@@ -1966,6 +1998,41 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
+
+        private MxReturnCode<bool> ProcessTextEditorLinesPerPageParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.ProcessTextEditorLinesPerPageParam", false);
+
+            //  HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamTextEditorLinesPerPage);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1023701, MxError.Source.User, $"parameter {ParamTextEditorLinesPerPage} has incorrect number of arguments; found {argCnt} should be 1");
+                else
+                {
+                    var rcArg = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorLinesPerPage}");
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
+                    {
+                        if (Int32.TryParse(rcArg.GetResult(), out var lines) == false)
+                            rc.SetError(1023502, MxError.Source.User, $"parameter '{ParamTextEditorLinesPerPage}' value '{rcArg.GetResult()}' is invalid. It must be a number between  {ArgTextEditorLinesPerPageMin} and {ArgTextEditorLinesPerPageMax}");
+                        else
+                        {
+                            TextEditorLinesPerPage = lines;
+                            rc.SetResult(true);
+                        }
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.LinesPerPage)}";
+            return rc;
+        }
+
         //argName is case sensitive and should be a unique argument name in the paraLine
         public static MxReturnCode<string> GetArgNameValue(string paramName, string argName, string paramLine, bool mandatory=true)
         {
@@ -2166,6 +2233,8 @@ namespace KLineEdCmdApp.Utils
                 TextEditorAutoSavePeriod = savedSettings.TextEditorAutoSavePeriod;
             if (TextEditorAutoCorrect == BoolValue.Unset)
                 TextEditorAutoCorrect = savedSettings.TextEditorAutoCorrect;
+            if (TextEditorLinesPerPage == Program.PosIntegerNotSet)
+                TextEditorLinesPerPage = savedSettings.TextEditorLinesPerPage;
         }
 
         
@@ -2308,6 +2377,12 @@ namespace KLineEdCmdApp.Utils
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
+            else if (help == Param.LinesPerPage)
+            {
+                msg += GetHelpInfoTextEditorLinesPerPage() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
             else
             {
                 rc = GetHelpInfoAll();
@@ -2331,6 +2406,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoTextEditorPauseTimeout() { return $"{ParamTextEditorPauseTimeout} {ArgTextEditorPauseTimeout}={ArgTextEditorPauseTimeoutDefault} <min {ArgTextEditorPauseTimeoutMin} max {ArgTextEditorPauseTimeoutMax}>"; }
         private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} {ArgTextEditorAutoSave}={ArgTextEditorAutoSaveDefault} <min={ArgTextEditorAutoSaveMin} max={ArgTextEditorAutoSaveMax}>"; }
         private static string GetHelpInfoTextEditorAutoCorrect() { return $"{ParamTextEditorAutoCorrect} [on|off]"; }
+        private static string GetHelpInfoTextEditorLinesPerPage() { return $"{ParamTextEditorLinesPerPage} {ArgTextEditorLinesPerPageDefault} <min={ArgTextEditorLinesPerPageMin} max={ArgTextEditorLinesPerPageMax}>"; }
         private static string GetHelpInfoToolBrowser() { return $"{ParamToolBrowser} {ArgToolBrowserExe}={ExeFileNameForm}"; }
         private static string GetHelpInfoToolHelp() { return $"{ParamToolHelp} {ArgToolBrowserUrl}={UrlForm}"; }
         private static string GetHelpInfoToolSearch() { return $"{ParamToolSearch} {ArgToolBrowserUrl}={UrlForm}"; }
@@ -2361,6 +2437,7 @@ namespace KLineEdCmdApp.Utils
             msg += $"   {GetHelpInfoTextEditorPauseTimeout()}" + Environment.NewLine;
             msg += $"   {GetHelpInfoTextEditorAutoSave()}" + Environment.NewLine;
             msg += $"   {GetHelpInfoTextEditorAutoCorrect()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoTextEditorLinesPerPage()}" + Environment.NewLine;
             msg += Environment.NewLine;
             msg += $"   {GetHelpInfoToolBrowser()}" + Environment.NewLine;
             msg += $"   {GetHelpInfoToolHelp()}" + Environment.NewLine;

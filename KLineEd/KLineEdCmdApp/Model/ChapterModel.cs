@@ -75,18 +75,18 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, string pathFilename, char paraBreakChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault, int typingPauseTimeout = CmdLineParamsApp.ArgTextEditorPauseTimeoutDefault)
+        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, string pathFilename, char paraBreakChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault, int typingPauseTimeout = CmdLineParamsApp.ArgTextEditorPauseTimeoutDefault, int linesPerPage = CmdLineParamsApp.ArgTextEditorLinesPerPageDefault)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 
-            if ((textEditorDisplayRows == Program.PosIntegerNotSet) || (textEditorDisplayCols == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax) || (typingPauseTimeout < CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) || (typingPauseTimeout > CmdLineParamsApp.ArgTextEditorPauseTimeoutMax))
-                rc.SetError(1050101, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin},{CmdLineParamsApp.ArgTextEditorTabSizeMax}>, scrollLimit={scrollLimit} <{CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>, typingPauseTimeout={typingPauseTimeout} <{CmdLineParamsApp.ArgTextEditorPauseTimeoutMin},{CmdLineParamsApp.ArgTextEditorPauseTimeoutMax}>", MxMsgs.MxErrBadMethodParam);
+            if ((textEditorDisplayRows == Program.PosIntegerNotSet) || (textEditorDisplayCols == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax) || (typingPauseTimeout < CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) || (typingPauseTimeout > CmdLineParamsApp.ArgTextEditorPauseTimeoutMax) || (linesPerPage < CmdLineParamsApp.ArgTextEditorLinesPerPageMin) || (linesPerPage > CmdLineParamsApp.ArgTextEditorLinesPerPageMax))
+                rc.SetError(1050101, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin},{CmdLineParamsApp.ArgTextEditorTabSizeMax}>, scrollLimit={scrollLimit} <{CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>, typingPauseTimeout={typingPauseTimeout} <{CmdLineParamsApp.ArgTextEditorPauseTimeoutMin},{CmdLineParamsApp.ArgTextEditorPauseTimeoutMax}>, linesPerPage={linesPerPage} <{CmdLineParamsApp.ArgTextEditorLinesPerPageMin},{CmdLineParamsApp.ArgTextEditorLinesPerPageMax}>", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
                     ChapterHeader.Properties.SetMaxPropertyLength(textEditorDisplayCols - PropsEditView.LongestLabelLength);
-                    var rcInit = ChapterBody.Initialise(textEditorDisplayRows, textEditorDisplayCols, paraBreakChar, spacesForTab, scrollLimit);
+                    var rcInit = ChapterBody.Initialise(textEditorDisplayRows, textEditorDisplayCols, paraBreakChar, spacesForTab, scrollLimit, linesPerPage);
                     rc += rcInit;
                     if (rcInit.IsSuccess(true))
                     {
@@ -412,7 +412,7 @@ namespace KLineEdCmdApp.Model
         {
             string rc = $"{Environment.NewLine}[not initialized]";   //reports always start with newline, but don't end with one
             if (Ready)
-                rc = ChapterHeader?.GetChapterReport(ChapterBody.GetLineCount(), ChapterBody.WordCount) ?? "[chapter info not available]";
+                rc = ChapterHeader?.GetChapterReport(ChapterBody.GetLineCount(), ChapterBody.WordCount, ChapterBody.LinesPerPage) ?? "[chapter info not available]";
 
             return rc;
         }

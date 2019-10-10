@@ -44,5 +44,6 @@
   "TextEditorEditLimit": 0,
   "TextEditorTabSize": 3,
   "TextEditorAutoSavePeriod": 5,
-  "TextEditorAutoCorrect": 0
+  "TextEditorAutoCorrect": 0,
+  "TextEditorLinesPerPage": 36
 }

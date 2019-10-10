@@ -37,8 +37,7 @@ namespace KLineEdCmdApp.Model
         public const char NullChar = (char)0;
         public const char SpaceChar = ' ';
 
-        public const int TextLinesPerPage = 36;                   //counted from Jack Kerouac's book 'On the Road'
-        public const int MaxTextLines = TextLinesPerPage * 2500;  //twice the number of pages in Tolstoy's 'War and Peace'
+        public const int MaxTextLines = 36 * 2500;  //twice the number of pages in Tolstoy's 'War and Peace'
 
 
         public enum Scroll
@@ -73,6 +72,7 @@ namespace KLineEdCmdApp.Model
         public CursorPosition EditAreaViewCursorLimit { get; private set; }
         public int EditAreaTopLineChapterIndex { private set; get; }        //TextLines[EditAreaTopLineChapterIndex] is displayed as first line in console
         public int WordCount { protected set; get; }
+        public int LinesPerPage { protected set; get; }
         public string TabSpaces { private set; get; }
         public char ParaBreakDisplayChar { private set; get; }
         public int ScrollLimitChapter { private set; get; }                 //maximum number of lines you can scroll back from the end of the chapter (0=unlimited)
@@ -89,6 +89,7 @@ namespace KLineEdCmdApp.Model
             EditAreaTopLineChapterIndex = Program.PosIntegerNotSet;
 
             WordCount = Program.PosIntegerNotSet;
+            LinesPerPage = Program.PosIntegerNotSet;
             SetTabSpaces(CmdLineParamsApp.ArgTextEditorTabSizeDefault);
             ParaBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault;
             ScrollLimitChapter = CmdLineParamsApp.ArgTextEditorLimitScrollDefault;
@@ -112,12 +113,12 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault)
+        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, char paraBreakDisplayChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault, int linesPerPage = CmdLineParamsApp.ArgTextEditorLinesPerPageDefault)
         {
             var rc = new MxReturnCode<bool>("Body.Initialise");
 
-            if ((textEditorDisplayCols == Program.PosIntegerNotSet) || (textEditorDisplayRows == Program.PosIntegerNotSet) || (paraBreakDisplayChar == NullChar) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax))
-                rc.SetError(1100201, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols}, paraBreak is 0, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin}, {CmdLineParamsApp.ArgTextEditorTabSizeMax}, scrollLimit={scrollLimit} < {CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>", MxMsgs.MxErrBadMethodParam);
+            if ((textEditorDisplayCols == Program.PosIntegerNotSet) || (textEditorDisplayRows == Program.PosIntegerNotSet) || (paraBreakDisplayChar == NullChar) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax) || (linesPerPage < CmdLineParamsApp.ArgTextEditorLinesPerPageMin) || (linesPerPage > CmdLineParamsApp.ArgTextEditorLinesPerPageMax))
+                rc.SetError(1100201, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols}, paraBreak is 0, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin}, {CmdLineParamsApp.ArgTextEditorTabSizeMax}, scrollLimit={scrollLimit} <{CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>, linesPerPage={linesPerPage} <{CmdLineParamsApp.ArgTextEditorLinesPerPageMin},{CmdLineParamsApp.ArgTextEditorLinesPerPageMax}>", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if ((TextLines == null) || (Cursor == null) || (EditAreaViewCursorLimit == null))
@@ -127,6 +128,7 @@ namespace KLineEdCmdApp.Model
                     EditAreaViewCursorLimit.RowIndex = textEditorDisplayRows - 1;
                     EditAreaViewCursorLimit.ColIndex = textEditorDisplayCols - 1;
 
+                    LinesPerPage = linesPerPage;
                     SetTabSpaces(spacesForTab);
                     ParaBreakDisplayChar = paraBreakDisplayChar;
                     ScrollLimitChapter = scrollLimit;
@@ -1140,8 +1142,8 @@ namespace KLineEdCmdApp.Model
         public int GetPageCount()
         {
             var rc = Program.PosIntegerNotSet;
-            if (TextLines != null)
-                rc = TextLines.Count / Body.TextLinesPerPage;
+            if ((TextLines != null) && (LinesPerPage > 0))
+                rc = TextLines.Count / LinesPerPage;
             return rc;
         }
 

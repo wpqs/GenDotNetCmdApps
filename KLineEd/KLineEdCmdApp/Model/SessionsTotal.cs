@@ -96,7 +96,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public static string GetReport(List<HeaderSession> sessions, int linesInChapter, int wordsInChapter)
+        public static string GetReport(List<HeaderSession> sessions, int linesInChapter, int wordsInChapter, int linesPerPage)
         {
             var rc = Environment.NewLine;   //reports always start with newline, but don't end with one
             rc += $"Chapter stats:{Environment.NewLine}";
@@ -105,7 +105,7 @@ namespace KLineEdCmdApp.Model
                 rc += Error;
             else
             {
-                var pages = linesInChapter / Body.TextLinesPerPage;
+                var pages = linesInChapter / ((linesPerPage > 0) ? linesPerPage : 1); 
                 rc += Environment.NewLine;
                 rc += $"Pages {pages}, lines {linesInChapter} (lines typed {TotalLinesTyped}, mean {MeanLinesTyped}), words {wordsInChapter} (words typed {TotalWordsTyped}, mean WPM {MeanWpm:F1})"; // , total corrections {TotalCorrectionsCount} mean per session {MeanWpc}, total spelling errors {TotalSpellCheckCount}, mean per session {MeanWps})
                 rc += Environment.NewLine;
