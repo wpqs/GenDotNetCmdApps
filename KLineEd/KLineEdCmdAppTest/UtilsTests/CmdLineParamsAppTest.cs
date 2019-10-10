@@ -1,5 +1,6 @@
 ﻿using System;
 using KLineEdCmdApp.Utils;
+using KLineEdCmdAppTest.ModelTests;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
@@ -913,6 +914,47 @@ namespace KLineEdCmdAppTest.UtilsTests
 
             Assert.False(rcParam.GetResult());
             Assert.Contains("error 1023501-user: parameter '--autosave' has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+
+        }
+
+        [Fact]
+        public void TestAutoCorrectParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autocorrect", "yes" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.TextEditorAutoCorrect);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--autocorrect", "no" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(CmdLineParamsApp.BoolValue.No, cmdLineParams.TextEditorAutoCorrect);
+        }
+
+        [Fact]
+        public void TestAutoCorrectParamFailBadValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autocorrect", "yXs" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023602-user: parameter '--autocorrect' argument is not 'yes' or 'no'; yXs", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestAutoCorrectParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autocorrect" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023601-user: parameter '--autocorrect' has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--autocorrect", "yes", "no" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023601-user: parameter '--autocorrect' has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
 
         }
 

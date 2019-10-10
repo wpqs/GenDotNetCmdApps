@@ -2,3 +2,4 @@ BugList
 =======
 
 1. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
+2. GetParamNameValue() should include 'You entered: "--autocorrect x"' like  GetParamValue()

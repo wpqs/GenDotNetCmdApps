@@ -1981,15 +1981,19 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023601, MxError.Source.User, $"parameter {ParamTextEditorAutoCorrect} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1023601, MxError.Source.User, $"parameter '{ParamTextEditorAutoCorrect}' has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorAutoCorrect}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgValue(paramLine, 1, true, $"parameter '{ParamTextEditorAutoCorrect}'");
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (IsValidForSettingBoolValue(rcArg.GetResult()) == false)
+                            rc.SetError(1023602, MxError.Source.User, $"parameter '{ParamTextEditorAutoCorrect}' argument is not '{ArgYes}' or '{ArgNo}'; {rcArg.GetResult()}");
+                        else
+                        {
+                            TextEditorAutoCorrect = (rcArg.GetResult() == "yes") ? BoolValue.Yes : BoolValue.No;
+                        }
                     }
                 }
             }
@@ -2405,7 +2409,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoTextEditorTabSize() { return $"{ParamTextEditorTabSize} {ArgTextEditorTabSizeDefault} <min {ArgTextEditorTabSizeMin} max {ArgTextEditorTabSizeMax}>"; }
         private static string GetHelpInfoTextEditorPauseTimeout() { return $"{ParamTextEditorPauseTimeout} {ArgTextEditorPauseTimeout}={ArgTextEditorPauseTimeoutDefault} <min {ArgTextEditorPauseTimeoutMin} max {ArgTextEditorPauseTimeoutMax}>"; }
         private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} {ArgTextEditorAutoSave}={ArgTextEditorAutoSaveDefault} <min={ArgTextEditorAutoSaveMin} max={ArgTextEditorAutoSaveMax}>"; }
-        private static string GetHelpInfoTextEditorAutoCorrect() { return $"{ParamTextEditorAutoCorrect} [on|off]"; }
+        private static string GetHelpInfoTextEditorAutoCorrect() { return $"{ParamTextEditorAutoCorrect} [yes|no]"; }
         private static string GetHelpInfoTextEditorLinesPerPage() { return $"{ParamTextEditorLinesPerPage} {ArgTextEditorLinesPerPageDefault} <min={ArgTextEditorLinesPerPageMin} max={ArgTextEditorLinesPerPageMax}>"; }
         private static string GetHelpInfoToolBrowser() { return $"{ParamToolBrowser} {ArgToolBrowserExe}={ExeFileNameForm}"; }
         private static string GetHelpInfoToolHelp() { return $"{ParamToolHelp} {ArgToolBrowserUrl}={UrlForm}"; }
