@@ -787,12 +787,12 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestPauseTimeoutParam()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "0" });
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=5" });
 
             Assert.True(rcParam.GetResult());
-            Assert.Equal(0, cmdLineParams.TextEditorPauseTimeout);
+            Assert.Equal(5, cmdLineParams.TextEditorPauseTimeout);
 
-            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "86400" });
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=86400" });
 
             Assert.True(rcParam.GetResult());
             Assert.Equal(86400, cmdLineParams.TextEditorPauseTimeout);
@@ -802,15 +802,15 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestPauseTimeoutParamFailOutOfRange()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "-2" });
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=-2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020318-user: parameter '--typingpause' value '-2' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020318-user: parameter '--typingpause' has a bad argument; value '-2' is invalid for 'seconds'", rcParam.GetErrorTechMsg());
 
-            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "86401" });
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=86401" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020318-user: parameter '--typingpause' value '86401' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020318-user: parameter '--typingpause' has a bad argument; value '86401' is invalid for 'seconds'", rcParam.GetErrorTechMsg());
         }
 
 
@@ -818,10 +818,21 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestPauseTimeoutParamFailBadValue()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "X" });
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=X" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1023402-user: parameter '--typingpause' value X is invalid. It must be a number between 0 and 86400", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1023402-user: parameter '--typingpause' argument 'seconds' value X is invalid. It must be a number between  5 and 86400", rcParam.GetErrorTechMsg());
+        }
+
+
+        [Fact]
+        public void TestPauseTimeoutParamFailBadName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "secs=5" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter --typingpause, arg seconds; name not found", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -833,7 +844,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.False(rcParam.GetResult());
             Assert.Contains("error 1023401-user: parameter --typingpause has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
 
-            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "12", "9"});
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=12", "9"});
 
             Assert.False(rcParam.GetResult());
             Assert.Contains("error 1023401-user: parameter --typingpause has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());

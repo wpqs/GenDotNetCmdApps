@@ -45,7 +45,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var rc = manuscript.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols, null);
 
             Assert.False(rc.GetResult());
-            Assert.Equal($"error 1050101-param: textEditorDisplayRows={TestConst.TextEditorDisplayRows}, textEditorDisplayCols={TestConst.TextEditorDisplayCols} is invalid, pathFilename=[null], spacesForTab=3 <1,25>, scrollLimit=0 <0, 90000>, typingPauseTimeout=60 <0,86400>", rc.GetErrorTechMsg());
+            Assert.Equal($"error 1050101-param: textEditorDisplayRows={TestConst.TextEditorDisplayRows}, textEditorDisplayCols={TestConst.TextEditorDisplayCols} is invalid, pathFilename=[null], spacesForTab=3 <1,25>, scrollLimit=0 <0, 90000>, typingPauseTimeout=60 <5,86400>", rc.GetErrorTechMsg());
             Assert.False(manuscript.Ready);
         }
 

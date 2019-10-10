@@ -213,8 +213,9 @@ namespace KLineEdCmdApp.Utils
 
         public const string ParamTextEditorPauseTimeout = "--typingpause"; // 60 <min 5 max 36000>
 
+            public static readonly string ArgTextEditorPauseTimeout = "seconds";
             public const int ArgTextEditorPauseTimeoutDefault = 60;
-            public const int ArgTextEditorPauseTimeoutMin = 0;
+            public const int ArgTextEditorPauseTimeoutMin = 5;
             public const int ArgTextEditorPauseTimeoutMax = 86400;     //24 * 60 * 60 - 24 hours
 
         public const string ParamTextEditorLimits = "--limits";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
@@ -943,7 +944,7 @@ namespace KLineEdCmdApp.Utils
                 if ((TextEditorPauseTimeout < CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) || (TextEditorPauseTimeout > CmdLineParamsApp.ArgTextEditorPauseTimeoutMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.TypingPause)}";
-                    rc.SetError(1020318, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' value '{TextEditorPauseTimeout}' is invalid");
+                    rc.SetError(1020318, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' has a bad argument; value '{TextEditorPauseTimeout}' is invalid for '{ArgTextEditorPauseTimeout}'");
                 }
 
 
@@ -1886,12 +1887,12 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1023401, MxError.Source.User, $"parameter {ParamTextEditorPauseTimeout} has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
-                    var rcArg = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorPauseTimeout}");
+                    var rcArg = GetArgNameValue(ParamTextEditorPauseTimeout, ArgTextEditorPauseTimeout, paramLine, true);
                     rc += rcArg;
                     if (rcArg.IsSuccess(true))
                     {
                         if (Int32.TryParse(rcArg.GetResult(), out var timeout) == false)
-                            rc.SetError(1023402, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' value {rcArg.GetResult()} is invalid. It must be a number between {ArgTextEditorPauseTimeoutMin} and {ArgTextEditorPauseTimeoutMax}");
+                            rc.SetError(1023402, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' argument '{ArgTextEditorPauseTimeout}' value {rcArg.GetResult()} is invalid. It must be a number between  {ArgTextEditorPauseTimeoutMin} and {ArgTextEditorPauseTimeoutMax}");
                         else
                         {
                             TextEditorPauseTimeout = timeout;
@@ -2325,7 +2326,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoTextEditorDisplay() { return $"{ParamTextEditorDisplay} ({ArgTextEditorDisplayRows}={ArgTextEditorDisplayRowsDefault} <min {ArgTextEditorDisplayRowsMin} max {ArgTextEditorDisplayRowsMax}>) ({ArgTextEditorDisplayCols}={ArgTextEditorDisplayColsDefault} <min {ArgTextEditorDisplayColsMin} max {ArgTextEditorDisplayColsMax}>) ({ArgTextEditorDisplayParaBreakDisplayChar}={ArgTextEditorDisplayParaBreakDisplayCharDefault})"; }
         private static string GetHelpInfoTextEditorLimits() { return $"{ParamTextEditorLimits} {ArgTextEditorLimitScroll}={ArgTextEditorLimitScrollDefault} <min {ArgTextEditorLimitScrollMin} max {ArgTextEditorLimitScrollMax}>"; }
         private static string GetHelpInfoTextEditorTabSize() { return $"{ParamTextEditorTabSize} {ArgTextEditorTabSizeDefault} <min {ArgTextEditorTabSizeMin} max {ArgTextEditorTabSizeMax}>"; }
-        private static string GetHelpInfoTextEditorPauseTimeout() { return $"{ParamTextEditorPauseTimeout} {ArgTextEditorPauseTimeoutDefault} <min {ArgTextEditorPauseTimeoutMin} max {ArgTextEditorPauseTimeoutMax}>"; }
+        private static string GetHelpInfoTextEditorPauseTimeout() { return $"{ParamTextEditorPauseTimeout} {ArgTextEditorPauseTimeout}={ArgTextEditorPauseTimeoutDefault} <min {ArgTextEditorPauseTimeoutMin} max {ArgTextEditorPauseTimeoutMax}>"; }
         private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} [{ArgTextEditorAutoSaveCR}|{ArgTextEditorAutoSaveParaBreak}|{ArgTextEditorAutoSaveOff}]"; }
         private static string GetHelpInfoTextEditorAutoCorrect() { return $"{ParamTextEditorAutoCorrect} [on|off]"; }
         private static string GetHelpInfoToolBrowser() { return $"{ParamToolBrowser} {ArgToolBrowserExe}={ExeFileNameForm}"; }
