@@ -213,9 +213,9 @@ namespace KLineEdCmdApp.Utils
 
         public const string ParamTextEditorPauseTimeout = "--typingpause"; // 60 <min 5 max 36000>
 
-            public static readonly int ArgTextEditorPauseTimeoutDefault = 60;
-            public static readonly int ArgTextEditorPauseTimeoutMin = 0;
-            public static readonly int ArgTextEditorPauseTimeoutMax = 86400;     //24 * 60 * 60 - 24 hours
+            public const int ArgTextEditorPauseTimeoutDefault = 60;
+            public const int ArgTextEditorPauseTimeoutMin = 0;
+            public const int ArgTextEditorPauseTimeoutMax = 86400;     //24 * 60 * 60 - 24 hours
 
         public const string ParamTextEditorLimits = "--limits";     // 0  <min 1 max 10000>		//(0 is unlimited) - was scrollreview, ParamScrollReviewMode
 
@@ -939,6 +939,13 @@ namespace KLineEdCmdApp.Utils
                     HelpHint = $"{GetParamHelp((int)Param.TabSize)}";
                     rc.SetError(1020317, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' value '{TextEditorTabSize}' is invalid");
                 }
+
+                if ((TextEditorPauseTimeout < CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) || (TextEditorPauseTimeout > CmdLineParamsApp.ArgTextEditorPauseTimeoutMax))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.TypingPause)}";
+                    rc.SetError(1020318, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' value '{TextEditorPauseTimeout}' is invalid");
+                }
+
 
                 if (rc.IsSuccess())  
                     rc.SetResult(true);
@@ -1876,15 +1883,20 @@ namespace KLineEdCmdApp.Utils
             {
                 var argCnt = rcCnt.GetResult();
                 if (argCnt != 1)
-                    rc.SetError(1023401, MxError.Source.User, $"parameter {ParamTextEditorPauseTimeout} has incorrect number of arguments; found {argCnt} should be two");
+                    rc.SetError(1023401, MxError.Source.User, $"parameter {ParamTextEditorPauseTimeout} has incorrect number of arguments; found {argCnt} should be 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorPauseTimeout}");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgValue(paramLine, 1, true, $"parameter {ParamTextEditorPauseTimeout}");
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        if (Int32.TryParse(rcArg.GetResult(), out var timeout) == false)
+                            rc.SetError(1023402, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' value {rcArg.GetResult()} is invalid. It must be a number between {ArgTextEditorPauseTimeoutMin} and {ArgTextEditorPauseTimeoutMax}");
+                        else
+                        {
+                            TextEditorPauseTimeout = timeout;
+                            rc.SetResult(true);
+                        }
                     }
                 }
             }

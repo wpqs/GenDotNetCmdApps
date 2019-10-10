@@ -72,12 +72,12 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, string pathFilename, char paraBreakChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault)
+        public MxReturnCode<bool> Initialise(int textEditorDisplayRows, int textEditorDisplayCols, string pathFilename, char paraBreakChar = CmdLineParamsApp.ArgTextEditorDisplayParaBreakDisplayCharDefault, int spacesForTab = CmdLineParamsApp.ArgTextEditorTabSizeDefault, int scrollLimit = CmdLineParamsApp.ArgTextEditorLimitScrollDefault, int typingPauseTimeout = CmdLineParamsApp.ArgTextEditorPauseTimeoutDefault)
         {
             var rc = new MxReturnCode<bool>("ChapterModel.Initialise");
 
-            if ((textEditorDisplayRows == Program.PosIntegerNotSet) || (textEditorDisplayCols == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax))
-                rc.SetError(1050101, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin},{CmdLineParamsApp.ArgTextEditorTabSizeMax}>, scrollLimit={scrollLimit} <{CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>", MxMsgs.MxErrBadMethodParam);
+            if ((textEditorDisplayRows == Program.PosIntegerNotSet) || (textEditorDisplayCols == Program.PosIntegerNotSet) || (string.IsNullOrEmpty(pathFilename)) || (spacesForTab < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (spacesForTab > CmdLineParamsApp.ArgTextEditorTabSizeMax) || (scrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (scrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax) || (typingPauseTimeout < CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) || (typingPauseTimeout > CmdLineParamsApp.ArgTextEditorPauseTimeoutMax))
+                rc.SetError(1050101, MxError.Source.Param, $"textEditorDisplayRows={textEditorDisplayRows}, textEditorDisplayCols={textEditorDisplayCols} is invalid, pathFilename={pathFilename ?? "[null]"}, spacesForTab={spacesForTab} <{CmdLineParamsApp.ArgTextEditorTabSizeMin},{CmdLineParamsApp.ArgTextEditorTabSizeMax}>, scrollLimit={scrollLimit} <{CmdLineParamsApp.ArgTextEditorLimitScrollMin}, {CmdLineParamsApp.ArgTextEditorLimitScrollMax}>, typingPauseTimeout={typingPauseTimeout} <{CmdLineParamsApp.ArgTextEditorPauseTimeoutMin},{CmdLineParamsApp.ArgTextEditorPauseTimeoutMax}>", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -110,7 +110,7 @@ namespace KLineEdCmdApp.Model
                             }
                             if (rcDone.IsSuccess(true))
                              {
-                                ChapterHeader.SetPauseWaitSeconds(CmdLineParamsApp.ArgTextEditorPauseTimeoutDefault); //todo set from value
+                                ChapterHeader.SetPauseWaitSeconds(typingPauseTimeout); 
                                 Ready = true;
                                 rc.SetResult(true);
                             }

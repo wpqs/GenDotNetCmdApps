@@ -783,6 +783,61 @@ namespace KLineEdCmdAppTest.UtilsTests
 
         }
 
+        [Fact]
+        public void TestPauseTimeoutParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "0" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(0, cmdLineParams.TextEditorPauseTimeout);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "86400" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(86400, cmdLineParams.TextEditorPauseTimeout);
+        }
+
+        [Fact]
+        public void TestPauseTimeoutParamFailOutOfRange()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "-2" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020318-user: parameter '--typingpause' value '-2' is invalid", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "86401" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020318-user: parameter '--typingpause' value '86401' is invalid", rcParam.GetErrorTechMsg());
+        }
+
+
+        [Fact]
+        public void TestPauseTimeoutParamFailBadValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "X" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023402-user: parameter '--typingpause' value X is invalid. It must be a number between 0 and 86400", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestPauseTimeoutParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023401-user: parameter --typingpause has incorrect number of arguments; found 0 should be 1", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "12", "9"});
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023401-user: parameter --typingpause has incorrect number of arguments; found 2 should be 1", rcParam.GetErrorTechMsg());
+        }
 
         [Fact]
         public void TestEditParam()
