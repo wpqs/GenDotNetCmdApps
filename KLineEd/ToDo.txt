@@ -20,17 +20,19 @@ Development work v1.0.43.0
 4. General improvements
     - done replace ConsoleColor with MxConsole.Colour - same but with UnsetColour= -1
 	- done create tests for MxConsole.Colour
+	- done Autosave and manual save
+	- done Implement view help - help for a particular view
+	- done Implement search - pass word at cursor
+	- done Implement thesaurus - pass word at cursor
+	- done Implement spelling checking - pass word at cursor (but don't implement autocorrect)
+	- done Implement max scroll back - maximum number of lines that the user can scroll back from end of chapter (Home, PgUp, up)
 	- move Terminal into MxConsole and rename ITerminal as IMxConsole
 	- rename TerminalTests to MxConsoleTests
     - clear entire window after abend or reset
 	- Detect any change in the Command Window Size and restore 
-	- done Autosave and manual save
-	- Implement view help - help for a particular view
-	- Implement search - pass word at cursor
-	- Implement thesaurus - pass word at cursor
-	- Implement spelling checking - pass word at cursor (but don't implement autocorrect)
-	- done Implement max scroll back - maximum number of lines that the user can scroll back from end of chapter (Home, PgUp, up)
 	- Check Chapter/Session stats are correct
+	- BugFixes 
+	- Test in Production Build
 
 6. Publish and Test
 	- Windows
