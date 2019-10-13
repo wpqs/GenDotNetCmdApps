@@ -32,6 +32,9 @@ namespace KLineEdCmdApp
         public const string MxErrException = "MxErrException"; //Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed.
         public const string MxErrSystemFailure = "MxErrSystemFailure"; //Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
         public const string MxErrBrowserFailed = "MxErrBrowserFailed"; //Error: cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
+        public const string MxErrNoWordSelected = "MxErrNoWordSelected"; //Error: no word found at current cursor position. Move cursor and try again"
+        public const string MxErrInvalidWordSelected = "MxErrInvalidWordSelected"; //Error: word found at current cursor position is invalid. Move cursor and try again"
+
 
         public const string MxWarnEndOfLine = "MxErrEndOfLine";     //Warning: you are at the end of the line. Press the left arrow key and try again.
         public const string MxWarnStartOfLine = "MxErrStartOfLine"; //Warning: you are at the start of the line. Press the right arrow key or enter a character.

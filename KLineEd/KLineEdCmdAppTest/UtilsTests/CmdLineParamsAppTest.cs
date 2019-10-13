@@ -1015,6 +1015,288 @@ namespace KLineEdCmdAppTest.UtilsTests
         }
 
         [Fact]
+        public void TestToolBrowserParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolbrowser", "command=cmd" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("cmd", cmdLineParams.ToolBrowserCmd);
+
+            rcParam = cmdLineParams.Initialise(new[] {"--help", "--toolbrowser", "command='c:\\ explorer.exe a b c'"});
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("c:\\ explorer.exe a b c", cmdLineParams.ToolBrowserCmd);
+        }
+
+        [Fact]
+        public void TestToolBrowserParamFailArgName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolbrowser", "cXmmand='cmd'" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolbrowser' is missing argument 'command'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolBrowserParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolbrowser" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022301-user: parameter '--toolbrowser' has incorrect number of arguments; found 0 should be at least 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolHelpParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolhelp", "url='https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/'" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/", cmdLineParams.ToolHelpUrl);
+        }
+
+        [Fact]
+        public void TestToolHelpParamFailArgName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolhelp", "urX='explorer.exe'" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolhelp' is missing argument 'url'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolhelp", "url=" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolhelp' is missing argument 'url'", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolHelpParamFailArgValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolhelp", "url=abc" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020322-user: parameter '--toolhelp' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolHelpParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolhelp" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022401-user: parameter '--toolhelp' has incorrect number of arguments; found 0 should be at least 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolSearchParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsearch", "url='https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/'" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/", cmdLineParams.ToolSearchUrl);
+        }
+
+        [Fact]
+        public void TestToolSearchParamFailArgName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsearch", "urX='explorer.exe'" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolsearch' is missing argument 'url'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsearch", "url=" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolsearch' is missing argument 'url'", rcParam.GetErrorTechMsg());
+
+        }
+
+        [Fact]
+        public void TestToolSearchParamFailArgValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsearch", "url=abc" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020323-user: parameter '--toolsearch' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolSearchParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsearch" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022501-user: parameter '--toolsearch' has incorrect number of arguments; found 0 should be at least 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolThesaurusParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolthesaurus", "url='https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/'" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/", cmdLineParams.ToolThesaurusUrl);
+        }
+
+        [Fact]
+        public void TestToolThesaurusParamFailArgName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolthesaurus", "urX='explorer.exe'" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolthesaurus' is missing argument 'url'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolthesaurus", "url=" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolthesaurus' is missing argument 'url'", rcParam.GetErrorTechMsg());
+
+        }
+
+        [Fact]
+        public void TestToolThesaurusParamFailArgValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolthesaurus", "url=abc" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020324-user: parameter '--toolthesaurus' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolThesaurusParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolthesaurus" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022601-user: parameter '--toolthesaurus' has incorrect number of arguments; found 0 should be at least 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolSpellParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolspell", "url='https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/'" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal("https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/", cmdLineParams.ToolSpellUrl);
+        }
+
+        [Fact]
+        public void TestToolSpellFailArgName()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolspell", "urX='explorer.exe'" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolspell' is missing argument 'url'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolspell", "url=" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolspell' is missing argument 'url'", rcParam.GetErrorTechMsg());
+
+        }
+
+        [Fact]
+        public void TestToolSpellParamFailArgValue()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolspell", "url=abc" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020325-user: parameter '--toolspell' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+        }
+
+
+        [Fact]
+        public void TestToolSpellParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolspell" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022701-user: parameter '--toolspell' has incorrect number of arguments; found 0 should be at least 1", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolSvnParam()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"username={CmdLineParamsApp.ArgToolSvnUserDefault}", $"password={CmdLineParamsApp.ArgToolSvnPasswordDefault}", $"url={CmdLineParamsApp.ArgToolSvnUrlDefault}" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(CmdLineParamsApp.ArgToolSvnUserDefault, cmdLineParams.ToolSvnUser);
+            Assert.Equal(CmdLineParamsApp.ArgToolSvnPasswordDefault, cmdLineParams.ToolSvnPasswordKey);
+            Assert.Equal(CmdLineParamsApp.ArgToolSvnUrlDefault, cmdLineParams.ToolSvnUrl);
+        }
+
+        [Fact]
+        public void TestToolSvnParamFailValueBad()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"username=''" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolsvn' is missing argument 'username'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"password=''" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1023904-user: parameter '--toolsvn' is missing argument 'password'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"url=abc" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020328-user: parameter '--toolsvn' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+
+        }
+
+        [Fact]
+        public void TestToolSvnParamFailNameBad()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"userXame={CmdLineParamsApp.ArgToolSvnUserDefault}", $"password={CmdLineParamsApp.ArgToolSvnPasswordDefault}", $"url={CmdLineParamsApp.ArgToolSvnUrlDefault}" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022802-user: parameter '--toolsvn' has invalid argument(s); processed 2 but found 3", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"userXame={CmdLineParamsApp.ArgToolSvnUserDefault}", $"pXssword={CmdLineParamsApp.ArgToolSvnPasswordDefault}", $"url={CmdLineParamsApp.ArgToolSvnUrlDefault}" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022802-user: parameter '--toolsvn' has invalid argument(s); processed 1 but found 3", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"userXame={CmdLineParamsApp.ArgToolSvnUserDefault}", $"pXssword={CmdLineParamsApp.ArgToolSvnPasswordDefault}", $"uXl={CmdLineParamsApp.ArgToolSvnUrlDefault}" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022802-user: parameter '--toolsvn' has invalid argument(s); processed 0 but found 3", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
+        public void TestToolSvnParamFailArgCount()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"username={CmdLineParamsApp.ArgToolSvnUserDefault}", $"password={CmdLineParamsApp.ArgToolSvnPasswordDefault}", $"url={CmdLineParamsApp.ArgToolSvnUrlDefault}", "test=x" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1022801-user: parameter '--toolsvn' has incorrect number of arguments; found 4 should be in the range 0-3", rcParam.GetErrorTechMsg());
+        }
+
+        [Fact]
         public void TestEditParam()
         {
             var cmdLineParams = new CmdLineParamsApp();

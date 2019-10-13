@@ -127,7 +127,7 @@
     <value>Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed.</value>
   </data>
   <data name="MxErrInvalidChapterFile" xml:space="preserve">
-    <value>Error: Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again</value>
+    <value>Error: Chapter file cannot be opened. It has been corrupted. Export and then Import to fix the problem</value>
   </data>
   <data name="MxErrInvalidCondition" xml:space="preserve">
     <value>Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed.</value>
@@ -138,8 +138,14 @@
   <data name="MxErrInvalidSettingsFile" xml:space="preserve">
     <value>Error: your settings file is invalid. The file used for saving your program parameters and arguments is corrupt. Please delete KLineEdApp.json and try again</value>
   </data>
+  <data name="MxErrInvalidWordSelected" xml:space="preserve">
+    <value>Error: word found at current cursor position is invalid. Move cursor and try again</value>
+  </data>
   <data name="MxErrLineTooLong" xml:space="preserve">
     <value>Error: line is too long. You have reached the end of the line. Press the Enter key to continue</value>
+  </data>
+  <data name="MxErrNoWordSelected" xml:space="preserve">
+    <value>Error: no word found at current cursor position. Move cursor and try again</value>
   </data>
   <data name="MxErrParamArgNameDuplicateFound" xml:space="preserve">
     <value>Error:  duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments</value>

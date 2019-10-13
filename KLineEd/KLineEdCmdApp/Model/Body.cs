@@ -1216,6 +1216,32 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public string GetSelectedWord()
+        {
+            string rc = null;
+            if ((TextLines.Count > 0) && (Cursor != null) && (TextLines.Count >= Cursor.RowIndex) && (TextLines[Cursor.RowIndex].Length >= Cursor.ColIndex))
+            {
+                var line = TextLines[Cursor.RowIndex];
+                if ((string.IsNullOrEmpty(line) == false) && (line.Length > Cursor.ColIndex))
+                {
+                    var start = Cursor.ColIndex;
+                    if (line[start] != ' ')
+                    {
+                        var end = start;
+                        while ((start >= 0) && (line[start] != ' '))
+                            start--;
+                        start = (start < 0) ? 0: start + 1;
+                        while ((end < line.Length) && (line[end] != ' ') && (line[end] != ParaBreakChar))
+                            end++;
+                        end = (end < line.Length) ? end - 1 : line.Length - 1;
+                        if ((line[start] != ' ') && (line[end] != ' ') && (line[end] != ParaBreakChar))
+                            rc = line.Snip(start, end);
+                    }
+                }
+            }
+            return rc;
+        }
+
         private MxReturnCode<bool> InsertLine(int rowIndex, string line)
         {
             var rc = new MxReturnCode<bool>("Body.InsertLine");

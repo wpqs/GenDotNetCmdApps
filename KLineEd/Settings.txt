@@ -91,10 +91,10 @@ Additional options for edit operation (--edit)
 	Tools options page
 
   --toolbrowser exe='explorer.exe'								//was ParamBrowser
-  --toolhelp url=https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}
-  --toolsearch url=https://www.google.com/search?q=%22{word}%22
-  --toolthesaurus url=https://www.thesaurus.com/browse/{word}
-  --toolspell ulr=http://www.spellcheck.net/{word}
+  --toolhelp url=https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual  //Program.CmdAppHelpUrl is default 
+  --toolsearch url=https://www.google.com/search?q=%22<word>%22	//<word> is replaced by selected word in text editor before url is passed to browser
+  --toolthesaurus url=https://www.thesaurus.com/browse/<word>	//<word> is replaced by selected word in text editor before url is passed to browser
+  --toolspell ulr=http://www.spellcheck.net/<word>				//<word> is replaced by selected word in text editor before url is passed to browser
   --toolsvn (username='name') (password=key) (url='https//xxx.svnrepository.com/books)'
 
 Implemented v1.2

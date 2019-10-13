@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
+using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View;
 using MxReturnCode;
 
@@ -8,9 +10,10 @@ namespace KLineEdCmdApp.Controller
 {
     public class TextEditingController : EditingBaseController
     {
-        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F2=Props F3=Spelling";
+        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Ctrl+Q=Quit Ctrl+S=Save F1=Help F2=Props F3=Spelling F4=Search F5=Thesaurus F6=Spell";
         public override EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
+
             EditingBaseController controller = this;
             if ((base.ProcessKey(model, keyInfo) != null) && (IsError() == false))
             {
@@ -22,9 +25,15 @@ namespace KLineEdCmdApp.Controller
                     //do stuff related to TextEditing, updating the model as needed
                     var ctrlKeyPressed = ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0);
                     if (keyInfo.Key == ConsoleKey.F2)
-                        controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController, BrowserExe);
+                        controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
                     else if (keyInfo.Key == ConsoleKey.F3)
-                        controller = ControllerFactory.Make(Chapter, ControllerFactory.SpellEditingController, BrowserExe);
+                        controller = ControllerFactory.Make(Chapter, ControllerFactory.SpellEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
+                    else if (keyInfo.Key == ConsoleKey.F4)
+                        LaunchBrowser(body, SearchUrl, true);
+                    else if (keyInfo.Key == ConsoleKey.F5)
+                        LaunchBrowser(body, ThesaurusUrl, true);
+                    else if (keyInfo.Key == ConsoleKey.F6)
+                        LaunchBrowser(body, SpellUrl, true);
                     else if ((ctrlKeyPressed == false) && (keyInfo.Key == ConsoleKey.UpArrow))
                     {
                         var rcMove = model.BodyMoveCursor(Body.CursorMove.PreviousRow);

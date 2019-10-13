@@ -23,9 +23,8 @@ namespace KLineEdCmdApp.Utils
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
 
-    //1. any change to Param consts value needs change to  enum Param
-
-    //2. when adding a new parameter:
+    //1. Steps for adding a new parameter:
+    //
     // a) define static readonly for i) name (SettingsParam) ii) args (SettingsArgUpdate) iii) default value(s)(SettingsArgUpdateValueDefault)
     // b) add properties for args (SettingsPathFileName, UpdateSettingsFile) 
     // c) add ToString()
@@ -61,6 +60,7 @@ namespace KLineEdCmdApp.Utils
         public static readonly string UrlForm = $"https://domain.xxx/args?name1=value&name2=value";
         public static readonly string UsernameForm = $"name";
         public static readonly string PasswordKeyForm = $"key";
+        public static readonly string UrlWordMarker = "<word>";
 
         public static readonly string DictionaryFileDefault = Program.ValueNotSet;
         public static readonly string DictionaryUrlDefault = Program.ValueNotSet;
@@ -142,35 +142,35 @@ namespace KLineEdCmdApp.Utils
 
        public const string ParamToolBrowser = "--toolbrowser";
 
-            public static readonly string ArgToolBrowserExe = "exe";
-            public static readonly string ArgToolBrowserExeDefault = "explorer.exe";
+            public static readonly string ArgToolBrowserCmd = "command";
+            public static readonly string ArgToolBrowserCmdDefault = "cmd";  //IsOSPlatform(OSPlatform.Linux) "xdg-open", IsOSPlatform(OSPlatform.OSX) "open"
 
-            public static readonly string ArgToolBrowserUrl = "url";
+        public static readonly string ArgToolBrowserUrl = "url";
 
-        public const string ParamToolHelp = "--toolhelp";             // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/{HelpVer}'
+        public const string ParamToolHelp = "--toolhelp";             
 
-            public static readonly string ArgToolHelpUrlDefault = "https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual/{HelpVer}";
+            public static readonly string ArgToolHelpUrlDefault = Program.CmdAppHelpUrl; // url 'https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0/v1-1'
 
-        public const string ParamToolSearch = "--toolsearch";         // url 'https://www.google.com/search?q=%22{word}%22'
+        public const string ParamToolSearch = "--toolsearch";         
 
-            public static readonly string ArgToolSearchUrlDefault = "https://www.google.com/search?q=%22{word}%22";
+            public static readonly string ArgToolSearchUrlDefault = $"https://www.google.com/search?q=%22{CmdLineParamsApp.UrlWordMarker}%22";
 
-        public const string ParamToolThesaurus = "--toolthesaurus";   // url https://www.thesaurus.com/browse/{word}
+        public const string ParamToolThesaurus = "--toolthesaurus";  
 
-            public static readonly string ArgToolThesaurusUrlDefault = "https://www.thesaurus.com/browse/{word}";
+            public static readonly string ArgToolThesaurusUrlDefault = $"https://www.thesaurus.com/browse/{CmdLineParamsApp.UrlWordMarker}";
 
-        public const string ParamToolSpell = "--toolspell";           // url http://www.spellcheck.net/{word}
+        public const string ParamToolSpell = "--toolspell";         
 
-            public static readonly string ArgToolSpellUrlDefault = "http://www.spellcheck.net/{word}";
+            public static readonly string ArgToolSpellUrlDefault = $"http://www.spellcheck.net/{CmdLineParamsApp.UrlWordMarker}";
 
         public const string ParamToolSvn = "--toolsvn";                   // username 'wills' password=[secret manager key] url 'https//me.svnrepository.com/books'
 
             public static readonly string ArgToolSvnUser = "username";
-            public static readonly string ArgToolSvnUserDefault = Program.ValueNotSet;
+            public static readonly string ArgToolSvnUserDefault = "Jane";
             public static readonly string ArgToolSvnPassword = "password";
-            public static readonly string ArgToolSvnPasswordDefault = Program.ValueNotSet;
+            public static readonly string ArgToolSvnPasswordDefault = "key";
             public static readonly string ArgToolSvnUrl = "url";
-            public static readonly string ArgToolSvnUrlDefault = Program.ValueNotSet;
+            public static readonly string ArgToolSvnUrlDefault = "https://me.svn.com/books";
 
         public const string ParamGeneralAudio = "--audio";         
         
@@ -313,7 +313,7 @@ namespace KLineEdCmdApp.Utils
 
         //Tools options page
 
-        public string ToolBrowserExe { set; get; }
+        public string ToolBrowserCmd { set; get; }
 
         public string ToolHelpUrl { set; get; }
         public string ToolSearchUrl { set; get; }
@@ -434,7 +434,7 @@ namespace KLineEdCmdApp.Utils
                 rc += "BackGndColourRule=" + MxConsole.XlatMxConsoleColorToString(BackGndColourRule) + $" ({(int)BackGndColourRule})" + Environment.NewLine;
                 rc += "ForeGndColourRule=" + MxConsole.XlatMxConsoleColorToString(ForeGndColourRule) + $" ({(int)ForeGndColourRule})" + Environment.NewLine;
                 rc += Environment.NewLine;
-                rc += "ToolBrowserExe=" + (ToolBrowserExe ?? "[null]") + Environment.NewLine;
+                rc += "ToolBrowserCmd=" + (ToolBrowserCmd ?? "[null]") + Environment.NewLine;
                 rc += "ToolHelpUrl=" + (ToolHelpUrl ?? "[null]") + Environment.NewLine;
                 rc += "ToolSearchUrl=" + (ToolSearchUrl ?? "[null]") + Environment.NewLine;
                 rc += "ToolThesaurusUrl=" + (ToolThesaurusUrl ?? "[null]") + Environment.NewLine;
@@ -515,7 +515,7 @@ namespace KLineEdCmdApp.Utils
 
             AudioVol = Program.PosIntegerNotSet;
 
-            ToolBrowserExe = null;
+            ToolBrowserCmd = null;
             ToolHelpUrl = null;
             ToolSearchUrl = null;
             ToolThesaurusUrl = null;
@@ -578,14 +578,14 @@ namespace KLineEdCmdApp.Utils
             ForeGndColourRule = MxConsole.XlatStringToMxConsoleColor(ArgForeGndColourRuleDefault);
             AudioVol = ArgAudioVolDefault;
 
-            ToolBrowserExe = ArgToolBrowserExeDefault;
+            ToolBrowserCmd = ArgToolBrowserCmdDefault;
             ToolHelpUrl = ArgToolHelpUrlDefault;
             ToolSearchUrl = ArgToolSearchUrlDefault;
             ToolThesaurusUrl = ArgToolThesaurusUrlDefault;
             ToolSpellUrl = ArgToolSpellUrlDefault;
-            ToolSvnUser = Program.ValueNotSet;
-            ToolSvnPasswordKey = Program.ValueNotSet;
-            ToolSvnUrl = Program.ValueNotSet;
+            ToolSvnUser =ArgToolSvnUserDefault;
+            ToolSvnPasswordKey = ArgToolSvnPasswordDefault;
+            ToolSvnUrl = ArgToolSvnUrlDefault;
 
             TextEditorRulersShow = BoolValue.Yes;
             TextEditorRulersUnitChar = ArgTextEditorRulersUnitCharDefault;
@@ -975,6 +975,48 @@ namespace KLineEdCmdApp.Utils
                 {
                     HelpHint = $"{GetParamHelp((int)Param.LinesPerPage)}";
                     rc.SetError(1020320, MxError.Source.User, $"parameter '{ParamTextEditorLinesPerPage}' has bad argument; value '{TextEditorLinesPerPage}' is invalid");
+                }
+
+                if (string.IsNullOrEmpty(ToolBrowserCmd) || (ToolBrowserCmd == Program.ValueNotSet))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.ToolBrowser)}";
+                    rc.SetError(1020321, MxError.Source.User, $"parameter '{ParamToolBrowser}' has bad argument; value '{ToolBrowserCmd ?? Program.ValueNotSet}' is invalid");
+                }
+                if (KLineEditor.IsValidUri(ToolHelpUrl) == false)
+                {
+                    HelpHint = $"{GetParamHelp((int) Param.ToolHelp)}";
+                    rc.SetError(1020322, MxError.Source.User, $"parameter '{ParamToolHelp}' has bad argument; value '{ToolHelpUrl ?? Program.ValueNotSet}' is invalid");
+                }
+                if (KLineEditor.IsValidUri(KLineEditor.GetXlatUrl(ToolSearchUrl, CmdLineParamsApp.UrlWordMarker, "test")) == false)
+                {
+                    HelpHint = $"{GetParamHelp((int) Param.ToolSearch)}";
+                    rc.SetError(1020323, MxError.Source.User, $"parameter '{ParamToolSearch}' has bad argument; value '{ToolSearchUrl ?? Program.ValueNotSet}' is invalid");
+                }
+                if (KLineEditor.IsValidUri(KLineEditor.GetXlatUrl(ToolThesaurusUrl, CmdLineParamsApp.UrlWordMarker, "test")) == false)
+                {
+                    HelpHint = $"{GetParamHelp((int) Param.ToolThesaurus)}";
+                    rc.SetError(1020324, MxError.Source.User, $"parameter '{ParamToolThesaurus}' has bad argument; value '{ToolThesaurusUrl ?? Program.ValueNotSet}' is invalid");
+                }
+                if (KLineEditor.IsValidUri(KLineEditor.GetXlatUrl(ToolSpellUrl, CmdLineParamsApp.UrlWordMarker, "test")) == false)
+                {
+                    HelpHint = $"{GetParamHelp((int) Param.ToolSpell)}";
+                    rc.SetError(1020325, MxError.Source.User, $"parameter '{ParamToolSpell}' has bad argument; value '{ToolSpellUrl ?? Program.ValueNotSet}' is invalid");
+                }
+
+                if (string.IsNullOrEmpty(ToolSvnUser) || (ToolSvnUser == Program.ValueNotSet))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.ToolSvn)}";
+                    rc.SetError(1020326, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnUser ?? Program.ValueNotSet}' is invalid");
+                }
+                if (string.IsNullOrEmpty(ToolSvnPasswordKey) || (ToolSvnPasswordKey == Program.ValueNotSet))
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.ToolSvn)}";
+                    rc.SetError(1020327, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnPasswordKey ?? Program.ValueNotSet}' is invalid");
+                }
+                if (KLineEditor.IsValidUri(ToolSvnUrl) == false)
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.ToolSvn)}";
+                    rc.SetError(1020328, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnUrl ?? Program.ValueNotSet}' is invalid");
                 }
 
                 if (rc.IsSuccess())  
@@ -1478,15 +1520,15 @@ namespace KLineEdCmdApp.Utils
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022301, MxError.Source.User, $"parameter '{ParamToolBrowser}' has incorrect number of arguments; found {argCnt} should be two");
+                if (argCnt < 1)     //todo update to argCnt != 1 after fix take account of a single arg in quotes - i.e. 'a b c' returns 3 not 1
+                    rc.SetError(1022301, MxError.Source.User, $"parameter '{ParamToolBrowser}' has incorrect number of arguments; found {argCnt} should be at least 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolBrowser}'");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamToolBrowser, ArgToolBrowserCmd, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
+                        ToolBrowserCmd = rcArg.GetResult();   
                         rc.SetResult(true);
                     }
                 }
@@ -1507,15 +1549,15 @@ namespace KLineEdCmdApp.Utils
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022401, MxError.Source.User, $"parameter '{ParamToolHelp}' has incorrect number of arguments; found {argCnt} should be two");
+                if (argCnt < 1)   //todo update to argCnt != 1 after fix take account of a single arg in quotes - i.e. 'a b c' returns 3 not 1
+                    rc.SetError(1022401, MxError.Source.User, $"parameter '{ParamToolHelp}' has incorrect number of arguments; found {argCnt} should be at least 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolHelp}'");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamToolHelp, ArgToolBrowserUrl, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
+                        ToolHelpUrl = rcArg.GetResult();
                         rc.SetResult(true);
                     }
                 }
@@ -1536,15 +1578,15 @@ namespace KLineEdCmdApp.Utils
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022501, MxError.Source.User, $"parameter '{ParamToolSearch}' has incorrect number of arguments; found {argCnt} should be two");
+                if (argCnt < 1)  //todo update to argCnt != 1 after fix take account of a single arg in quotes - i.e. 'a b c' returns 3 not 1
+                    rc.SetError(1022501, MxError.Source.User, $"parameter '{ParamToolSearch}' has incorrect number of arguments; found {argCnt} should be at least 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolSearch}'");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamToolSearch, ArgToolBrowserUrl, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
+                        ToolSearchUrl = rcArg.GetResult();
                         rc.SetResult(true);
                     }
                 }
@@ -1565,15 +1607,15 @@ namespace KLineEdCmdApp.Utils
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022601, MxError.Source.User, $"parameter '{ParamToolThesaurus}' has incorrect number of arguments; found {argCnt} should be two");
+                if (argCnt < 1)  //todo update to argCnt != 1 after fix take account of a single arg in quotes - i.e. 'a b c' returns 3 not 1
+                    rc.SetError(1022601, MxError.Source.User, $"parameter '{ParamToolThesaurus}' has incorrect number of arguments; found {argCnt} should be at least 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolThesaurus}'");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamToolThesaurus, ArgToolBrowserUrl, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
+                        ToolThesaurusUrl = rcArg.GetResult();
                         rc.SetResult(true);
                     }
                 }
@@ -1594,15 +1636,15 @@ namespace KLineEdCmdApp.Utils
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022701, MxError.Source.User, $"parameter '{ParamToolSpell}' has incorrect number of arguments; found {argCnt} should be two");
+                if (argCnt < 1)  //todo update to argCnt != 1 after fix take account of a single arg in quotes - i.e. 'a b c' returns 3 not 1
+                    rc.SetError(1022701, MxError.Source.User, $"parameter '{ParamToolSpell}' has incorrect number of arguments; found {argCnt} should be at least 1");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolSpell}'");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var rcArg = GetArgNameValue(ParamToolSpell, ArgToolBrowserUrl, paramLine, true);
+                    rc += rcArg;
+                    if (rcArg.IsSuccess(true))
                     {
-                        // EditFile = rcArg1.GetResult();
+                        ToolSpellUrl = rcArg.GetResult();
                         rc.SetResult(true);
                     }
                 }
@@ -1623,16 +1665,39 @@ namespace KLineEdCmdApp.Utils
             if (rcCnt.IsSuccess())
             {
                 var argCnt = rcCnt.GetResult();
-                if (argCnt != 1)
-                    rc.SetError(1022801, MxError.Source.User, $"parameter '{ParamToolSvn}' has incorrect number of arguments; found {argCnt} should be two");
+                if ((argCnt < 0) || (argCnt > 3))
+                    rc.SetError(1022801, MxError.Source.User, $"parameter '{ParamToolSvn}' has incorrect number of arguments; found {argCnt} should be in the range 0-3");
                 else
                 {
-                    var rcArg1 = GetArgValue(paramLine, 1, true, $"parameter '{ParamToolSvn}'");
-                    rc += rcArg1;
-                    if (rcArg1.IsSuccess(true))
+                    var argProc = 0;
+                    var rcArgUser = GetArgNameValue(ParamToolSvn, ArgToolSvnUser, paramLine, false);
+                    rc += rcArgUser;
+                    if (rcArgUser.IsSuccess() && (rcArgUser.GetResult() != null))
                     {
-                        // EditFile = rcArg1.GetResult();
-                        rc.SetResult(true);
+                        ToolSvnUser = rcArgUser.GetResult();
+                        argProc++;
+                    }
+                    var rcArgPwd = GetArgNameValue(ParamToolSvn, ArgToolSvnPassword, paramLine, false);
+                    rc += rcArgPwd;
+                    if (rcArgPwd.IsSuccess() && (rcArgPwd.GetResult() != null))
+                    {
+                        var password = rcArgPwd.GetResult();
+                        ToolSvnPasswordKey = password;       //todo put password in secret store and save key
+                        argProc++;
+                    }
+                    var rcArgUrl = GetArgNameValue(ParamToolSvn, ArgToolSvnUrl, paramLine, false);
+                    rc += rcArgUrl;
+                    if (rcArgUrl.IsSuccess() && (rcArgUrl.GetResult() != null))
+                    {
+                        ToolSvnUrl = rcArgUrl.GetResult();
+                        argProc++;
+                    }
+                    if (rc.IsSuccess())
+                    {
+                        if (argProc < argCnt)
+                            rc.SetError(1022802, MxError.Source.User, $"parameter '{ParamToolSvn}' has invalid argument(s); processed {argProc} but found {argCnt}");
+                        else
+                            rc.SetResult(true);
                     }
                 }
             }
@@ -2194,8 +2259,8 @@ namespace KLineEdCmdApp.Utils
             if (AudioVol == Program.PosIntegerNotSet)
                 AudioVol = savedSettings.AudioVol;
 
-            if (ToolBrowserExe == null)
-                ToolBrowserExe = savedSettings.ToolBrowserExe;
+            if (ToolBrowserCmd == null)
+                ToolBrowserCmd = savedSettings.ToolBrowserCmd;
             if (ToolHelpUrl == null)
                 ToolHelpUrl = savedSettings.ToolHelpUrl;
             if (ToolSearchUrl == null)
@@ -2411,7 +2476,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoTextEditorAutoSave() { return $"{ParamTextEditorAutoSave} {ArgTextEditorAutoSave}={ArgTextEditorAutoSaveDefault} <min={ArgTextEditorAutoSaveMin} max={ArgTextEditorAutoSaveMax}>"; }
         private static string GetHelpInfoTextEditorAutoCorrect() { return $"{ParamTextEditorAutoCorrect} [yes|no]"; }
         private static string GetHelpInfoTextEditorLinesPerPage() { return $"{ParamTextEditorLinesPerPage} {ArgTextEditorLinesPerPageDefault} <min={ArgTextEditorLinesPerPageMin} max={ArgTextEditorLinesPerPageMax}>"; }
-        private static string GetHelpInfoToolBrowser() { return $"{ParamToolBrowser} {ArgToolBrowserExe}={ExeFileNameForm}"; }
+        private static string GetHelpInfoToolBrowser() { return $"{ParamToolBrowser} {ArgToolBrowserCmd}={ExeFileNameForm}"; }
         private static string GetHelpInfoToolHelp() { return $"{ParamToolHelp} {ArgToolBrowserUrl}={UrlForm}"; }
         private static string GetHelpInfoToolSearch() { return $"{ParamToolSearch} {ArgToolBrowserUrl}={UrlForm}"; }
         private static string GetHelpInfoToolThesaurus() { return $"{ParamToolThesaurus} {ArgToolBrowserUrl}={UrlForm}"; }

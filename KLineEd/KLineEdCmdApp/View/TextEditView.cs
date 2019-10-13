@@ -16,7 +16,7 @@ namespace KLineEdCmdApp.View
 
     public class TextEditView : EditAreaView
     {
-        public static readonly string TextEditorMode = "Text Editing:";
+        public static readonly string TextEditorMode = "Editor:";
 
 
 

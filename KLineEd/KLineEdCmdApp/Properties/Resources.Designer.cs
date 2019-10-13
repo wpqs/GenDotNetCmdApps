@@ -88,7 +88,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again.
+        ///   Looks up a localized string similar to Error: Chapter file cannot be opened. It has been corrupted. Export and then Import to fix the problem.
         /// </summary>
         internal static string MxErrInvalidChapterFile {
             get {
@@ -124,11 +124,29 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: word found at current cursor position is invalid. Move cursor and try again.
+        /// </summary>
+        internal static string MxErrInvalidWordSelected {
+            get {
+                return ResourceManager.GetString("MxErrInvalidWordSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: line is too long. You have reached the end of the line. Press the Enter key to continue.
         /// </summary>
         internal static string MxErrLineTooLong {
             get {
                 return ResourceManager.GetString("MxErrLineTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: no word found at current cursor position. Move cursor and try again.
+        /// </summary>
+        internal static string MxErrNoWordSelected {
+            get {
+                return ResourceManager.GetString("MxErrNoWordSelected", resourceCulture);
             }
         }
         

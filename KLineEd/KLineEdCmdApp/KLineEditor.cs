@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Threading;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
@@ -63,7 +65,11 @@ namespace KLineEdCmdApp
         public int AutoSavePeriod { private set; get; }
 
         public string Report { private set; get; }
-        public string BrowserExe { private set; get; }
+        public string BrowserCmd { private set; get; }
+        public string HelpUrl { private set; get; }
+        public string SearchUrl { private set; get; }
+        public string ThesaurusUrl { private set; get; }
+        public string SpellUrl { private set; get; }
         public bool Ready { private set; get; }
 
         private List<BaseView> ViewList { set; get; }
@@ -81,7 +87,11 @@ namespace KLineEdCmdApp
             EditAreaLineWidth = Program.PosIntegerNotSet;
             AutoSavePeriod = 0;
             Report = Program.ValueNotSet;
-            BrowserExe = CmdLineParamsApp.ArgToolBrowserExeDefault;
+            BrowserCmd = CmdLineParamsApp.ArgToolBrowserCmdDefault;
+            HelpUrl = CmdLineParamsApp.ArgToolHelpUrlDefault;
+            SearchUrl = CmdLineParamsApp.ArgToolSearchUrlDefault;
+            ThesaurusUrl = CmdLineParamsApp.ArgToolThesaurusUrlDefault;
+            SpellUrl = CmdLineParamsApp.ArgToolSpellUrlDefault;
             Ready = false;
 
 
@@ -139,6 +149,49 @@ namespace KLineEdCmdApp
             return rc;
         }
 
+        public static bool StartBrowser(string command, string url)     //call from within try/catch
+        {
+            var rc = false;
+
+            if (string.IsNullOrEmpty(url) == false)
+            {   
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                { 
+                    url = url.Replace("&", "^&");  //see https://github.com/dotnet/corefx/issues/10361
+                    System.Diagnostics.Process.Start(new ProcessStartInfo(command, $"/c start {url}") { CreateNoWindow = true });
+                    rc = true;
+                }
+                else 
+                {
+                    System.Diagnostics.Process.Start(command, url);
+                    rc = true;
+                }
+            }
+            return rc;
+        }
+
+        public static bool IsValidUri(string uri)
+        {
+            var rc = false;
+
+            if (string.IsNullOrEmpty(uri) == false)
+            {
+                if (Uri.TryCreate(uri, UriKind.Absolute, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
+                    rc = true;
+                //if (Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                //    rc = true;
+            }
+            return rc;
+        }
+
+        public static string GetXlatUrl(string generalUrl, string wordMarker, string replaceWord)
+        {
+            string rc = null;
+            if ((string.IsNullOrEmpty(generalUrl) == false) && (string.IsNullOrEmpty(wordMarker) == false) && (string.IsNullOrEmpty(replaceWord) == false))
+                rc = generalUrl.Replace(wordMarker, replaceWord);
+            return rc;
+        }
+
 
         private MxReturnCode<bool> Initialise(CmdLineParamsApp param, ChapterModel model, ITerminal terminal)
         {
@@ -150,7 +203,12 @@ namespace KLineEdCmdApp
             {
                 try
                 {
-                    //ToolBrowserExe = param.ToolBrowserExe;
+                    BrowserCmd = param.ToolBrowserCmd;
+                    HelpUrl = param.ToolHelpUrl;
+                    SearchUrl = param.ToolSearchUrl;
+                    ThesaurusUrl = param.ToolThesaurusUrl;
+                    SpellUrl = param.ToolSpellUrl;
+
                     EditAreaLineWidth = param.TextEditorDisplayCols; //there is actually an additional column used by cursor when at end of line
                     AutoSavePeriod = param.TextEditorAutoSavePeriod;
                     Width = GetWindowFrameCols() + param.TextEditorDisplayCols;  
@@ -222,7 +280,7 @@ namespace KLineEdCmdApp
                     rc.SetError(1030402, MxError.Source.Sys, $"settings.Validate() failed; {terminalSettings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
                 else
                 {
-                    if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserExe)) == null) || Controller.IsError())
+                    if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl)) == null) || Controller.IsError())
                         rc.SetError(1030403, MxError.Source.Program, $"ControllerFactory.Make failed", MxMsgs.MxErrInvalidCondition);
                     else
                     {

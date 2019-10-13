@@ -2,6 +2,7 @@
 using KLineEdCmdApp;
 using KLineEdCmdApp.Model;
 using KLineEdCmdAppTest.TestSupport;
+using Microsoft.Azure.Services.AppAuthentication;
 using Xunit;
 // ReSharper disable All
 
@@ -170,6 +171,64 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(-1, Body.GetIndexOfWord(text, -1));
             Assert.Equal(-1, Body.GetIndexOfWord(text, -1, false));
 
+        }
+
+        [Fact]
+        public void GetSelectedWordTest()
+        {
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
+            Assert.False(body.IsError());
+
+            Assert.Equal(0, body.GetLineCount());
+            body.SetTestLine("one two three four five");
+            body.SetTestLine("");
+            body.SetTestLine("six");
+            body.SetTestLine(" seven");
+
+            var rcCursor = body.SetCursorInChapter(0, 0);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("one", body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(0, 2);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("one", body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(0, 3);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Null(body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(0, 4);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("two", body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(0, 19);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("five", body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(0, 22);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("five", body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(1, 0);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Null( body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(2, 0);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("six", body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(2, 4);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("six", body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(3, 0);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Null(body.GetSelectedWord());
+
+            rcCursor = body.SetCursorInChapter(3, 1);
+            Assert.True(rcCursor.IsSuccess(true));
+            Assert.Equal("seven", body.GetSelectedWord());
         }
 
 

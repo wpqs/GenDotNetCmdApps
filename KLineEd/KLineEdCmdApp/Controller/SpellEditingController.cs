@@ -16,7 +16,7 @@ namespace KLineEdCmdApp.Controller
             {
                 //do stuff related to TextEditing, updating the model as needed
                 if (keyInfo.Key == ConsoleKey.F2)
-                    controller = ControllerFactory.Make(Chapter, ControllerFactory.TextEditingController, BrowserExe);
+                    controller = ControllerFactory.Make(Chapter, ControllerFactory.TextEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
             }
             return controller;
         }

@@ -27,13 +27,13 @@ namespace KLineEdCmdApp
         public const string ValueUnknown = "[unknown]";
         public const string ValueOverflow = "...";
         public const string MxNoError = "[no error]";
-        public const char NullChar = (char)0;
+        public const char NullChar = (char) 0;
 
+        public static readonly string HelpVersion = "-v1.0";
         public static readonly string CmdAppVersion = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version ?? Program.ValueNotSet;
         public static readonly string CmdAppName = typeof(Program).GetTypeInfo()?.Assembly?.GetName().Name ?? Program.ValueNotSet;
         public static readonly string CmdAppCopyright = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? Program.ValueNotSet;
-
-        public static readonly string CmdAppHelpUrl = $"https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual{Program.GetAppUserManualVersion()}";
+        public static readonly string CmdAppHelpUrl = $"https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual" + HelpVersion;
 
         static int Main(string[] args)
         {
@@ -64,7 +64,7 @@ namespace KLineEdCmdApp
                     {
                         rcOp = HelpProcessing(cmdLineParams: cmdLineParams, terminal);
                     }
-                    else  if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Edit)
+                    else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Edit)
                     {
                         rcOp = EditProcessing(cmdLineParams: cmdLineParams, terminal);
                     }
@@ -121,6 +121,7 @@ namespace KLineEdCmdApp
                 {
                     terminal.WriteLine(line);
                 }
+
                 terminal.WriteLine("end of report");
                 cmdLineParams.HelpHint = "";
                 rc.SetResult("succeeded");
@@ -129,6 +130,7 @@ namespace KLineEdCmdApp
             {
                 rc.SetError(1010201, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
+
             return rc;
         }
 
@@ -145,7 +147,7 @@ namespace KLineEdCmdApp
                     terminal.WriteLine($"{Environment.NewLine}Opening file: {cmdLineParams?.EditFile ?? ValueNotSet}");
 
                     var editModel = new ChapterModel();
-                    var rcInitModel = editModel.Initialise(cmdLineParams.TextEditorDisplayRows, cmdLineParams.TextEditorDisplayCols, cmdLineParams.EditFile, cmdLineParams.TextEditorParaBreakDisplayChar, cmdLineParams.TextEditorTabSize, cmdLineParams.TextEditorScrollLimit, cmdLineParams.TextEditorPauseTimeout, cmdLineParams.TextEditorLinesPerPage); 
+                    var rcInitModel = editModel.Initialise(cmdLineParams.TextEditorDisplayRows, cmdLineParams.TextEditorDisplayCols, cmdLineParams.EditFile, cmdLineParams.TextEditorParaBreakDisplayChar, cmdLineParams.TextEditorTabSize, cmdLineParams.TextEditorScrollLimit, cmdLineParams.TextEditorPauseTimeout, cmdLineParams.TextEditorLinesPerPage);
                     rc += rcInitModel;
                     if (rcInitModel.IsSuccess(true))
                     {
@@ -170,13 +172,13 @@ namespace KLineEdCmdApp
                             {
                                 var editor = new KLineEditor();
                                 var rcRun = editor.Run(cmdLineParams, editModel, terminal);
-                                rc += rcRun;  //same as rc.SetResult(rcRun.GetResult());
+                                rc += rcRun; //same as rc.SetResult(rcRun.GetResult());
 
                                 if (terminal.Setup(originalSettings) == false)
                                     rc.SetError(1010303, terminal.GetErrorSource(), $"Terminal settings not restored. {terminal.GetErrorTechMsg()}", terminal.GetErrorUserMsg());
                                 else
                                 {
-                                    var report = Environment.NewLine;   //reports always start with newline
+                                    var report = Environment.NewLine; //reports always start with newline
                                     report += String.Format(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
                                     report += $"{editor.Report}{Environment.NewLine}";
 
@@ -198,6 +200,7 @@ namespace KLineEdCmdApp
                     rc.SetError(1010302, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
+
             return rc;
         }
 
@@ -234,6 +237,7 @@ namespace KLineEdCmdApp
                     rc.SetError(1010504, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
+
             return rc;
         }
 
@@ -269,18 +273,9 @@ namespace KLineEdCmdApp
                     rc.SetError(1010604, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
-            return rc;
-        }
-
-        private static string GetAppUserManualVersion()
-        {
-            var rc = "";
-
-            var parts = Program.CmdAppVersion.Split('.'); //https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual-v1.0
-            if (parts.Length > 2)
-                rc = $"-v{parts[0]}.{parts[1]}";
 
             return rc;
         }
+
     }
 }

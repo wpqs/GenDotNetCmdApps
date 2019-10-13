@@ -1,5 +1,7 @@
 BugList
 =======
 
-1. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
-2. GetParamNameValue() should include 'You entered: "--autocorrect x"' like  GetParamValue()
+1. GetArgCount() doesn't take account of a single arg in quotes - i.e. 'a b c' returns 3 not 1
+2. Editor problems:
+	1. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
+	2. pressing { key

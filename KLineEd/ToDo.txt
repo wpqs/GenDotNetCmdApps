@@ -24,7 +24,7 @@ Development work v1.0.43.0
 	- rename TerminalTests to MxConsoleTests
     - clear entire window after abend or reset
 	- Detect any change in the Command Window Size and restore 
-	- Autosave and manual save
+	- done Autosave and manual save
 	- Implement view help - help for a particular view
 	- Implement search - pass word at cursor
 	- Implement thesaurus - pass word at cursor
@@ -43,6 +43,7 @@ Development work v1.0.44.0
 
 1. Refactor Application structure
     - resolve const / readonly issue
+	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
 	- Rename KLineEdCmdApp Project, KLineEditor.cs and KLineEdCmdApp.json to KScribeCmdApp, KScribeEditor.cs, KScribe.json
 	- Rename KLineEdCmdAppTest to KScribeCmdAppTest (KLineEditorTests) 
@@ -71,6 +72,7 @@ Development work v1.0.45.0
 	- Modal Dialog box
 
 4. Refactor
+    - Move to MxDotNetUtils KLineEditor.StartBrowser,  KLineEditor.StartBrowser, KLineEditor.IsValidUri, and KLineEditor.GetXlatUrl + tests
 	- Move to MxDotNetUtils CmdLineParamApp parameter base class, MxConsole, general MVC and factory stuff as well as UIElements.cs 
     - Update KScribe for new version of MxDotNetUtils
 
@@ -95,17 +97,22 @@ Development work v1.0.47.0
 2. Implement Abort - exit without saving unsaved changes
 	ModalDlgView - abort y/n?
 
-3. Implement Find, Replace
+3. Implement text selection Shift+arrows - invert foregnd/backgnd
+	- delete
+	- find
+	- selection for google 
 
-4. Implement Undo (Ctrl+Z)
+4. Implement Find, Replace
 
-5. Implement two line error messages
+5. Implement Undo (Ctrl+Z)
 
-6. Improve warning messages - use of modal dialog, better separation of data and user errors
+6. Implement two line error messages
 
-7. Improve unit testing and full test
+7. Improve warning messages - use of modal dialog, better separation of data and user errors
 
-8. Create Windows/iOS Installer - Wix
+8. Improve unit testing and full test
+
+9. Create Windows/iOS Installer - Wix
 
 Release work v1.1 (first major release)
 --------------------------------------
@@ -147,6 +154,7 @@ WARNING: changes may break iOS version
 	- Ctrl+V
 	- Ctrl+C
 	- Ctrl+X
+
 
 Release work v1.2
 -----------------

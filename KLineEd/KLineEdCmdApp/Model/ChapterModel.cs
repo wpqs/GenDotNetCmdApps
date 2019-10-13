@@ -199,10 +199,11 @@ namespace KLineEdCmdApp.Model
             string line = null;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (elapsed?.TotalDays > 0.99)
-                line = $"{(elapsed?.TotalDays ?? 0.0).ToString(Header.MxStdFrmtDouble0)} days {elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
+                line = $"{(elapsed?.TotalDays ?? 0.0).ToString(Header.MxStdFrmtDouble0)} days {elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"}";
             else
-                line = $"{elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"} ";
+                line = $"{elapsed?.ToString(Header.MxStdFrmtTimeSpan) ?? "00:00:00"}";
 
+            line += $" {(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)} ";
             line += (LastSaved != null) ? $"Saved:{LastSaved?.ToString(MxStdFrmt.ShortTime) ?? "00:00"} | " : "[not saved] | ";
 
             line += $"Line: {ChapterBody?.Cursor?.RowIndex+1 ?? Program.PosIntegerNotSet} ";
@@ -210,8 +211,6 @@ namespace KLineEdCmdApp.Model
 
             line += $"| Words: {ChapterBody?.WordCount ?? Program.PosIntegerNotSet} ";
             line += $"Pages: {ChapterBody?.GetPageCount() ?? Program.PosIntegerNotSet} ";  
-
-            line += $"| {(ChapterHeader?.GetPauseDetails() ?? Program.ValueNotSet)}";
 
             if (StatusLine != line)
             {
