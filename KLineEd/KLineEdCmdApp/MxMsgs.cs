@@ -34,7 +34,9 @@ namespace KLineEdCmdApp
         public const string MxErrBrowserFailed = "MxErrBrowserFailed"; //Error: cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
         public const string MxErrNoWordSelected = "MxErrNoWordSelected"; //Error: no word found at current cursor position. Move cursor and try again"
         public const string MxErrInvalidWordSelected = "MxErrInvalidWordSelected"; //Error: word found at current cursor position is invalid. Move cursor and try again"
-
+        public const string MxErrExportInputFileNotFound = "MxErrExportInputFileNotFound"; //Error: input file does not exist. Change the '--export' parameter argument 'from' and try again
+        public const string MxErrExportOutputFileExists = "MxErrExportOutputFileExists"; //Error: output file already exists. Change the '--export' parameter argument 'to' and try again
+        public const string MxErrExportOutputFileEmpty = "MxErrExportOutputFileEmpty"; //Error: input file is empty. Select another file and try again
 
         public const string MxWarnEndOfLine = "MxErrEndOfLine";     //Warning: you are at the end of the line. Press the left arrow key and try again.
         public const string MxWarnStartOfLine = "MxErrStartOfLine"; //Warning: you are at the start of the line. Press the right arrow key or enter a character.
@@ -83,6 +85,8 @@ namespace KLineEdCmdApp
         public const int PropsEditingControllerFirst =  1230101; //first error code in class PropsEditingController.cs
         public const int TextEditingControllerFirst =   1240101; //first error code in class TextEditingController.cs
         public const int EditingBaseControllerFirst =   1250101; //first error code in class EditingBaseController.cs
+
+        public const int ExportProcFirst =              1260101; //first error code in class ExportProc.cs
 
     }
 }

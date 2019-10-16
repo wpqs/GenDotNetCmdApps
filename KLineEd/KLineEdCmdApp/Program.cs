@@ -224,11 +224,12 @@ namespace KLineEdCmdApp
                             rc.SetError(1010503, MxError.Source.User, $"folder for output file {cmdLineParams.ExportOutputFile} does not exist. Create folder and try again.");
                         else
                         {
-                            terminal.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportOutputFile}...");
-                            //process editfile to remove all metadata - see EditFileOps class
-                            File.Copy(cmdLineParams.EditFile, cmdLineParams.ExportOutputFile, true);
                             cmdLineParams.HelpHint = "";
-                            rc.SetResult("succeeded");
+                            terminal.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportOutputFile}...");
+                            var rcExport = ExportProc.CreateTxtFile(cmdLineParams.EditFile, cmdLineParams.ExportOutputFile);
+                            rc += rcExport;
+                            if (rcExport.IsSuccess(true))
+                                rc.SetResult(rcExport.GetResult());
                         }
                     }
                 }
