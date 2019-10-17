@@ -115,6 +115,33 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error: input file is empty. Select another file and try again.
+        /// </summary>
+        internal static string MxErrImportInputFileEmpty {
+            get {
+                return ResourceManager.GetString("MxErrImportInputFileEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: input file does not exist. Change the &apos;--import&apos; parameter argument &apos;from&apos; and try again.
+        /// </summary>
+        internal static string MxErrImportInputFileNotFound {
+            get {
+                return ResourceManager.GetString("MxErrImportInputFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: output file already exists. Change the &apos;--import&apos; parameter argument &apos;to&apos; and try again.
+        /// </summary>
+        internal static string MxErrImportOutputFileExists {
+            get {
+                return ResourceManager.GetString("MxErrImportOutputFileExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error: Chapter file cannot be opened. It has been corrupted. Export and then Import to fix the problem.
         /// </summary>
         internal static string MxErrInvalidChapterFile {

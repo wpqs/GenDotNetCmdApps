@@ -224,12 +224,12 @@ namespace KLineEdCmdApp
                             rc.SetError(1010503, MxError.Source.User, $"folder for output file {cmdLineParams.ExportOutputFile} does not exist. Create folder and try again.");
                         else
                         {
-                            cmdLineParams.HelpHint = "";
                             terminal.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportOutputFile}...");
                             var rcExport = ExportProc.CreateTxtFile(cmdLineParams.EditFile, cmdLineParams.ExportOutputFile);
                             rc += rcExport;
                             if (rcExport.IsSuccess(true))
                                 rc.SetResult(rcExport.GetResult());
+
                         }
                     }
                 }
@@ -237,8 +237,8 @@ namespace KLineEdCmdApp
                 {
                     rc.SetError(1010504, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
+                cmdLineParams.HelpHint = rc.IsError(true) ? CmdLineParamsApp.GetHelpForParam(CmdLineParamsApp.Param.ExportFile) : "";
             }
-
             return rc;
         }
 
@@ -262,10 +262,10 @@ namespace KLineEdCmdApp
                         else
                         {
                             terminal.WriteLine($"importing {cmdLineParams.ImportInputFile} to {cmdLineParams.EditFile}...");
-
-                            //File.Copy(cmdLineParams.EditFile, cmdLineParams.ExportOutputFile, true);
-                            cmdLineParams.HelpHint = "";
-                            rc.SetResult("succeeded");
+                            var rcImport = ImportProc.CreateKsxFile( cmdLineParams.ImportInputFile, cmdLineParams.EditFile, cmdLineParams.TextEditorDisplayCols);
+                            rc += rcImport;
+                            if (rcImport.IsSuccess(true))
+                                rc.SetResult(rcImport.GetResult());
                         }
                     }
                 }
@@ -273,8 +273,8 @@ namespace KLineEdCmdApp
                 {
                     rc.SetError(1010604, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
+                cmdLineParams.HelpHint = rc.IsError(true) ? CmdLineParamsApp.GetHelpForParam(CmdLineParamsApp.Param.ImportFile) : "";
             }
-
             return rc;
         }
 

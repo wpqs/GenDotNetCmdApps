@@ -59,8 +59,20 @@ namespace KLineEdCmdApp.Utils
                             else
                             {
                                 var output = "";
+                                var row = 0;
                                 foreach (var line in textLines)
-                                    output += (line == Environment.NewLine) ? Environment.NewLine : line + " ";
+                                {
+                                    if (line == Environment.NewLine)
+                                        output += Environment.NewLine;
+                                    else
+                                    {
+                                        if ((row + 1 >= textLines.Count) || (textLines[row + 1] == Environment.NewLine))
+                                            output += line;
+                                        else
+                                            output += line + " ";
+                                    }  
+                                    row++;
+                                }
                                 using (var file = new StreamWriter(exportOutputFile)) //default StreamBuffer size is 1024
                                 {
                                     file.Write(output);
@@ -73,7 +85,7 @@ namespace KLineEdCmdApp.Utils
                         }
                         catch (Exception e)
                         {
-                            rc.SetError(1051202, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                            rc.SetError(1260105, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                         }
                     }
                 }

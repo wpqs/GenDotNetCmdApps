@@ -2306,14 +2306,17 @@ namespace KLineEdCmdApp.Utils
                 TextEditorLinesPerPage = savedSettings.TextEditorLinesPerPage;
         }
 
-        
         protected override string GetParamHelp(int paramId = 0) // paramId = KLineEditor.PosIntegerNotSet 
+        {
+            return GetHelpForParam((Param)paramId);
+        }
+
+        public static string GetHelpForParam(Param help)
         {
             var rc = "";
 
             var msg = $"{Environment.NewLine}Hint: retry using expected arguments for the parameter, updating the settings file if necessary.{Environment.NewLine}";
 
-            Param help = (Param)paramId;
             if (help == Param.Help)
             {
                 msg += GetHelpInfoHelp() + Environment.NewLine;
@@ -2322,13 +2325,13 @@ namespace KLineEdCmdApp.Utils
             }
             else if (help == Param.ExportFile)
             {
-                msg += GetHelpInfoExport() + Environment.NewLine; 
+                msg += GetHelpInfoExport() + Environment.NewLine;
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
             else if (help == Param.ImportFile)
             {
-                msg += GetHelpInfoImport() + Environment.NewLine; 
+                msg += GetHelpInfoImport() + Environment.NewLine;
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
@@ -2457,11 +2460,12 @@ namespace KLineEdCmdApp.Utils
                 rc = GetHelpInfoAll();
             }
             return rc;
+
         }
 
         private static string GetHelpInfoHelp() { return $"{ParamHelp}"; }
-        private static string GetHelpInfoExport() { return $"{ParamExportFile} {ArgFileFrom}={EditFileNameForm} {ArgFileTo}={TextFileNameForm}"; }
-        private static string GetHelpInfoImport() { return $"{ParamImportFile} {ArgFileFrom}={TextFileNameForm} {ArgFileTo}={EditFileNameForm}"; }
+        public static string GetHelpInfoExport() { return $"{ParamExportFile} {ArgFileFrom}={EditFileNameForm} {ArgFileTo}={TextFileNameForm}"; }
+        public static string GetHelpInfoImport() { return $"{ParamImportFile} {ArgFileFrom}={TextFileNameForm} {ArgFileTo}={EditFileNameForm}"; }
         private static string GetHelpInfoEdit() { return $"{ParamEditFile} {EditFileNameForm}"; }
         private static string GetHelpInfoGeneralSettings() { return $"{ParamGeneralSettings} ({ArgSettingsDisplay}=[yes|no]) ({ArgSettingsPathFileName}={SettingsFileNameForm}) ({ArgSettingsUpdate}=[yes|no]))"; }
         private static string GetHelpInfoGeneralForeGndColour() { return $"{ParamGeneralForeGndColour} ({ArgColourText}=COLOR) ({ArgColourMsgError}=COLOR) ({ArgColourMsgWarn}=COLOR) ({ArgColourMsgInfo}=COLOUR) ({ArgColourCmds}=COLOR) ({ArgColourStatus}=COLOR) ({ArgColourRule}=COLOR)"; }
@@ -2521,7 +2525,7 @@ namespace KLineEdCmdApp.Utils
             return msg;
         }
 
-        private static string GetAppHelpNotes()
+        public static string GetAppHelpNotes()
         {
             var rc = GetHelpNotes() + Environment.NewLine;
 

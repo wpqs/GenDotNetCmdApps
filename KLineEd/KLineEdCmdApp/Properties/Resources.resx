@@ -135,6 +135,15 @@
   <data name="MxErrExportOutputFileExists" xml:space="preserve">
     <value>Error: output file already exists. Change the '--export' parameter argument 'to' and try again</value>
   </data>
+  <data name="MxErrImportInputFileEmpty" xml:space="preserve">
+    <value>Error: input file is empty. Select another file and try again</value>
+  </data>
+  <data name="MxErrImportInputFileNotFound" xml:space="preserve">
+    <value>Error: input file does not exist. Change the '--import' parameter argument 'from' and try again</value>
+  </data>
+  <data name="MxErrImportOutputFileExists" xml:space="preserve">
+    <value>Error: output file already exists. Change the '--import' parameter argument 'to' and try again</value>
+  </data>
   <data name="MxErrInvalidChapterFile" xml:space="preserve">
     <value>Error: Chapter file cannot be opened. It has been corrupted. Export and then Import to fix the problem</value>
   </data>

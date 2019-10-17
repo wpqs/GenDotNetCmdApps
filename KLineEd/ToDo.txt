@@ -14,8 +14,8 @@ Development work v1.0.43.0
    											// in working directory (if not found create using factory-defaults).  
 3. Implement Fix, Import and Export
      done --fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx - replaced with export and import
-	 --export create .txt file and copy body.TextLines; add CRLF at the end of each line; replace ParaBreak with double CRLF 
-	 --import create new .KSX file and read into body.TextLines; replace double CRLF with ParaBreak and remove any remaining CRLF
+	 done --export create .txt file and copy body.TextLines; add CRLF at the end of each line; replace ParaBreak with double CRLF 
+	 done --import create new .KSX file and read into body.TextLines; replace double CRLF with ParaBreak and remove any remaining CRLF
 
 4. General improvements
     - done replace ConsoleColor with MxConsole.Colour - same but with UnsetColour= -1
@@ -26,6 +26,7 @@ Development work v1.0.43.0
 	- done Implement thesaurus - pass word at cursor
 	- done Implement spelling checking - pass word at cursor (but don't implement autocorrect)
 	- done Implement max scroll back - maximum number of lines that the user can scroll back from end of chapter (Home, PgUp, up)
+	
 	- move Terminal into MxConsole and rename ITerminal as IMxConsole
 	- rename TerminalTests to MxConsoleTests
     - clear entire window after abend or reset
@@ -43,7 +44,9 @@ Development work v1.0.43.0
 Development work v1.0.44.0
 --------------------------
 
-1. Refactor Application structure
+1. Build and test with VS2019
+
+2. Refactor Application structure
     - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
@@ -54,7 +57,6 @@ Development work v1.0.44.0
 		- Integrate KScribeLib Class Library with KScribeCmdApp - Program.cs, KScribeEditor, Terminal.cs.
 	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
 
-2. Build and test with VS2019
 
 Development work v1.0.45.0
 --------------------------

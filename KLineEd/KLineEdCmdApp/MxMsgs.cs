@@ -37,6 +37,10 @@ namespace KLineEdCmdApp
         public const string MxErrExportInputFileNotFound = "MxErrExportInputFileNotFound"; //Error: input file does not exist. Change the '--export' parameter argument 'from' and try again
         public const string MxErrExportOutputFileExists = "MxErrExportOutputFileExists"; //Error: output file already exists. Change the '--export' parameter argument 'to' and try again
         public const string MxErrExportOutputFileEmpty = "MxErrExportOutputFileEmpty"; //Error: input file is empty. Select another file and try again
+        public const string MxErrImportInputFileNotFound = "MxErrImportInputFileNotFound"; //Error: input file does not exist. Change the '--import' parameter argument 'from' and try again
+        public const string MxErrImportOutputFileExists = "MxErrImportOutputFileExists"; //Error: output file already exists. Change the '--import' parameter argument 'to' and try again
+        public const string MxErrImportInputFileEmpty = "MxErrImportInputFileEmpty"; //Error: input file is empty. Select another file and try again
+
 
         public const string MxWarnEndOfLine = "MxErrEndOfLine";     //Warning: you are at the end of the line. Press the left arrow key and try again.
         public const string MxWarnStartOfLine = "MxErrStartOfLine"; //Warning: you are at the start of the line. Press the right arrow key or enter a character.
@@ -87,6 +91,6 @@ namespace KLineEdCmdApp
         public const int EditingBaseControllerFirst =   1250101; //first error code in class EditingBaseController.cs
 
         public const int ExportProcFirst =              1260101; //first error code in class ExportProc.cs
-
+        public const int ImportProcFirst =              1270101; //first error code in class ImportProc.cs
     }
 }

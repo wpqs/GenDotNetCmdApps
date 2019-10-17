@@ -1242,7 +1242,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        private MxReturnCode<bool> InsertLine(int rowIndex, string line)
+        public MxReturnCode<bool> InsertLine(int rowIndex, string line)
         {
             var rc = new MxReturnCode<bool>("Body.InsertLine");
 
