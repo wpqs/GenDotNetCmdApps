@@ -5,6 +5,7 @@ using MxReturnCode;
 namespace KLineEdCmdApp.View.Base
 {
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+    [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
     public abstract class EditAreaView : BaseView
     {
         public bool DisplayRulers { private set; get; }
@@ -18,7 +19,7 @@ namespace KLineEdCmdApp.View.Base
         public MxConsole.Color TextForeGndColour { private set; get; }
         public MxConsole.Color TextBackGndColour { private set; get; }
 
-        public EditAreaView(ITerminal terminal) : base(terminal)
+        public EditAreaView(IMxConsole console) : base(console)
         {
             DisplayRulers = false;
             TopRuleUnitChar = CmdLineParamsApp.ArgTextEditorRulersUnitCharDefault;
@@ -71,8 +72,8 @@ namespace KLineEdCmdApp.View.Base
             base.OnUpdate(notificationItem);
             if (IsOnUpdateError() == false)
             {
-                if (Terminal.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                    SetMxError(1140202, Terminal.GetErrorSource(), $"Terminal: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+                if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
+                    SetMxError(1140202, Console.GetErrorSource(), $"MxConsole: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
             }
         }
 
@@ -80,10 +81,10 @@ namespace KLineEdCmdApp.View.Base
         {
             var rc = new MxReturnCode<bool>("EditAreaView.InitDisplay");
 
-            Terminal.SetCursorVisible(false);
+            Console.SetCursorVisible(false);
 
-            if (Terminal.SetColour(RuleForeGndColour, RuleBackGndColour) == false)
-                rc.SetError(1140301, Terminal.GetErrorSource(), $"TextEditView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+            if (Console.SetColour(RuleForeGndColour, RuleBackGndColour) == false)
+                rc.SetError(1140301, Console.GetErrorSource(), $"TextEditView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
             else
             {
                 var rcTop = DisplayLine(KLineEditor.EditAreaMarginTopRuleIndex, KLineEditor.EditAreaMarginLeft, TopRule);
@@ -94,8 +95,8 @@ namespace KLineEdCmdApp.View.Base
                     rc += rcBot;
                     if (rcBot.IsSuccess(true))
                     {
-                        if (Terminal.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                            rc.SetError(1140302, Terminal.GetErrorSource(), $"EditAreaView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+                        if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
+                            rc.SetError(1140302, Console.GetErrorSource(), $"EditAreaView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
                         else
                         {
                             for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
@@ -116,7 +117,7 @@ namespace KLineEdCmdApp.View.Base
                     }
                 }
             }
-            Terminal.SetCursorVisible(CursorOn);
+            Console.SetCursorVisible(CursorOn);
 
             return rc;
         }
@@ -129,8 +130,8 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editAreaRowIndex} (max={EditAreaHeight}), col={editAreaColIndex} (max={WindowWidth - 1})", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (Terminal.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editAreaRowIndex, KLineEditor.EditAreaMarginLeft + editAreaColIndex) == false)
-                    rc.SetError(1110402, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
+                if (Console.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editAreaRowIndex, KLineEditor.EditAreaMarginLeft + editAreaColIndex) == false)
+                    rc.SetError(1110402, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
                 else
                     rc.SetResult(true);
             }

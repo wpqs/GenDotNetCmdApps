@@ -16,7 +16,7 @@ namespace KLineEdCmdApp.View
         public MxConsole.Color EditorHelpLineForeGndColour { private set; get; }
         public MxConsole.Color EditorHelpLineBackGndColour { private set; get; }
 
-        public EditorHelpLineView(ITerminal terminal) : base(terminal)
+        public EditorHelpLineView(IMxConsole console) : base(console)
         {
             EditorHelpLineForeGndColour = MxConsole.Color.Gray;
             EditorHelpLineBackGndColour = MxConsole.Color.Black;
@@ -37,8 +37,8 @@ namespace KLineEdCmdApp.View
                     EditorHelpLineForeGndColour = param.ForeGndColourCmds; 
                     EditorHelpLineBackGndColour = param.BackGndColourCmds; 
 
-                    if (Terminal.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
-                        rc.SetError(1120102, Terminal.GetErrorSource(), $"EditHelpLineView. {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+                    if (Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
+                        rc.SetError(1120102, Console.GetErrorSource(), $"EditHelpLineView. {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
                    else
                     {
                         var rcClear = ClearLine(KLineEditor.EditorHelpLineRowIndex, KLineEditor.EditorHelpLineLeftCol);
@@ -73,8 +73,8 @@ namespace KLineEdCmdApp.View
                         rc.SetError(1120301, MxError.Source.Program, "model is null", MxMsgs.MxErrInvalidCondition);
                     else
                     {
-                        if (Terminal.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
-                            rc.SetError(1120302, Terminal.GetErrorSource(), $"EditHelpLineView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+                        if (Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
+                            rc.SetError(1120302, Console.GetErrorSource(), $"EditHelpLineView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
                         else
                         {
                             var helpText = model.EditorHelpLine ?? Program.ValueNotSet;

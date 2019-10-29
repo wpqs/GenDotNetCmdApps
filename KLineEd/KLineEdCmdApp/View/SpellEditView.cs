@@ -10,7 +10,7 @@ namespace KLineEdCmdApp.View
     public class SpellEditView : EditAreaView
     {
         public static readonly string SpellEditorMode = "Spelling Correction:";
-        public SpellEditView(ITerminal terminal) : base(terminal) { }
+        public SpellEditView(IMxConsole console) : base(console) { }
 
         public override void OnUpdate(NotificationItem notificationItem)
         {

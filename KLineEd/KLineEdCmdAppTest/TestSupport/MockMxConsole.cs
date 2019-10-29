@@ -9,7 +9,7 @@ namespace KLineEdCmdAppTest.TestSupport
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "SimplifyConditionalTernaryExpression")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class MockTerminal : ITerminal
+    public class MockMxConsole : IMxConsole
     {
         private readonly MxReturnCode<bool> _mxErrorCode;
         public int CursorRow { get; private set; }
@@ -18,10 +18,10 @@ namespace KLineEdCmdAppTest.TestSupport
         public MxConsole.Color ForeGndColour { get; private set; }
         public MxConsole.Color BackGndColour { get; private set; }
 
-        public MockTerminal()
+        public MockMxConsole()
         {
-            _mxErrorCode = new MxReturnCode<bool>($"MockTerminal.Ctor", false); //SetResult(true) on error
-            _mxErrorCode.SetError(9210201, MxError.Source.Program, "Terminal.Setup not called");
+            _mxErrorCode = new MxReturnCode<bool>($"MockMxConsole.Ctor", false); //SetResult(true) on error
+            _mxErrorCode.SetError(9210201, MxError.Source.Program, "MxConsole.Setup not called");
             CursorRow = 0;
             CursorColumn = 0;
             ForeGndColour = MxConsole.Color.Gray;
@@ -30,7 +30,7 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public MxReturnCode<MxReturnCode<bool>> GetMxError()
         {
-            var rc = new MxReturnCode<MxReturnCode<bool>>($"MockTerminal.GetMxError");
+            var rc = new MxReturnCode<MxReturnCode<bool>>($"MockMxConsole.GetMxError");
 
             rc += _mxErrorCode;
 
@@ -47,7 +47,7 @@ namespace KLineEdCmdAppTest.TestSupport
             return true;
         }
 
-        public bool Setup(TerminalProperties props)
+        public bool Setup(MxConsoleProperties props)
         {
             _mxErrorCode.SetResult(true);
             return true;
@@ -55,7 +55,7 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public MxReturnCode<bool> Close()
         {
-            var rc = new MxReturnCode<bool>($"Terminal.Close");
+            var rc = new MxReturnCode<bool>($"MxConsole.Close");
 
             if (_mxErrorCode.IsError())
                 rc += _mxErrorCode;
@@ -63,10 +63,10 @@ namespace KLineEdCmdAppTest.TestSupport
             return rc;
         }
 
-        public TerminalProperties GetSettings()
+        public MxConsoleProperties GetSettings()
         {
             _mxErrorCode.SetResult(true);
-            return new TerminalProperties();
+            return new MxConsoleProperties();
         }
 
         public bool SetCursorPosition(int row, int column)

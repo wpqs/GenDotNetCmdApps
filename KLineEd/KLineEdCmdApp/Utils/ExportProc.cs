@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 using KLineEdCmdApp.Model;
-using Microsoft.Azure.Amqp.Serialization;
 using MxReturnCode;
 
 namespace KLineEdCmdApp.Utils
 {
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
     public class ExportProc
     {
         public static MxReturnCode<string> CreateTxtFile(string exportInputFile, string exportOutputFile)
@@ -77,7 +77,7 @@ namespace KLineEdCmdApp.Utils
                                 {
                                     file.Write(output);
                                 }
-                                if (bodyFound == true)
+                                if (bodyFound)
                                     rc.SetResult($"Succeeded: {exportInputFile} lacks closing {Body.ClosingElement}, but {rowIndex+1} lines still exported to {exportOutputFile}");
                                 else
                                     rc.SetResult($"Succeeded: {exportInputFile} exported {rowIndex + 1} lines to {exportOutputFile}");

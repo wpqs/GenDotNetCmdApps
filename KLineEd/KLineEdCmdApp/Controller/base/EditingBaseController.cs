@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Properties;
@@ -9,6 +8,7 @@ using MxReturnCode;
 namespace KLineEdCmdApp.Controller.Base
 {
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
+    [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
     public abstract class EditingBaseController
     {
         public ChapterModel Chapter { private set; get; }

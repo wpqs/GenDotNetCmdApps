@@ -35,7 +35,7 @@ namespace KLineEdCmdApp.View.Base
             [EnumMember(Value = "Info")] Info= 2,
             [EnumMember(Value = "Unknown")] Unknown =3
         }
-        protected ITerminal Terminal { get; }
+        protected IMxConsole Console { get; }
         public int WindowHeight { private set; get; }
         public int WindowWidth { private set; get; }
         protected int EditAreaWidth { private set; get; }
@@ -65,9 +65,9 @@ namespace KLineEdCmdApp.View.Base
         public bool Ready { protected set; get; }
 
         // ReSharper disable once RedundantBaseConstructorCall
-        protected BaseView(ITerminal terminal) : base()
+        protected BaseView(IMxConsole console) : base()
         {
-            Terminal = terminal;
+            Console = console;
             EditAreaWidth = Program.PosIntegerNotSet;
             EditAreaHeight = Program.PosIntegerNotSet;
             WindowHeight = Program.PosIntegerNotSet;
@@ -90,7 +90,7 @@ namespace KLineEdCmdApp.View.Base
         protected virtual void OnUpdateDone(MxReturnCode<bool> errorCode, bool cursorOn)
         {
             CursorOn = cursorOn;
-            Terminal.SetCursorVisible(CursorOn);
+            Console.SetCursorVisible(CursorOn);
             if (errorCode.IsError(true))
                 DisplayErrorMsg(errorCode);
         }
@@ -100,10 +100,10 @@ namespace KLineEdCmdApp.View.Base
             _mxErrorCode = new MxReturnCode<bool>($"{GetType().Name}.OnUpdate", false); //SetResult(true) on error
 
             CursorOn = false;
-            Terminal.SetCursorVisible(CursorOn);
+            Console.SetCursorVisible(CursorOn);
 
-            if (Terminal.IsError())
-                SetMxError(1140201, Terminal.GetErrorSource(), $"Terminal: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+            if (Console.IsError())
+                SetMxError(1140201, Console.GetErrorSource(), $"MxConsole: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
             else
                 _mxErrorCode?.SetResult(true);
         }
@@ -181,8 +181,8 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110201, MxError.Source.Param, $"rowIndex={rowIndex}, colIndex={colIndex}, WinHt={WindowHeight} WinWd={WindowWidth}", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (Terminal.SetCursorPosition(rowIndex, colIndex) == false)
-                    rc.SetError(1110202, Terminal.GetErrorSource(), $"BaseView: {Terminal.GetErrorTechMsg()}", Terminal.GetErrorUserMsg());
+                if (Console.SetCursorPosition(rowIndex, colIndex) == false)
+                    rc.SetError(1110202, Console.GetErrorSource(), $"BaseView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
                 else
                     rc.SetResult(true);
             }
@@ -197,16 +197,16 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110301, MxError.Source.Param, $"rowIndex={rowIndex}, colIndex={colIndex}, WinHt={WindowHeight} WinWd={WindowWidth}", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (Terminal.SetCursorPosition(rowIndex, 0) == false)
-                    rc.SetError(1110302, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
+                if (Console.SetCursorPosition(rowIndex, 0) == false)
+                    rc.SetError(1110302, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
                 else
                 {
-                    if (Terminal.Write(BlankLine) == null)
-                        rc.SetError(1110303, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
+                    if (Console.Write(BlankLine) == null)
+                        rc.SetError(1110303, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
                     else
                     {
-                        if (Terminal.SetCursorPosition(rowIndex, colIndex) == false)
-                            rc.SetError(1110304, Terminal.GetErrorSource(), Terminal.GetErrorTechMsg(), Terminal.GetErrorUserMsg());
+                        if (Console.SetCursorPosition(rowIndex, colIndex) == false)
+                            rc.SetError(1110304, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
                         else
                         {
                             rc.SetResult(true);
@@ -232,7 +232,7 @@ namespace KLineEdCmdApp.View.Base
 
                 if (rc.IsSuccess(true))
                 {
-                    if ((LastTerminalOutput = Terminal.Write(BaseView.TruncateTextForLine(text, WindowWidth - colIndex-1))) == null) //column=WindowWidth-1 is the right most column, writing to next col generates a new line
+                    if ((LastConsoleOutput = Console.Write(BaseView.TruncateTextForLine(text, WindowWidth - colIndex-1))) == null) //column=WindowWidth-1 is the right most column, writing to next col generates a new line
                         rc.SetError(1110402, MxError.Source.Data, $"rowIndex={rowIndex}, colIndex={colIndex}, text={text}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
@@ -254,7 +254,7 @@ namespace KLineEdCmdApp.View.Base
                 rc += SetCursorPosition(rowIndex, colIndex);
                 if (rc.IsSuccess(true))
                 {
-                    if ((LastTerminalOutput = Terminal.Write(BaseView.TruncateTextForLine(word, WindowWidth - colIndex - 1))) == null) //column=WindowWidth-1 is the right most column, writing to next col generates a new line
+                    if ((LastConsoleOutput = Console.Write(BaseView.TruncateTextForLine(word, WindowWidth - colIndex - 1))) == null) //column=WindowWidth-1 is the right most column, writing to next col generates a new line
                         rc.SetError(1110502, MxError.Source.Data, $"rowIndex={rowIndex}, colIndex={colIndex}, text={word}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
@@ -318,7 +318,7 @@ namespace KLineEdCmdApp.View.Base
             {
                 case MsgType.Error:
                 {
-                    Terminal.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
+                    Console.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
                     if ((msg.Length > 0) && (msg.StartsWith(BaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(BaseView.ErrorMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.ErrorMsgPrecursor} {msg}";
                     else
@@ -327,7 +327,7 @@ namespace KLineEdCmdApp.View.Base
                 break;
                 case MsgType.Warning:
                 {
-                    Terminal.SetColour(MsgLineWarnForeGndColour, MsgLineWarnBackGndColour);
+                    Console.SetColour(MsgLineWarnForeGndColour, MsgLineWarnBackGndColour);
                     if ((msg.Length > 0) && (msg.StartsWith(BaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(BaseView.WarnMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.WarnMsgPrecursor} {msg}";
                     else
@@ -337,7 +337,7 @@ namespace KLineEdCmdApp.View.Base
                 case MsgType.Info:
                 default:
                 {
-                    Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
+                    Console.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
                     if ((msg.Length > 0) && (msg.StartsWith(BaseView.InfoMsgPrecursor) == false) && (msg.StartsWith(BaseView.InfoMsgPrecursor.ToLower()) == false))
                         rc = $"{BaseView.InfoMsgPrecursor} {msg}";
                     else

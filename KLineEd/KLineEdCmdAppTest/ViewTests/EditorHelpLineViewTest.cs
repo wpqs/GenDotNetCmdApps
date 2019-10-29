@@ -21,7 +21,7 @@ namespace KLineEdCmdAppTest.ViewTests
 
             _fixture.Model.SetEditorHelpLine("test cmd");
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
-            Assert.Equal("test cmd", _fixture.View.LastTerminalOutput);
+            Assert.Equal("test cmd", _fixture.View.LastConsoleOutput);
         }
     }
 }

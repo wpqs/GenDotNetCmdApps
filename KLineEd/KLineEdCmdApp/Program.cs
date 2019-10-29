@@ -19,6 +19,7 @@ namespace KLineEdCmdApp
     [SuppressMessage("ReSharper", "InvertIf")]
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "RedundantNameQualifier")]
+    [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
     public class Program
     {
         public const int PosIntegerNotSet = -1; //used for default values of params so cannot be readonly
@@ -39,7 +40,7 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<int>(invokeDetails: $"{Program.CmdAppName} v{Program.CmdAppVersion}", defaultResult: PosIntegerNotSet);
 
-            var terminal = new Terminal();
+            var console = new MxConsole();
             var cmdLineParams = new CmdLineParamsApp();
             IConfigurationRoot config = null;
 
@@ -53,7 +54,7 @@ namespace KLineEdCmdApp
                 rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null,
                     config?["ConnectionStrings:AzureWebJobsServiceBus"], sbqName: config?["MxLogMsg:AzureServiceBusQueueName"]);
 
-                terminal.WriteLine(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
+                console.WriteLine(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
 
                 var rcParams = cmdLineParams.Initialise(args: args);
                 rc += rcParams;
@@ -62,19 +63,19 @@ namespace KLineEdCmdApp
                     MxReturnCode<string> rcOp = null;
                     if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Help)
                     {
-                        rcOp = HelpProcessing(cmdLineParams: cmdLineParams, terminal);
+                        rcOp = HelpProcessing(cmdLineParams: cmdLineParams, console);
                     }
                     else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Edit)
                     {
-                        rcOp = EditProcessing(cmdLineParams: cmdLineParams, terminal);
+                        rcOp = EditProcessing(cmdLineParams: cmdLineParams, console);
                     }
                     else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Export)
                     {
-                        rcOp = ExportProcessing(cmdLineParams: cmdLineParams, terminal);
+                        rcOp = ExportProcessing(cmdLineParams: cmdLineParams, console);
                     }
                     else if (cmdLineParams.Op == CmdLineParamsApp.OpMode.Import)
                     {
-                        rcOp = ImportProcessing(cmdLineParams: cmdLineParams, terminal);
+                        rcOp = ImportProcessing(cmdLineParams: cmdLineParams, console);
                     }
                     else
                     {
@@ -86,7 +87,7 @@ namespace KLineEdCmdApp
                         rc += rcOp;
                         if (rcOp.IsSuccess(reporting: true))
                         {
-                            terminal.WriteLine(rcOp.GetResult());
+                            console.WriteLine(rcOp.GetResult());
                             rc.SetResult(val: 0);
                         }
                     }
@@ -99,18 +100,18 @@ namespace KLineEdCmdApp
 
             if (rc.IsError(reporting: true))
             {
-                terminal.WriteLine(rc.GetErrorUserMsg());
-                terminal.WriteLine(cmdLineParams.HelpHint);
+                console.WriteLine(rc.GetErrorUserMsg());
+                console.WriteLine(cmdLineParams.HelpHint);
             }
 
             if (cmdLineParams.SettingsDisplay == CmdLineParamsApp.BoolValue.Yes)
-                terminal.WriteLines(cmdLineParams.ToString().Split(Environment.NewLine));
+                console.WriteLines(cmdLineParams.ToString().Split(Environment.NewLine));
 
-            terminal.WriteLine((rc.IsSuccess()) ? $"program ends - bye-bye :-) return code {rc.GetResult()} - success" : $"program abends: return code {rc.GetResult()} - failure");
+            console.WriteLine((rc.IsSuccess()) ? $"program ends - bye-bye :-) return code {rc.GetResult()} - success" : $"program abends: return code {rc.GetResult()} - failure");
             return rc.GetResult();
         }
 
-        private static MxReturnCode<string> HelpProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
+        private static MxReturnCode<string> HelpProcessing(CmdLineParamsApp cmdLineParams, IMxConsole console)
         {
             var rc = new MxReturnCode<string>("Program.HelpProcessing");
 
@@ -119,10 +120,10 @@ namespace KLineEdCmdApp
                 var lines = cmdLineParams.HelpHint.Split(Environment.NewLine);
                 foreach (var line in lines)
                 {
-                    terminal.WriteLine(line);
+                    console.WriteLine(line);
                 }
 
-                terminal.WriteLine("end of report");
+                console.WriteLine("end of report");
                 cmdLineParams.HelpHint = "";
                 rc.SetResult("succeeded");
             }
@@ -134,48 +135,48 @@ namespace KLineEdCmdApp
             return rc;
         }
 
-        private static MxReturnCode<string> EditProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
+        private static MxReturnCode<string> EditProcessing(CmdLineParamsApp cmdLineParams, IMxConsole console)
         {
             var rc = new MxReturnCode<string>("Program.EditProcessing");
 
-            if ((cmdLineParams == null) || (terminal == null) || (terminal.IsError()))
-                rc.SetError(1010301, MxError.Source.Param, $"cmdLineParams is null, or terminal is null or error", MxMsgs.MxErrInvalidParamArg);
+            if ((cmdLineParams == null) || (console == null) || (console.IsError()))
+                rc.SetError(1010301, MxError.Source.Param, $"cmdLineParams is null, or console is null or error", MxMsgs.MxErrInvalidParamArg);
             else
             {
                 try
                 {
-                    terminal.WriteLine($"{Environment.NewLine}Opening file: {cmdLineParams?.EditFile ?? ValueNotSet}");
+                    console.WriteLine($"{Environment.NewLine}Opening file: {cmdLineParams?.EditFile ?? ValueNotSet}");
 
                     var editModel = new ChapterModel();
                     var rcInitModel = editModel.Initialise(cmdLineParams.TextEditorDisplayRows, cmdLineParams.TextEditorDisplayCols, cmdLineParams.EditFile, cmdLineParams.TextEditorParaBreakDisplayChar, cmdLineParams.TextEditorTabSize, cmdLineParams.TextEditorScrollLimit, cmdLineParams.TextEditorPauseTimeout, cmdLineParams.TextEditorLinesPerPage);
                     rc += rcInitModel;
                     if (rcInitModel.IsSuccess(true))
                     {
-                        terminal.WriteLine($"{Environment.NewLine}Ready to edit chapter: {editModel.ChapterHeader?.Properties?.Title ?? "[null]"}{Environment.NewLine}");
-                        terminal.WriteLine(editModel.GetChapterReport());
-                        terminal.WriteLine($"{Environment.NewLine}Press 'Esc' to cancel, or any other key to open the KLineEd editor...");
+                        console.WriteLine($"{Environment.NewLine}Ready to edit chapter: {editModel.ChapterHeader?.Properties?.Title ?? "[null]"}{Environment.NewLine}");
+                        console.WriteLine(editModel.GetChapterReport());
+                        console.WriteLine($"{Environment.NewLine}Press 'Esc' to cancel, or any other key to open the KLineEd editor...");
 
-                        var op = terminal.GetKey(true);
+                        var op = console.GetKey(true);
                         if (op == ConsoleKey.Escape)
                         {
-                            terminal.WriteLine($"{Environment.NewLine}Edit cancelled - chapter is unchanged");
+                            console.WriteLine($"{Environment.NewLine}Edit cancelled - chapter is unchanged");
 
                             cmdLineParams.HelpHint = "";
                             rc.SetResult("succeeded");
                         }
                         else
                         {
-                            var originalSettings = terminal.GetSettings();
+                            var originalSettings = console.GetSettings();
                             if (originalSettings?.IsError() ?? false)
-                                rc.SetError(1010302, MxError.Source.Data, $"Terminal original settings not saved", MxMsgs.MxErrInvalidCondition);
+                                rc.SetError(1010302, MxError.Source.Data, $"MxConsole original settings not saved", MxMsgs.MxErrInvalidCondition);
                             else
                             {
                                 var editor = new KLineEditor();
-                                var rcRun = editor.Run(cmdLineParams, editModel, terminal);
+                                var rcRun = editor.Run(cmdLineParams, editModel, console);
                                 rc += rcRun; //same as rc.SetResult(rcRun.GetResult());
 
-                                if (terminal.Setup(originalSettings) == false)
-                                    rc.SetError(1010303, terminal.GetErrorSource(), $"Terminal settings not restored. {terminal.GetErrorTechMsg()}", terminal.GetErrorUserMsg());
+                                if (console.Setup(originalSettings) == false)
+                                    rc.SetError(1010303, console.GetErrorSource(), $"MxConsole settings not restored. {console.GetErrorTechMsg()}", console.GetErrorUserMsg());
                                 else
                                 {
                                     var report = Environment.NewLine; //reports always start with newline
@@ -184,8 +185,8 @@ namespace KLineEdCmdApp
 
                                     var lines = report.Split(Environment.NewLine, StringSplitOptions.None);
                                     foreach (var line in lines)
-                                        terminal.Write(line + Environment.NewLine);
-                                    terminal.WriteLine($"{Environment.NewLine}end of report{Environment.NewLine}");
+                                        console.Write(line + Environment.NewLine);
+                                    console.WriteLine($"{Environment.NewLine}end of report{Environment.NewLine}");
 
                                     cmdLineParams.HelpHint = "";
                                     if (rc.IsSuccess())
@@ -205,7 +206,7 @@ namespace KLineEdCmdApp
         }
 
 
-        private static MxReturnCode<string> ExportProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
+        private static MxReturnCode<string> ExportProcessing(CmdLineParamsApp cmdLineParams, IMxConsole console)
         {
             var rc = new MxReturnCode<string>("Program.ExportProcessing");
 
@@ -224,7 +225,7 @@ namespace KLineEdCmdApp
                             rc.SetError(1010503, MxError.Source.User, $"folder for output file {cmdLineParams.ExportOutputFile} does not exist. Create folder and try again.");
                         else
                         {
-                            terminal.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportOutputFile}...");
+                            console.WriteLine($"exporting {cmdLineParams.EditFile} to {cmdLineParams.ExportOutputFile}...");
                             var rcExport = ExportProc.CreateTxtFile(cmdLineParams.EditFile, cmdLineParams.ExportOutputFile);
                             rc += rcExport;
                             if (rcExport.IsSuccess(true))
@@ -242,7 +243,7 @@ namespace KLineEdCmdApp
             return rc;
         }
 
-        private static MxReturnCode<string> ImportProcessing(CmdLineParamsApp cmdLineParams, ITerminal terminal)
+        private static MxReturnCode<string> ImportProcessing(CmdLineParamsApp cmdLineParams, IMxConsole console)
         {
             var rc = new MxReturnCode<string>("Program.ImportProcessing");
 
@@ -261,7 +262,7 @@ namespace KLineEdCmdApp
                             rc.SetError(1010603, MxError.Source.User, $"folder for input file {cmdLineParams.ImportInputFile} does not exist. Create folder and try again.");
                         else
                         {
-                            terminal.WriteLine($"importing {cmdLineParams.ImportInputFile} to {cmdLineParams.EditFile}...");
+                            console.WriteLine($"importing {cmdLineParams.ImportInputFile} to {cmdLineParams.EditFile}...");
                             var rcImport = ImportProc.CreateKsxFile( cmdLineParams.ImportInputFile, cmdLineParams.EditFile, cmdLineParams.TextEditorDisplayCols);
                             rc += rcImport;
                             if (rcImport.IsSuccess(true))

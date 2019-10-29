@@ -1,10 +1,12 @@
-﻿using KLineEdCmdApp.Model;
+﻿using System.Diagnostics.CodeAnalysis;
+using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ModelTests
 {
+    [SuppressMessage("ReSharper", "UnusedVariable")]
     public class BodyLeftJustificationTests
     {
         [Fact]

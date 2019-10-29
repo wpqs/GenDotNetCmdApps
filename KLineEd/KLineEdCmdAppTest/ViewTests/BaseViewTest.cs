@@ -36,22 +36,22 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.View.Ready);
 
             Assert.True( _fixture.View.DisplayMsg(BaseView.MsgType.Info, "test"));
-            Assert.Equal($"{BaseView.InfoMsgPrecursor} test", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"{BaseView.InfoMsgPrecursor} test", _fixture.View.LastConsoleOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Warning, "testx"));
-            Assert.Equal($"{BaseView.WarnMsgPrecursor} testx", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"{BaseView.WarnMsgPrecursor} testx", _fixture.View.LastConsoleOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Error, "testy"));
-            Assert.Equal($"{BaseView.ErrorMsgPrecursor} testy", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"{BaseView.ErrorMsgPrecursor} testy", _fixture.View.LastConsoleOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Error, null));
-            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastConsoleOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Warning, null));
-            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastConsoleOutput);
 
             Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Info, null));
-            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+            Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastConsoleOutput);
         }
 
 
@@ -62,13 +62,13 @@ namespace KLineEdCmdAppTest.ViewTests
 
         //    var errMsg = BaseView.FormatMxErrorMsg(1010102, BaseView.ErrorType.user, "msg");
         //    _fixture.View.DisplayMxErrorMsg(errMsg);
-        //    Assert.Equal($"error 1010102-user: msg", _fixture.View.LastTerminalOutput);
+        //    Assert.Equal($"error 1010102-user: msg", _fixture.View.LastConsoleOutput);
 
         //    _fixture.View.DisplayMxErrorMsg(null);
-        //    Assert.Equal($"error 1110201-program: DisplayMsg is null", _fixture.View.LastTerminalOutput);
+        //    Assert.Equal($"error 1110201-program: DisplayMsg is null", _fixture.View.LastConsoleOutput);
 
         //    _fixture.View.DisplayMxErrorMsg("xyz"); //typical use is DisplayMxErrorMsg(rc.GetErrorUserMsg()) so MxReturnCode is responsible for formatting the message string; no checks made in this regard 
-        //    Assert.Equal($"{BaseView.ErrorMsgPrecursor} xyz", _fixture.View.LastTerminalOutput);
+        //    Assert.Equal($"{BaseView.ErrorMsgPrecursor} xyz", _fixture.View.LastConsoleOutput);
 
         //}
     }

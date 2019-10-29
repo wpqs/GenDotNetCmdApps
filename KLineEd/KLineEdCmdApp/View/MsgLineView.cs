@@ -10,7 +10,7 @@ namespace KLineEdCmdApp.View
     [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     public class MsgLineView : BaseView
     {
-        public MsgLineView(ITerminal terminal) : base(terminal)
+        public MsgLineView(IMxConsole console) : base(console)
         {
         }
 
@@ -26,7 +26,7 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    if (Terminal.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour) == false)
+                    if (Console.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour) == false)
                         rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", MxMsgs.MxErrInvalidCondition);
                     else
                     {

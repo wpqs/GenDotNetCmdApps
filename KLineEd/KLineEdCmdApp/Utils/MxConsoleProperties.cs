@@ -5,7 +5,8 @@ namespace KLineEdCmdApp.Utils
 {
     [SuppressMessage("ReSharper", "SimplifyConditionalTernaryExpression")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class TerminalProperties
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
+    public class MxConsoleProperties
     {
         public const string DefaultTitle = Program.ValueNotSet;
 
@@ -40,7 +41,7 @@ namespace KLineEdCmdApp.Utils
 
         public bool IsError(){ return Error;}
 
-        public TerminalProperties()
+        public MxConsoleProperties()
         {
             Error = SetDefaults() ? false : true;
         }

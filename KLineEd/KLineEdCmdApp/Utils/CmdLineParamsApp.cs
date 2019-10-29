@@ -936,10 +936,10 @@ namespace KLineEdCmdApp.Utils
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
                     rc.SetError(1020313, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayCols}' is invalid for '{ArgTextEditorDisplayCols}'");
                 }
-                if (TerminalProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols()) != null)
+                if (MxConsoleProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols()) != null)
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
-                    rc.SetError(1020314, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; {TerminalProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols())}");
+                    rc.SetError(1020314, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; {MxConsoleProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols())}");
                 }
                 if (TextEditorParaBreakDisplayChar == Program.NullChar)
                 {

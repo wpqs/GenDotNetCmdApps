@@ -33,7 +33,7 @@ namespace KLineEdCmdApp.View
             PathFileName = 8
         }
 
-        public PropsEditView(ITerminal terminal) : base(terminal) { }
+        public PropsEditView(IMxConsole console) : base(console) { }
 
         public override void OnUpdate(NotificationItem notificationItem)
         {

@@ -84,7 +84,7 @@ namespace KLineEdCmdApp
         public const int SpellEditViewFirst =           1160101; //first error code in class SpellEditViewView.cs
 
         public const int StatusLineViewFirst =          1200101; //first error code in class StatusLineView.cs
-        public const int TerminalFirst =                1210101; //first error code in class Terminal.cs
+        public const int MxConsoleFirst =               1210101; //first error code in class MxConsole.cs
         public const int ControllerFactoryFirst =       1220101; //first error code in class ControllerFactory.cs
         public const int PropsEditingControllerFirst =  1230101; //first error code in class PropsEditingController.cs
         public const int TextEditingControllerFirst =   1240101; //first error code in class TextEditingController.cs

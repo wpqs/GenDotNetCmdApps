@@ -21,7 +21,7 @@ namespace KLineEdCmdAppTest.ViewTests
 
             _fixture.Model.SetStatusLine();
             Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
-            Assert.Contains("Words:", _fixture.View.LastTerminalOutput);
+            Assert.Contains("Words:", _fixture.View.LastConsoleOutput);
 
         }
     }

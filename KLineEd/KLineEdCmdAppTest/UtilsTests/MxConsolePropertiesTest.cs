@@ -4,33 +4,33 @@ using Xunit;
 
 namespace KLineEdCmdAppTest.UtilsTests
 {
-    public class TerminalPropertiesTest
+    public class MxConsolePropertiesTest
     {
         [Fact]
         public void NoParamTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             Assert.False(props.IsError());
         }
 
         [Fact]
         public void ValidateDefaultTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             Assert.True(props.Validate());
         }
 
         [Fact]
         public void GetValidationErrorTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             Assert.Null(props.GetValidationError());
         }
 
         [Fact]
         public void GetValidationErrorTitleTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.Title = null;
             Assert.Equal($"Title is null", props.GetValidationError());
         }
@@ -38,57 +38,57 @@ namespace KLineEdCmdAppTest.UtilsTests
         [Fact]
         public void GetValidationErrorBufferHeightTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.BufferHeight = -1;
-            Assert.Equal($"BufferHeight={props.BufferHeight} is out of range (WindowTop={TerminalProperties.DefaultWindowTop}, WindowHeight={TerminalProperties.DefaultWindowHeight})", props.GetValidationError());
+            Assert.Equal($"BufferHeight={props.BufferHeight} is out of range (WindowTop={MxConsoleProperties.DefaultWindowTop}, WindowHeight={MxConsoleProperties.DefaultWindowHeight})", props.GetValidationError());
             props.BufferHeight = Int16.MaxValue;
-            Assert.Equal($"BufferHeight={props.BufferHeight} is out of range (WindowTop={TerminalProperties.DefaultWindowTop}, WindowHeight={TerminalProperties.DefaultWindowHeight})", props.GetValidationError());
+            Assert.Equal($"BufferHeight={props.BufferHeight} is out of range (WindowTop={MxConsoleProperties.DefaultWindowTop}, WindowHeight={MxConsoleProperties.DefaultWindowHeight})", props.GetValidationError());
             props.BufferHeight = props.WindowTop + props.WindowHeight - 1;
-            Assert.Equal($"BufferHeight={props.BufferHeight} is out of range (WindowTop={TerminalProperties.DefaultWindowTop}, WindowHeight={TerminalProperties.DefaultWindowHeight})", props.GetValidationError());
+            Assert.Equal($"BufferHeight={props.BufferHeight} is out of range (WindowTop={MxConsoleProperties.DefaultWindowTop}, WindowHeight={MxConsoleProperties.DefaultWindowHeight})", props.GetValidationError());
         }
 
         [Fact]
         public void GetValidationErrorBufferWidthTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.BufferWidth = -1;
-            Assert.Equal($"BufferWidth={ props.BufferWidth} is out of range (WindowLeft={TerminalProperties.DefaultWindowLeft}, WindowWidth={TerminalProperties.DefaultWindowWidth})", props.GetValidationError());
+            Assert.Equal($"BufferWidth={ props.BufferWidth} is out of range (WindowLeft={MxConsoleProperties.DefaultWindowLeft}, WindowWidth={MxConsoleProperties.DefaultWindowWidth})", props.GetValidationError());
             props.BufferWidth = Int16.MaxValue;
-            Assert.Equal($"BufferWidth={ props.BufferWidth} is out of range (WindowLeft={TerminalProperties.DefaultWindowLeft}, WindowWidth={TerminalProperties.DefaultWindowWidth})", props.GetValidationError());
+            Assert.Equal($"BufferWidth={ props.BufferWidth} is out of range (WindowLeft={MxConsoleProperties.DefaultWindowLeft}, WindowWidth={MxConsoleProperties.DefaultWindowWidth})", props.GetValidationError());
             props.BufferWidth = props.WindowLeft + props.WindowWidth - 1;
-            Assert.Equal($"BufferWidth={ props.BufferWidth} is out of range (WindowLeft={TerminalProperties.DefaultWindowLeft}, WindowWidth={TerminalProperties.DefaultWindowWidth})", props.GetValidationError());
+            Assert.Equal($"BufferWidth={ props.BufferWidth} is out of range (WindowLeft={MxConsoleProperties.DefaultWindowLeft}, WindowWidth={MxConsoleProperties.DefaultWindowWidth})", props.GetValidationError());
         }
 
         [Fact]
         public void GetValidationErrorWindowHeightTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.WindowHeight = -1;
-            Assert.Equal($"WindowHeight={props.WindowHeight} is out of range (WindowTop={TerminalProperties.DefaultWindowTop})", props.GetValidationError());
+            Assert.Equal($"WindowHeight={props.WindowHeight} is out of range (WindowTop={MxConsoleProperties.DefaultWindowTop})", props.GetValidationError());
             //caught by BufferHeight test
             //props.WindowHeight = Int16.MaxValue; 
-            //Assert.Equal($"error WindowHeight={props.WindowHeight} is out of range (WindowTop={TerminalProperties.DefaultWindowTop})", props.GetValidationError());
+            //Assert.Equal($"error WindowHeight={props.WindowHeight} is out of range (WindowTop={MxConsoleProperties.DefaultWindowTop})", props.GetValidationError());
             //props.WindowHeight = Console.LargestWindowHeight + 1;
-            //Assert.Equal($"error WindowHeight={props.WindowHeight} is out of range (WindowTop={TerminalProperties.DefaultWindowTop})", props.GetValidationError());
+            //Assert.Equal($"error WindowHeight={props.WindowHeight} is out of range (WindowTop={MxConsoleProperties.DefaultWindowTop})", props.GetValidationError());
         }
 
         [Fact]
         public void GetValidationErrorWindowWidthTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.WindowWidth = -1;
-            Assert.Equal($"WindowWidth={props.WindowWidth} is out of range (WindowLeft={TerminalProperties.DefaultWindowLeft})", props.GetValidationError());
+            Assert.Equal($"WindowWidth={props.WindowWidth} is out of range (WindowLeft={MxConsoleProperties.DefaultWindowLeft})", props.GetValidationError());
             //caught by BufferWidth test 
             //props.WindowWidth = Int16.MaxValue;
-            //Assert.Equal($"error WindowWidth={props.WindowWidth} is out of range (WindowLeft={TerminalProperties.DefaultWindowLeft})", props.GetValidationError());
+            //Assert.Equal($"error WindowWidth={props.WindowWidth} is out of range (WindowLeft={MxConsoleProperties.DefaultWindowLeft})", props.GetValidationError());
             //props.WindowWidth = Console.LargestWindowWidth;
-            //Assert.Equal($"error WindowWidth={props.WindowWidth} is out of range (WindowLeft={TerminalProperties.DefaultWindowLeft})", props.GetValidationError());
+            //Assert.Equal($"error WindowWidth={props.WindowWidth} is out of range (WindowLeft={MxConsoleProperties.DefaultWindowLeft})", props.GetValidationError());
         }
 
         [Fact]
         public void GetValidationErrorWindowTopTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.WindowTop = -1;
             Assert.Equal($"WindowTop={props.WindowTop} is less than zero", props.GetValidationError());
             props.WindowHeight = 50;
@@ -101,7 +101,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         [Fact]
         public void GetValidationErrorWindowLeftTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.WindowLeft = -1;
             Assert.Equal($"WindowLeft={props.WindowLeft} is less than zero", props.GetValidationError());
 
@@ -116,7 +116,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         [Fact]
         public void GetValidationErrorCursorSizeTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.CursorSize = 0;
             Assert.Equal($"CursorSize={props.CursorSize} is out of range 1-100", props.GetValidationError());
             props.CursorSize = 101;
@@ -126,21 +126,21 @@ namespace KLineEdCmdAppTest.UtilsTests
         [Fact]
         public void GetValidationErrorCursorTopTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.CursorTop = -1;
-            Assert.Equal($"CursorTop={props.CursorTop} is out of range (BufferHeight={TerminalProperties.DefaultBufferHeight})", props.GetValidationError());
+            Assert.Equal($"CursorTop={props.CursorTop} is out of range (BufferHeight={MxConsoleProperties.DefaultBufferHeight})", props.GetValidationError());
             props.CursorTop = props.BufferHeight;
-            Assert.Equal($"CursorTop={props.CursorTop} is out of range (BufferHeight={TerminalProperties.DefaultBufferHeight})", props.GetValidationError());
+            Assert.Equal($"CursorTop={props.CursorTop} is out of range (BufferHeight={MxConsoleProperties.DefaultBufferHeight})", props.GetValidationError());
 
         }
         [Fact]
         public void GetValidationErrorCursorLeftTest()
         {
-            var props = new TerminalProperties();
+            var props = new MxConsoleProperties();
             props.CursorLeft = -1;
-            Assert.Equal($"CursorLeft={props.CursorLeft} is out of range (BufferWidth={TerminalProperties.DefaultBufferWidth})", props.GetValidationError());
+            Assert.Equal($"CursorLeft={props.CursorLeft} is out of range (BufferWidth={MxConsoleProperties.DefaultBufferWidth})", props.GetValidationError());
             props.CursorLeft = props.BufferWidth;
-            Assert.Equal($"CursorLeft={props.CursorLeft} is out of range (BufferWidth={TerminalProperties.DefaultBufferWidth})", props.GetValidationError());
+            Assert.Equal($"CursorLeft={props.CursorLeft} is out of range (BufferWidth={MxConsoleProperties.DefaultBufferWidth})", props.GetValidationError());
 
         }
     }

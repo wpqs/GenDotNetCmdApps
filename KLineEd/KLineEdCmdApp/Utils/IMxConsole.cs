@@ -6,7 +6,7 @@ using MxReturnCode;
 namespace KLineEdCmdApp.Utils
 {
     [SuppressMessage("ReSharper", "IdentifierTypo")]
-    public interface ITerminal
+    public interface IMxConsole
     {
         MxReturnCode<MxReturnCode<bool>> GetMxError();
         bool IsError();
@@ -15,9 +15,9 @@ namespace KLineEdCmdApp.Utils
         string GetErrorTechMsg();
         string GetErrorUserMsg();
 
-        bool Setup(TerminalProperties props);
+        bool Setup(MxConsoleProperties props);
         MxReturnCode<bool> Close();
-        TerminalProperties GetSettings();
+        MxConsoleProperties GetSettings();
 
         bool Clear();
 

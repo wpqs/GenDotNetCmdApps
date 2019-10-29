@@ -44,7 +44,7 @@ namespace KLineEdCmdAppTest
         //{
         //    var edit = new Edit();
 
-        //    var rcEdit = edit.Start(_screen.Terminal, null);
+        //    var rcEdit = edit.Start(_screen.MxConsole, null);
 
         //    Assert.StartsWith("error 1040101-param: [null] is invalid", rcEdit.GetErrorTechMsg());
 
@@ -59,7 +59,7 @@ namespace KLineEdCmdAppTest
         //{
         //    var edit = new Edit();
 
-        //    var rcEdit = edit.Start(_screen.Terminal, "xxx");
+        //    var rcEdit = edit.Start(_screen.MxConsole, "xxx");
 
         //    Assert.StartsWith("error 1040102-program: editFile=xxx", rcEdit.GetErrorTechMsg());
         //    Assert.False(rcEdit.GetResult());
@@ -75,7 +75,7 @@ namespace KLineEdCmdAppTest
         //{
         //    var edit = new Edit();
 
-        //    var rcEdit = edit.Start(_screen.Terminal, ScreenFixture.UnitTestEditFileName);
+        //    var rcEdit = edit.Start(_screen.MxConsole, ScreenFixture.UnitTestEditFileName);
         //    Assert.True(rcEdit.GetResult());
 
         //    Assert.True(edit.InitDone);
@@ -104,7 +104,7 @@ namespace KLineEdCmdAppTest
         //{
         //    var edit = new Edit();
 
-        //    var rcEdit = edit.Start(_screen.Terminal, ScreenFixture.UnitTestEditFileName);
+        //    var rcEdit = edit.Start(_screen.MxConsole, ScreenFixture.UnitTestEditFileName);
         //    Assert.True(rcEdit.GetResult());
 
         //    Assert.True(edit.InitDone);
@@ -133,7 +133,7 @@ namespace KLineEdCmdAppTest
         //{
         //    var edit = new Edit();
 
-        //    var rcEdit = edit.Start(_screen.Terminal, ScreenFixture.UnitTestEditFileName);
+        //    var rcEdit = edit.Start(_screen.MxConsole, ScreenFixture.UnitTestEditFileName);
         //    Assert.True(rcEdit.GetResult());
 
         //    Assert.True(edit.InitDone);

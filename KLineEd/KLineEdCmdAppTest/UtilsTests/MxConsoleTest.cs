@@ -1,12 +1,42 @@
 ﻿using System;
-using KLineEdCmdApp;
-using KLineEdCmdApp.Utils;
 using Xunit;
+using KLineEdCmdApp.Utils;
+using KLineEdCmdApp;
 
 namespace KLineEdCmdAppTest.UtilsTests
 {
-    public class MxConsoleColorTest
+    public class MxConsoleTest
     {
+        [Fact]
+        public void NoParamTest()
+        {
+            var console = new MxConsole();
+
+            Assert.True(console.IsError());
+        }
+
+        [Fact]
+        public void SetupTest()
+        {
+            var console = new MxConsole();
+            Assert.True(console.IsError());
+
+            var props = new MxConsoleProperties();
+            Assert.True(console.Setup(props));
+            Assert.True(console.IsError() == false);
+        }
+
+        [Fact]
+        public void GetSettingsTest()
+        {
+            var console = new MxConsole();
+
+            var props = console.GetSettings();
+            Assert.True(props.IsError() == false);
+
+            Assert.True(console.Setup(props));
+            Assert.True(console.IsError() == false);
+        }
 
         [Fact]
         public void GetConsoleColorTest()
@@ -135,6 +165,5 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.Equal(result, MxConsole.GetMxConsoleColorNameList(separator));
 
         }
-
     }
 }

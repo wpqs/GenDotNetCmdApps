@@ -13,7 +13,7 @@ namespace KLineEdCmdApp.View
     [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-
+    [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
     public class TextEditView : EditAreaView
     {
         public static readonly string TextEditorMode = "Editor:";
@@ -21,7 +21,7 @@ namespace KLineEdCmdApp.View
 
 
         // ReSharper disable once RedundantBaseConstructorCall
-        public TextEditView(ITerminal terminal) : base(terminal)
+        public TextEditView(IMxConsole console) : base(console)
         {
         }
 
@@ -85,7 +85,7 @@ namespace KLineEdCmdApp.View
                                 case ChapterModel.ChangeHint.End:
                                 case ChapterModel.ChangeHint.All:
                                 {
-                                    Terminal.SetCursorVisible(false);
+                                    Console.SetCursorVisible(false);
 
                                     var rcRes = model.ChapterBody.GetEditAreaLinesForDisplay(EditAreaHeight);
                                     rc += rcRes;
@@ -117,12 +117,12 @@ namespace KLineEdCmdApp.View
                                                 rc.SetResult(true);
                                         }
                                     }
-                                    Terminal.SetCursorVisible(CursorOn);
+                                    Console.SetCursorVisible(CursorOn);
                                     break;
                                 }
                                 case ChapterModel.ChangeHint.Line: //only change to line so just update line at cursor.rowIndex 
                                 {
-                                    Terminal.SetCursorVisible(false);
+                                    Console.SetCursorVisible(false);
 
                                     var rcRes = model.ChapterBody.GetEditAreaCursorLineForDisplay();
                                     rc += rcRes;
@@ -136,7 +136,7 @@ namespace KLineEdCmdApp.View
                                                 rc.SetResult(true);
                                         }
                                     }
-                                    Terminal.SetCursorVisible(true);
+                                    Console.SetCursorVisible(true);
                                     break;
                                 }
                                 case ChapterModel.ChangeHint.Cursor:
