@@ -15,7 +15,7 @@ namespace KLineEdCmdApp.Utils
         string GetErrorTechMsg();
         string GetErrorUserMsg();
 
-        bool Setup(MxConsoleProperties props);
+        bool ApplySettings(MxConsoleProperties props, bool restore=false);
         MxReturnCode<bool> Close();
         MxConsoleProperties GetSettings();
 

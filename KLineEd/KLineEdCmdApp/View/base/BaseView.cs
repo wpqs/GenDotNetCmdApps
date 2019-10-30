@@ -110,7 +110,7 @@ namespace KLineEdCmdApp.View.Base
 
         public virtual MxReturnCode<bool> Setup(CmdLineParamsApp param)
         {
-            var rc = new MxReturnCode<bool>("BaseView.Setup");
+            var rc = new MxReturnCode<bool>("BaseView.ApplySettings");
 
             if (param == null)
                 rc.SetError(1110101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);

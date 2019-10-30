@@ -24,7 +24,7 @@ namespace KLineEdCmdApp.View
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
         {
-            var rc = new MxReturnCode<bool>("StatusLineView.Setup");
+            var rc = new MxReturnCode<bool>("StatusLineView.ApplySettings");
 
             if (param == null)
                 rc.SetError(1200101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);

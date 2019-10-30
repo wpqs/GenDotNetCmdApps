@@ -29,7 +29,7 @@ Development work v1.0.43.0
 	
 	- done move Terminal into MxConsole and rename ITerminal as IMxConsole
 	- done rename TerminalTests to MxConsoleTests
-    - clear entire window after abend or reset
+    - not done - clear entire window after abend or reset - see https://github.com/microsoft/terminal/issues/3374
 	- Detect any change in the Command Window Size and restore 
 	- Check Chapter/Session stats are correct
 	- BugFixes 

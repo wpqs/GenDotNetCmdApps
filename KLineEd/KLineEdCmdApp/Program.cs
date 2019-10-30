@@ -108,6 +108,7 @@ namespace KLineEdCmdApp
                 console.WriteLines(cmdLineParams.ToString().Split(Environment.NewLine));
 
             console.WriteLine((rc.IsSuccess()) ? $"program ends - bye-bye :-) return code {rc.GetResult()} - success" : $"program abends: return code {rc.GetResult()} - failure");
+
             return rc.GetResult();
         }
 
@@ -175,7 +176,7 @@ namespace KLineEdCmdApp
                                 var rcRun = editor.Run(cmdLineParams, editModel, console);
                                 rc += rcRun; //same as rc.SetResult(rcRun.GetResult());
 
-                                if (console.Setup(originalSettings) == false)
+                                if (console.ApplySettings(originalSettings, true) == false)
                                     rc.SetError(1010303, console.GetErrorSource(), $"MxConsole settings not restored. {console.GetErrorTechMsg()}", console.GetErrorUserMsg());
                                 else
                                 {

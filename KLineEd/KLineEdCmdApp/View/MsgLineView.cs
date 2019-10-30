@@ -16,7 +16,7 @@ namespace KLineEdCmdApp.View
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
         {
-            var rc = new MxReturnCode<bool>("MsgLineView.Setup");
+            var rc = new MxReturnCode<bool>("MsgLineView.ApplySettings");
 
             if (param == null)
                 rc.SetError(1130101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);

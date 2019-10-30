@@ -21,7 +21,7 @@ namespace KLineEdCmdAppTest.TestSupport
         public MockMxConsole()
         {
             _mxErrorCode = new MxReturnCode<bool>($"MockMxConsole.Ctor", false); //SetResult(true) on error
-            _mxErrorCode.SetError(9210201, MxError.Source.Program, "MxConsole.Setup not called");
+            _mxErrorCode.SetError(9210201, MxError.Source.Program, "MxConsole.ApplySettings not called");
             CursorRow = 0;
             CursorColumn = 0;
             ForeGndColour = MxConsole.Color.Gray;
@@ -47,7 +47,7 @@ namespace KLineEdCmdAppTest.TestSupport
             return true;
         }
 
-        public bool Setup(MxConsoleProperties props)
+        public bool ApplySettings(MxConsoleProperties props, bool restore=false)
         {
             _mxErrorCode.SetResult(true);
             return true;

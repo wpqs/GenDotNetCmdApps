@@ -66,7 +66,7 @@ namespace KLineEdCmdApp.Utils
         public MxConsole()
         {
             _mxErrorCode = new MxReturnCode<bool>($"MxConsole.Ctor", false); //SetResult(true) on error
-            _mxErrorCode.SetError(1210101, MxError.Source.Program, "MxConsole.Setup not called");
+            _mxErrorCode.SetError(1210101, MxError.Source.Program, "MxConsole.ApplySettings not called");
             CursorSize = MxConsoleProperties.DefaultCursorSize;
         }
 
@@ -94,7 +94,7 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
-        public bool Setup(MxConsoleProperties props)
+        public bool ApplySettings(MxConsoleProperties props, bool restore=false)
         {
             if ((props == null) || (props.IsError()))
                 _mxErrorCode.SetError(1210201, MxError.Source.Data, props?.GetValidationError() ?? Program.ValueNotSet, MxMsgs.MxErrInvalidSettingsFile);
@@ -102,22 +102,32 @@ namespace KLineEdCmdApp.Utils
             {
                 try
                 {
+                    Console.WindowTop = 0;
+                    Console.WindowLeft = 0;
+
+                    if (restore == false)
+                    {
+                        Console.SetWindowSize(props.WindowWidth, props.WindowHeight); //must set window before buffer
+                        Console.SetBufferSize(props.BufferWidth, props.BufferHeight);
+                        Console.WindowTop = 0; //props.WindowTop;
+                        Console.WindowLeft = 0; //props.WindowLeft;
+                    }
+                    else
+                    {
+                        Console.SetBufferSize(Console.BufferWidth, props.BufferHeight);
+                    }
+
                     Console.Title = props.Title;
-
-                    Console.SetWindowSize(props.WindowWidth, props.WindowHeight); //must set window before buffer
-                    Console.SetBufferSize(props.BufferWidth, props.BufferHeight);
-
                     CursorSize = props.CursorSize;
                     Console.CursorSize = props.CursorSize;
-                    Console.WindowTop = props.WindowTop;
-                    Console.WindowLeft = props.WindowLeft;
                     Console.CursorTop = props.CursorTop;
                     Console.CursorLeft = props.CursorLeft;
-                    Console.ForegroundColor = MxConsole.GetConsoleColor(props.ForegroundColor);
-                    Console.BackgroundColor = MxConsole.GetConsoleColor(props.BackgroundColor);
                     Console.TreatControlCAsInput = props.TreateCtrlCAsInput;
 
-                     if (Clear(true) == false)
+                    Console.ForegroundColor = MxConsole.GetConsoleColor(props.ForegroundColor); 
+                    Console.BackgroundColor = MxConsole.GetConsoleColor(props.BackgroundColor); 
+
+                    if (Clear(true) == false)
                         _mxErrorCode.SetError(1210202, MxError.Source.Sys, "MxConsole.Clear() failed", MxMsgs.MxErrSystemFailure);
                     else
                     {

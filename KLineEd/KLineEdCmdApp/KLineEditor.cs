@@ -227,7 +227,7 @@ namespace KLineEdCmdApp
                         rc.SetError(1030202, MxError.Source.Sys, $"settings.Validate() failed; {settings.GetValidationError()}");
                     else
                     {
-                        if (console.Setup(settings) == false)
+                        if (console.ApplySettings(settings) == false)
                             rc.SetError(1030203, console.GetErrorSource(), console.GetErrorTechMsg(), console.GetErrorUserMsg());
                         else
                         {
@@ -248,7 +248,7 @@ namespace KLineEdCmdApp
 
         private MxReturnCode<bool> Start(ChapterModel model)
         {
-            var rc = new MxReturnCode<bool>("Edit.Setup");
+            var rc = new MxReturnCode<bool>("Edit.ApplySettings");
 
             if ((model == null) || (model.Ready == false)  )
                 rc.SetError(1030301, MxError.Source.Param, $"model is {((model == null) ? "[null]" : "[not ready]")}", MxMsgs.MxErrBadMethodParam);
@@ -330,7 +330,7 @@ namespace KLineEdCmdApp
                                 }
                                 if (Controller?.IsRefresh() ?? true)
                                 {
-                                    Console.Setup(consoleSettings);
+                                    Console.ApplySettings(consoleSettings);
                                     Model.Refresh();
                                 }
                                 if (Controller?.IsQuit() ?? true)

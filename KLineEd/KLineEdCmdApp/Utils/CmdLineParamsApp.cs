@@ -29,7 +29,7 @@ namespace KLineEdCmdApp.Utils
     // b) add properties for args (SettingsPathFileName, UpdateSettingsFile) 
     // c) add ToString()
     // d) update SetDefaultValues() SetFactoryDefaults() and UpdateProperties()
-    // e) add item enum Param (Settings)
+    // e) add item enum Param (ApplySettings)
     // f) update ParamProc() and create new private method like SettingsParamProc()
     // g) optionally update ValidateParams()
     // h) add GetHelpInfoxxx() for new parameter

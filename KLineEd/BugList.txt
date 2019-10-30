@@ -6,3 +6,4 @@ BugList
 	2. pressing { key
 	3. Error 1110402 BaseView.DisplayLine() throws an exception so returns null - happens when no final parabreak and empty bottom line
 	4. Bad error msg "error: error 1110402: Error: invalid condition..." - doesn't terminate either
+	5. MxConsole.Setup() - doesn't report exception 

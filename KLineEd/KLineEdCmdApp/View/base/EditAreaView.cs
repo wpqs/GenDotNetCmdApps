@@ -37,7 +37,7 @@ namespace KLineEdCmdApp.View.Base
 
         public override MxReturnCode<bool> Setup(CmdLineParamsApp param)
         {
-            var rc = new MxReturnCode<bool>("EditAreaView.Setup");
+            var rc = new MxReturnCode<bool>("EditAreaView.ApplySettings");
 
             if (param == null)
                 rc.SetError(1170101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
@@ -101,7 +101,7 @@ namespace KLineEdCmdApp.View.Base
                         {
                             for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
                             {
-                                //var blank = $"{editAreaRowIndex}";         ////see also BaseView.Setup()
+                                //var blank = $"{editAreaRowIndex}";         ////see also BaseView.ApplySettings()
                                 //blank = blank.PadRight(EditAreaWidth - 2, ',');
                                 //blank += "o";
                                 //DisplayLine(KLineEditor.EditAreaTopRowIndex+editAreaRowIndex, KLineEditor.EditAreaMarginLeft, blank, true);
