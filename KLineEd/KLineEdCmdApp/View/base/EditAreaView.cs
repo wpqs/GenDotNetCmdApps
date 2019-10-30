@@ -40,7 +40,7 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("EditAreaView.Setup");
 
             if (param == null)
-                rc.SetError(1140101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1170101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var rcBase = base.Setup(param);
@@ -73,7 +73,7 @@ namespace KLineEdCmdApp.View.Base
             if (IsOnUpdateError() == false)
             {
                 if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                    SetMxError(1140202, Console.GetErrorSource(), $"MxConsole: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                    SetMxError(1170201, Console.GetErrorSource(), $"MxConsole: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
             }
         }
 
@@ -84,7 +84,7 @@ namespace KLineEdCmdApp.View.Base
             Console.SetCursorVisible(false);
 
             if (Console.SetColour(RuleForeGndColour, RuleBackGndColour) == false)
-                rc.SetError(1140301, Console.GetErrorSource(), $"TextEditView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                rc.SetError(1170301, Console.GetErrorSource(), $"TextEditView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
             else
             {
                 var rcTop = DisplayLine(KLineEditor.EditAreaMarginTopRuleIndex, KLineEditor.EditAreaMarginLeft, TopRule);
@@ -96,7 +96,7 @@ namespace KLineEdCmdApp.View.Base
                     if (rcBot.IsSuccess(true))
                     {
                         if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                            rc.SetError(1140302, Console.GetErrorSource(), $"EditAreaView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                            rc.SetError(1170302, Console.GetErrorSource(), $"EditAreaView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
                         else
                         {
                             for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
@@ -127,11 +127,11 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("EditAreaView.SetEditAreaCursorPosition");
 
             if ((editAreaRowIndex < 0) || (editAreaRowIndex >= EditAreaHeight) || (editAreaColIndex < 0) || (editAreaColIndex >= WindowWidth - 1))
-                rc.SetError(1140401, MxError.Source.Param, $"SetCursor= row{editAreaRowIndex} (max={EditAreaHeight}), col={editAreaColIndex} (max={WindowWidth - 1})", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1170401, MxError.Source.Param, $"SetCursor= row{editAreaRowIndex} (max={EditAreaHeight}), col={editAreaColIndex} (max={WindowWidth - 1})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (Console.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editAreaRowIndex, KLineEditor.EditAreaMarginLeft + editAreaColIndex) == false)
-                    rc.SetError(1110402, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
+                    rc.SetError(1170402, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
                 else
                     rc.SetResult(true);
             }
@@ -143,12 +143,12 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<CursorPosition>("EditAreaView.GetEditAreaCursorPosition");
 
             if ((EditAreaHeight < 0) || (chapterRowIndex < 0) ||  (chapterColIndex < 0) || (editAreaTopLineChapterIndex < 0) || (editAreaTopLineChapterIndex > chapterRowIndex))
-                rc.SetError(1140501, MxError.Source.Param, $"row{chapterRowIndex} col={chapterColIndex}, editAreaTopLineChapterIndex={editAreaTopLineChapterIndex} (EditAreaHeight={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1170501, MxError.Source.Param, $"row{chapterRowIndex} col={chapterColIndex}, editAreaTopLineChapterIndex={editAreaTopLineChapterIndex} (EditAreaHeight={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var editAreaRowIndex = chapterRowIndex - editAreaTopLineChapterIndex; 
                 if ((editAreaRowIndex < 0) || (editAreaRowIndex > (EditAreaHeight-1)))
-                    rc.SetError(1140502, MxError.Source.Program, $"editAreaRowIndex={editAreaRowIndex} EditAreaHeight={EditAreaHeight}", MxMsgs.MxErrInvalidCondition);
+                    rc.SetError(1170502, MxError.Source.Program, $"editAreaRowIndex={editAreaRowIndex} EditAreaHeight={EditAreaHeight}", MxMsgs.MxErrInvalidCondition);
                 else
                     rc.SetResult(new CursorPosition(editAreaRowIndex, chapterColIndex));
             }
@@ -159,7 +159,7 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("EditAreaView.DisplayEditAreaLine");
 
             if ((line == null) || (editRowIndex < 0) || (editRowIndex >= EditAreaHeight))
-                rc.SetError(1140601, MxError.Source.Param, $"line is null or row={editRowIndex} (max={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1170601, MxError.Source.Param, $"line is null or row={editRowIndex} (max={EditAreaHeight})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 rc += DisplayLine(KLineEditor.EditAreaTopRowIndex + editRowIndex, KLineEditor.EditAreaMarginLeft, line, clear);
@@ -176,7 +176,7 @@ namespace KLineEdCmdApp.View.Base
             var rc = new MxReturnCode<bool>("EditAreaView.DisplayEditAreaWord");
 
             if ((word == null) || (editRowIndex < 0) || (editRowIndex >= EditAreaHeight) || (editColIndex < 0) || (editColIndex >= EditAreaWidth))
-                rc.SetError(1140701, MxError.Source.Param, $"word is null or row={editRowIndex} (max={EditAreaHeight}) or col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1170701, MxError.Source.Param, $"word is null or row={editRowIndex} (max={EditAreaHeight}) or col={editColIndex} (max={EditAreaWidth})", MxMsgs.MxErrBadMethodParam);
             else
             {
                 rc += DisplayWord(KLineEditor.EditAreaTopRowIndex + editRowIndex, KLineEditor.EditAreaMarginLeft + editColIndex, word, true);

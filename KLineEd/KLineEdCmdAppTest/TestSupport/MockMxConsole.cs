@@ -42,7 +42,7 @@ namespace KLineEdCmdAppTest.TestSupport
         public string GetErrorTechMsg() { return _mxErrorCode?.GetErrorTechMsg() ?? Program.ValueNotSet; }
         public string GetErrorUserMsg() { return _mxErrorCode?.GetErrorUserMsg() ?? Program.ValueNotSet; }
 
-        public bool Clear()
+        public bool Clear(bool force = false)
         {
             return true;
         }

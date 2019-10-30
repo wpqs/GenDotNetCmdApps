@@ -19,7 +19,7 @@ namespace KLineEdCmdApp.Utils
         MxReturnCode<bool> Close();
         MxConsoleProperties GetSettings();
 
-        bool Clear();
+        bool Clear(bool force = false);
 
         bool SetColour(MxConsole.Color foreGndColour, MxConsole.Color msgLineErrorBackGndColour);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using System.Text;
 using MxReturnCode;
 
 namespace KLineEdCmdApp.Utils
@@ -116,7 +117,7 @@ namespace KLineEdCmdApp.Utils
                     Console.BackgroundColor = MxConsole.GetConsoleColor(props.BackgroundColor);
                     Console.TreatControlCAsInput = props.TreateCtrlCAsInput;
 
-                    if (Clear() == false)
+                     if (Clear(true) == false)
                         _mxErrorCode.SetError(1210202, MxError.Source.Sys, "MxConsole.Clear() failed", MxMsgs.MxErrSystemFailure);
                     else
                     {
@@ -269,11 +270,29 @@ namespace KLineEdCmdApp.Utils
             }
         }
 
-        public bool Clear()
+        public bool Clear(bool force=false)
         {
             try
             {
                 Console.Clear();
+                if (force == true)
+                {
+                    var cursorRow = Console.CursorTop;
+                    var cursorCol = Console.CursorLeft;
+                    var WindowWidth = Console.WindowWidth;
+                    var WindowHeight = Console.WindowHeight;
+                    var blankLine = new StringBuilder(WindowWidth).Insert(0, " ", WindowWidth).ToString();
+
+                    for (int y = 0; y < WindowHeight; y++)
+                    {
+                        Console.CursorLeft = 0;
+                        Console.CursorTop = y;
+                        Console.WriteLine(blankLine);
+                    }
+                    Console.CursorLeft = cursorCol;
+                    Console.CursorTop = cursorRow;
+
+                }
                 _mxErrorCode.SetResult(true);
             }
             catch (Exception e)

@@ -1,7 +1,8 @@
 BugList
 =======
 
-1. GetArgCount() doesn't take account of a single arg in quotes - i.e. 'a b c' returns 3 not 1
-2. Editor problems:
+1. Editor problems:
 	1. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
 	2. pressing { key
+	3. Error 1110402 BaseView.DisplayLine() throws an exception so returns null - happens when no final parabreak and empty bottom line
+	4. Bad error msg "error: error 1110402: Error: invalid condition..." - doesn't terminate either
