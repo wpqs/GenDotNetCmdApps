@@ -56,7 +56,7 @@ namespace KLineEdCmdApp
         public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................";
 
         private EditingBaseController Controller { set; get; }
-        public IMxConsole Console { set; get; }
+        public IMxConsole Console { private set; get; }
         public ChapterModel Model { private set; get; }
 
         public int Width { private set; get; }
@@ -303,14 +303,20 @@ namespace KLineEdCmdApp
                                 if ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusLineUpdateMilliSecs)
                                 {
                                     lastStatusUpdateUtc = DateTime.UtcNow;
-                                    Model.SetStatusLine();            //1. comment out to stop StatusLine refresh during debugging
+                                                                        //1. comment out to stop StatusLine refresh during debugging
+                                    if (Console.IsWindowSizeChanged(consoleSettings.WindowWidth, consoleSettings.WindowHeight))
+                                    {
+                                        Console.ApplySettings(consoleSettings);
+                                        Model.Refresh();
+                                    }
+                                    Model.SetStatusLine();            //2. comment out to stop StatusLine refresh during debugging
                                     if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, false) == false)
                                     {
                                         rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
                                         break;
                                     }
                                     if (Controller.IsError() == false)
-                                        Model.SetMsgLine("");        //2. comment out to stop MsgLine refresh during debugging
+                                        Model.SetMsgLine("");        //3. comment out to stop MsgLine refresh during debugging
                                     Console.SetCursorInsertMode((Controller.IsInsertMode()));
                                 }
                                 if (Console.IsKeyAvailable())

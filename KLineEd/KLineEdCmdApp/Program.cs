@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Net.Mime;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using MxReturnCode;
@@ -36,25 +37,24 @@ namespace KLineEdCmdApp
         public static readonly string CmdAppCopyright = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? Program.ValueNotSet;
         public static readonly string CmdAppHelpUrl = $"https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual" + HelpVersion;
 
+
         static int Main(string[] args)
         {
             var rc = new MxReturnCode<int>(invokeDetails: $"{Program.CmdAppName} v{Program.CmdAppVersion}", defaultResult: PosIntegerNotSet);
 
+            AppDomain.CurrentDomain.UnhandledException += Program_UnhandledException;
             var console = new MxConsole();
             var cmdLineParams = new CmdLineParamsApp();
-            IConfigurationRoot config = null;
 
             try
             {
-                var reporting = true;
-                // var reporting = (CmdLineParams.GetParamValue(args, "--reporting") == "on") ? true : false;
-                if (reporting)
-                    config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile("appsettings.json")?.AddUserSecrets<Program>().Build();
-
-                rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null,
-                    config?["ConnectionStrings:AzureWebJobsServiceBus"], sbqName: config?["MxLogMsg:AzureServiceBusQueueName"]);
-
                 console.WriteLine(Resources.WelcomeNotice, Program.CmdAppName, Program.CmdAppVersion, Program.CmdAppCopyright, Environment.NewLine);
+
+                IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile("appsettings.json")?.AddUserSecrets<Program>().Build();
+                var SBQConn = config?["ConnectionStrings:AzureWebJobsServiceBus"] ?? null;
+                var SBQName = config?["MxLogMsg:AzureServiceBusQueueName"] ?? null;
+
+                rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null,SBQConn, SBQName);
 
                 var rcParams = cmdLineParams.Initialise(args: args);
                 rc += rcParams;
@@ -110,6 +110,23 @@ namespace KLineEdCmdApp
             console.WriteLine((rc.IsSuccess()) ? $"program ends - bye-bye :-) return code {rc.GetResult()} - success" : $"program abends: return code {rc.GetResult()} - failure");
 
             return rc.GetResult();
+        }
+
+        private static void Program_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            try
+            {
+                var logFile = $"{System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? System.IO.Path.GetTempPath())}\\{CmdAppName}Exception.log";
+                using (var file = new StreamWriter(logFile))
+                {
+                    var ex = (Exception) e.ExceptionObject;
+                    file.WriteLine($"Type:{ex?.GetType()?.ToString() ?? "[(Exception) e.ExceptionObject is null]"} {Environment.NewLine}");
+                    file.WriteLine($"Message:{ex?.Message ?? "[(Exception) e.ExceptionObject is null]"} {Environment.NewLine}");
+                    file.WriteLine($"Source:{ex?.Source ?? "[(Exception) e.ExceptionObject is null]"} {Environment.NewLine}");
+                    file.WriteLine($"StackTrace:{ex?.StackTrace ?? "[(Exception) e.ExceptionObject is null]"} {Environment.NewLine}");
+                }
+            }
+            catch (Exception) { }
         }
 
         private static MxReturnCode<string> HelpProcessing(CmdLineParamsApp cmdLineParams, IMxConsole console)

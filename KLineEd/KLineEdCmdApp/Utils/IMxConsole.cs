@@ -21,6 +21,8 @@ namespace KLineEdCmdApp.Utils
 
         bool Clear(bool force = false);
 
+        bool IsWindowSizeChanged(int expectedWidth, int expectedHeight);
+
         bool SetColour(MxConsole.Color foreGndColour, MxConsole.Color msgLineErrorBackGndColour);
 
         bool SetCursorPosition(int row, int column);

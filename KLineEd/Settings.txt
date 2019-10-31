@@ -1,6 +1,9 @@
 Settings.txt
 ============
 
+Path=C:\Program Files\Maximodex\KLineEdCmdApp
+Command Prompt - Properties - Use Legacy console (Microsoft Windows [Version 10.0.18362.418])
+
 The priorty of settings is:
 
 	1) those found in KLineEdCmdApp.json located in working directory. This is the global settings file and is created if not found 

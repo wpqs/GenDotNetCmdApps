@@ -122,7 +122,7 @@ namespace KLineEdCmdApp.Utils
                     Console.CursorSize = props.CursorSize;
                     Console.CursorTop = props.CursorTop;
                     Console.CursorLeft = props.CursorLeft;
-                    Console.TreatControlCAsInput = props.TreateCtrlCAsInput;
+                    Console.TreatControlCAsInput = props.TreatCtrlCAsInput;
 
                     Console.ForegroundColor = MxConsole.GetConsoleColor(props.ForegroundColor); 
                     Console.BackgroundColor = MxConsole.GetConsoleColor(props.BackgroundColor); 
@@ -160,7 +160,7 @@ namespace KLineEdCmdApp.Utils
                 CursorLeft = Console.CursorLeft,
                 ForegroundColor = MxConsole.XlatConsoleColorToMxConsoleColor(Console.ForegroundColor),
                 BackgroundColor = MxConsole.XlatConsoleColorToMxConsoleColor(Console.BackgroundColor),
-                TreateCtrlCAsInput = Console.TreatControlCAsInput
+                TreatCtrlCAsInput = Console.TreatControlCAsInput
             };
             if (props.Validate() == false)
                 _mxErrorCode.SetError(1210301, MxError.Source.Sys, $"Console's existing props are invalid: {props.GetValidationError()}", MxMsgs.MxErrSystemFailure);
@@ -310,6 +310,11 @@ namespace KLineEdCmdApp.Utils
                 _mxErrorCode.SetError(1210901, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
             return (IsError()) ? false : true;
+        }
+
+        public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight)
+        {
+            return ((Console.WindowWidth != expectedWidth) || (Console.WindowHeight != expectedHeight)) ? true : false;
         }
 
         public string WriteLine(string line, params object[] args)

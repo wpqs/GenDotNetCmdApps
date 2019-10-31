@@ -47,6 +47,11 @@ namespace KLineEdCmdAppTest.TestSupport
             return true;
         }
 
+        public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight)
+        {
+            return false;
+        }
+
         public bool ApplySettings(MxConsoleProperties props, bool restore=false)
         {
             _mxErrorCode.SetResult(true);

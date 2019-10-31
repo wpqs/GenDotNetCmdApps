@@ -581,7 +581,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=500" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020313-user: parameter '--display' has a bad argument; value '500' is invalid for 'cols'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020314-user: parameter '--display' has a bad argument; 'cols=500' is invalid on this machine; max value is 204", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -621,7 +621,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=500" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020312-user: parameter '--display' has a bad argument; value '500' is invalid for 'rows'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020314-user: parameter '--display' has a bad argument; 'rows=500' is invalid on this machine; max value is 67", rcParam.GetErrorTechMsg());
         }
 
 

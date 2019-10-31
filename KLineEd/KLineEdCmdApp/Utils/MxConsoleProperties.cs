@@ -35,7 +35,7 @@ namespace KLineEdCmdApp.Utils
         public MxConsole.Color ForegroundColor  { set; get; }
         public MxConsole.Color BackgroundColor  { set; get; }
 
-        public bool TreateCtrlCAsInput { set; get; }
+        public bool TreatCtrlCAsInput { set; get; }
 
         private bool Error { set; get; }
 
@@ -60,7 +60,7 @@ namespace KLineEdCmdApp.Utils
             CursorLeft = DefaultCursorLeft;
             ForegroundColor = DefaultForegroundColor;
             BackgroundColor = DefaultBackgroundColor;
-            TreateCtrlCAsInput = true;
+            TreatCtrlCAsInput = true;
 
             return Validate();
         }

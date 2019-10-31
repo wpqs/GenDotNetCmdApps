@@ -29,24 +29,29 @@ Development work v1.0.43.0
 	
 	- done move Terminal into MxConsole and rename ITerminal as IMxConsole
 	- done rename TerminalTests to MxConsoleTests
-    - not done - clear entire window after abend or reset - see https://github.com/microsoft/terminal/issues/3374
-	- Detect any change in the Command Window Size and restore 
-	- Check Chapter/Session stats are correct
-	- BugFixes 
-	- Test in Production Build
-
-6. Publish and Test
-	- Windows
-	- iOS
-
-7. Create pre-release ZIP for GitHub
+	- done - Detect any change in the Command Window Size and restore 
 
 Development work v1.0.44.0
 --------------------------
 
 1. Build and test with VS2019
 
-2. Refactor Application structure
+2. Prepare for alpha release
+    - Check Chapter/Session stats are correct
+	- BugFixes 
+	- Test in Production Build
+
+3. Publish and Test
+	- Windows
+	- iOS
+
+4. Create pre-release ZIP for GitHub
+	
+
+Development work v1.0.45.0
+--------------------------
+
+1. Refactor Application structure
     - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
@@ -58,7 +63,7 @@ Development work v1.0.44.0
 	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
 
 
-Development work v1.0.45.0
+Development work v1.0.46.0
 --------------------------
 
 1. Implement ModalDlgView - a modal dialog box
@@ -85,7 +90,7 @@ Development work v1.0.45.0
 	- use updated MxDotNetUtils to call SettingsFileProc() appropriately
 
 
-Development work v1.0.46.0
+Development work v1.0.47.0
 --------------------------
 
 1. Implement Secret Manager lookup for json settings (SVN)
@@ -93,7 +98,7 @@ Development work v1.0.46.0
 2. Refactor
     - Update KScribe for new version of MxReturnCode (C++ interop)
 
-Development work v1.0.47.0
+Development work v1.0.48.0
 --------------------------
 
 1. Implement SettingsView - allow command line parameters to be changed from within the Editor
@@ -118,7 +123,7 @@ Development work v1.0.47.0
 
 9. Create Windows/iOS Installer - Wix
 
-Release work v1.1 (first major release)
+Release work v1.1 (first beta release)
 --------------------------------------
 
 1.  Create Logo
