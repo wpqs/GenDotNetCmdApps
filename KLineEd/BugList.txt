@@ -13,3 +13,8 @@ BugList
 		see https://github.com/microsoft/terminal/issues/3374
 3. Install problems:
 	1. appsettings.json (and KLineEdCmdApp.json) must be in the same directory as d:\test\mytest.ksx
+4. Unit test problem
+     https://github.com/xunit/visualstudio.xunit/issues/178
+	 https://developercommunity.visualstudio.com/content/problem/803059/update-to-vs2019-some-tests-now-fail-when-run-from.html
+
+

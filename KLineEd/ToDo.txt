@@ -1,44 +1,15 @@
 Todo: KLineEd
 =============
 
-Development work v1.0.43.0
---------------------------
-
-1. done - Change filetype from .txt to .ksx
-
-2. Implement help, command line parameters/args and settings - see settings.txt
-	done --help									//update help info
-	done --reset									//remove
-	done --settings KLineEdCmdApp.json update	//update KLineEdCmdApp.json from given command line params and args.
-											// If settings parameter not given then read settings from KLineEdCmdApp.json 
-   											// in working directory (if not found create using factory-defaults).  
-3. Implement Fix, Import and Export
-     done --fix 'drive:path\edit.ksx' 'drive:path\new.ksx'			//fix errors in edit.ksx and write to new.ksx - replaced with export and import
-	 done --export create .txt file and copy body.TextLines; add CRLF at the end of each line; replace ParaBreak with double CRLF 
-	 done --import create new .KSX file and read into body.TextLines; replace double CRLF with ParaBreak and remove any remaining CRLF
-
-4. General improvements
-    - done replace ConsoleColor with MxConsole.Colour - same but with UnsetColour= -1
-	- done create tests for MxConsole.Colour
-	- done Autosave and manual save
-	- done Implement view help - help for a particular view
-	- done Implement search - pass word at cursor
-	- done Implement thesaurus - pass word at cursor
-	- done Implement spelling checking - pass word at cursor (but don't implement autocorrect)
-	- done Implement max scroll back - maximum number of lines that the user can scroll back from end of chapter (Home, PgUp, up)
-	
-	- done move Terminal into MxConsole and rename ITerminal as IMxConsole
-	- done rename TerminalTests to MxConsoleTests
-	- done - Detect any change in the Command Window Size and restore 
 
 Development work v1.0.44.0
 --------------------------
 
-1. Build and test with VS2019
+1. done - Build and test with VS2019
 
 2. Prepare for alpha release
-    - Check Chapter/Session stats are correct
 	- BugFixes 
+    - Check Chapter/Session stats are correct
 	- Test in Production Build
 
 3. Publish and Test
@@ -52,7 +23,7 @@ Development work v1.0.45.0
 --------------------------
 
 1. Refactor Application structure
-    - resolve const / readonly issue
+     - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
 	- Rename KLineEdCmdApp Project, KLineEditor.cs and KLineEdCmdApp.json to KScribeCmdApp, KScribeEditor.cs, KScribe.json
@@ -61,6 +32,14 @@ Development work v1.0.45.0
 		- Move Controller, Model, Utils, View from KScribeCmdApp (not Terminal.cs)
 		- Integrate KScribeLib Class Library with KScribeCmdApp - Program.cs, KScribeEditor, Terminal.cs.
 	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
+
+2. Create new GitHub private project in imageqc - KScribe and clone to local C:\Users\wills\source\repos\ImageQC\KScribe
+3. Import code from C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd
+	- test
+	- version
+4. Push changes to KScribe v1.0.45.0
+5. Delete C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd and clone from v1.0.44.0
+    - test
 
 
 Development work v1.0.46.0
