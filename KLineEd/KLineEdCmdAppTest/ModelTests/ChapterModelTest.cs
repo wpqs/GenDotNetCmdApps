@@ -13,6 +13,8 @@ namespace KLineEdCmdAppTest.ModelTests
 
         public ChapterModelTest()
         {
+            if (Directory.Exists(TestConst.UnitTestDir) == false)
+                Directory.CreateDirectory(TestConst.UnitTestDir);
             _instancePathFileName = TestConst.UnitTestInstanceTestsPathFileName;  //file deleted before each test
             if (File.Exists(_instancePathFileName))
                 File.Delete(_instancePathFileName);

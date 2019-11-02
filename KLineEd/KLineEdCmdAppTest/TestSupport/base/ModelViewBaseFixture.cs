@@ -20,6 +20,9 @@ namespace KLineEdCmdAppTest.TestSupport.Base
 
             Error = TestConst.UnitTestNotSet;
 
+            if (Directory.Exists(TestConst.UnitTestDir) == false)
+                Directory.CreateDirectory(TestConst.UnitTestDir);
+
             if (File.Exists(TestConst.UnitTestSharedTestsPathFileName))
                 File.Delete(TestConst.UnitTestSharedTestsPathFileName);
 

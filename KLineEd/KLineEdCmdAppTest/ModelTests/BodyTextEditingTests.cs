@@ -15,6 +15,8 @@ namespace KLineEdCmdAppTest.ModelTests
 
         public BodyTextEditingTests()
         {
+            if (Directory.Exists(TestConst.UnitTestDir) == false)
+                Directory.CreateDirectory(TestConst.UnitTestDir);
             _instancePathFileName = TestConst.UnitTestInstanceTestsPathFileName;  //file deleted before each test
             if (File.Exists(_instancePathFileName))
                 File.Delete(_instancePathFileName);

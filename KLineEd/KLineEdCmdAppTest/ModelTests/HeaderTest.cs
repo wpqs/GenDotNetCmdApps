@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdAppTest.TestSupport;
@@ -9,11 +10,23 @@ namespace KLineEdCmdAppTest.ModelTests
 {
     public class HeaderTest
     {
+        private readonly string _instancePathFileName;
+
+        public HeaderTest()
+        {
+
+            if (Directory.Exists(TestConst.UnitTestDir) == false)
+                Directory.CreateDirectory(TestConst.UnitTestDir);
+            _instancePathFileName = TestConst.UnitTestInstanceTestsPathFileName;  //file deleted before each test
+            if (File.Exists(_instancePathFileName))
+                File.Delete(_instancePathFileName);
+        }
+
         [Fact]
         public void SetDefaultsTest()
         {
             Header header = new Header();
-            Assert.True(header.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName));
+            Assert.True(header.SetDefaults(_instancePathFileName));
             Assert.StartsWith($"{Environment.NewLine}Author: [author not set]", header.GetChapterReport());
         }
 
@@ -35,7 +48,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void CreateOneNewSessionTest()
         {
             Header header = new Header();
-            Assert.True(header.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName));
+            Assert.True(header.SetDefaults(_instancePathFileName));
             Assert.True(header.CreateNewSession(1).GetResult());
 
             Assert.True(header.Validate().GetResult());
@@ -50,7 +63,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void CreateThreeNewSessionsTest()
         {
             Header header = new Header();
-            Assert.True(header.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName));
+            Assert.True(header.SetDefaults(_instancePathFileName));
             Assert.True(header.CreateNewSession(7).GetResult());
             Assert.True(header.CreateNewSession(8).GetResult());
             Assert.True(header.CreateNewSession(9).GetResult());
@@ -70,7 +83,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void CreateCreateNewSessionVariousLineNoTest()
         {
             Header header = new Header();
-            Assert.True(header.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName));
+            Assert.True(header.SetDefaults(_instancePathFileName));
             Assert.True(header.CreateNewSession(11).GetResult());
             Assert.True(header.Validate().GetResult());
 
@@ -97,7 +110,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void CreateCreateNewSessionDupLineNoTest()
         {
             Header header = new Header();
-            Assert.True(header.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName));
+            Assert.True(header.SetDefaults(_instancePathFileName));
             Assert.True(header.CreateNewSession(11).GetResult());
 
             Assert.True(header.Validate().GetResult());
@@ -117,7 +130,7 @@ namespace KLineEdCmdAppTest.ModelTests
         public void CreateCreateNewSessionInvalidSessionNoTest()
         {
             Header header = new Header();
-            Assert.True(header.SetDefaults(TestConst.UnitTestInstanceTestsPathFileName));
+            Assert.True(header.SetDefaults(_instancePathFileName));
             Assert.True(header.CreateNewSession(11).GetResult());
             Assert.True(header.CreateNewSession(11).GetResult());
             Assert.True(header.CreateNewSession(11).GetResult());
