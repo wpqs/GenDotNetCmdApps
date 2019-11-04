@@ -7,16 +7,18 @@ Development work v1.0.44.0
 
 1. done - Build and test with VS2019
 
-2. Prepare for alpha release
+2. Add Param --statusupdate 0 is no status line update
+
+3. Prepare for alpha release
 	- BugFixes 
     - Check Chapter/Session stats are correct
 	- Test in Production Build
 
-3. Publish and Test
+4. Publish and Test
 	- Windows
 	- iOS
 
-4. Create pre-release ZIP for GitHub
+5. Create pre-release ZIP for GitHub
 	
 
 Development work v1.0.45.0

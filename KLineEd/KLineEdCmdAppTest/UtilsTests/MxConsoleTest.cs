@@ -38,6 +38,14 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.True(console.IsError() == false);
         }
 
+        //[Fact]
+        //public void WriteCharactersTest()
+        //{
+        //    var console = new MxConsole();
+
+        //    Assert.Equal("{", console.Write("{"));
+        //}
+
         [Fact]
         public void GetConsoleColorTest()
         {

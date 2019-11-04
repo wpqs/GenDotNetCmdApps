@@ -358,8 +358,16 @@ namespace KLineEdCmdApp.Utils
             {
                 try
                 {
-                    Console.Write(msg, args);
-                    rc = string.Format(msg, args);
+                    //if (args.Length == 0)
+                    //{
+                    //    Console.Write(msg);
+                    //    rc = msg;
+                    //}
+                    //else
+                    //{
+                        Console.Write(msg, args);
+                        rc = string.Format(msg, args);
+                   // }
                     _mxErrorCode.SetResult(true);
                 }
                 catch (Exception e)
