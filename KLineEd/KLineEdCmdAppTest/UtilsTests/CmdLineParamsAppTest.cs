@@ -371,6 +371,56 @@ namespace KLineEdCmdAppTest.UtilsTests
         }
 
         [Fact]
+        public void TestStatusUpdatePeriodParams()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=200" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(200, cmdLineParams.StatusUpdatePeriod);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=0" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(0, cmdLineParams.StatusUpdatePeriod);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestStatusUpdatePeriodParamsRange()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=5000" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(5000, cmdLineParams.StatusUpdatePeriod);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=50" });
+
+            Assert.True(rcParam.GetResult());
+            Assert.Equal(50, cmdLineParams.StatusUpdatePeriod);
+            Assert.Contains("Help request:", cmdLineParams.HelpHint);
+        }
+
+        [Fact]
+        public void TestStatusUpdatePeriodParamsFailRange()
+        {
+            var cmdLineParams = new CmdLineParamsApp();
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=5001" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020309-user: parameter '--statusupdate' has a bad argument; value 5001 is invalid for 'mS'", rcParam.GetErrorTechMsg());
+
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=49" });
+
+            Assert.False(rcParam.GetResult());
+            Assert.Contains("error 1020309-user: parameter '--statusupdate' has a bad argument; value 49 is invalid for 'mS'", rcParam.GetErrorTechMsg());
+
+        }
+
+        [Fact]
         public void TestRuleParamsAll()
         {
             var cmdLineParams = new CmdLineParamsApp();
@@ -461,7 +511,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "size=101" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020311-user: parameter '--cursor' has a bad argument; value '101' is invalid for 'size'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020312-user: parameter '--cursor' has a bad argument; value '101' is invalid for 'size'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -471,7 +521,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--cursor", "size=0" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020311-user: parameter '--cursor' has a bad argument; value '0' is invalid for 'size'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020312-user: parameter '--cursor' has a bad argument; value '0' is invalid for 'size'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -571,7 +621,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=1" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020313-user: parameter '--display' has a bad argument; value '1' is invalid for 'cols'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020314-user: parameter '--display' has a bad argument; value '1' is invalid for 'cols'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -581,7 +631,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "cols=500" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020314-user: parameter '--display' has a bad argument; 'cols=500' is invalid on this machine; max value is 204", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020315-user: parameter '--display' has a bad argument; 'cols=500' is invalid on this machine; max value is 204", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -611,7 +661,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=0" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020312-user: parameter '--display' has a bad argument; value '0' is invalid for 'rows'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020313-user: parameter '--display' has a bad argument; value '0' is invalid for 'rows'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -621,7 +671,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--display", "rows=500" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020314-user: parameter '--display' has a bad argument; 'rows=500' is invalid on this machine; max value is 67", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020315-user: parameter '--display' has a bad argument; 'rows=500' is invalid on this machine; max value is 67", rcParam.GetErrorTechMsg());
         }
 
 
@@ -673,12 +723,12 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=-2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020316-user: parameter '--limits' has a bad argument; value '-2' is invalid for 'scrollback'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020317-user: parameter '--limits' has a bad argument; value '-2' is invalid for 'scrollback'", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--limits", "scrollback=90001" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020316-user: parameter '--limits' has a bad argument; value '90001' is invalid for 'scrollback'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020317-user: parameter '--limits' has a bad argument; value '90001' is invalid for 'scrollback'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -749,12 +799,12 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "0" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020317-user: parameter '--tabsize' value '0' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020318-user: parameter '--tabsize' value '0' is invalid", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--tabsize", "26" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020317-user: parameter '--tabsize' value '26' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020318-user: parameter '--tabsize' value '26' is invalid", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -805,12 +855,12 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=-2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020318-user: parameter '--typingpause' has a bad argument; value '-2' is invalid for 'seconds'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020319-user: parameter '--typingpause' has a bad argument; value '-2' is invalid for 'seconds'", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--typingpause", "seconds=86401" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020318-user: parameter '--typingpause' has a bad argument; value '86401' is invalid for 'seconds'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020319-user: parameter '--typingpause' has a bad argument; value '86401' is invalid for 'seconds'", rcParam.GetErrorTechMsg());
         }
 
 
@@ -872,12 +922,12 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=-2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020319-user: parameter '--autosave' has a bad argument; value '-2' is invalid for 'minutes'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020320-user: parameter '--autosave' has a bad argument; value '-2' is invalid for 'minutes'", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--autosave", "minutes=1441" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020319-user: parameter '--autosave' has a bad argument; value '1441' is invalid for 'minutes'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020320-user: parameter '--autosave' has a bad argument; value '1441' is invalid for 'minutes'", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -979,12 +1029,12 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "-2" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020320-user: parameter '--linesperpage' has bad argument; value '-2' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020321-user: parameter '--linesperpage' has bad argument; value '-2' is invalid", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--linesperpage", "10001" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020320-user: parameter '--linesperpage' has bad argument; value '10001' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020321-user: parameter '--linesperpage' has bad argument; value '10001' is invalid", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -1080,7 +1130,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolhelp", "url=abc" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020322-user: parameter '--toolhelp' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020323-user: parameter '--toolhelp' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -1126,7 +1176,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsearch", "url=abc" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020323-user: parameter '--toolsearch' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020324-user: parameter '--toolsearch' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -1172,7 +1222,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolthesaurus", "url=abc" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020324-user: parameter '--toolthesaurus' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020325-user: parameter '--toolthesaurus' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
         }
 
         [Fact]
@@ -1218,7 +1268,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolspell", "url=abc" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020325-user: parameter '--toolspell' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020326-user: parameter '--toolspell' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
         }
 
 
@@ -1261,7 +1311,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--toolsvn", $"url=abc" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020328-user: parameter '--toolsvn' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020329-user: parameter '--toolsvn' has bad argument; value 'abc' is invalid", rcParam.GetErrorTechMsg());
 
         }
 

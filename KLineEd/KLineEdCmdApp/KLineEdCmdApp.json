@@ -4,6 +4,7 @@
   "AudioFileCr": "cr.mp3",
   "AudioFileStartup": "paperinsert.mp3",
   "AudioFileEnd": "paperremove.mp3",
+  "StatusUpdatePeriod": 200,
   "ReportMxErrors": 1,
   "DictionaryFile": "[not set]",
   "DictionaryUrl": "[not set]",

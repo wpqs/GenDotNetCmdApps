@@ -72,6 +72,12 @@ namespace KLineEdCmdApp.Controller.Base
             return rc;
         }
 
+        public bool SetRefresh(bool refresh=true)
+        {
+            _refresh = refresh;
+            return _refresh;
+        }
+
         public virtual MxReturnCode<bool> Initialise(ChapterModel model, string browserCmd, string helpUrl, string searchUrl, string thesaurusUrl, string spellUrl)
         {
             var rc = new MxReturnCode<bool>("EditingBaseController.Initialise");

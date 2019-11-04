@@ -2,20 +2,21 @@ BugList
 =======
 
 1. Editor problems:
-	1. pressing { key - Console cannot print { - what other characters? - create unit test
-	2. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
-	3. Error 1110402 BaseView.DisplayLine() throws an exception so returns null - happens when no final parabreak and empty bottom line
-	4. Bad error msg "error: error 1110402: Error: invalid condition..." - doesn't terminate either
-	5. MxConsole.Setup() - doesn't report exception 
-2. Console problems:
-	1. Always works when run in release/debug from VS2017, but sometimes crashes when run from Cmd Prompt in non-legacy mode, particularly if window width altered 
+	1. Bad error msg "error: error 1110402: Error: invalid condition..." - doesn't terminate either
+	2. pressing { key - Console cannot print { - what other characters? - create unit test
+		Error 1110402 BaseView.DisplayLine() throws an exception so returns null - happens when no final parabreak and empty bottom line
+	3. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
+	4. MxConsole.Setup() - doesn't report exception 
+2. Install problems:
+	1. appsettings.json (and KLineEdCmdApp.json) must be in the same directory as d:\test\mytest.ksx
+3. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange
+4. Console problems:
+	1. Always works when run in release/debug from VS2017 or VS2019, but sometimes crashes when run from Cmd Prompt in non-legacy mode, particularly if window width altered 
 		- something to do with Setting Console.BufferSize, Console.WindowSize, Console.WindowTop and Console.WindowLeft Cmd Prompt
 		see https://github.com/microsoft/terminal/issues/3374
-3. Install problems:
-	1. appsettings.json (and KLineEdCmdApp.json) must be in the same directory as d:\test\mytest.ksx
-4. Unit test problem - need to run from command console or debug all tests
+5. Unit test problem - need to run from command console or debug all tests
      https://github.com/xunit/visualstudio.xunit/issues/178
 	 https://developercommunity.visualstudio.com/content/problem/803059/update-to-vs2019-some-tests-now-fail-when-run-from.html
-5. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange
+
 
 

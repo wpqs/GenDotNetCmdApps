@@ -78,7 +78,7 @@ Additional options for edit operation (--edit)
   --backgnd (text=COLOUR) (msg-error=COLOUR) (msg-warn=COLOUR) (msg-info=COLOUR) (cmds=COLOUR) (status=COLOUR) (rule=COLOUR) //- was  ParamBackGndColour
   --foregnd (text=COLOUR) (msg-error=COLOUR) (msg-warn=COLOUR) (msg-info COLOUR) (cmds=COLOUR) (status=COLOUR) (rule=COLOUR) //- was  ParamForeGndColour
   --audio vol=0  <min 0 max 10>								//(0 is off)
-  --statusupdate ms=200 <min 50 max 5000>   				//0 is no updates (for debugging)
+  --statusupdate mS=200 <min 50 max 5000>   				//0 is no updates (for debugging)
 
 	Text Editor options page
 

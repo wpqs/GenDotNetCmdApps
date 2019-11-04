@@ -20,7 +20,6 @@ namespace KLineEdCmdApp
     public class KLineEditor
     {
         public static readonly int MaxSplitLineLength = 25000;  //500 words per page * 5 chars per word * 10 pages - see https://stackoverflow.com/questions/140468/what-is-the-maximum-possible-length-of-a-net-string
-        public static readonly int StatusLineUpdateMilliSecs = 200;
 
         public static readonly int MaxWindowHeight = System.Console.LargestWindowHeight;  
         public static readonly int MaxWindowWidth = System.Console.LargestWindowWidth;
@@ -63,6 +62,7 @@ namespace KLineEdCmdApp
         public int Height { private set; get; }
         public int EditAreaLineWidth { private set; get; }
         public int AutoSavePeriod { private set; get; }
+        public int StatusUpdatePeriod { private set; get; }
 
         public string Report { private set; get; }
         public string BrowserCmd { private set; get; }
@@ -71,6 +71,8 @@ namespace KLineEdCmdApp
         public string ThesaurusUrl { private set; get; }
         public string SpellUrl { private set; get; }
         public bool Ready { private set; get; }
+
+   
 
         private List<BaseView> ViewList { set; get; }
 
@@ -86,6 +88,7 @@ namespace KLineEdCmdApp
             Height = Program.PosIntegerNotSet;
             EditAreaLineWidth = Program.PosIntegerNotSet;
             AutoSavePeriod = 0;
+            StatusUpdatePeriod = CmdLineParamsApp.ArgStatusUpdatePeriodDefault;
             Report = Program.ValueNotSet;
             BrowserCmd = CmdLineParamsApp.ArgToolBrowserCmdDefault;
             HelpUrl = CmdLineParamsApp.ArgToolHelpUrlDefault;
@@ -210,6 +213,7 @@ namespace KLineEdCmdApp
                     SpellUrl = param.ToolSpellUrl;
 
                     EditAreaLineWidth = param.TextEditorDisplayCols; //there is actually an additional column used by cursor when at end of line
+                    StatusUpdatePeriod = param.StatusUpdatePeriod;
                     AutoSavePeriod = param.TextEditorAutoSavePeriod;
                     Width = GetWindowFrameCols() + param.TextEditorDisplayCols;  
                     Height = GetWindowFrameRows() + param.TextEditorDisplayRows;
@@ -300,24 +304,25 @@ namespace KLineEdCmdApp
                                     if (rcSave.IsError(true))
                                         Model.SetMsgLine(rcSave.GetErrorTechMsg());
                                 }
-                                if ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusLineUpdateMilliSecs)
+
+                                if ((StatusUpdatePeriod != 0) && ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusUpdatePeriod))
                                 {
                                     lastStatusUpdateUtc = DateTime.UtcNow;
-                                                                        //1. comment out to stop StatusLine refresh during debugging
+
                                     if (Console.IsWindowSizeChanged(consoleSettings.WindowWidth, consoleSettings.WindowHeight))
-                                    {
-                                        Console.ApplySettings(consoleSettings);
-                                        Model.Refresh();
+                                        Controller.SetRefresh(true);
+                                    else 
+                                    { 
+                                        Model.SetStatusLine();
+                                        if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, false) == false)
+                                        {
+                                            rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
+                                            break;
+                                        }
+                                        if (Controller.IsError() == false)
+                                            Model.SetMsgLine("");
+                                        Console.SetCursorInsertMode((Controller.IsInsertMode()));
                                     }
-                                    Model.SetStatusLine();            //2. comment out to stop StatusLine refresh during debugging
-                                    if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, false) == false)
-                                    {
-                                        rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
-                                        break;
-                                    }
-                                    if (Controller.IsError() == false)
-                                        Model.SetMsgLine("");        //3. comment out to stop MsgLine refresh during debugging
-                                    Console.SetCursorInsertMode((Controller.IsInsertMode()));
                                 }
                                 if (Console.IsKeyAvailable())
                                 {

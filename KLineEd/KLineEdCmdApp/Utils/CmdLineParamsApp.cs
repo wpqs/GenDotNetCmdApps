@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization;
 using KLineEdCmdApp.Model;
 using Newtonsoft.Json;
@@ -185,7 +186,15 @@ namespace KLineEdCmdApp.Utils
                 public static readonly string ArgAudioFileStartupDefault = "paperinsert.mp3";
                 public static readonly string ArgAudioFileEndDefault = "paperremove.mp3";
 
-                //edit operational parameters - text editor
+
+          public const string ParamGeneralStatusUpdate = "--statusupdate";
+
+                public static readonly string ArgStatusUpdatePeriod = "mS";      //  0  <min 1 max 10> //(0 is off)
+                public const int ArgStatusUpdatePeriodMin = 50;
+                public const int ArgStatusUpdatePeriodMax = 5000;
+                public const int ArgStatusUpdatePeriodDefault = 200;     
+
+        //edit operational parameters - text editor
 
         public const string ParamTextEditorRulers = "--rulers";             //  show [yes | no] unitchar '.'
 
@@ -284,6 +293,9 @@ namespace KLineEdCmdApp.Utils
         public string AudioFileStartup { set; get; }
         public string AudioFileEnd { set; get; }
 
+        public int StatusUpdatePeriod { set; get; }
+
+
         public BoolValue ReportMxErrors { set; get; }
 
         public string DictionaryFile { set; get; }
@@ -369,13 +381,15 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = ParamGeneralSettings)] Settings,
             [EnumMember(Value = ParamGeneralBackGndColour)] BackGnd,
             [EnumMember(Value = ParamGeneralForeGndColour)] ForeGnd,
+            [EnumMember(Value = ParamGeneralAudio)] Audio,
+            [EnumMember(Value = ParamGeneralStatusUpdate)] StatusUpdatePeriod,
             [EnumMember(Value = ParamToolBrowser)] ToolBrowser,
             [EnumMember(Value = ParamToolHelp)] ToolHelp,
             [EnumMember(Value = ParamToolSearch)] ToolSearch,
             [EnumMember(Value = ParamToolThesaurus)] ToolThesaurus,
             [EnumMember(Value = ParamToolSpell)] ToolSpell,
             [EnumMember(Value = ParamToolSvn)] ToolSvn,
-            [EnumMember(Value =ParamGeneralAudio)] Audio,
+
             [EnumMember(Value = ParamTextEditorRulers)] Rulers,
             [EnumMember(Value = ParamTextEditorCursor)] Cursor,
             [EnumMember(Value = ParamTextEditorDisplay)] Display,
@@ -441,6 +455,7 @@ namespace KLineEdCmdApp.Utils
                 rc += "ToolSpellUrl=" + (ToolSpellUrl ?? "[null]") + Environment.NewLine;
                 rc += "ToolSvnUser=" + (ToolSvnUser ?? "[null]" ) + " ToolSvnPasswordKey=" + (ToolSvnPasswordKey ?? "[null]") + " ToolSvnUrl=" + (ToolSvnUrl ?? "[null]") + Environment.NewLine;
                 rc += "AudioVol=" + AudioVol + Environment.NewLine;
+                rc += "StatusUpdatePeriod=" + StatusUpdatePeriod + Environment.NewLine;
                 rc += "TextEditorRulersShow=" + EnumOps.XlatToString(ReportMxErrors) + Environment.NewLine;
                 rc += "TextEditorRulersUnitChar=" + TextEditorRulersUnitChar.ToString() + Environment.NewLine;
                 rc += "TextEditorRulersBotChar=" + TextEditorRulersBotChar.ToString() + Environment.NewLine;
@@ -485,6 +500,7 @@ namespace KLineEdCmdApp.Utils
             ExportOutputFile = null;
             ImportInputFile = null;
             FixInputFile = null;
+
             SettingsUpdate = BoolValue.Unset;
 
             AudioFileKeyPress = null;
@@ -492,10 +508,15 @@ namespace KLineEdCmdApp.Utils
             AudioFileCr = null;
             AudioFileStartup = null;
             AudioFileEnd = null;
+
+            StatusUpdatePeriod = Program.PosIntegerNotSet;
+
             ReportMxErrors = BoolValue.Unset;
+
             DictionaryFile = null;
             DictionaryUrl = null;
             DictionaryVersion = null;
+
             SettingsDisplay = BoolValue.Unset;
 
             BackGndColourText = MxConsole.Color.NotSet;
@@ -556,6 +577,9 @@ namespace KLineEdCmdApp.Utils
             AudioFileCr = ArgAudioFileCrDefault;
             AudioFileStartup = ArgAudioFileStartupDefault;
             AudioFileEnd = ArgAudioFileEndDefault;
+
+            StatusUpdatePeriod = ArgStatusUpdatePeriodDefault;
+
             ReportMxErrors = BoolValue.Yes;
             DictionaryFile = DictionaryFileDefault;
             DictionaryUrl = DictionaryUrlDefault;
@@ -683,6 +707,14 @@ namespace KLineEdCmdApp.Utils
                         case Param.Audio:
                         {
                             var rcSettings = ProcessGeneralAudioParam(paramLine);
+                            rc += rcSettings;
+                            if (rcSettings.IsSuccess())
+                                rc.SetResult(true);
+                            break;
+                        }
+                        case Param.StatusUpdatePeriod:
+                        {
+                            var rcSettings = StatusUpdateParam(paramLine);
                             rc += rcSettings;
                             if (rcSettings.IsSuccess())
                                 rc.SetResult(true);
@@ -911,112 +943,118 @@ namespace KLineEdCmdApp.Utils
                     rc.SetError(1020308, MxError.Source.User, $"parameter '{ParamGeneralAudio}' has a bad argument; value {AudioVol} is invalid for '{ArgAudioVol}'");
                 }
 
+                if (((StatusUpdatePeriod != 0) && (StatusUpdatePeriod < ArgStatusUpdatePeriodMin)) || (StatusUpdatePeriod > ArgStatusUpdatePeriodMax) )
+                {
+                    HelpHint = $"{GetParamHelp((int)Param.StatusUpdatePeriod)}";
+                    rc.SetError(1020309, MxError.Source.User, $"parameter '{ParamGeneralStatusUpdate}' has a bad argument; value {StatusUpdatePeriod} is invalid for '{ArgStatusUpdatePeriod}'");
+                }
+
                 if ((TextEditorRulersShow == BoolValue.Unset) || (TextEditorRulersUnitChar == Program.NullChar) || ((TextEditorRulersBotChar == Program.NullChar)))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Rulers)}";
                     if (TextEditorRulersShow == BoolValue.Unset)
-                        rc.SetError(1020309, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has a bad argument; '{ArgTextEditorRulersShow}' is not set");
+                        rc.SetError(102010, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has a bad argument; '{ArgTextEditorRulersShow}' is not set");
                     else
-                        rc.SetError(1020310, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has a bad argument; '{((TextEditorRulersUnitChar == Program.NullChar) ? ArgTextEditorRulersUnitChar : ArgTextEditorRulersBotChar)}' is not set");
+                        rc.SetError(1020311, MxError.Source.User, $"parameter '{ParamTextEditorRulers}' has a bad argument; '{((TextEditorRulersUnitChar == Program.NullChar) ? ArgTextEditorRulersUnitChar : ArgTextEditorRulersBotChar)}' is not set");
                 }
 
                 if ((TextEditorCursorSize < ArgTextEditorCursorSizeMin) || (TextEditorCursorSize > ArgTextEditorCursorSizeMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Cursor)}";
-                    rc.SetError(1020311, MxError.Source.User, $"parameter '{ParamTextEditorCursor}' has a bad argument; value '{TextEditorCursorSize}' is invalid for '{ArgTextEditorCursorSize}'");
+                    rc.SetError(1020312, MxError.Source.User, $"parameter '{ParamTextEditorCursor}' has a bad argument; value '{TextEditorCursorSize}' is invalid for '{ArgTextEditorCursorSize}'");
                 }
 
                 if ((TextEditorDisplayRows < ArgTextEditorDisplayRowsMin) || (TextEditorDisplayRows > ArgTextEditorDisplayRowsMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
-                    rc.SetError(1020312, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayRows}' is invalid for '{ArgTextEditorDisplayRows}'");
+                    rc.SetError(1020313, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayRows}' is invalid for '{ArgTextEditorDisplayRows}'");
                 }
                 if ((TextEditorDisplayCols < ArgTextEditorDisplayColsMin) || (TextEditorDisplayCols > ArgTextEditorDisplayColsMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
-                    rc.SetError(1020313, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayCols}' is invalid for '{ArgTextEditorDisplayCols}'");
+                    rc.SetError(1020314, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayCols}' is invalid for '{ArgTextEditorDisplayCols}'");
                 }
                 if (MxConsoleProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols()) != null)
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
-                    rc.SetError(1020314, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; {MxConsoleProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols())}");
+                    rc.SetError(1020315, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; {MxConsoleProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols())}");
                 }
                 if (TextEditorParaBreakDisplayChar == Program.NullChar)
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
-                    rc.SetError(1020315, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; '{ArgTextEditorDisplayParaBreakDisplayChar}' is not set");
+                    rc.SetError(1020316, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; '{ArgTextEditorDisplayParaBreakDisplayChar}' is not set");
                 }
 
                 if ((TextEditorScrollLimit < CmdLineParamsApp.ArgTextEditorLimitScrollMin) || (TextEditorScrollLimit > CmdLineParamsApp.ArgTextEditorLimitScrollMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Limits)}";
-                    rc.SetError(1020316, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' has a bad argument; value '{TextEditorScrollLimit}' is invalid for '{ArgTextEditorLimitScroll}'");
+                    rc.SetError(1020317, MxError.Source.User, $"parameter '{ParamTextEditorLimits}' has a bad argument; value '{TextEditorScrollLimit}' is invalid for '{ArgTextEditorLimitScroll}'");
                 }
 
                 if ((TextEditorTabSize < CmdLineParamsApp.ArgTextEditorTabSizeMin) || (TextEditorTabSize > CmdLineParamsApp.ArgTextEditorTabSizeMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.TabSize)}";
-                    rc.SetError(1020317, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' value '{TextEditorTabSize}' is invalid");
+                    rc.SetError(1020318, MxError.Source.User, $"parameter '{ParamTextEditorTabSize}' value '{TextEditorTabSize}' is invalid");
                 }
 
                 if ((TextEditorPauseTimeout < CmdLineParamsApp.ArgTextEditorPauseTimeoutMin) || (TextEditorPauseTimeout > CmdLineParamsApp.ArgTextEditorPauseTimeoutMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.TypingPause)}";
-                    rc.SetError(1020318, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' has a bad argument; value '{TextEditorPauseTimeout}' is invalid for '{ArgTextEditorPauseTimeout}'");
+                    rc.SetError(1020319, MxError.Source.User, $"parameter '{ParamTextEditorPauseTimeout}' has a bad argument; value '{TextEditorPauseTimeout}' is invalid for '{ArgTextEditorPauseTimeout}'");
                 }
 
                 if ((TextEditorAutoSavePeriod < CmdLineParamsApp.ArgTextEditorAutoSaveMin) || (TextEditorAutoSavePeriod > CmdLineParamsApp.ArgTextEditorAutoSaveMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.AutoSave)}";
-                    rc.SetError(1020319, MxError.Source.User, $"parameter '{ParamTextEditorAutoSave}' has a bad argument; value '{TextEditorAutoSavePeriod}' is invalid for '{ArgTextEditorAutoSave}'");
+                    rc.SetError(1020320, MxError.Source.User, $"parameter '{ParamTextEditorAutoSave}' has a bad argument; value '{TextEditorAutoSavePeriod}' is invalid for '{ArgTextEditorAutoSave}'");
                 }
 
                 if ((TextEditorLinesPerPage < CmdLineParamsApp.ArgTextEditorLinesPerPageMin) || (TextEditorLinesPerPage > CmdLineParamsApp.ArgTextEditorLinesPerPageMax))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.LinesPerPage)}";
-                    rc.SetError(1020320, MxError.Source.User, $"parameter '{ParamTextEditorLinesPerPage}' has bad argument; value '{TextEditorLinesPerPage}' is invalid");
+                    rc.SetError(1020321, MxError.Source.User, $"parameter '{ParamTextEditorLinesPerPage}' has bad argument; value '{TextEditorLinesPerPage}' is invalid");
                 }
 
                 if (string.IsNullOrEmpty(ToolBrowserCmd) || (ToolBrowserCmd == Program.ValueNotSet))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.ToolBrowser)}";
-                    rc.SetError(1020321, MxError.Source.User, $"parameter '{ParamToolBrowser}' has bad argument; value '{ToolBrowserCmd ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020322, MxError.Source.User, $"parameter '{ParamToolBrowser}' has bad argument; value '{ToolBrowserCmd ?? Program.ValueNotSet}' is invalid");
                 }
                 if (KLineEditor.IsValidUri(ToolHelpUrl) == false)
                 {
                     HelpHint = $"{GetParamHelp((int) Param.ToolHelp)}";
-                    rc.SetError(1020322, MxError.Source.User, $"parameter '{ParamToolHelp}' has bad argument; value '{ToolHelpUrl ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020323, MxError.Source.User, $"parameter '{ParamToolHelp}' has bad argument; value '{ToolHelpUrl ?? Program.ValueNotSet}' is invalid");
                 }
                 if (KLineEditor.IsValidUri(KLineEditor.GetXlatUrl(ToolSearchUrl, CmdLineParamsApp.UrlWordMarker, "test")) == false)
                 {
                     HelpHint = $"{GetParamHelp((int) Param.ToolSearch)}";
-                    rc.SetError(1020323, MxError.Source.User, $"parameter '{ParamToolSearch}' has bad argument; value '{ToolSearchUrl ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020324, MxError.Source.User, $"parameter '{ParamToolSearch}' has bad argument; value '{ToolSearchUrl ?? Program.ValueNotSet}' is invalid");
                 }
                 if (KLineEditor.IsValidUri(KLineEditor.GetXlatUrl(ToolThesaurusUrl, CmdLineParamsApp.UrlWordMarker, "test")) == false)
                 {
                     HelpHint = $"{GetParamHelp((int) Param.ToolThesaurus)}";
-                    rc.SetError(1020324, MxError.Source.User, $"parameter '{ParamToolThesaurus}' has bad argument; value '{ToolThesaurusUrl ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020325, MxError.Source.User, $"parameter '{ParamToolThesaurus}' has bad argument; value '{ToolThesaurusUrl ?? Program.ValueNotSet}' is invalid");
                 }
                 if (KLineEditor.IsValidUri(KLineEditor.GetXlatUrl(ToolSpellUrl, CmdLineParamsApp.UrlWordMarker, "test")) == false)
                 {
                     HelpHint = $"{GetParamHelp((int) Param.ToolSpell)}";
-                    rc.SetError(1020325, MxError.Source.User, $"parameter '{ParamToolSpell}' has bad argument; value '{ToolSpellUrl ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020326, MxError.Source.User, $"parameter '{ParamToolSpell}' has bad argument; value '{ToolSpellUrl ?? Program.ValueNotSet}' is invalid");
                 }
 
                 if (string.IsNullOrEmpty(ToolSvnUser) || (ToolSvnUser == Program.ValueNotSet))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.ToolSvn)}";
-                    rc.SetError(1020326, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnUser ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020327, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnUser ?? Program.ValueNotSet}' is invalid");
                 }
                 if (string.IsNullOrEmpty(ToolSvnPasswordKey) || (ToolSvnPasswordKey == Program.ValueNotSet))
                 {
                     HelpHint = $"{GetParamHelp((int)Param.ToolSvn)}";
-                    rc.SetError(1020327, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnPasswordKey ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020328, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnPasswordKey ?? Program.ValueNotSet}' is invalid");
                 }
                 if (KLineEditor.IsValidUri(ToolSvnUrl) == false)
                 {
                     HelpHint = $"{GetParamHelp((int)Param.ToolSvn)}";
-                    rc.SetError(1020328, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnUrl ?? Program.ValueNotSet}' is invalid");
+                    rc.SetError(1020329, MxError.Source.User, $"parameter '{ParamToolSvn}' has bad argument; value '{ToolSvnUrl ?? Program.ValueNotSet}' is invalid");
                 }
 
                 if (rc.IsSuccess())  
@@ -1508,6 +1546,41 @@ namespace KLineEdCmdApp.Utils
                 HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.Audio)}";
             return rc;
         }
+
+        private MxReturnCode<bool> StatusUpdateParam(string paramLine)
+        {
+            var rc = new MxReturnCode<bool>("CmdLineParamsApp.StatusUpdateParam", false);
+
+            //    HelpHint = Environment.NewLine;
+
+            var rcCnt = GetArgCount(paramLine, ParamGeneralStatusUpdate);
+            rc += rcCnt;
+            if (rcCnt.IsSuccess())
+            {
+                var argCnt = rcCnt.GetResult();
+                if (argCnt != 1)
+                    rc.SetError(1022212, MxError.Source.User, $"parameter '{ParamGeneralStatusUpdate}' has incorrect number of arguments; found {argCnt} should be two");
+                else
+                {
+                    var rcArg1 = GetArgNameValue(ParamGeneralStatusUpdate, ArgStatusUpdatePeriod, paramLine, true);
+                    rc += rcArg1;
+                    if (rcArg1.IsSuccess(true))
+                    {
+                        if (Int32.TryParse(rcArg1.GetResult(), out var mS) == false)
+                            rc.SetError(1022213, MxError.Source.User, $"parameter '{ParamGeneralStatusUpdate}' argument '{ ArgStatusUpdatePeriod}' is invalid. It must be a number between {ArgStatusUpdatePeriodMin} and {ArgStatusUpdatePeriodMax}");
+                        else
+                        {
+                            StatusUpdatePeriod = mS;
+                            rc.SetResult(true);
+                        }
+                    }
+                }
+            }
+            if (rc.IsError())
+                HelpHint = $"{Environment.NewLine}You entered: \"{paramLine}\" {Environment.NewLine}{GetParamHelp((int)Param.StatusUpdatePeriod)}";
+            return rc;
+        }
+
 
         private MxReturnCode<bool> ProcessToolBrowserParam(string paramLine)
         {
@@ -2215,6 +2288,9 @@ namespace KLineEdCmdApp.Utils
             if (AudioFileEnd == null)
                 AudioFileEnd = savedSettings.AudioFileEnd;
 
+            if (StatusUpdatePeriod == Program.PosIntegerNotSet)
+                StatusUpdatePeriod = savedSettings.StatusUpdatePeriod;
+
             if (ReportMxErrors == BoolValue.Unset)
                 ReportMxErrors = savedSettings.ReportMxErrors;
 
@@ -2365,6 +2441,12 @@ namespace KLineEdCmdApp.Utils
                 msg += GetAppHelpNotes();
                 rc = msg;
             }
+            else if (help == Param.StatusUpdatePeriod)
+            {
+                msg += GetHelpInfoGeneralStatusUpdatePeriod() + Environment.NewLine;
+                msg += GetAppHelpNotes();
+                rc = msg;
+            }
             else if (help == Param.ToolBrowser)
             {
                 msg += GetHelpInfoToolBrowser() + Environment.NewLine;
@@ -2471,6 +2553,7 @@ namespace KLineEdCmdApp.Utils
         private static string GetHelpInfoGeneralForeGndColour() { return $"{ParamGeneralForeGndColour} ({ArgColourText}=COLOR) ({ArgColourMsgError}=COLOR) ({ArgColourMsgWarn}=COLOR) ({ArgColourMsgInfo}=COLOUR) ({ArgColourCmds}=COLOR) ({ArgColourStatus}=COLOR) ({ArgColourRule}=COLOR)"; }
         private static string GetHelpInfoGeneralBackGndColour() { return $"{ParamGeneralBackGndColour} ({ArgColourText}=COLOR) ({ArgColourMsgError}=COLOR) ({ArgColourMsgWarn}=COLOR) ({ArgColourMsgInfo}=COLOUR) ({ArgColourCmds}=COLOR) ({ArgColourStatus}=COLOR) ({ArgColourRule}=COLOR)"; }
         private static string GetHelpInfoGeneralAudio() { return $"{ParamGeneralAudio} {ArgAudioVol}={ArgAudioVolDefault} <min {ArgAudioVolMin} max {ArgAudioVolMax}>"; }
+        private static string GetHelpInfoGeneralStatusUpdatePeriod() { return $"{ParamGeneralStatusUpdate} {ArgStatusUpdatePeriod}={ArgStatusUpdatePeriodDefault} <min {ArgStatusUpdatePeriodMin} max {ArgStatusUpdatePeriodMax}>"; }
         private static string GetHelpInfoTextEditorRulers() { return $"{ParamTextEditorRulers} ({ArgTextEditorRulersShow}=[yes|no]) ({ArgTextEditorRulersUnitChar}=.) ({ArgTextEditorRulersBotChar}=_)"; }
         private static string GetHelpInfoTextEditorCursor() { return $"{ParamTextEditorCursor} {ArgTextEditorCursorSize}={ArgTextEditorCursorSizeDefault} <min {ArgTextEditorCursorSizeMin} max {ArgTextEditorCursorSizeMax}>"; }
         private static string GetHelpInfoTextEditorDisplay() { return $"{ParamTextEditorDisplay} ({ArgTextEditorDisplayRows}={ArgTextEditorDisplayRowsDefault} <min {ArgTextEditorDisplayRowsMin} max {ArgTextEditorDisplayRowsMax}>) ({ArgTextEditorDisplayCols}={ArgTextEditorDisplayColsDefault} <min {ArgTextEditorDisplayColsMin} max {ArgTextEditorDisplayColsMax}>) ({ArgTextEditorDisplayParaBreakDisplayChar}={ArgTextEditorDisplayParaBreakDisplayCharDefault})"; }
@@ -2501,6 +2584,7 @@ namespace KLineEdCmdApp.Utils
             msg += $"   {GetHelpInfoGeneralForeGndColour()}" + Environment.NewLine;
             msg += $"   {GetHelpInfoGeneralBackGndColour()}" + Environment.NewLine;
             msg += $"   {GetHelpInfoGeneralAudio()}" + Environment.NewLine;
+            msg += $"   {GetHelpInfoGeneralStatusUpdatePeriod()}" + Environment.NewLine;
             msg += Environment.NewLine;
             msg += $"   {GetHelpInfoTextEditorRulers()}" + Environment.NewLine;
             msg += $"   {GetHelpInfoTextEditorCursor()}" + Environment.NewLine;
