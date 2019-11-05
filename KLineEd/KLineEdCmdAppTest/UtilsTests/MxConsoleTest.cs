@@ -12,18 +12,17 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var console = new MxConsole();
 
-            Assert.True(console.IsError());
+            Assert.False(console.IsErrorState());
         }
 
         [Fact]
         public void SetupTest()
         {
             var console = new MxConsole();
-            Assert.True(console.IsError());
 
             var props = new MxConsoleProperties();
             Assert.True(console.ApplySettings(props));
-            Assert.True(console.IsError() == false);
+            Assert.True(console.IsErrorState() == false);
         }
 
         [Fact]
@@ -35,7 +34,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.True(props.IsError() == false);
 
             Assert.True(console.ApplySettings(props));
-            Assert.True(console.IsError() == false);
+            Assert.True(console.IsErrorState() == false);
         }
 
         //[Fact]

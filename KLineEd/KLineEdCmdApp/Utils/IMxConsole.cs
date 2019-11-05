@@ -8,12 +8,10 @@ namespace KLineEdCmdApp.Utils
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     public interface IMxConsole
     {
-        MxReturnCode<MxReturnCode<bool>> GetMxError();
-        bool IsError();
-        MxError.Source GetErrorSource();
-        int GetErrorNo();
-        string GetErrorTechMsg();
-        string GetErrorUserMsg();
+        bool IsErrorState();
+        MxReturnCode<bool> GetErrorState();
+        void ResetErrorState();
+        bool SetErrorState(MxReturnCode<bool> mxErr);
 
         bool ApplySettings(MxConsoleProperties props, bool restore=false);
         MxReturnCode<bool> Close();

@@ -11,7 +11,21 @@ namespace KLineEdCmdAppTest.TestSupport
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class MockMxConsole : IMxConsole
     {
-        private readonly MxReturnCode<bool> _mxErrorCode;
+        private MxReturnCode<bool> _mxErrorState;
+        public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
+        public MxReturnCode<bool> GetErrorState() { return _mxErrorState ?? null; }
+        public void ResetErrorState() { _mxErrorState = null; }
+        public bool SetErrorState(MxReturnCode<bool> mxErr)
+        {
+            var rc = false;
+
+            if (_mxErrorState == null)
+            {
+                _mxErrorState = mxErr;
+                rc = true;
+            }
+            return rc;
+        }
         public int CursorRow { get; private set; }
         public int CursorColumn { get; private set; }
 
@@ -20,27 +34,12 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public MockMxConsole()
         {
-            _mxErrorCode = new MxReturnCode<bool>($"MockMxConsole.Ctor", false); //SetResult(true) on error
-            _mxErrorCode.SetError(9210201, MxError.Source.Program, "MxConsole.ApplySettings not called");
+            _mxErrorState = null;
             CursorRow = 0;
             CursorColumn = 0;
             ForeGndColour = MxConsole.Color.Gray;
             BackGndColour = MxConsole.Color.Black;
         }
-
-        public MxReturnCode<MxReturnCode<bool>> GetMxError()
-        {
-            var rc = new MxReturnCode<MxReturnCode<bool>>($"MockMxConsole.GetMxError");
-
-            rc += _mxErrorCode;
-
-            return rc;
-        }
-        public bool IsError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
-        public MxError.Source GetErrorSource() { return _mxErrorCode?.GetErrorType() ?? MxError.Source.Program; }
-        public int GetErrorNo() { return _mxErrorCode?.GetErrorCode() ?? Program.PosIntegerNotSet; }
-        public string GetErrorTechMsg() { return _mxErrorCode?.GetErrorTechMsg() ?? Program.ValueNotSet; }
-        public string GetErrorUserMsg() { return _mxErrorCode?.GetErrorUserMsg() ?? Program.ValueNotSet; }
 
         public bool Clear(bool force = false)
         {
@@ -54,7 +53,6 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public bool ApplySettings(MxConsoleProperties props, bool restore=false)
         {
-            _mxErrorCode.SetResult(true);
             return true;
         }
 
@@ -62,15 +60,11 @@ namespace KLineEdCmdAppTest.TestSupport
         {
             var rc = new MxReturnCode<bool>($"MxConsole.Close");
 
-            if (_mxErrorCode.IsError())
-                rc += _mxErrorCode;
-
             return rc;
         }
 
         public MxConsoleProperties GetSettings()
         {
-            _mxErrorCode.SetResult(true);
             return new MxConsoleProperties();
         }
 

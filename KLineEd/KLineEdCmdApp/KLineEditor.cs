@@ -106,7 +106,7 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<string>("KLineEditor.Run");
 
-            if ((cmdLineParams == null) || (editModel == null) || (editModel.Ready == false) || (console == null) || (console.IsError()))
+            if ((cmdLineParams == null) || (editModel == null) || (editModel.Ready == false) || (console == null) || (console.IsErrorState()))
                 rc.SetError(1030101, MxError.Source.Param, $"cmdLineParams is null, editModel is null or not read, or console is null or error", MxMsgs.MxErrInvalidParamArg);
             else
             {
@@ -200,7 +200,7 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<bool>("KLineEditor. Initialise");
 
-            if ((param == null) || ((model?.Ready ?? false ) == false) || (console?.IsError() ?? true)) 
+            if ((param == null) || ((model?.Ready ?? false ) == false) || (console?.IsErrorState() ?? true)) 
                 rc.SetError(1030201, MxError.Source.Param, $"param is null or editModel null, not ready", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -232,7 +232,7 @@ namespace KLineEdCmdApp
                     else
                     {
                         if (console.ApplySettings(settings) == false)
-                            rc.SetError(1030203, console.GetErrorSource(), console.GetErrorTechMsg(), console.GetErrorUserMsg());
+                            rc.SetError(1030203, MxError.Source.Data, console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                         else
                         {
                             Console = console;
@@ -284,7 +284,7 @@ namespace KLineEdCmdApp
                     rc.SetError(1030402, MxError.Source.Sys, $"settings.Validate() failed; {consoleSettings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
                 else
                 {
-                    if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl)) == null) || Controller.IsError())
+                    if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl)) == null) || Controller.IsErrorState())
                         rc.SetError(1030403, MxError.Source.Program, $"ControllerFactory.Make failed", MxMsgs.MxErrInvalidCondition);
                     else
                     {
@@ -295,14 +295,14 @@ namespace KLineEdCmdApp
                             var lastAutoSaveUtc = DateTime.UtcNow;
                             var lastKeyPress = lastStatusUpdateUtc;
 
+                            //!!!!!!!!!!!!!!!!!!! MAIN LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                            
                             while (rc.IsError() == false)
                             {
                                 if ((AutoSavePeriod > 0) && ((DateTime.UtcNow - lastAutoSaveUtc).TotalMinutes > AutoSavePeriod))
                                 {
                                     lastAutoSaveUtc = DateTime.UtcNow;
-                                    var rcSave = Model.Save();
-                                    if (rcSave.IsError(true))
-                                        Model.SetMsgLine(rcSave.GetErrorTechMsg()); //Controller.SetError
+                                    Model.Save();
                                 }
 
                                 if ((StatusUpdatePeriod != 0) && ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusUpdatePeriod))
@@ -315,12 +315,10 @@ namespace KLineEdCmdApp
                                     { 
                                         Model.SetStatusLine();
                                         if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, false) == false)
-                                        {
+                                        {       //move error handling so it sets the Model.ErrorState
                                             rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
                                             break;
                                         }
-                                        if (Controller.IsError() == false)
-                                            Model.SetMsgLine("");
                                         Console.SetCursorInsertMode((Controller.IsInsertMode()));
                                     }
                                 }
@@ -333,26 +331,25 @@ namespace KLineEdCmdApp
                                         break; 
                                     }
                                     Controller = Controller.ProcessKey(Model, Console.ReadKey(true));
-                                    if (Controller.IsError())
-                                    {
-                                        Model.SetMsgLine(Controller.GetErrorTechDetails());
-                                        //Model.SetMxErrorMsg(Controller.GetErrorTechDetails()); //todo wait for next release of MxReturnCode to get resource string
-                                    }
                                 }
-                                if (Controller?.IsRefresh() ?? true)
-                                {
-                                    Console.ApplySettings(consoleSettings);
-                                    Model.Refresh();
-                                }
-                                if (Controller?.IsQuit() ?? true)
-                                    break;
-
-                                var rcErr = GetAnyCriticalError(ViewList, Controller); 
-                                if (rcErr.IsError())
+                                var rcErr = Controller.ErrorProcessing(ViewList, Console);
+                                if (rcErr.IsError(true) || (rcErr.GetResult() == false))
                                     rc += rcErr;
                                 else
-                                    Thread.Sleep(0);
+                                {
+                                    if (Controller?.IsRefresh() ?? true)
+                                    {
+                                        Console.ApplySettings(consoleSettings);
+                                        Model.Refresh();
+                                    }
+                                    if (Controller?.IsQuit() ?? true)
+                                        break;
+                                }
+                                Thread.Sleep(0);
                             }
+
+                            //!!!!!!!!!!!!!!!!!!! MAIN LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
                             var rcDoneProc = Model.ChapterHeader.KLineEditorProcessDone(lastStatusUpdateUtc, lastKeyPress);
                             if (rc.IsSuccess())
                             {
@@ -395,7 +392,7 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<bool>("KLineEditor.CreateViews");
 
-            if ((cmdLineParams == null) || (ViewList == null) || (console == null) || (console.IsError()) || (model == null) || (model.Ready == false))
+            if ((cmdLineParams == null) || (ViewList == null) || (console == null) || (console.IsErrorState()) || (model == null) || (model.Ready == false))
                 rc.SetError(1030601, MxError.Source.Param, $"cmdLineParams= is null, or ViewList is null, or console is null or error, or model is null or not ready", MxMsgs.MxErrInvalidParamArg);
             else
             {
@@ -489,31 +486,6 @@ namespace KLineEdCmdApp
 
                 if (rc.IsSuccess())
                     rc.SetResult(true);
-            }
-            return rc;
-        }
-
-        private MxReturnCode<bool> GetAnyCriticalError(List<BaseView> viewList, EditingBaseController controller)
-        {
-            var rc = new MxReturnCode<bool>("KLineEditor.GetAnyCriticalError");
-
-            if ((viewList == null) || (controller == null))
-                rc.SetError(1030801, MxError.Source.Param, $"ViewList or controller is null", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                if (controller.IsError(true))
-                    rc.SetError(controller.GetErrorNo(), controller.GetErrorSource(), controller.GetErrorTechDetails()); //; controller.GetErrorUserMsg()); wait for next MxReturnCode release
-                else
-                {
-                    foreach (var view in viewList)
-                    {
-                        var rcViewErr = view.GetMxError();
-                        if (rcViewErr.IsError() && (rcViewErr.GetErrorType() != MxError.Source.User)) //or MxError.Source.Data
-                            rc += rcViewErr;
-                    }
-                    if (rc.IsSuccess())
-                        rc.SetResult(true);
-                }
             }
             return rc;
         }

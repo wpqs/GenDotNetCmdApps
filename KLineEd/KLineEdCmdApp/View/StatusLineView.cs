@@ -61,9 +61,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("EditorHelpView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsOnUpdateError())
-                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
-            else
+            if (IsErrorState() == false)
             {
                 ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
                 if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.StatusLine))
@@ -76,7 +74,7 @@ namespace KLineEdCmdApp.View
                     else
                     {
                         if (Console.SetColour(StatusLineForeGndColour, StatusLineBackGndColour) == false)
-                            rc.SetError(1200102, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
+                            rc.SetError(1200102, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                         else
                         {
                             var statusText = model.StatusLine ?? Program.ValueNotSet;

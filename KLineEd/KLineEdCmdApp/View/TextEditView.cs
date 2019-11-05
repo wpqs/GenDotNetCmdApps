@@ -60,9 +60,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("TextEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsOnUpdateError())
-                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
-            else
+            if (IsErrorState() == false)
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model?.ChapterBody == null)

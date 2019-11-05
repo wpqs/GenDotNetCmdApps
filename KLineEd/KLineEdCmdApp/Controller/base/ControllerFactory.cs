@@ -1,4 +1,5 @@
 ﻿using KLineEdCmdApp.Model;
+using MxReturnCode;
 
 namespace KLineEdCmdApp.Controller.Base
 {
@@ -9,44 +10,51 @@ namespace KLineEdCmdApp.Controller.Base
         public static readonly string SpellEditingController = "SpellEditingController";
         public static EditingBaseController Make(ChapterModel model, string className, string browserCmd, string helpUrl, string searchUrl, string thesaurusUrl, string spellUrl)
         {
-            EditingBaseController rc = null;
+            var rc = new MxReturnCode<bool>($"ControllerFactory.Maker");
+
+            EditingBaseController controller = null;
 
             if ((model?.Ready ?? false) && (className != null) && (browserCmd != null) && (helpUrl != null) && (searchUrl != null) && (thesaurusUrl != null) && (spellUrl != null))
             {
-                EditingBaseController controller = null;
+                EditingBaseController ctrller = null;
                 if (className == TextEditingController)
-                    controller = new TextEditingController();
+                    ctrller = new TextEditingController();
                 else
                 {
                     if (className == PropsEditingController)
-                        controller = new PropsEditingController();
+                        ctrller = new PropsEditingController();
                     else
                     {
                         if (className == SpellEditingController)
-                            controller = new SpellEditingController();
+                            ctrller = new SpellEditingController();
 
                         //create other Editors here
 
                     }
                 }
 
-                if (controller == null)
-                    model.SetErrorMsg(1220101, $"Program defect. {className} is unsupported. Please report this problem.");
+                if (ctrller == null)
+                    rc.SetError(1220101, MxError.Source.Program, $"Program defect. {className} is unsupported. Please report this problem.");
                 else
                 {
-                    var rcInit = controller.Initialise(model, browserCmd, helpUrl, searchUrl, thesaurusUrl, spellUrl);
+                    var rcInit = ctrller.Initialise(model, browserCmd, helpUrl, searchUrl, thesaurusUrl, spellUrl);
                     if (rcInit.IsError(true))
-                        model.SetMxErrorMsg(rcInit.GetErrorUserMsg());
+                        rc += rcInit;
                     else
                     {
-                        model.SetEditorHelpLine(controller.GetEditorHelpLine(), false);
+                        model.SetEditorHelpLine(ctrller.GetEditorHelpLine(), false);
                         model.Refresh();
                         //model.SetTextAreaName(controller.GetEditorTextAreaName());
-                        rc = controller;
+                        controller = ctrller;
+                        rc.SetResult(true);
                     }
                 }
             }
-            return rc;
+
+            if (rc.IsError(true))
+                model.SetErrorState(rc);
+
+            return controller;
         }
     }
 }

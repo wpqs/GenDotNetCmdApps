@@ -157,7 +157,7 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<string>("Program.EditProcessing");
 
-            if ((cmdLineParams == null) || (console == null) || (console.IsError()))
+            if ((cmdLineParams == null) || (console == null) || (console.IsErrorState()))
                 rc.SetError(1010301, MxError.Source.Param, $"cmdLineParams is null, or console is null or error", MxMsgs.MxErrInvalidParamArg);
             else
             {
@@ -194,7 +194,7 @@ namespace KLineEdCmdApp
                                 rc += rcRun; //same as rc.SetResult(rcRun.GetResult());
 
                                 if (console.ApplySettings(originalSettings, true) == false)
-                                    rc.SetError(1010303, console.GetErrorSource(), $"MxConsole settings not restored. {console.GetErrorTechMsg()}", console.GetErrorUserMsg());
+                                    rc.SetError(1010303, MxError.Source.Sys, console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                                 else
                                 {
                                     var report = Environment.NewLine; //reports always start with newline

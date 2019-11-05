@@ -7,9 +7,11 @@ Development work v1.0.44.0
 
 1. done - Build and test with VS2019
 
-2. Add Param --statusupdate 0 is no status line update
+2. done Add Param --statusupdate 0 is no status line update
 
 3. Prepare for alpha release
+    - Error handling refactor
+	- Convert MxConsole to MxReturnCode
 	- BugFixes 
     - Check Chapter/Session stats are correct
 	- Test in Production Build

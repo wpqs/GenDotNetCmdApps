@@ -70,10 +70,10 @@ namespace KLineEdCmdApp.View.Base
         public override void OnUpdate(NotificationItem notificationItem)
         {
             base.OnUpdate(notificationItem);
-            if (IsOnUpdateError() == false)
+            if (IsErrorState() == false)
             {
                 if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                    SetMxError(1170201, Console.GetErrorSource(), $"MxConsole: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                    SetErrorState(Console.GetErrorState());
             }
         }
 
@@ -84,7 +84,7 @@ namespace KLineEdCmdApp.View.Base
             Console.SetCursorVisible(false);
 
             if (Console.SetColour(RuleForeGndColour, RuleBackGndColour) == false)
-                rc.SetError(1170301, Console.GetErrorSource(), $"TextEditView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                rc.SetError(1170301, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
             else
             {
                 var rcTop = DisplayLine(KLineEditor.EditAreaMarginTopRuleIndex, KLineEditor.EditAreaMarginLeft, TopRule);
@@ -96,7 +96,7 @@ namespace KLineEdCmdApp.View.Base
                     if (rcBot.IsSuccess(true))
                     {
                         if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                            rc.SetError(1170302, Console.GetErrorSource(), $"EditAreaView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                            rc.SetError(1170302, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                         else
                         {
                             for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
@@ -131,7 +131,7 @@ namespace KLineEdCmdApp.View.Base
             else
             {
                 if (Console.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editAreaRowIndex, KLineEditor.EditAreaMarginLeft + editAreaColIndex) == false)
-                    rc.SetError(1170402, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
+                    rc.SetError(1170402, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                 else
                     rc.SetResult(true);
             }

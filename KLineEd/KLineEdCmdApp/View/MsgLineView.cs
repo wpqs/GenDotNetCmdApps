@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using MxReturnCode;
 using KLineEdCmdApp.Utils;
@@ -48,9 +49,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("MsgLineView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsOnUpdateError())
-                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
-            else
+            if (IsErrorState() == false)
             {
                 ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
                 if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.MsgLine))
@@ -63,75 +62,14 @@ namespace KLineEdCmdApp.View
                     else
                     {
                         if (string.IsNullOrEmpty(model.MsgLine))
-                            DisplayMsg(MsgType.Info, "");
+                            DisplayMsg(MxReturnCodeUtils.MsgClass.Info, "");
                         else
-                            DisplayMsg(GetMsgType(model.MsgLine), GetMsg(model.MsgLine));
+                            DisplayMsg(EditingBaseController.GetMsgClass(model.MsgLine), model.MsgLine); //Msg is formatted in EditingBaseController.ErrorProcessing()
                         rc.SetResult(true);
                     }
                 }
             }
             OnUpdateDone(rc, false);
-        }
-
-        private string GetMsg(string msgLine)
-        {
-            var rc = Program.ValueNotSet;
-
-            if (msgLine != null)
-            {
-                var errorPartStart = "error ";
-                var start = msgLine.ToLower().IndexOf(errorPartStart, StringComparison.Ordinal);
-                if (start < 0)
-                    rc = msgLine;
-                else
-                {
-                    var end = msgLine.IndexOf('-');
-                    if (end < 0)
-                        rc = msgLine;
-                    else
-                    { 
-                        var errorCode = msgLine.Snip(start + errorPartStart.Length, end-1);
-                        var errorPartTerminator = ": ";
-                        var startTextIndex = msgLine.IndexOf(errorPartTerminator, StringComparison.Ordinal); //error 1100703-user: Warning: you cannot move beyond the end of the chapter
-                        if ((startTextIndex < 0) || (errorCode == null))
-                            rc = msgLine;
-                        else
-                        {
-                            var msg = msgLine.Substring(startTextIndex + errorPartTerminator.Length);
-                            if (msg.StartsWith(MxMsgs.ErrorMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
-                                rc = $"#{errorCode} - {msg.Substring(MxMsgs.ErrorMsgPrecursor.Length + 1)}";
-                            else if (msg.StartsWith(MxMsgs.WarningMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
-                                rc = $"#{errorCode} - {msg.Substring(MxMsgs.WarningMsgPrecursor.Length + 1)}";
-                            else if (msg.StartsWith(MxMsgs.InfoMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
-                                rc = $"#{errorCode} - {msg.Substring(MxMsgs.InfoMsgPrecursor.Length + 1)}";
-                            else
-                                rc = msgLine;
-                        }
-                    }
-                }
-            }
-            return rc;
-        }
-
-        private MsgType GetMsgType(string msgLine)
-        {
-            var rc = MsgType.Error;
-            if (msgLine != null)
-            {
-                var errorPartTerminator = ": ";
-                var startTextIndex = msgLine.IndexOf(errorPartTerminator, StringComparison.Ordinal);  //error 1100703-user: Warning: you cannot move beyond the end of the chapter
-                if (startTextIndex >= 0)
-                {
-                    var msg = msgLine.Substring(startTextIndex+ errorPartTerminator.Length);
-                    if (msg.StartsWith(MxMsgs.ErrorMsgPrecursor))
-                        rc = MsgType.Error;
-                    else if (msg.StartsWith(MxMsgs.WarningMsgPrecursor))
-                        rc = MsgType.Warning;
-                    else
-                        rc = MsgType.Info;
-                }
-            }
-            return rc;
         }
     }
 }

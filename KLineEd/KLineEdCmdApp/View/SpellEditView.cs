@@ -17,9 +17,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("SpellEditView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsOnUpdateError())
-                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
-            else
+            if (IsErrorState() == false)
             {
                 ChapterModel model = notificationItem.Data as ChapterModel;
                 if (model == null)

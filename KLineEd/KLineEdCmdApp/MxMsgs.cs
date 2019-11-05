@@ -7,13 +7,8 @@ namespace KLineEdCmdApp
     {
         public const string SupportedCultures = "en;";      //must end with ;
 
-        public const string ErrorMsgPrecursor = "Error:";       //"All error messages in resources start with this text 
-        public const string WarningMsgPrecursor = "Warning:";   //"All warning messages in resources start with this text 
-        public const string InfoMsgPrecursor = "Info:";         //"All info messages in resources start with this text 
-
         //Messages
         public const string MxMsgNotFound = "MxMsgNotFound"; //"Message not found. Coding defect. Please report this problem" 
-
 
         //Errors 
         public const string MxErrTest = "MxErrTest"; //"Error test. Test of error handling. Please take no action"

@@ -32,7 +32,7 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.View.Ready);
 
             _fixture.Model.SetEditorHelpLine(PropsEditingController.EditorHelpText);
-            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
+            Assert.False(_fixture.View.IsErrorState());
         }
     }
 }

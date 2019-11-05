@@ -12,7 +12,7 @@ namespace KLineEdCmdApp.Controller
         public override EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
             EditingBaseController controller = this;
-            if ((base.ProcessKey(model, keyInfo) != null) && (IsError() == false))
+            if ((base.ProcessKey(model, keyInfo) != null) && (IsErrorState() == false))
             {
                 //do stuff related to TextEditing, updating the model as needed
                 if (keyInfo.Key == ConsoleKey.F2)

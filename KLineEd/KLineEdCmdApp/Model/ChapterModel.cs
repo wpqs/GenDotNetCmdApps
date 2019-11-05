@@ -51,6 +51,22 @@ namespace KLineEdCmdApp.Model
         public string MsgLine { private set; get; }
         public string EditorHelpLine { private set; get; }
 
+        private MxReturnCode<bool> _mxErrorState;
+        public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
+        public MxReturnCode<bool> GetErrorState(){ return _mxErrorState ?? null;}
+        public void ResetErrorState() { _mxErrorState = null; }
+        public bool SetErrorState(MxReturnCode<bool> mxErr)
+        {
+            var rc = false;
+
+            if (_mxErrorState == null)
+            {
+                _mxErrorState = mxErr;
+                rc = true;
+            }
+            return rc;
+        }
+
         // ReSharper disable once RedundantBaseConstructorCall
         public ChapterModel() : base()
         {
@@ -60,6 +76,7 @@ namespace KLineEdCmdApp.Model
             StatusLine = "";
             MsgLine = "";
             EditorHelpLine = "";
+            _mxErrorState = null;
             Ready = false;
         }
 
@@ -112,7 +129,7 @@ namespace KLineEdCmdApp.Model
                                 rc += rcDone;
                             }
                             if (rcDone.IsSuccess(true))
-                             {
+                            {
                                 ChapterHeader.SetPauseWaitSeconds(typingPauseTimeout); 
                                 Ready = true;
                                 rc.SetResult(true);
@@ -173,6 +190,8 @@ namespace KLineEdCmdApp.Model
                     rc.SetResult(true);
                 }
             }
+            if (rc.IsError(true))
+                SetErrorState(rc);
             return rc;
         }
 
@@ -229,20 +248,7 @@ namespace KLineEdCmdApp.Model
             }
         }
 
-        public void SetErrorMsg(int errorNo, string msg, bool update = true)
-        {
-            MsgLine = $"{BaseView.ErrorMsgPrecursor} {errorNo} {msg}";
-            if (update)
-                UpdateAllViews((int)ChangeHint.MsgLine);
-        }
-
-        public void SetMxErrorMsg(string msg, bool update = true)
-        {
-            MsgLine = msg;
-            if (update)
-                UpdateAllViews((int)ChangeHint.MsgLine);
-        }
-
+        
         public void SetEditorHelpLine(string text, bool update = true)
         {
             EditorHelpLine = text; //use to discover the active editor - TextEditView, etc

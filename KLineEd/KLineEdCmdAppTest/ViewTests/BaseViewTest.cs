@@ -1,4 +1,5 @@
-﻿using KLineEdCmdApp.View.Base;
+﻿using KLineEdCmdApp.Utils;
+using KLineEdCmdApp.View.Base;
 using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
@@ -35,22 +36,22 @@ namespace KLineEdCmdAppTest.ViewTests
         {
             Assert.True(_fixture.View.Ready);
 
-            Assert.True( _fixture.View.DisplayMsg(BaseView.MsgType.Info, "test"));
+            Assert.True( _fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Info, "test"));
             Assert.Equal($"{BaseView.InfoMsgPrecursor} test", _fixture.View.LastConsoleOutput);
 
-            Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Warning, "testx"));
+            Assert.True(_fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Warning, "testx"));
             Assert.Equal($"{BaseView.WarnMsgPrecursor} testx", _fixture.View.LastConsoleOutput);
 
-            Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Error, "testy"));
+            Assert.True(_fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Error, "testy"));
             Assert.Equal($"{BaseView.ErrorMsgPrecursor} testy", _fixture.View.LastConsoleOutput);
 
-            Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Error, null));
+            Assert.True(_fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Error, null));
             Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastConsoleOutput);
 
-            Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Warning, null));
+            Assert.True(_fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Warning, null));
             Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastConsoleOutput);
 
-            Assert.True(_fixture.View.DisplayMsg(BaseView.MsgType.Info, null));
+            Assert.True(_fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Info, null));
             Assert.Equal($"error: 1110201-program: DisplayMsg is null", _fixture.View.LastConsoleOutput);
         }
 

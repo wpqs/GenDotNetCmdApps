@@ -12,29 +12,14 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "RedundantCaseLabel")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "SimplifyConditionalTernaryExpression")]
-    public abstract class BaseView : ObserverView
+    public abstract partial class BaseView : ObserverView
     {
         public static readonly string ErrorMsgPrecursor = "error:";
         public static readonly string WarnMsgPrecursor = "warn:";
         public static readonly string InfoMsgPrecursor = "info:";
 
         [SuppressMessage("ReSharper", "InconsistentNaming")]
-        public enum ErrorType
-        {
-            [EnumMember(Value = "exception")] exception = 0,
-            [EnumMember(Value = "program")] program = 1,
-            [EnumMember(Value = "data")] data = 2,
-            [EnumMember(Value = "param")]param = 3,
-            [EnumMember(Value = "user")] user = 4
-        }
 
-        public enum MsgType
-        {
-            [EnumMember(Value = "Error")] Error = 0,        
-            [EnumMember(Value = "Warning")] Warning = 1,  
-            [EnumMember(Value = "Info")] Info= 2,
-            [EnumMember(Value = "Unknown")] Unknown =3
-        }
         protected IMxConsole Console { get; }
         public int WindowHeight { private set; get; }
         public int WindowWidth { private set; get; }
@@ -54,13 +39,23 @@ namespace KLineEdCmdApp.View.Base
         // ReSharper disable once MemberCanBePrivate.Global
         protected MxConsole.Color MsgLineInfoBackGndColour { private set; get; }
 
-        private MxReturnCode<bool> _mxErrorCode;
 
-        public bool IsOnUpdateError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
-        public MxError.Source GetErrorSource() { return _mxErrorCode?.GetErrorType() ?? MxError.Source.Program; }
-        public int GetErrorNo() { return _mxErrorCode?.GetErrorCode() ?? Program.PosIntegerNotSet; }
-        public string GetErrorTechMsg() { return _mxErrorCode?.GetErrorTechMsg() ?? Program.ValueNotSet; }
-        public string GetErrorUserMsg() { return _mxErrorCode?.GetErrorUserMsg() ?? Program.ValueNotSet; }
+        private MxReturnCode<bool> _mxErrorState;
+        public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
+        public MxReturnCode<bool> GetErrorState() { return _mxErrorState ?? null; }
+        public void ResetErrorState() { _mxErrorState = null; }
+        public bool SetErrorState(MxReturnCode<bool> mxErr)
+        {
+            var rc = false;
+
+            if (_mxErrorState == null)
+            {
+                _mxErrorState = mxErr;
+                rc = true;
+            }
+            return rc;
+        }
+
 
         public bool Ready { protected set; get; }
 
@@ -82,30 +77,33 @@ namespace KLineEdCmdApp.View.Base
 
             BlankLine = "";
             CursorOn = false;
-            _mxErrorCode = null; 
+            _mxErrorState = null;
 
             Ready = false;
         }
 
-        protected virtual void OnUpdateDone(MxReturnCode<bool> errorCode, bool cursorOn)
+        protected virtual void OnUpdateDone(MxReturnCode<bool> err, bool cursorOn)
         {
             CursorOn = cursorOn;
             Console.SetCursorVisible(CursorOn);
-            if (errorCode.IsError(true))
-                DisplayErrorMsg(errorCode);
+            if (err.IsError(true))
+                SetErrorState(err);
         }
 
         public override void OnUpdate(NotificationItem notificationItem)
         {
-            _mxErrorCode = new MxReturnCode<bool>($"{GetType().Name}.OnUpdate", false); //SetResult(true) on error
+            var rc = new MxReturnCode<bool>($"{GetType().Name}.OnUpdate", false); //SetResult(true) on error
 
             CursorOn = false;
             Console.SetCursorVisible(CursorOn);
 
-            if (Console.IsError())
-                SetMxError(1140201, Console.GetErrorSource(), $"MxConsole: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+            if (Console.IsErrorState())
+                rc.SetError(1140201, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
             else
-                _mxErrorCode?.SetResult(true);
+               rc.SetResult(true);
+
+            if (rc.IsError(true))
+                SetErrorState(rc);
         }
 
         public virtual MxReturnCode<bool> Setup(CmdLineParamsApp param)
@@ -146,30 +144,9 @@ namespace KLineEdCmdApp.View.Base
         {
             var rc = new MxReturnCode<bool>($"{GetType().Name}.Close");
 
-            if (_mxErrorCode.IsError())
-                rc += _mxErrorCode;
+            if (IsErrorState())
+                rc += GetErrorState();
 
-            return rc;
-        }
-
-        public MxReturnCode<MxReturnCode<bool>> GetMxError()
-        {
-            var rc = new MxReturnCode<MxReturnCode<bool>>($"{GetType().Name}.GetMxError");
-
-            rc += _mxErrorCode;
-
-            return rc;
-        }
-
-        protected bool SetMxError(int errorCode, MxError.Source source, string errMsgTech, string errMsgUser)
-        {       //use only in base classes, concrete derived classes use local MxResult variable like EditorHelpLineView, TextEditView, etc
-            var rc = false;
-
-            if ((_mxErrorCode != null) && (errMsgTech != null) && (errMsgUser != null))
-            {
-                _mxErrorCode.SetError(errorCode, source, errMsgTech, errMsgUser);
-                rc = true;
-            }
             return rc;
         }
 
@@ -182,7 +159,7 @@ namespace KLineEdCmdApp.View.Base
             else
             {
                 if (Console.SetCursorPosition(rowIndex, colIndex) == false)
-                    rc.SetError(1110202, Console.GetErrorSource(), $"BaseView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                    rc.SetError(1110202, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                 else
                     rc.SetResult(true);
             }
@@ -198,15 +175,15 @@ namespace KLineEdCmdApp.View.Base
             else
             {
                 if (Console.SetCursorPosition(rowIndex, 0) == false)
-                    rc.SetError(1110302, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
+                    rc.SetError(1110302, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                 else
                 {
                     if (Console.Write(BlankLine) == null)
-                        rc.SetError(1110303, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
+                        rc.SetError(1110303, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                     else
                     {
                         if (Console.SetCursorPosition(rowIndex, colIndex) == false)
-                            rc.SetError(1110304, Console.GetErrorSource(), Console.GetErrorTechMsg(), Console.GetErrorUserMsg());
+                            rc.SetError(1110304, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                         else
                         {
                             rc.SetResult(true);
@@ -271,34 +248,19 @@ namespace KLineEdCmdApp.View.Base
             return rc;
         }
 
-        public void DisplayErrorMsg(MxReturnCode<bool> err)
-        {
-            var errNo = err.GetErrorCode(); 
-            var errType = err.GetErrorType(); //xlat MxError.Source to BaseView.ErrorType
-            var errMsg = err.GetErrorUserMsg(); //trim before ': ' 
-           // var msg = FormatMxErrorMsg(errNo, errType, errMsg);
-
-            DisplayMsg(MsgType.Error, err.GetErrorUserMsg());  
-        }
-
-        public bool DisplayMsg(MsgType msgType, string msg)
+        public bool DisplayMsg(MxReturnCodeUtils.MsgClass msgClass, string msg)
         {
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (msg == null)
-                DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, $"{ BaseView.ErrorMsgPrecursor} {1110201}-{ErrorType.program}: DisplayMsg is null", true);
+                DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, $"{ BaseView.ErrorMsgPrecursor} {1110201}-{MxReturnCodeUtils.ErrorType.program}: DisplayMsg is null", true);
             else
             {
                 if (string.IsNullOrEmpty(msg))
                     ClearLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
                 else
-                    DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, MsgSetup(msgType, msg), true);
+                    DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, MsgSetup(msgClass, msg), true);
             }
             return true;
-        }
-
-        public static string FormatMxErrorMsg(int errorNo, ErrorType errType, string errMsg) //"error 1010102-exception: msg"
-        {
-            return $"{ BaseView.ErrorMsgPrecursor} {errorNo}-{errType}: {errMsg ?? Program.ValueNotSet}";
         }
 
         public static string TruncateTextForLine(string text, int maxLength)
@@ -314,14 +276,14 @@ namespace KLineEdCmdApp.View.Base
             return rc;
         }
 
-        private string MsgSetup(MsgType msgType, string msg)
+        private string MsgSetup(MxReturnCodeUtils.MsgClass msgClass, string msg)
         {
             // ReSharper disable once RedundantAssignment
             var rc = Program.ValueNotSet;
 
-            switch (msgType)
+            switch (msgClass)
             {
-                case MsgType.Error:
+                case MxReturnCodeUtils.MsgClass.Error:
                 {
                     Console.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
                     if ((msg.Length > 0) && (msg.StartsWith(BaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(BaseView.ErrorMsgPrecursor.ToLower()) == false))
@@ -330,7 +292,7 @@ namespace KLineEdCmdApp.View.Base
                         rc = msg;
                 }
                 break;
-                case MsgType.Warning:
+                case MxReturnCodeUtils.MsgClass.Warning:
                 {
                     Console.SetColour(MsgLineWarnForeGndColour, MsgLineWarnBackGndColour);
                     if ((msg.Length > 0) && (msg.StartsWith(BaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(BaseView.WarnMsgPrecursor.ToLower()) == false))
@@ -339,7 +301,7 @@ namespace KLineEdCmdApp.View.Base
                         rc = msg;
                 }
                 break;
-                case MsgType.Info:
+                case MxReturnCodeUtils.MsgClass.Info:
                 default:
                 {
                     Console.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);

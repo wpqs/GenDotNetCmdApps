@@ -40,23 +40,23 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.Equal("a hello>", _fixture.View.LastConsoleOutput);
 
             _fixture.Model.Refresh();
-            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
+            Assert.False(_fixture.View.IsErrorState());
             Assert.Equal("a hello>", _fixture.View.LastConsoleOutput);
 
             _fixture.Model.BodyInsertText(" world");
-            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
+            Assert.False(_fixture.View.IsErrorState());
             Assert.Equal("a hello world>", _fixture.View.LastConsoleOutput);
 
             _fixture.Model.Refresh();
-            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
+            Assert.False(_fixture.View.IsErrorState());
             Assert.Equal("a hello world>", _fixture.View.LastConsoleOutput);
 
             _fixture.Model.BodyInsertText('s'.ToString());
-            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
+            Assert.False(_fixture.View.IsErrorState());
             Assert.Equal("a hello worlds>", _fixture.View.LastConsoleOutput);
 
             _fixture.Model.Refresh();
-            Assert.Equal(TestConst.MxNoError, _fixture.View.GetErrorTechMsg());
+            Assert.False(_fixture.View.IsErrorState());
             Assert.Equal("a hello worlds>", _fixture.View.LastConsoleOutput);
             Assert.Equal(1, _fixture.Model.ChapterBody.GetLineCount());
 

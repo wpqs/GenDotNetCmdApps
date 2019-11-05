@@ -38,7 +38,7 @@ namespace KLineEdCmdApp.View
                     EditorHelpLineBackGndColour = param.BackGndColourCmds; 
 
                     if (Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
-                        rc.SetError(1120102, Console.GetErrorSource(), $"EditHelpLineView. {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                        rc.SetError(1120102, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                    else
                     {
                         var rcClear = ClearLine(KLineEditor.EditorHelpLineRowIndex, KLineEditor.EditorHelpLineLeftCol);
@@ -59,9 +59,7 @@ namespace KLineEdCmdApp.View
             var rc = new MxReturnCode<bool>("EditorHelpLineView.OnUpdate");
 
             base.OnUpdate(notificationItem);
-            if (IsOnUpdateError())
-                rc.SetError(GetErrorNo(), GetErrorSource(), GetErrorTechMsg(), GetErrorUserMsg());
-            else
+            if (IsErrorState() == false)
             {
                 ChapterModel.ChangeHint change = (ChapterModel.ChangeHint) notificationItem.Change;
                 if ((change != ChapterModel.ChangeHint.All) && (change != ChapterModel.ChangeHint.HelpLine))
@@ -74,7 +72,7 @@ namespace KLineEdCmdApp.View
                     else
                     {
                         if (Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
-                            rc.SetError(1120302, Console.GetErrorSource(), $"EditHelpLineView: {Console.GetErrorTechMsg()}", Console.GetErrorUserMsg());
+                            rc.SetError(1120302, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
                         else
                         {
                             var helpText = model.EditorHelpLine ?? Program.ValueNotSet;
