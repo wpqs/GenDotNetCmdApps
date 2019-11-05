@@ -14,33 +14,33 @@ namespace KLineEdCmdApp
         //Messages
         public const string MxMsgNotFound = "MxMsgNotFound"; //"Message not found. Coding defect. Please report this problem" 
 
-        //Warnings - must start with text 'Warning'
 
         //Errors 
         public const string MxErrTest = "MxErrTest"; //"Error test. Test of error handling. Please take no action"
-        public const string MxErrInvalidSettingsFile = "MxErrInvalidSettingsFile"; //"Error: your settings file is invalid. The file used for saving your program parameters and arguments is corrupt. Delete KLineEdApp.json and try again"
-        public const string MxErrUnknownParam = "MxErrUnsupportedParam"; //"Error: parameter not supported. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application"
-        public const string MxErrInvalidParamArg = "MxErrInvalidParamArg"; //"Error: parameter or argument is not correctly set. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application"
-        public const string MxErrParamArgValueNotFound = "MxErrParamArgValueNotFound"; //"Error: value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
-        public const string MxErrParamArgNameNotFound = "MxErrParamArgNameNotFound"; //"Error:  argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
-        public const string MxErrParamArgNameDuplicateFound = "MxErrParamArgNameDuplicateFound"; //"Error:  duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
+        public const string MxErrInvalidSettingsFile = "MxErrInvalidSettingsFile"; //"Your settings file is invalid. The file used for saving your program parameters and arguments is corrupt. Delete KLineEdApp.json and try again"
+        public const string MxErrUnknownParam = "MxErrUnsupportedParam"; //"Parameter not supported. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application"
+        public const string MxErrInvalidParamArg = "MxErrInvalidParamArg"; //"Parameter or argument is not correctly set. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application"
+        public const string MxErrParamArgValueNotFound = "MxErrParamArgValueNotFound"; //"Value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
+        public const string MxErrParamArgNameNotFound = "MxErrParamArgNameNotFound"; //"Argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
+        public const string MxErrParamArgNameDuplicateFound = "MxErrParamArgNameDuplicateFound"; //"Duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments"
 
-        public const string MxErrBadMethodParam = "MxErrBadMethodParam";  //Error: internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed.
-        public const string MxErrInvalidCondition = "MxErrInvalidCondition"; //Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed.
-        public const string MxErrLineTooLong = "MxErrLineTooLong"; //Error: line is too long. You have reached the end of the line. Press the Enter key to continue
-        public const string MxErrInvalidChapterFile = "MxErrInvalidChapterFile"; //Error: chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again 
-        public const string MxErrException = "MxErrException"; //Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed.
-        public const string MxErrSystemFailure = "MxErrSystemFailure"; //Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
-        public const string MxErrBrowserFailed = "MxErrBrowserFailed"; //Error: cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
-        public const string MxErrNoWordSelected = "MxErrNoWordSelected"; //Error: no word found at current cursor position. Move cursor and try again"
-        public const string MxErrInvalidWordSelected = "MxErrInvalidWordSelected"; //Error: word found at current cursor position is invalid. Move cursor and try again"
-        public const string MxErrExportInputFileNotFound = "MxErrExportInputFileNotFound"; //Error: input file does not exist. Change the '--export' parameter argument 'from' and try again
-        public const string MxErrExportOutputFileExists = "MxErrExportOutputFileExists"; //Error: output file already exists. Change the '--export' parameter argument 'to' and try again
-        public const string MxErrExportOutputFileEmpty = "MxErrExportOutputFileEmpty"; //Error: input file is empty. Select another file and try again
-        public const string MxErrImportInputFileNotFound = "MxErrImportInputFileNotFound"; //Error: input file does not exist. Change the '--import' parameter argument 'from' and try again
-        public const string MxErrImportOutputFileExists = "MxErrImportOutputFileExists"; //Error: output file already exists. Change the '--import' parameter argument 'to' and try again
-        public const string MxErrImportInputFileEmpty = "MxErrImportInputFileEmpty"; //Error: input file is empty. Select another file and try again
+        public const string MxErrBadMethodParam = "MxErrBadMethodParam";  //Internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed.
+        public const string MxErrInvalidCondition = "MxErrInvalidCondition"; //Invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed.
+        public const string MxErrLineTooLong = "MxErrLineTooLong"; //Line is too long. You have reached the end of the line. Press the Enter key to continue
+        public const string MxErrInvalidChapterFile = "MxErrInvalidChapterFile"; //Chapter file cannot be opened. It has been corrupted. Run using --fix parameter and then try again 
+        public const string MxErrException = "MxErrException"; //Unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed.
+        public const string MxErrSystemFailure = "MxErrSystemFailure"; //Unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
+        public const string MxErrBrowserFailed = "MxErrBrowserFailed"; //Cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
+        public const string MxErrNoWordSelected = "MxErrNoWordSelected"; //No word found at current cursor position. Move cursor and try again"
+        public const string MxErrInvalidWordSelected = "MxErrInvalidWordSelected"; //Word found at current cursor position is invalid. Move cursor and try again"
+        public const string MxErrExportInputFileNotFound = "MxErrExportInputFileNotFound"; //Input file does not exist. Change the '--export' parameter argument 'from' and try again
+        public const string MxErrExportOutputFileExists = "MxErrExportOutputFileExists"; //Output file already exists. Change the '--export' parameter argument 'to' and try again
+        public const string MxErrExportOutputFileEmpty = "MxErrExportOutputFileEmpty"; //Input file is empty. Select another file and try again
+        public const string MxErrImportInputFileNotFound = "MxErrImportInputFileNotFound"; //Input file does not exist. Change the '--import' parameter argument 'from' and try again
+        public const string MxErrImportOutputFileExists = "MxErrImportOutputFileExists"; //Output file already exists. Change the '--import' parameter argument 'to' and try again
+        public const string MxErrImportInputFileEmpty = "MxErrImportInputFileEmpty"; //Input file is empty. Select another file and try again
 
+        //Warnings - must start with text 'Warning: '
 
         public const string MxWarnEndOfLine = "MxErrEndOfLine";     //Warning: you are at the end of the line. Press the left arrow key and try again.
         public const string MxWarnStartOfLine = "MxErrStartOfLine"; //Warning: you are at the start of the line. Press the right arrow key or enter a character.
@@ -52,6 +52,8 @@ namespace KLineEdCmdApp
         public const string MxWarnTooManyLines = "MxWarnTooManyLines"; //Warning: Line limit reached. Please start a new chapter
         public const string MxWarnChapterEmpty = "MxWarnChapterEmpty"; //Warning: Chapter is empty. Please type a character and try again.
         public const string MxWarnScrollLimit = "MxWarnScrollLimit";   //Warning: you cannot scroll back any further. Change --limits parameter and try again.
+
+        //Info - must start with text 'Info: '
 
     }
 

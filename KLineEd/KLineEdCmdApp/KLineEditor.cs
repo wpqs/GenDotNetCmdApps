@@ -302,7 +302,7 @@ namespace KLineEdCmdApp
                                     lastAutoSaveUtc = DateTime.UtcNow;
                                     var rcSave = Model.Save();
                                     if (rcSave.IsError(true))
-                                        Model.SetMsgLine(rcSave.GetErrorTechMsg());
+                                        Model.SetMsgLine(rcSave.GetErrorTechMsg()); //Controller.SetError
                                 }
 
                                 if ((StatusUpdatePeriod != 0) && ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusUpdatePeriod))

@@ -19,7 +19,7 @@ namespace KLineEdCmdApp.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -61,7 +61,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        ///   Looks up a localized string similar to Internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed..
         /// </summary>
         internal static string MxErrBadMethodParam {
             get {
@@ -70,7 +70,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
+        ///   Looks up a localized string similar to Cannot start browser. Your web browser may be defective. Please reboot your computer and try again.
         /// </summary>
         internal static string MxErrBrowserFailed {
             get {
@@ -79,7 +79,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        ///   Looks up a localized string similar to Unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed..
         /// </summary>
         internal static string MxErrException {
             get {
@@ -88,7 +88,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: input file does not exist. Change the &apos;--export&apos; parameter argument &apos;from&apos; and try again.
+        ///   Looks up a localized string similar to Input file does not exist. Change the &apos;--export&apos; parameter argument &apos;from&apos; and try again.
         /// </summary>
         internal static string MxErrExportInputFileNotFound {
             get {
@@ -97,7 +97,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: input file is empty. Select another file and try again.
+        ///   Looks up a localized string similar to Input file is empty. Select another file and try again.
         /// </summary>
         internal static string MxErrExportOutputFileEmpty {
             get {
@@ -106,7 +106,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: output file already exists. Change the &apos;--export&apos; parameter argument &apos;to&apos; and try again.
+        ///   Looks up a localized string similar to Output file already exists. Change the &apos;--export&apos; parameter argument &apos;to&apos; and try again.
         /// </summary>
         internal static string MxErrExportOutputFileExists {
             get {
@@ -115,7 +115,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: input file is empty. Select another file and try again.
+        ///   Looks up a localized string similar to Input file is empty. Select another file and try again.
         /// </summary>
         internal static string MxErrImportInputFileEmpty {
             get {
@@ -124,7 +124,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: input file does not exist. Change the &apos;--import&apos; parameter argument &apos;from&apos; and try again.
+        ///   Looks up a localized string similar to Input file does not exist. Change the &apos;--import&apos; parameter argument &apos;from&apos; and try again.
         /// </summary>
         internal static string MxErrImportInputFileNotFound {
             get {
@@ -133,7 +133,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: output file already exists. Change the &apos;--import&apos; parameter argument &apos;to&apos; and try again.
+        ///   Looks up a localized string similar to Output file already exists. Change the &apos;--import&apos; parameter argument &apos;to&apos; and try again.
         /// </summary>
         internal static string MxErrImportOutputFileExists {
             get {
@@ -142,7 +142,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: Chapter file cannot be opened. It has been corrupted. Export and then Import to fix the problem.
+        ///   Looks up a localized string similar to Chapter file cannot be opened. It has been corrupted. Export and then Import to fix the problem.
         /// </summary>
         internal static string MxErrInvalidChapterFile {
             get {
@@ -151,7 +151,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        ///   Looks up a localized string similar to Invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed..
         /// </summary>
         internal static string MxErrInvalidCondition {
             get {
@@ -160,7 +160,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: parameter or argument is not correctly set. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application.
+        ///   Looks up a localized string similar to Parameter or argument is not correctly set. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application.
         /// </summary>
         internal static string MxErrInvalidParamArg {
             get {
@@ -169,7 +169,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: your settings file is invalid. The file used for saving your program parameters and arguments is corrupt. Please delete KLineEdApp.json and try again.
+        ///   Looks up a localized string similar to Your settings file is invalid. The file used for saving your program parameters and arguments is corrupt. Please delete KLineEdApp.json and try again.
         /// </summary>
         internal static string MxErrInvalidSettingsFile {
             get {
@@ -178,7 +178,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: word found at current cursor position is invalid. Move cursor and try again.
+        ///   Looks up a localized string similar to Word found at current cursor position is invalid. Move cursor and try again.
         /// </summary>
         internal static string MxErrInvalidWordSelected {
             get {
@@ -187,7 +187,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: line is too long. You have reached the end of the line. Press the Enter key to continue.
+        ///   Looks up a localized string similar to Line is too long. You have reached the end of the line. Press the Enter key to continue.
         /// </summary>
         internal static string MxErrLineTooLong {
             get {
@@ -196,7 +196,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: no word found at current cursor position. Move cursor and try again.
+        ///   Looks up a localized string similar to No word found at current cursor position. Move cursor and try again.
         /// </summary>
         internal static string MxErrNoWordSelected {
             get {
@@ -205,7 +205,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error:  duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        ///   Looks up a localized string similar to Duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
         /// </summary>
         internal static string MxErrParamArgNameDuplicateFound {
             get {
@@ -214,7 +214,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error:  argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        ///   Looks up a localized string similar to Argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
         /// </summary>
         internal static string MxErrParamArgNameNotFound {
             get {
@@ -223,7 +223,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        ///   Looks up a localized string similar to Value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
         /// </summary>
         internal static string MxErrParamArgValueNotFound {
             get {
@@ -232,7 +232,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
+        ///   Looks up a localized string similar to Unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
         /// </summary>
         internal static string MxErrSystemFailure {
             get {
@@ -241,7 +241,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: test of error handling. Please take no action.
+        ///   Looks up a localized string similar to Error. test of error handling. Please take no action.
         /// </summary>
         internal static string MxErrTest {
             get {
@@ -250,7 +250,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Error: parameter not supported. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application.
+        ///   Looks up a localized string similar to Parameter not supported. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application.
         /// </summary>
         internal static string MxErrUnsupportedParam {
             get {

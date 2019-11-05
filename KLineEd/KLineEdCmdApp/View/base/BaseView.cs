@@ -233,7 +233,7 @@ namespace KLineEdCmdApp.View.Base
                 if (rc.IsSuccess(true))
                 {
                     if ((LastConsoleOutput = Console.Write(BaseView.TruncateTextForLine(text, WindowWidth - colIndex-1))) == null) //column=WindowWidth-1 is the right most column, writing to next col generates a new line
-                        rc.SetError(1110402, MxError.Source.Data, $"rowIndex={rowIndex}, colIndex={colIndex}, text={text}", MxMsgs.MxErrInvalidCondition);
+                        rc.SetError(1110402, MxError.Source.Data, $"window rowIndex={rowIndex}, colIndex={colIndex}, text={text}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
                         rc.SetResult(true);
@@ -273,6 +273,11 @@ namespace KLineEdCmdApp.View.Base
 
         public void DisplayErrorMsg(MxReturnCode<bool> err)
         {
+            var errNo = err.GetErrorCode(); 
+            var errType = err.GetErrorType(); //xlat MxError.Source to BaseView.ErrorType
+            var errMsg = err.GetErrorUserMsg(); //trim before ': ' 
+           // var msg = FormatMxErrorMsg(errNo, errType, errMsg);
+
             DisplayMsg(MsgType.Error, err.GetErrorUserMsg());  
         }
 
