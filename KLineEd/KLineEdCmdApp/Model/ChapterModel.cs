@@ -17,7 +17,7 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
-    public class ChapterModel : NotifierModel
+    public class ChapterModel : NotifierModel, IErrorState
     {
         public enum CursorState
         {

@@ -6,13 +6,8 @@ using MxReturnCode;
 namespace KLineEdCmdApp.Utils
 {
     [SuppressMessage("ReSharper", "IdentifierTypo")]
-    public interface IMxConsole
+    public interface IMxConsole : IErrorState
     {
-        bool IsErrorState();
-        MxReturnCode<bool> GetErrorState();
-        void ResetErrorState();
-        bool SetErrorState(MxReturnCode<bool> mxErr);
-
         bool ApplySettings(MxConsoleProperties props, bool restore=false);
         MxReturnCode<bool> Close();
         MxConsoleProperties GetSettings();

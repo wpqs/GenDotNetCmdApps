@@ -8,15 +8,15 @@ namespace KLineEdCmdApp.Controller.Base
         public static readonly string TextEditingController = "TextEditingController";
         public static readonly string PropsEditingController = "PropsEditingController";
         public static readonly string SpellEditingController = "SpellEditingController";
-        public static EditingBaseController Make(ChapterModel model, string className, string browserCmd, string helpUrl, string searchUrl, string thesaurusUrl, string spellUrl)
+        public static BaseEditingController Make(ChapterModel model, string className, string browserCmd, string helpUrl, string searchUrl, string thesaurusUrl, string spellUrl)
         {
             var rc = new MxReturnCode<bool>($"ControllerFactory.Maker");
 
-            EditingBaseController controller = null;
+            BaseEditingController controller = null;
 
             if ((model?.Ready ?? false) && (className != null) && (browserCmd != null) && (helpUrl != null) && (searchUrl != null) && (thesaurusUrl != null) && (spellUrl != null))
             {
-                EditingBaseController ctrller = null;
+                BaseEditingController ctrller = null;
                 if (className == TextEditingController)
                     ctrller = new TextEditingController();
                 else

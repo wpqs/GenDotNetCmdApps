@@ -9,16 +9,16 @@ using MxReturnCode;
 namespace KLineEdCmdApp.Controller
 {
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
-    public class PropsEditingController : EditingBaseController
+    public class PropsEditingController : BaseEditingController
     {
         public static readonly string EditorHelpText = $"{PropsEditView.PropsEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F2=Text editing";
 
-        public override EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
+        public override BaseEditingController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
             var rc = new MxReturnCode<bool>("PropsEditingController. ProcessKey");
 
-            EditingBaseController controller = this;
-            if ((base.ProcessKey(model, keyInfo) != null) && (IsErrorState() == false))
+            BaseEditingController controller = this;
+            if ((base.ProcessKey(model, keyInfo) != null)) // && (IsErrorState() == false))
             {
                 //do stuff related to TextEditing, updating the model as needed
                 var  props = model?.ChapterHeader?.Properties;

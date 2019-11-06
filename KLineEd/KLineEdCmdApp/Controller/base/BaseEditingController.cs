@@ -11,7 +11,7 @@ namespace KLineEdCmdApp.Controller.Base
 {
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
-    public abstract class EditingBaseController
+    public abstract class BaseEditingController : IErrorState
     {
         public ChapterModel Chapter { private set; get; }
         public string BrowserCmd { private set; get; }
@@ -23,6 +23,7 @@ namespace KLineEdCmdApp.Controller.Base
         private bool _insertMode;
         private bool _ctrlQ;
         private bool _refresh;
+        private bool _userErrorResetRequest;
 
         private MxReturnCode<bool> _mxErrorState;
         public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
@@ -42,10 +43,11 @@ namespace KLineEdCmdApp.Controller.Base
 
         // ReSharper disable once SimplifyConditionalTernaryExpression
 
-        protected EditingBaseController()
+        protected BaseEditingController()
         {
             _ctrlQ = false;
             _refresh = false;
+            _userErrorResetRequest = false;
             _mxErrorState = null;
             Chapter = null;
             _insertMode = false;
@@ -75,7 +77,7 @@ namespace KLineEdCmdApp.Controller.Base
 
         public virtual MxReturnCode<bool> Initialise(ChapterModel model, string browserCmd, string helpUrl, string searchUrl, string thesaurusUrl, string spellUrl)
         {
-            var rc = new MxReturnCode<bool>("EditingBaseController.Initialise");
+            var rc = new MxReturnCode<bool>("BaseEditingController.Initialise");
 
             if ((model?.Ready ?? false) == false)
                 rc.SetError(1250101, MxError.Source.Param, $"model null, not ready, or browserCmd null", MxMsgs.MxErrBadMethodParam);
@@ -84,6 +86,7 @@ namespace KLineEdCmdApp.Controller.Base
 
                 _ctrlQ = false;
                 _refresh = false;
+                _userErrorResetRequest = false;
                 _insertMode = false;
                 _mxErrorState = null;
                 Chapter = model;
@@ -98,69 +101,14 @@ namespace KLineEdCmdApp.Controller.Base
             return rc;
         }
 
-
-        public MxReturnCode<bool> ErrorProcessing(List<BaseView> viewList, IMxConsole console)
+        public MxReturnCode<bool> Close()
         {
-            var rc = new MxReturnCode<bool>("EditingBaseController.ErrorProcessing");
+            var rc = new MxReturnCode<bool>($"{GetType().Name}.Close");
 
-            if ((viewList == null) || (console == null) || ((Chapter?.Ready ?? false) == false) )
-                rc.SetError(1250201, MxError.Source.Param, $"viewList is null, or console is null, or model null, or not ready  ", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                var err = _mxErrorState;                    //check controller
-                if (err == null)
-                {
-                    if (console.IsErrorState())             //check console
-                        err = console.GetErrorState();
-                    else
-                    {
-                        if (Chapter.IsErrorState())         //check model
-                            err = Chapter.GetErrorState();
-                        else
-                        {
-                            foreach (var view in viewList)  //check views
-                            {
-                                if (view.IsErrorState())
-                                {
-                                    err = view.GetErrorState();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+            if (IsErrorState())
+                rc += GetErrorState();
 
-                if (err != null)
-                {
-                    SetErrorState(err);     //copy any errors found in model or views into controller error state
-                    var mxErrorMsg = GetErrorState()?.GetErrorUserMsg();
-                    var msgClass = MxDotNetUtilsLib.EnumOps.XlatToString(MxReturnCodeUtils.GetErrorClass(mxErrorMsg));
-                    var msgText = MxReturnCodeUtils.GetErrorText(mxErrorMsg);
-                    var msgErrCode = MxReturnCodeUtils.GetErrorCode(mxErrorMsg);
-
-                    var msg = $"{msgClass} #{msgErrCode}: {msgText ?? Program.ValueNotSet}"; ;
-
-                    Chapter.SetMsgLine(msg);
-                    if ((GetErrorState()?.GetErrorType() != MxError.Source.Exception))
-                        rc.SetResult(true);
-                }
-                else
-                {       //user pressed a key (not Ctrl+Q) and so cleared controller._mxErrorState, if set - see ProcessKey
-                        //clear any errors in  console, model or views that were copied into controller.SetErrorState 
-                    if (console.IsErrorState())         //check console
-                      console.ResetErrorState();
-                    if (Chapter.IsErrorState())         //check model
-                        Chapter.ResetErrorState();
-                    foreach (var view in viewList)      //check views
-                    {
-                        if (view.IsErrorState())
-                            view.ResetErrorState();
-                    }
-                    rc.SetResult(true);
-                }
-
-            }
-            return rc;  //terminate loop if error or GetResult() is false;
+            return rc;
         }
 
         public static MxReturnCodeUtils.MsgClass GetMsgClass(string msg)
@@ -176,22 +124,94 @@ namespace KLineEdCmdApp.Controller.Base
             return rc;
         }
 
-        public MxReturnCode<bool> Close()
+
+        public MxReturnCode<bool> ErrorProcessing(List<BaseView> viewList, IMxConsole console)
         {
-            var rc = new MxReturnCode<bool>($"{GetType().Name}.Close");
+            var rc = new MxReturnCode<bool>("BaseEditingController.ErrorProcessing");
 
-            if (IsErrorState())
-                rc += GetErrorState();
+            if ((viewList == null) || (console == null) || ((Chapter?.Ready ?? false) == false) )
+                rc.SetError(1250201, MxError.Source.Param, $"viewList is null, or console is null, or model null, or not ready  ", MxMsgs.MxErrBadMethodParam);
+            else
+            {
+                if (_userErrorResetRequest)
+                {
+                    _userErrorResetRequest = false;
+                    ResetAllErrorStates(viewList, console);
+                    if (Chapter.MsgLine?.Length > 0)
+                        Chapter.SetMsgLine("");
+                    rc.SetResult(true);
+                }
+                else
+                {
+                    var err = GetAllErrorStates(viewList, console);
+                    if (err == null)
+                        rc.SetResult(true);
+                    else
+                    {
+                        SetErrorState(err);
+                        var mxErrorMsg = err.GetErrorUserMsg();
+                        var msgClass = MxDotNetUtilsLib.EnumOps.XlatToString(MxReturnCodeUtils.GetErrorClass(mxErrorMsg));
+                        var msgText = MxReturnCodeUtils.GetErrorText(mxErrorMsg);
+                        var msgErrCode = MxReturnCodeUtils.GetErrorCode(mxErrorMsg);
+                        Chapter.SetMsgLine($"{msgClass} {msgErrCode}: {msgText ?? Program.ValueNotSet}"); //FORMAT MESSAGE FOR DISPLAY - message only displayed if Chapter.MsgLine != msg  
+                        _userErrorResetRequest = false;
 
-            return rc;
+                        if ((err.GetErrorType() != MxError.Source.Exception))
+                            rc.SetResult(true);
+                    }
+                }
+            }
+            return rc;  //terminate loop if error or GetResult() is false;
+        }
+
+        private void ResetAllErrorStates(List<BaseView> viewList, IMxConsole console)
+        {
+            if (IsErrorState())         //check controller
+                ResetErrorState();
+            if (console.IsErrorState()) //check console
+                console.ResetErrorState();
+            if (Chapter.IsErrorState()) //check model
+                Chapter.ResetErrorState();
+            foreach (var view in viewList) //check views
+            {
+                if (view.IsErrorState())
+                    view.ResetErrorState();
+            }
+        }
+
+        private MxReturnCode<bool> GetAllErrorStates(List<BaseView> viewList, IMxConsole console)
+        {
+            var err = _mxErrorState; //check controller
+            if (err == null)
+            {
+                if (console.IsErrorState()) //check console
+                    err = console.GetErrorState();
+                else
+                {
+                    if (Chapter.IsErrorState()) //check model
+                        err = Chapter.GetErrorState();
+                    else
+                    {
+                        foreach (var view in viewList) //check views
+                        {
+                            if (view.IsErrorState())
+                            {
+                                err = view.GetErrorState();
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return err;
         }
 
 
-        public virtual EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
+        public virtual BaseEditingController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
-            EditingBaseController controller = null;
+            BaseEditingController controller = null;
 
-            var rc = new MxReturnCode<bool>($"EditingBaseController.ProcessKey");
+            var rc = new MxReturnCode<bool>($"BaseEditingController.ProcessKey");
             
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             if ((model == null) || (keyInfo == null))
@@ -201,17 +221,14 @@ namespace KLineEdCmdApp.Controller.Base
                 var ctrlKeyPressed = ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0);
 
                 if ((ctrlKeyPressed) && (keyInfo.Key == ConsoleKey.Q))
-                    _ctrlQ = true;
-                if ((_ctrlQ == false) && (IsErrorState()))
                 {
-                    ResetErrorState(); 
-                    if (Chapter.MsgLine?.Length > 0)
-                        Chapter.SetMsgLine("");
+                    _ctrlQ = true;
                     rc.SetResult(true);
                 }
-
-                if (_ctrlQ == false)
+                else
                 {
+                    if (IsErrorState())
+                        _userErrorResetRequest = true;
                     if (ctrlKeyPressed && (keyInfo.Key == ConsoleKey.S))
                     {
                         var rcSave = Chapter.Save();
@@ -248,7 +265,7 @@ namespace KLineEdCmdApp.Controller.Base
             return controller; 
         }
 
-        protected virtual EditingBaseController ProcessKey(ConsoleKeyInfo key)
+        protected virtual BaseEditingController ProcessKey(ConsoleKeyInfo key)
         {
             //do common stuff with key - let override in derived class do the rest 
             return this;  
@@ -256,7 +273,7 @@ namespace KLineEdCmdApp.Controller.Base
 
         protected void LaunchBrowser(Body body, string url, bool replaceSelectedWord = false)
         {
-            var rc = new MxReturnCode<bool>($"EditingBaseController.LaunchBrowser");
+            var rc = new MxReturnCode<bool>($"BaseEditingController.LaunchBrowser");
 
             if ((body == null) || (string.IsNullOrEmpty(url)))
                 rc.SetError(1250301, MxError.Source.Param, "body of url is null", MxMsgs.MxErrBadMethodParam);

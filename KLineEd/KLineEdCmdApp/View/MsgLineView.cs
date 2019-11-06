@@ -64,7 +64,7 @@ namespace KLineEdCmdApp.View
                         if (string.IsNullOrEmpty(model.MsgLine))
                             DisplayMsg(MxReturnCodeUtils.MsgClass.Info, "");
                         else
-                            DisplayMsg(EditingBaseController.GetMsgClass(model.MsgLine), model.MsgLine); //Msg is formatted in EditingBaseController.ErrorProcessing()
+                            DisplayMsg(BaseEditingController.GetMsgClass(model.MsgLine), model.MsgLine); //Msg is formatted in BaseEditingController.ErrorProcessing()
                         rc.SetResult(true);
                     }
                 }

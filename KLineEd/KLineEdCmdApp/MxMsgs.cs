@@ -87,7 +87,7 @@ namespace KLineEdCmdApp
         public const int ControllerFactoryFirst =       1220101; //first error code in class ControllerFactory.cs
         public const int PropsEditingControllerFirst =  1230101; //first error code in class PropsEditingController.cs
         public const int TextEditingControllerFirst =   1240101; //first error code in class TextEditingController.cs
-        public const int EditingBaseControllerFirst =   1250101; //first error code in class EditingBaseController.cs
+        public const int BaseEditingControllerFirst =   1250101; //first error code in class BaseEditingController.cs
 
         public const int ExportProcFirst =              1260101; //first error code in class ExportProc.cs
         public const int ImportProcFirst =              1270101; //first error code in class ImportProc.cs

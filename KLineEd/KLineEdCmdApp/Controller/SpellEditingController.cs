@@ -5,14 +5,14 @@ using KLineEdCmdApp.View;
 
 namespace KLineEdCmdApp.Controller
 {
-    public class SpellEditingController : EditingBaseController
+    public class SpellEditingController : BaseEditingController
     {
         public static readonly string EditorHelpText = $"{SpellEditView.SpellEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F2=Text editing";
 
-        public override EditingBaseController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
+        public override BaseEditingController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
-            EditingBaseController controller = this;
-            if ((base.ProcessKey(model, keyInfo) != null) && (IsErrorState() == false))
+            BaseEditingController controller = this;
+            if ((base.ProcessKey(model, keyInfo) != null)) // && (IsErrorState() == false))
             {
                 //do stuff related to TextEditing, updating the model as needed
                 if (keyInfo.Key == ConsoleKey.F2)

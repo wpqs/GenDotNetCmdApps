@@ -12,11 +12,8 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "RedundantCaseLabel")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "SimplifyConditionalTernaryExpression")]
-    public abstract partial class BaseView : ObserverView
+    public abstract partial class BaseView : ObserverView, IErrorState
     {
-        public static readonly string ErrorMsgPrecursor = "error:";
-        public static readonly string WarnMsgPrecursor = "warn:";
-        public static readonly string InfoMsgPrecursor = "info:";
 
         [SuppressMessage("ReSharper", "InconsistentNaming")]
 
@@ -252,7 +249,7 @@ namespace KLineEdCmdApp.View.Base
         {
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (msg == null)
-                DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, $"{ BaseView.ErrorMsgPrecursor} {1110201}-{MxReturnCodeUtils.ErrorType.program}: DisplayMsg is null", true);
+                DisplayLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol, $"{MxReturnCodeUtils.ErrorMsgPrecursor}({1110201}) DisplayMsg is null", true);
             else
             {
                 if (string.IsNullOrEmpty(msg))
@@ -286,29 +283,20 @@ namespace KLineEdCmdApp.View.Base
                 case MxReturnCodeUtils.MsgClass.Error:
                 {
                     Console.SetColour(MsgLineErrorForeGndColour, MsgLineErrorBackGndColour);
-                    if ((msg.Length > 0) && (msg.StartsWith(BaseView.ErrorMsgPrecursor) == false) && (msg.StartsWith(BaseView.ErrorMsgPrecursor.ToLower()) == false))
-                        rc = $"{BaseView.ErrorMsgPrecursor} {msg}";
-                    else
-                        rc = msg;
+                    rc = msg;
                 }
                 break;
                 case MxReturnCodeUtils.MsgClass.Warning:
                 {
                     Console.SetColour(MsgLineWarnForeGndColour, MsgLineWarnBackGndColour);
-                    if ((msg.Length > 0) && (msg.StartsWith(BaseView.WarnMsgPrecursor) == false) && (msg.StartsWith(BaseView.WarnMsgPrecursor.ToLower()) == false))
-                        rc = $"{BaseView.WarnMsgPrecursor} {msg}";
-                    else
-                        rc = msg;
+                     rc = msg;
                 }
                 break;
                 case MxReturnCodeUtils.MsgClass.Info:
                 default:
                 {
                     Console.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
-                    if ((msg.Length > 0) && (msg.StartsWith(BaseView.InfoMsgPrecursor) == false) && (msg.StartsWith(BaseView.InfoMsgPrecursor.ToLower()) == false))
-                        rc = $"{BaseView.InfoMsgPrecursor} {msg}";
-                    else
-                        rc = msg;
+                    rc = msg;
                 }
                 break;
             }

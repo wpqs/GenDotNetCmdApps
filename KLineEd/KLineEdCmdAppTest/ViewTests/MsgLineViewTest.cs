@@ -1,4 +1,5 @@
-﻿using KLineEdCmdAppTest.TestSupport;
+﻿using KLineEdCmdApp.Utils;
+using KLineEdCmdAppTest.TestSupport;
 using Xunit;
 
 namespace KLineEdCmdAppTest.ViewTests
@@ -19,9 +20,9 @@ namespace KLineEdCmdAppTest.ViewTests
             Assert.True(_fixture.Model.Ready);
             Assert.True(_fixture.View.Ready);
 
-            _fixture.Model.SetMsgLine("test msg");
+            _fixture.Model.SetMsgLine($"{MxReturnCodeUtils.ErrorMsgPrecursor}#1010101 test msg");
             Assert.False(_fixture.View.IsErrorState());
-            Assert.Equal("error: test msg", _fixture.View.LastConsoleOutput);
+            Assert.Equal("Error: #1010101 test msg", _fixture.View.LastConsoleOutput);
         }
     }
 }

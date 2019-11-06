@@ -54,7 +54,7 @@ namespace KLineEdCmdApp
 
         public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................";
 
-        private EditingBaseController Controller { set; get; }
+        private BaseEditingController Controller { set; get; }
         public IMxConsole Console { private set; get; }
         public ChapterModel Model { private set; get; }
 
