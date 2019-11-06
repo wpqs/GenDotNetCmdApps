@@ -106,7 +106,7 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<string>("KLineEditor.Run");
 
-            if ((cmdLineParams == null) || (editModel == null) || (editModel.Ready == false) || (console == null) || (console.IsErrorState()))
+            if ((cmdLineParams == null) || (editModel == null) || (editModel.Ready == false) || (console == null) )
                 rc.SetError(1030101, MxError.Source.Param, $"cmdLineParams is null, editModel is null or not read, or console is null or error", MxMsgs.MxErrInvalidParamArg);
             else
             {
@@ -200,8 +200,8 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<bool>("KLineEditor. Initialise");
 
-            if ((param == null) || ((model?.Ready ?? false ) == false) || (console?.IsErrorState() ?? true)) 
-                rc.SetError(1030201, MxError.Source.Param, $"param is null or editModel null, not ready", MxMsgs.MxErrBadMethodParam);
+            if ((param == null) || ((model?.Ready ?? false ) == false)) 
+                rc.SetError(1030201, MxError.Source.Param, $"param is null or model null, not ready", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -231,9 +231,9 @@ namespace KLineEdCmdApp
                         rc.SetError(1030202, MxError.Source.Sys, $"settings.Validate() failed; {settings.GetValidationError()}");
                     else
                     {
-                        if (console.ApplySettings(settings) == false)
-                            rc.SetError(1030203, MxError.Source.Data, console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                        else
+                        var rcSettings = console.ApplySettings(settings);
+                        rc += rcSettings;
+                        if (rcSettings.IsSuccess(true))
                         {
                             Console = console;
                             Model = model;
@@ -279,87 +279,102 @@ namespace KLineEdCmdApp
                 rc.SetError(1030401, MxError.Source.Param, $"Ready false", MxMsgs.MxErrBadMethodParam);
             else
             {
-                var consoleSettings = Console.GetSettings();
-                if (consoleSettings.Validate() == false)
-                    rc.SetError(1030402, MxError.Source.Sys, $"settings.Validate() failed; {consoleSettings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
-                else
+                var rcSettings = Console.GetSettings();
+                rc += rcSettings;
+                if (rcSettings.IsSuccess(true))
                 {
-                    if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl)) == null) || Controller.IsErrorState())
-                        rc.SetError(1030403, MxError.Source.Program, $"ControllerFactory.Make failed", MxMsgs.MxErrInvalidCondition);
+                    var consoleSettings = rcSettings.GetResult();
+                    if (consoleSettings.Validate() == false)
+                        rc.SetError(1030402, MxError.Source.Sys, $"settings.Validate() failed; {consoleSettings.GetValidationError()}", MxMsgs.MxErrInvalidSettingsFile);
                     else
                     {
-                        try
+                        if (((Controller = ControllerFactory.Make(Model, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl)) == null) || Controller.IsErrorState())
+                            rc.SetError(1030403, MxError.Source.Program, $"ControllerFactory.Make failed", MxMsgs.MxErrInvalidCondition);
+                        else
                         {
-                            Model.SetStatusLine();
-                            var lastStatusUpdateUtc = DateTime.UtcNow;
-                            var lastAutoSaveUtc = DateTime.UtcNow;
-                            var lastKeyPress = lastStatusUpdateUtc;
-
-                            //!!!!!!!!!!!!!!!!!!! MAIN LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                            
-                            while (rc.IsError() == false)
+                            try
                             {
-                                if ((AutoSavePeriod > 0) && ((DateTime.UtcNow - lastAutoSaveUtc).TotalMinutes > AutoSavePeriod))
-                                {
-                                    lastAutoSaveUtc = DateTime.UtcNow;
-                                    Model.Save();
-                                }
+                                Model.SetStatusLine();
+                                var lastStatusUpdateUtc = DateTime.UtcNow;
+                                var lastAutoSaveUtc = DateTime.UtcNow;
+                                var lastKeyPress = lastStatusUpdateUtc;
 
-                                if ((StatusUpdatePeriod != 0) && ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusUpdatePeriod))
-                                {
-                                    lastStatusUpdateUtc = DateTime.UtcNow;
+                                //!!!!!!!!!!!!!!!!!!! MAIN LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-                                    if (Console.IsWindowSizeChanged(consoleSettings.WindowWidth, consoleSettings.WindowHeight))
-                                        Controller.SetRefresh(true);
-                                    else 
-                                    { 
-                                        Model.SetStatusLine();
-                                        if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, false) == false)
-                                        {       //move error handling so it sets the Model.ErrorState
-                                            rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
+                                while (rc.IsError() == false)
+                                {
+                                    if ((AutoSavePeriod > 0) && ((DateTime.UtcNow - lastAutoSaveUtc).TotalMinutes > AutoSavePeriod))
+                                    {
+                                        lastAutoSaveUtc = DateTime.UtcNow;
+                                        Model.Save();
+                                    }
+
+                                    if ((StatusUpdatePeriod != 0) && ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusUpdatePeriod))
+                                    {
+                                        lastStatusUpdateUtc = DateTime.UtcNow;
+
+                                        if (Console.IsWindowSizeChanged(consoleSettings.WindowWidth, consoleSettings.WindowHeight))
+                                            Controller.SetRefresh(true);
+                                        else
+                                        {
+                                            Model.SetStatusLine();
+                                            if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, false) == false)
+                                            { //move error handling so it sets the Model.ErrorState
+                                                rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
+                                                break;
+                                            }
+
+                                            Console.SetCursorInsertMode((Controller.IsInsertMode()));
+                                        }
+                                    }
+
+                                    if (Console.IsKeyAvailable())
+                                    {
+                                        lastKeyPress = DateTime.UtcNow;
+                                        if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, true) == false)
+                                        {
+                                            rc.SetError(1030405, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
                                             break;
                                         }
-                                        Console.SetCursorInsertMode((Controller.IsInsertMode()));
+                                        var rcKey = Console.GetKeyInfo(true);
+                                        if (rcKey.IsError(true))
+                                            rc += rcKey;
+                                        else
+                                            Controller = Controller.ProcessKey(Model, rcKey.GetResult());
                                     }
-                                }
-                                if (Console.IsKeyAvailable())
-                                {
-                                    lastKeyPress = DateTime.UtcNow;
-                                    if (Model.ChapterHeader.PauseProcessing(lastStatusUpdateUtc, lastKeyPress, true) == false)
+
+                                    var rcErr = Controller.ErrorProcessing(ViewList);
+                                    if (rcErr.IsError(true) || (rcErr.GetResult() == false))
+                                        rc += rcErr;
+                                    else
                                     {
-                                        rc.SetError(1030405, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
-                                        break; 
+                                        if (Controller?.IsRefresh() ?? true)
+                                        {
+                                            rc += Console.ApplySettings(consoleSettings);
+                                            if (rc.IsSuccess())
+                                                Model.Refresh();
+                                        }
+
+                                        if (Controller?.IsQuit() ?? true)
+                                            break;
                                     }
-                                    Controller = Controller.ProcessKey(Model, Console.ReadKey(true));
+
+                                    Thread.Sleep(0);
                                 }
-                                var rcErr = Controller.ErrorProcessing(ViewList, Console);
-                                if (rcErr.IsError(true) || (rcErr.GetResult() == false))
-                                    rc += rcErr;
-                                else
+
+                                //!!!!!!!!!!!!!!!!!!! MAIN LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                                var rcDoneProc = Model.ChapterHeader.KLineEditorProcessDone(lastStatusUpdateUtc, lastKeyPress);
+                                if (rc.IsSuccess())
                                 {
-                                    if (Controller?.IsRefresh() ?? true)
-                                    {
-                                        Console.ApplySettings(consoleSettings);
-                                        Model.Refresh();
-                                    }
-                                    if (Controller?.IsQuit() ?? true)
-                                        break;
+                                    rc += rcDoneProc; //keep any existing error
+                                    rc.SetResult(true);
                                 }
-                                Thread.Sleep(0);
                             }
-
-                            //!!!!!!!!!!!!!!!!!!! MAIN LOOP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                            var rcDoneProc = Model.ChapterHeader.KLineEditorProcessDone(lastStatusUpdateUtc, lastKeyPress);
-                            if (rc.IsSuccess())
+                            catch (Exception e)
                             {
-                                rc += rcDoneProc;       //keep any existing error
-                                rc.SetResult(true);
+                                rc.SetError(1030406, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                             }
-                        }
-                        catch (Exception e)
-                        {
-                            rc.SetError(1030406, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                         }
                     }
                 }
@@ -392,8 +407,8 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<bool>("KLineEditor.CreateViews");
 
-            if ((cmdLineParams == null) || (ViewList == null) || (console == null) || (console.IsErrorState()) || (model == null) || (model.Ready == false))
-                rc.SetError(1030601, MxError.Source.Param, $"cmdLineParams= is null, or ViewList is null, or console is null or error, or model is null or not ready", MxMsgs.MxErrInvalidParamArg);
+            if ((cmdLineParams == null) || (ViewList == null) || (console == null) || (model == null) || (model.Ready == false))
+                rc.SetError(1030601, MxError.Source.Param, $"cmdLineParams= is null, or ViewList is null, console is null, or model is null or not ready", MxMsgs.MxErrInvalidParamArg);
             else
             {
                 try

@@ -11,21 +11,6 @@ namespace KLineEdCmdAppTest.TestSupport
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class MockMxConsole : IMxConsole
     {
-        private MxReturnCode<bool> _mxErrorState;
-        public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
-        public MxReturnCode<bool> GetErrorState() { return _mxErrorState ?? null; }
-        public void ResetErrorState() { _mxErrorState = null; }
-        public bool SetErrorState(MxReturnCode<bool> mxErr)
-        {
-            var rc = false;
-
-            if (_mxErrorState == null)
-            {
-                _mxErrorState = mxErr;
-                rc = true;
-            }
-            return rc;
-        }
         public int CursorRow { get; private set; }
         public int CursorColumn { get; private set; }
 
@@ -34,121 +19,151 @@ namespace KLineEdCmdAppTest.TestSupport
 
         public MockMxConsole()
         {
-            _mxErrorState = null;
             CursorRow = 0;
             CursorColumn = 0;
             ForeGndColour = MxConsole.Color.Gray;
             BackGndColour = MxConsole.Color.Black;
         }
 
-        public bool Clear(bool force = false)
-        {
-            return true;
-        }
-
-        public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight)
-        {
-            return false;
-        }
-
-        public bool ApplySettings(MxConsoleProperties props, bool restore=false)
-        {
-            return true;
-        }
+        public bool IsKeyAvailable() { return true; }
+        public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight) { return false; }
 
         public MxReturnCode<bool> Close()
         {
             var rc = new MxReturnCode<bool>($"MxConsole.Close");
-
             return rc;
         }
 
-        public MxConsoleProperties GetSettings()
+        public MxReturnCode<bool> Clear(bool force = false)
         {
-            return new MxConsoleProperties();
+            var rc = new MxReturnCode<bool>($"MockMxConsole.Clear");
+            rc.SetResult(true);
+            return rc;
         }
 
-        public bool SetCursorPosition(int row, int column)
+        public MxReturnCode<bool> ApplySettings(MxConsoleProperties props, bool restore=false)
         {
-            CursorColumn = column;
-            CursorRow = row;
-            return true;
+            var rc = new MxReturnCode<bool>($"MockMxConsole.ApplySettings");
+            rc.SetResult(true);
+            return rc;
         }
 
-        public int GetCursorColumn()
+        public MxReturnCode<MxConsoleProperties> GetSettings()
         {
-            return CursorColumn;
+            var rc = new MxReturnCode<MxConsoleProperties>($"MockMxConsole.GetSettings");
+            rc.SetResult(new MxConsoleProperties());
+            return rc;
         }
 
-        public int GetCursorRow()
+        public MxReturnCode<bool> SetColour(MxConsole.Color foreGndColour, MxConsole.Color msgLineErrorBackGndColour)
         {
-            return CursorRow;
-        }
+            var rc = new MxReturnCode<bool>($"MockMxConsole.SetColour");
 
-        public void SetCursorVisible(bool hide=false)
-        {
-
-        }
-
-        public void SetCursorInsertMode(bool insertMode = false)
-        {
-
-        }
-
-        public bool IsKeyAvailable()
-        {
-            return true;
-        }
-
-        public bool SetColour(MxConsole.Color foreGndColour, MxConsole.Color msgLineErrorBackGndColour)
-        {
             ForeGndColour = foreGndColour;
             BackGndColour = msgLineErrorBackGndColour;
-            return true;
-        }
 
-        public string WriteLine(string line, params object[] args)
-        {
-            // ReSharper disable once RedundantAssignment
-            string rc = null;
-
-            rc = string.Format(line, args);
-
+            rc.SetResult(true);
             return rc;
         }
 
-        public string WriteLines(string[] lines)
+        public MxReturnCode<bool> SetCursorPosition(int row, int column)
         {
-            string rc = null;
+            var rc = new MxReturnCode<bool>($"MockMxConsole.SetCursorPosition");
+
+            CursorColumn = column;
+            CursorRow = row;
+
+            rc.SetResult(true);
+            return rc;
+        }
+
+        public MxReturnCode<int> GetCursorColumn()
+        {
+            var rc = new MxReturnCode<int>($"MockMxConsole.GetCursorColumn");
+            rc.SetResult(CursorColumn);
+            return rc;
+        }
+
+
+        public MxReturnCode<int> GetCursorRow()
+        {
+            var rc = new MxReturnCode<int>($"MockMxConsole.GetCursorRow");
+            rc.SetResult(CursorRow);
+            return rc;
+        }
+
+        public MxReturnCode<bool> SetCursorVisible(bool hide = false)
+        {
+            var rc = new MxReturnCode<bool>($"MockMxConsole.SetCursorVisible");
+            rc.SetResult(true);
+            return rc;
+        }
+
+        public MxReturnCode<bool> SetCursorSize(int size)
+        {
+            var rc = new MxReturnCode<bool>($"MockMxConsole.SetCursorSize");
+            rc.SetResult(true);
+            return rc;
+        }
+
+        public MxReturnCode<bool> SetCursorInsertMode(bool insertMode = false)
+        {
+            var rc = new MxReturnCode<bool>($"MockMxConsole.SetCursorInsertMode");
+            rc.SetResult(true);
+            return rc;
+        }
+
+
+        public MxReturnCode<string> WriteLine(string line, params object[] args)
+        {
+            var rc = new MxReturnCode<string>($"MockMxConsole.WriteLine");
+            rc.SetResult(string.Format(line, args));
+            return rc;
+        }
+
+        public MxReturnCode<bool> WriteLines(string[] lines)
+        {
+            var rc = new MxReturnCode<bool>($"MockMxConsole.WriteLines");
             foreach (var line in lines)
-                rc = WriteLine(line);
+            {
+                var rcLine = WriteLine(line);
+                if (rcLine.IsError(true))
+                {
+                    rc += rcLine;
+                    break;
+                }
+            }
+            if (rc.IsError())
+                rc.SetResult(true);
             return rc;
         }
 
-        public string Write(string msg, params object[] args)
+        public MxReturnCode<string> Write(string msg, params object[] args)
         {
-            // ReSharper disable once RedundantAssignment
-            string rc = null;
-
-            rc = string.Format(msg, args);
-
+            var rc = new MxReturnCode<string>($"MockMxConsole.Write");
+            rc.SetResult(string.Format(msg, args));
             return rc;
-
         }
 
-        public char GetKeyChar(bool hide = false, char defaultVal = ' ')
+        public MxReturnCode<char> GetKeyChar(bool hide = false, char defaultVal = ' ')
         {
-            return defaultVal;
+            var rc = new MxReturnCode<char>($"MockMxConsole.GetKeyChar");
+            rc.SetResult(defaultVal);
+            return rc;
         }
 
-        public ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
+        public MxReturnCode<ConsoleKey> GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
-            return defaultVal;
+            var rc = new MxReturnCode<ConsoleKey>($"MockMxConsole.GetKey");
+            rc.SetResult(defaultVal);
+            return rc;
         }
 
-        public ConsoleKeyInfo ReadKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
+        public MxReturnCode<ConsoleKeyInfo> GetKeyInfo(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
-            return new ConsoleKeyInfo('X', defaultVal, false, false, true);
+            var rc = new MxReturnCode<ConsoleKeyInfo>($"MockMxConsole.GetKeyInfo");
+            rc.SetResult(new ConsoleKeyInfo('X', defaultVal, false, false, true));
+            return rc;
         }
     }
 }

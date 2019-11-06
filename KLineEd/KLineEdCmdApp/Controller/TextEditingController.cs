@@ -14,7 +14,9 @@ namespace KLineEdCmdApp.Controller
             var rc = new MxReturnCode<bool>($"TextEditingController.ProcessKey");
 
             BaseEditingController controller = this;
-            if ((base.ProcessKey(model, keyInfo) != null)) // && (IsErrorState() == false)) //error state persists after user presses key to initiate ResetAllErrorStates
+            if ((base.ProcessKey(model, keyInfo) == null)) // && (IsErrorState() == false)) //error state persists after user presses key to initiate ResetAllErrorStates
+                rc.SetResult(true);     //key handled by base class - no further action needed           
+            else
             {
                 var body = model?.ChapterBody;
                 if (body == null)

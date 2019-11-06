@@ -38,9 +38,9 @@ namespace KLineEdCmdApp.View
                     StatusLineBackGndColour = param.BackGndColourStatus; 
                     StatusLineRow = WindowHeight - KLineEditor.StatusLineRowCount - 1;
 
-                    if (Console.SetColour(StatusLineForeGndColour, StatusLineBackGndColour) == false)
-                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", MxMsgs.MxErrInvalidCondition);
-                    else
+                    var rcColour = Console.SetColour(StatusLineForeGndColour, StatusLineBackGndColour);
+                    rc += rcColour;
+                    if (rcColour.IsSuccess(true))
                     {
                         var rcClear = ClearLine(StatusLineRow, KLineEditor.StatusLineLeftCol);
                         rc += rcClear;
@@ -73,9 +73,9 @@ namespace KLineEdCmdApp.View
                         rc.SetError(1200101, MxError.Source.Program, "model is null", MxMsgs.MxErrInvalidCondition);
                     else
                     {
-                        if (Console.SetColour(StatusLineForeGndColour, StatusLineBackGndColour) == false)
-                            rc.SetError(1200102, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                        else
+                        var rcColour = Console.SetColour(StatusLineForeGndColour, StatusLineBackGndColour);
+                        rc += rcColour;
+                        if( rcColour.IsSuccess(true))
                         {
                             var statusText = model.StatusLine ?? Program.ValueNotSet;
                             rc += DisplayLine(StatusLineRow, KLineEditor.StatusLineLeftCol, statusText, true);

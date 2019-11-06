@@ -72,8 +72,9 @@ namespace KLineEdCmdApp.View.Base
             base.OnUpdate(notificationItem);
             if (IsErrorState() == false)
             {
-                if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                    SetErrorState(Console.GetErrorState());
+                var rcColour = Console.SetColour(TextForeGndColour, TextBackGndColour);
+                if (rcColour.IsError(true))
+                    SetErrorState(rcColour);
             }
         }
 
@@ -83,9 +84,9 @@ namespace KLineEdCmdApp.View.Base
 
             Console.SetCursorVisible(false);
 
-            if (Console.SetColour(RuleForeGndColour, RuleBackGndColour) == false)
-                rc.SetError(1170301, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-            else
+            var rcRule = Console.SetColour(RuleForeGndColour, RuleBackGndColour);
+            rc += rcRule;
+            if(rcRule.IsSuccess(true))
             {
                 var rcTop = DisplayLine(KLineEditor.EditAreaMarginTopRuleIndex, KLineEditor.EditAreaMarginLeft, TopRule);
                 rc += rcTop;
@@ -95,9 +96,9 @@ namespace KLineEdCmdApp.View.Base
                     rc += rcBot;
                     if (rcBot.IsSuccess(true))
                     {
-                        if (Console.SetColour(TextForeGndColour, TextBackGndColour) == false)
-                            rc.SetError(1170302, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                        else
+                        var rcText = Console.SetColour(TextForeGndColour, TextBackGndColour);
+                        rc += rcText;
+                        if (rcText.IsSuccess(true))
                         {
                             for (int editRowIndex = 0; editRowIndex < EditAreaHeight; editRowIndex++)
                             {
@@ -130,9 +131,9 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1170401, MxError.Source.Param, $"SetCursor= row{editAreaRowIndex} (max={EditAreaHeight}), col={editAreaColIndex} (max={WindowWidth - 1})", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (Console.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editAreaRowIndex, KLineEditor.EditAreaMarginLeft + editAreaColIndex) == false)
-                    rc.SetError(1170402, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                else
+                var rcCursor = Console.SetCursorPosition(KLineEditor.EditAreaTopRowIndex + editAreaRowIndex, KLineEditor.EditAreaMarginLeft + editAreaColIndex);
+                rc += rcCursor;
+                if (rcCursor.IsSuccess(true))
                     rc.SetResult(true);
             }
             return rc;

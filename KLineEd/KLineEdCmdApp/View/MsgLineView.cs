@@ -27,9 +27,9 @@ namespace KLineEdCmdApp.View
                 rc += rcBase;
                 if (rcBase.IsSuccess(true))
                 {
-                    if (Console.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour) == false)
-                        rc.SetError(1200102, MxError.Source.Program, $"StatusLineView: Invalid cursor position: Row={KLineEditor.MsgLineRowIndex}, LeftCol={KLineEditor.MsgLineLeftCol}", MxMsgs.MxErrInvalidCondition);
-                    else
+                    var rcColour = Console.SetColour(MsgLineInfoForeGndColour, MsgLineInfoBackGndColour);
+                    rc += rcColour;
+                    if (rcColour.IsSuccess(true))
                     {
                         var rcClear = ClearLine(KLineEditor.MsgLineRowIndex, KLineEditor.MsgLineLeftCol);
                         rc += rcClear;

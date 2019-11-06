@@ -35,11 +35,11 @@ namespace KLineEdCmdApp.View
                 if (rcBase.IsSuccess(true))
                 {
                     EditorHelpLineForeGndColour = param.ForeGndColourCmds; 
-                    EditorHelpLineBackGndColour = param.BackGndColourCmds; 
+                    EditorHelpLineBackGndColour = param.BackGndColourCmds;
 
-                    if (Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
-                        rc.SetError(1120102, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                   else
+                    var rcHelp = Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour);
+                    rc += rcHelp;
+                    if (rcHelp.IsSuccess(true))
                     {
                         var rcClear = ClearLine(KLineEditor.EditorHelpLineRowIndex, KLineEditor.EditorHelpLineLeftCol);
                         rc += rcClear;
@@ -71,9 +71,9 @@ namespace KLineEdCmdApp.View
                         rc.SetError(1120301, MxError.Source.Program, "model is null", MxMsgs.MxErrInvalidCondition);
                     else
                     {
-                        if (Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour) == false)
-                            rc.SetError(1120302, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                        else
+                        var rcColour = Console.SetColour(EditorHelpLineForeGndColour, EditorHelpLineBackGndColour);
+                        rc += rcColour;
+                        if (rcColour.IsSuccess(true))
                         {
                             var helpText = model.EditorHelpLine ?? Program.ValueNotSet;
                             rc += DisplayLine(KLineEditor.EditorHelpLineRowIndex, KLineEditor.EditorHelpLineLeftCol, helpText, true);

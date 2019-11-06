@@ -94,10 +94,7 @@ namespace KLineEdCmdApp.View.Base
             CursorOn = false;
             Console.SetCursorVisible(CursorOn);
 
-            if (Console.IsErrorState())
-                rc.SetError(1140201, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-            else
-               rc.SetResult(true);
+            rc.SetResult(true);
 
             if (rc.IsError(true))
                 SetErrorState(rc);
@@ -155,9 +152,9 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110201, MxError.Source.Param, $"rowIndex={rowIndex}, colIndex={colIndex}, WinHt={WindowHeight} WinWd={WindowWidth}", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (Console.SetCursorPosition(rowIndex, colIndex) == false)
-                    rc.SetError(1110202, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                else
+                var rcCursor = Console.SetCursorPosition(rowIndex, colIndex);
+                rc += rcCursor;
+                if (rcCursor.IsSuccess(true))
                     rc.SetResult(true);
             }
             return rc;
@@ -171,20 +168,18 @@ namespace KLineEdCmdApp.View.Base
                 rc.SetError(1110301, MxError.Source.Param, $"rowIndex={rowIndex}, colIndex={colIndex}, WinHt={WindowHeight} WinWd={WindowWidth}", MxMsgs.MxErrBadMethodParam);
             else
             {
-                if (Console.SetCursorPosition(rowIndex, 0) == false)
-                    rc.SetError(1110302, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                else
+                var rcCursorColStart = Console.SetCursorPosition(rowIndex, 0);
+                rc += rcCursorColStart;
+                if (rcCursorColStart.IsSuccess(true))
                 {
-                    if (Console.Write(BlankLine) == null)
-                        rc.SetError(1110303, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                    else
+                    var rcWrite = Console.Write(BlankLine);
+                    rc += rcWrite;
+                    if (rcWrite.IsSuccess(true))
                     {
-                        if (Console.SetCursorPosition(rowIndex, colIndex) == false)
-                            rc.SetError(1110304, MxError.Source.Sys, Console.GetErrorState()?.GetErrorTechMsg() ?? Program.ValueNotSet, Console.GetErrorState()?.GetErrorUserMsg() ?? Program.ValueNotSet);
-                        else
-                        {
+                        var rcCursorIndex = Console.SetCursorPosition(rowIndex, colIndex);
+                        rc += rcCursorIndex;
+                        if (rcCursorIndex.IsSuccess(true))
                             rc.SetResult(true);
-                        }
                     }
                 }
             }
@@ -206,10 +201,12 @@ namespace KLineEdCmdApp.View.Base
 
                 if (rc.IsSuccess(true))
                 {
-                    if ((LastConsoleOutput = Console.Write(BaseView.TruncateTextForLine(text, WindowWidth - colIndex-1))) == null) //column=WindowWidth-1 is the right most column, writing to next col generates a new line
-                        rc.SetError(1110402, MxError.Source.Data, $"window rowIndex={rowIndex}, colIndex={colIndex}, text={text}", MxMsgs.MxErrInvalidCondition);
+                    var rcWrite = Console.Write(BaseView.TruncateTextForLine(text, WindowWidth - colIndex-1)); //column=WindowWidth-1 is the right most column, writing to next col generates a new line
+                    if (rcWrite.IsError(true)) 
+                        rc.SetError(1110402, MxError.Source.Data, $"window rowIndex={rowIndex}, colIndex={colIndex}, text={text}: error={rcWrite.GetErrorTechMsg()}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
+                        LastConsoleOutput = rcWrite.GetResult();
                         rc.SetResult(true);
                     }
                 }
@@ -228,10 +225,12 @@ namespace KLineEdCmdApp.View.Base
                 rc += SetCursorPosition(rowIndex, colIndex);
                 if (rc.IsSuccess(true))
                 {
-                    if ((LastConsoleOutput = Console.Write(BaseView.TruncateTextForLine(word, WindowWidth - colIndex - 1))) == null) //column=WindowWidth-1 is the right most column, writing to next col generates a new line
-                        rc.SetError(1110502, MxError.Source.Data, $"rowIndex={rowIndex}, colIndex={colIndex}, text={word}", MxMsgs.MxErrInvalidCondition);
+                    var rcWrite = Console.Write(BaseView.TruncateTextForLine(word, WindowWidth - colIndex - 1)); //column=WindowWidth-1 is the right most column, writing to next col generates a new line
+                    if (rcWrite.IsError(true))
+                        rc.SetError(1110502, MxError.Source.Data, $"window rowIndex={rowIndex}, colIndex={colIndex}, text={word}: error={rcWrite.GetErrorTechMsg()}", MxMsgs.MxErrInvalidCondition);
                     else
                     {
+                        LastConsoleOutput = rcWrite.GetResult();
                         if (setCursor)
                         {
                             var nextColIndex = ((colIndex + word.Length) <= WindowWidth - 1) ? (colIndex + word.Length) : WindowWidth - 1;

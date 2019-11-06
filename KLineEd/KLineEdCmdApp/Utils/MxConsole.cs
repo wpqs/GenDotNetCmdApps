@@ -60,52 +60,65 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = Program.ValueUnknown)] Unknown = Program.PosIntegerError
         }
 
-        private MxReturnCode<bool> _mxErrorState;
-        public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
-        public MxReturnCode<bool> GetErrorState() { return _mxErrorState ?? null; }
-        public void ResetErrorState() { _mxErrorState = null; }
-        public bool SetErrorState(MxReturnCode<bool> mxErr)
-        {
-            var rc = false;
-
-            if (_mxErrorState == null)
-            {
-                _mxErrorState = mxErr;
-                rc = true;
-            }
-            return rc;
-        }
-
-        private int CursorSize { set; get; }
+       private int CursorSize { set; get; }
 
         public MxConsole()
         {
-            _mxErrorState = null;
             CursorSize = MxConsoleProperties.DefaultCursorSize;
         }
 
-        //public bool IsError() { return (_mxErrorCode?.GetResult() ?? false) ? false : true; }
-        //public MxError.Source GetErrorSource() { return _mxErrorCode?.GetErrorType() ?? MxError.Source.Program; }
-        //public int GetErrorNo() { return _mxErrorCode?.GetErrorCode() ?? Program.PosIntegerNotSet; }
-        //public string GetErrorTechMsg() { return _mxErrorCode?.GetErrorTechMsg() ?? Program.ValueNotSet; }
-        //public string GetErrorUserMsg() { return _mxErrorCode?.GetErrorUserMsg() ?? Program.ValueNotSet; }
 
+        public bool IsKeyAvailable() { return Console.KeyAvailable; }
+        public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight) { return ((Console.WindowWidth != expectedWidth) || (Console.WindowHeight != expectedHeight)) ? true : false; }
 
         public MxReturnCode<bool> Close()
         {
             var rc = new MxReturnCode<bool>($"MxConsole.Close");
 
-            if (IsErrorState())
-                rc += GetErrorState();
+            rc.SetResult(true);
 
             return rc;
         }
 
-        public bool ApplySettings(MxConsoleProperties props, bool restore=false)
+        public MxReturnCode<bool> Clear(bool force = false)
+        {
+            var rc = new MxReturnCode<bool>($"MxConsole.Clear");
+
+            try
+            {
+                Console.Clear();
+                if (force == true)
+                {
+                    var cursorRow = Console.CursorTop;
+                    var cursorCol = Console.CursorLeft;
+                    var WindowWidth = Console.WindowWidth;
+                    var WindowHeight = Console.WindowHeight;
+                    var blankLine = new StringBuilder(WindowWidth).Insert(0, " ", WindowWidth).ToString();
+
+                    for (int y = 0; y < WindowHeight; y++)
+                    {
+                        Console.CursorLeft = 0;
+                        Console.CursorTop = y;
+                        Console.WriteLine(blankLine);
+                    }
+                    Console.CursorLeft = cursorCol;
+                    Console.CursorTop = cursorRow;
+
+                }
+                rc.SetResult(true);
+            }
+            catch (Exception e)
+            {
+                rc.SetError(1210101, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+            }
+            return rc;
+        }
+
+        public MxReturnCode<bool> ApplySettings(MxConsoleProperties props, bool restore=false)
         {
             var rc = new MxReturnCode<bool>($"MxConsole.ApplySettings");
 
-            if ((props == null) || (IsErrorState()))
+            if (props == null) 
                 rc.SetError(1210201, MxError.Source.Program, "props is null or (IsErrorState()", MxMsgs.MxErrBadMethodParam);
             else
             {
@@ -140,9 +153,9 @@ namespace KLineEdCmdApp.Utils
                         Console.ForegroundColor = MxConsole.GetConsoleColor(props.ForegroundColor);
                         Console.BackgroundColor = MxConsole.GetConsoleColor(props.BackgroundColor);
 
-                        if (Clear(true) == false)
-                            rc.SetError(1210202, MxError.Source.Sys, "MxConsole.Clear() failed", MxMsgs.MxErrSystemFailure);
-                        else
+                        var rcClear = Clear(true);
+                        rc += rcClear;
+                        if (rcClear.IsSuccess(true))
                         {
                             rc.SetResult(true);
                         }
@@ -153,15 +166,12 @@ namespace KLineEdCmdApp.Utils
                     }
                 }
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-
-            return (IsErrorState()) ? false : true;
+            return rc;
         }
 
-        public MxConsoleProperties GetSettings()
+        public MxReturnCode<MxConsoleProperties> GetSettings()
         {
-            var rc = new MxReturnCode<bool>($"MxConsole.GetSettings");
+            var rc = new MxReturnCode<MxConsoleProperties>($"MxConsole.GetSettings");
 
             var props = new MxConsoleProperties
             {
@@ -183,23 +193,14 @@ namespace KLineEdCmdApp.Utils
                 rc.SetError(1210301, MxError.Source.Sys, $"Console's existing props are invalid: {props.GetValidationError()}", MxMsgs.MxErrSystemFailure);
             else
             {
-                rc.SetResult(true);
+                rc.SetResult(props);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-
-            return (IsErrorState() == false) ? props : null;
+            return rc;
         }
 
-        public bool IsKeyAvailable()
-        {
-            return Console.KeyAvailable;
-        }
-
-        public bool SetColour(MxConsole.Color foreGndColour, MxConsole.Color backGndColour)
+        public MxReturnCode<bool> SetColour(MxConsole.Color foreGndColour, MxConsole.Color backGndColour)
         {
             var rc = new MxReturnCode<bool>($"MxConsole.SetColour");
-
             try
             {
                 Console.ForegroundColor = MxConsole.GetConsoleColor(foreGndColour);
@@ -210,16 +211,14 @@ namespace KLineEdCmdApp.Utils
             {
                 rc.SetError(1210401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState()) ? false : true;
+            return rc;
         }
-        public bool SetCursorPosition(int row, int column)
+        public MxReturnCode<bool> SetCursorPosition(int row, int column)
         {
             var rc = new MxReturnCode<bool>($"MxConsole.SetCursorPosition");
 
             if ((row < 0) || (row >= Console.BufferHeight) || (column < 0) || (column >= Console.BufferWidth))
-                rc.SetError(1210402, MxError.Source.Param, $"Invalid cursor position: line={row}, column={column}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1210501, MxError.Source.Param, $"Invalid cursor position: line={row}, column={column}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -230,54 +229,45 @@ namespace KLineEdCmdApp.Utils
                 }
                 catch (Exception e)
                 {
-                    rc.SetError(1210403, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                    rc.SetError(1210502, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState()) ? false : true;
+            return rc;
         }
 
-        public int GetCursorColumn()
+        public MxReturnCode<int> GetCursorColumn()
         {
-            var rc = new MxReturnCode<bool>($"MxConsole.GetCursorColumn");
+            var rc = new MxReturnCode<int>($"MxConsole.GetCursorColumn", Program.PosIntegerNotSet);
 
-            var col = Program.PosIntegerNotSet;
             try
             {
-                col = Console.CursorLeft;
-                rc.SetResult(true);
-            }
-            catch (Exception e)
-            {
-                rc.SetError(1210501, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
-            }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState()) ? Program.PosIntegerNotSet : col;
-        }
-        public int GetCursorRow()
-        {
-            var rc = new MxReturnCode<bool>($"MxConsole.GetCursorRow");
-
-            var row = Program.PosIntegerNotSet;
-            try
-            {
-                row = Console.CursorTop;
-                rc.SetResult(true);
+                rc.SetResult(Console.CursorLeft);
             }
             catch (Exception e)
             {
                 rc.SetError(1210601, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState()) ? Program.PosIntegerNotSet : row;
+            return rc;
+        }
+        public MxReturnCode<int> GetCursorRow()
+        {
+            var rc = new MxReturnCode<int>($"MxConsole.GetCursorRow");
+
+            try
+            {
+                rc.SetResult(Console.CursorTop);
+            }
+            catch (Exception e)
+            {
+                rc.SetError(1210701, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+            }
+            return rc;
         }
 
-        public void SetCursorVisible(bool show = true)
+        public MxReturnCode<bool> SetCursorVisible(bool show = true)
         {
             var rc = new MxReturnCode<bool>($"MxConsole.SetCursorVisible");
+
             try
             {
                 Console.CursorVisible = show;
@@ -285,34 +275,33 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                rc.SetError(1210701, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                rc.SetError(1210801, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
+            return rc;
         }
 
-        public void SetCursorSize(int size)
+        public MxReturnCode<bool> SetCursorSize(int size)
         {
             var rc = new MxReturnCode<bool>($"MxConsole.SetCursorSize");
 
-            try
+            if ((size <= 0) ||(size > 100))
+                rc.SetError(1210901, MxError.Source.Param, $"invalid cursor size {size}", MxMsgs.MxErrBadMethodParam);
+            else
             {
-                if ((size > 0) && (size <= 100))
+                try
                 {
-                    CursorSize = size;
-                    Console.CursorSize = CursorSize;
+                    Console.CursorSize = size;
                     rc.SetResult(true);
                 }
+                catch (Exception e)
+                {
+                    rc.SetError(1210902, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                }
             }
-            catch (Exception e)
-            {
-                rc.SetError(1210802, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
-            }
-            if (rc.IsError(true))
-                SetErrorState(rc);
+            return rc;
         }
 
-        public void SetCursorInsertMode(bool insertMode = false)
+        public MxReturnCode<bool> SetCursorInsertMode(bool insertMode = false)
         {
             var rc = new MxReturnCode<bool>($"MxConsole.SetCursorInsertMode");
 
@@ -323,97 +312,60 @@ namespace KLineEdCmdApp.Utils
             }
             catch (Exception e)
             {
-                rc.SetError(1210801, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
+                rc.SetError(1211001, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
+            return rc;
         }
 
-        public bool Clear(bool force=false)
+
+        public MxReturnCode<string> WriteLine(string line, params object[] args)
         {
-            var rc = new MxReturnCode<bool>($"MxConsole.Clear");
-
-            try
-            {
-                Console.Clear();
-                if (force == true)
-                {
-                    var cursorRow = Console.CursorTop;
-                    var cursorCol = Console.CursorLeft;
-                    var WindowWidth = Console.WindowWidth;
-                    var WindowHeight = Console.WindowHeight;
-                    var blankLine = new StringBuilder(WindowWidth).Insert(0, " ", WindowWidth).ToString();
-
-                    for (int y = 0; y < WindowHeight; y++)
-                    {
-                        Console.CursorLeft = 0;
-                        Console.CursorTop = y;
-                        Console.WriteLine(blankLine);
-                    }
-                    Console.CursorLeft = cursorCol;
-                    Console.CursorTop = cursorRow;
-
-                }
-                rc.SetResult(true);
-            }
-            catch (Exception e)
-            {
-                rc.SetError(1210901, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
-            }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState()) ? false : true;
-        }
-
-        public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight)
-        {
-            return ((Console.WindowWidth != expectedWidth) || (Console.WindowHeight != expectedHeight)) ? true : false;
-        }
-
-        public string WriteLine(string line, params object[] args)
-        {
-            var rc = new MxReturnCode<bool>($"MxConsole.WriteLine");
+            var rc = new MxReturnCode<string>($"MxConsole.WriteLine", null);
 
             string text = null;
             if (line == null)
-                rc.SetError(1211001, MxError.Source.Param, $"line is null", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1211101, MxError.Source.Param, $"line is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
-                    Console.WriteLine(line, args);
+                    Console.WriteLine(line, args);  //todo check args is not empty
                     text = string.Format(line, args);
-                    rc.SetResult(true);
+                    rc.SetResult(text);
                 }
                 catch (Exception e)
                 {
                     rc.SetError(1211102, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState() == false) ? text : null;
+            return rc;
         }
 
-        public string WriteLines(string[] lines)
+        public MxReturnCode<bool> WriteLines(string[] lines)
         {
-            string rc = null;
+            var rc = new MxReturnCode<bool>($"MxConsole.WriteLines");
+
             if (lines != null)
             {
                 foreach (var line in lines)
                 {
-                    if ((rc = WriteLine(line)) == null)
+                    var rcLine = WriteLine(line);
+                    if (rcLine.IsError(true))
+                    {
+                        rc += rcLine;
                         break;
+                    }
                 }
+                if (rc.IsError())
+                    rc.SetResult(true);
             }
             return rc;
         }
 
-        public string Write(string msg, params object[] args)
+        public MxReturnCode<string> Write(string msg, params object[] args)
         {
-            var rc = new MxReturnCode<bool>($"MxConsole.Write");
+            var rc = new MxReturnCode<string>($"MxConsole.Write");
 
-            string txt = null;
             if (msg == null)
                 rc.SetError(1211201, MxError.Source.Param, $"msg is null", MxMsgs.MxErrBadMethodParam);
             else
@@ -428,76 +380,64 @@ namespace KLineEdCmdApp.Utils
                     //else
                     //{
                         Console.Write(msg, args);
-                        txt = string.Format(msg, args);
+                        var txt = string.Format(msg, args);
 
                     // }
-                    rc.SetResult(true);
+                    rc.SetResult(txt);
                 }
                 catch (Exception e)
                 {
                    rc.SetError(1211202, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
                 }
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState() == false) ? txt : null;
+            return rc;
         }
 
-        public char GetKeyChar(bool hide = false, char defaultVal = ' ')
+        public MxReturnCode<char> GetKeyChar(bool hide = false, char defaultVal = ' ')
         {
-            var rc = new MxReturnCode<bool>($"MxConsole.GetKeyChar");
+            var rc = new MxReturnCode<char>($"MxConsole.GetKeyChar");
 
-            var input = (char)0;
             try
             {
-                input = Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
-                rc.SetResult(true);
+                var input = Console.ReadKey(hide).KeyChar;       //defaultVal is helpful in testing
+                rc.SetResult(input);
             }
             catch (Exception e)
             {
                rc.SetError(1211401, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState() == false) ? input : (char)0;
+            return rc;
         }
 
-        public ConsoleKey GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
+        public MxReturnCode<ConsoleKey> GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
-            var rc = new MxReturnCode<bool>($"MxConsole.GetKey");
-
-            var input = MxConsole.InvalidKey;
+            var rc = new MxReturnCode<ConsoleKey>($"MxConsole.GetKey");
             try
             {
-                input = Console.ReadKey(hide).Key; //defaultVal is helpful in testing
-               rc.SetResult(true);
+               var input = Console.ReadKey(hide).Key; //defaultVal is helpful in testing
+               rc.SetResult(input);
             }
             catch (Exception e)
             {
                rc.SetError(1211501, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return (IsErrorState() == false) ? input : MxConsole.InvalidKey;
+            return rc;
         }
 
-        public ConsoleKeyInfo ReadKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
+        public MxReturnCode<ConsoleKeyInfo> GetKeyInfo(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape)
         {
-            var rc = new MxReturnCode<bool>($"MxConsole.ReadKey");
+            var rc = new MxReturnCode<ConsoleKeyInfo>($"MxConsole.GetKeyInfo");
 
-            var input = new ConsoleKeyInfo('\0', ConsoleKey.Clear, false, false, false);
             try
             {
-                input = Console.ReadKey(hide);
-               rc.SetResult(true);
+               var input = Console.ReadKey(hide);
+               rc.SetResult(input);
             }
             catch (Exception e)
             {
                 rc.SetError(1211601, MxError.Source.Exception, e.Message, MxMsgs.MxErrException);
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
-            return input;
+            return rc;
         }
 
 

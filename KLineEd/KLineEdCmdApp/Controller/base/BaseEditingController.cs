@@ -125,25 +125,25 @@ namespace KLineEdCmdApp.Controller.Base
         }
 
 
-        public MxReturnCode<bool> ErrorProcessing(List<BaseView> viewList, IMxConsole console)
+        public MxReturnCode<bool> ErrorProcessing(List<BaseView> viewList)
         {
             var rc = new MxReturnCode<bool>("BaseEditingController.ErrorProcessing");
 
-            if ((viewList == null) || (console == null) || ((Chapter?.Ready ?? false) == false) )
-                rc.SetError(1250201, MxError.Source.Param, $"viewList is null, or console is null, or model null, or not ready  ", MxMsgs.MxErrBadMethodParam);
+            if ((viewList == null) ||  ((Chapter?.Ready ?? false) == false) )
+                rc.SetError(1250201, MxError.Source.Param, $"viewList is null, or model null, or not ready  ", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (_userErrorResetRequest)
                 {
                     _userErrorResetRequest = false;
-                    ResetAllErrorStates(viewList, console);
+                    ResetAllErrorStates(viewList);
                     if (Chapter.MsgLine?.Length > 0)
                         Chapter.SetMsgLine("");
                     rc.SetResult(true);
                 }
                 else
                 {
-                    var err = GetAllErrorStates(viewList, console);
+                    var err = GetAllErrorStates(viewList);
                     if (err == null)
                         rc.SetResult(true);
                     else
@@ -164,13 +164,11 @@ namespace KLineEdCmdApp.Controller.Base
             return rc;  //terminate loop if error or GetResult() is false;
         }
 
-        private void ResetAllErrorStates(List<BaseView> viewList, IMxConsole console)
+        private void ResetAllErrorStates(List<BaseView> viewList)
         {
-            if (IsErrorState())         //check controller
+            if (IsErrorState())             //check controller
                 ResetErrorState();
-            if (console.IsErrorState()) //check console
-                console.ResetErrorState();
-            if (Chapter.IsErrorState()) //check model
+            if (Chapter.IsErrorState())    //check model
                 Chapter.ResetErrorState();
             foreach (var view in viewList) //check views
             {
@@ -179,26 +177,21 @@ namespace KLineEdCmdApp.Controller.Base
             }
         }
 
-        private MxReturnCode<bool> GetAllErrorStates(List<BaseView> viewList, IMxConsole console)
+        private MxReturnCode<bool> GetAllErrorStates(List<BaseView> viewList)
         {
             var err = _mxErrorState; //check controller
             if (err == null)
             {
-                if (console.IsErrorState()) //check console
-                    err = console.GetErrorState();
+                if (Chapter.IsErrorState()) //check model
+                    err = Chapter.GetErrorState();
                 else
                 {
-                    if (Chapter.IsErrorState()) //check model
-                        err = Chapter.GetErrorState();
-                    else
+                    foreach (var view in viewList) //check views
                     {
-                        foreach (var view in viewList) //check views
+                        if (view.IsErrorState())
                         {
-                            if (view.IsErrorState())
-                            {
-                                err = view.GetErrorState();
-                                break;
-                            }
+                            err = view.GetErrorState();
+                            break;
                         }
                     }
                 }

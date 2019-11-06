@@ -7,13 +7,6 @@ namespace KLineEdCmdAppTest.UtilsTests
 {
     public class MxConsoleTest
     {
-        [Fact]
-        public void NoParamTest()
-        {
-            var console = new MxConsole();
-
-            Assert.False(console.IsErrorState());
-        }
 
         [Fact]
         public void SetupTest()
@@ -21,8 +14,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var console = new MxConsole();
 
             var props = new MxConsoleProperties();
-            Assert.True(console.ApplySettings(props));
-            Assert.True(console.IsErrorState() == false);
+            Assert.True(console.ApplySettings(props).GetResult());
         }
 
         [Fact]
@@ -30,11 +22,10 @@ namespace KLineEdCmdAppTest.UtilsTests
         {
             var console = new MxConsole();
 
-            var props = console.GetSettings();
+            var props = console.GetSettings().GetResult();
             Assert.True(props.IsError() == false);
 
-            Assert.True(console.ApplySettings(props));
-            Assert.True(console.IsErrorState() == false);
+            Assert.True(console.ApplySettings(props).GetResult());
         }
 
         //[Fact]
