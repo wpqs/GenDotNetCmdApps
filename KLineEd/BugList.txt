@@ -4,13 +4,14 @@ BugList
 1. Editor problems:
 	1. done - Bad error msg "error: error 1110402: Error: invalid condition..." - doesn't terminate either
 	2. done - pressing { key - Console cannot print { - what other characters? - create unit test - fix MxConsole calls console.write(msg) if args.length == 0
-	3. enter parabreak at end of chapter and then delete - the line isn't refreshed - home, end shows it has been deleted from TextLines
-	    same as delete line doesn't redraw lines below
-		Error 1110402 BaseView.DisplayLine() throws an exception so returns null - happens when no final parabreak and empty bottom line
-	3. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
+	3. done - TextEditView doesn't display null lines returned by model.ChapterBody.GetEditAreaLinesForDisplay(EditAreaHeight) so any deleted line at bottom is not overwritten as presented by
+		done - enter parabreak at end of chapter and then delete - the line isn't refreshed - home, end shows it has been deleted from TextLines
+	    done - same as delete line doesn't redraw lines below
+		done - Error 1110402 BaseView.DisplayLine() throws an exception so returns null - happens when no final parabreak and empty bottom line
 	4. MxConsole.Setup() - doesn't report exception 
-2. Install problems:
-	1. appsettings.json (and KLineEdCmdApp.json) must be in the same directory as d:\test\mytest.ksx
+	5. appsettings.json (and KLineEdCmdApp.json) must be in the same directory as d:\test\mytest.ksx
+	6. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
+
 3. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange
 4. Console problems:
 	1. Always works when run in release/debug from VS2017 or VS2019, but sometimes crashes when run from Cmd Prompt in non-legacy mode, particularly if window width altered 

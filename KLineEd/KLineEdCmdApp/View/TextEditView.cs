@@ -93,15 +93,14 @@ namespace KLineEdCmdApp.View
                                             rc += InitDisplay();
                                         if (rc.IsSuccess() && (editAreaCursor != null))
                                         {
+                                            var blankLine = new string(' ', EditAreaWidth + 1); //add one as parabreak can be one char beyond actual width 
                                             var row = 0;
                                             var lines = rcRes.GetResult();
                                             foreach (var line in lines)
                                             {
-                                                if (line == null)
-                                                    break;
                                                 if ((change == ChapterModel.ChangeHint.All) || ((change == ChapterModel.ChangeHint.End) && (row >= editAreaCursor.RowIndex - 1)))
                                                 {
-                                                    rc += DisplayEditAreaLine(row, line, (change == ChapterModel.ChangeHint.End));
+                                                    rc += DisplayEditAreaLine(row, (line != null) ? line : blankLine , (change == ChapterModel.ChangeHint.End));
                                                     if (rc.IsError(true))
                                                         break;
                                                 }
