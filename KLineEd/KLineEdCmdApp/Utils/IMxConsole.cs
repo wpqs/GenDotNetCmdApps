@@ -31,7 +31,7 @@ namespace KLineEdCmdApp.Utils
 
         MxReturnCode<string> WriteLine(string line, params object[] args);
         MxReturnCode<bool> WriteLines(string[] lines);
-        MxReturnCode<string> Write(string line, params object[] args);
+        MxReturnCode<string> WriteString(string line, params object[] args);
 
         MxReturnCode<char> GetKeyChar(bool hide = false, char defaultVal = Body.SpaceChar);
         MxReturnCode<ConsoleKey> GetKey(bool hide = false, ConsoleKey defaultVal = ConsoleKey.Escape);

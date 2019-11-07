@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace KLineEdCmdApp.Utils
 {
@@ -9,12 +8,14 @@ namespace KLineEdCmdApp.Utils
     {
         public static readonly string MxErrorMessageFirstWord = "error";
         public static readonly char MxErrorMessageTypeSeparator = '-';
-        public static readonly string ErrorTextSeparator = ": ";
+        public static readonly string MxErrorMessageTextSeparator = ": ";
 
         public const string ErrorMsgPrecursor = "Error: ";       //error messages in resources MAY start with this text 
         public const string WarningMsgPrecursor = "Warning: ";   //All warning messages in resources start with this text 
         public const string InfoMsgPrecursor = "Info: ";         //All info messages in resources start with this text 
 
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         public enum ErrorType
         {
             [EnumMember(Value = "exception")] exception = 0,
@@ -33,7 +34,7 @@ namespace KLineEdCmdApp.Utils
         }
 
         public static int GetErrorCode(string mxErrorMsg) //returns '1100703' from 'error 1100703-user: Warning: you cannot move beyond the end of the chapter' 
-        {
+        {                                                 //note: rc.GetUserMsg() returns 'error 1100703: ...'
             var rc = Program.PosIntegerNotSet;
 
             if (mxErrorMsg != null)
@@ -42,7 +43,9 @@ namespace KLineEdCmdApp.Utils
                 var start = mxErrorMsg.ToLower().IndexOf(errorPartStart, StringComparison.Ordinal);
                 if (start >= 0)
                 {
-                    var end = mxErrorMsg.IndexOf(MxErrorMessageTypeSeparator);
+                    var end = mxErrorMsg.IndexOf(MxErrorMessageTypeSeparator, StringComparison.Ordinal);
+                    if (end == -1)
+                        end = mxErrorMsg.IndexOf(MxErrorMessageTextSeparator, StringComparison.Ordinal);
                     if (end >= 0)
                     {
                         var errorCode = mxErrorMsg.Snip(start + errorPartStart.Length, end - 1);
@@ -64,13 +67,15 @@ namespace KLineEdCmdApp.Utils
                 var start = mxErrorMsg.ToLower().IndexOf(errorPartStart, StringComparison.Ordinal);
                 if (start >= 0)
                 {
-                    var end = mxErrorMsg.IndexOf(MxErrorMessageTypeSeparator);
+                    var end = mxErrorMsg.IndexOf(MxErrorMessageTypeSeparator, StringComparison.Ordinal);
+                    if (end == -1)
+                        end = mxErrorMsg.IndexOf(MxErrorMessageTextSeparator, StringComparison.Ordinal);
                     if (end >= 0)
                     {
-                        var startTextIndex = mxErrorMsg.IndexOf(ErrorTextSeparator, StringComparison.Ordinal);
+                        var startTextIndex = mxErrorMsg.IndexOf(MxErrorMessageTextSeparator, StringComparison.Ordinal);
                         if (startTextIndex >= 0)
                         {
-                            var msg = mxErrorMsg.Substring(startTextIndex + ErrorTextSeparator.Length);
+                            var msg = mxErrorMsg.Substring(startTextIndex + MxErrorMessageTextSeparator.Length);
                             if (msg.StartsWith(ErrorMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
                                 rc = MsgClass.Error;
                             else if (msg.StartsWith(WarningMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
@@ -98,18 +103,20 @@ namespace KLineEdCmdApp.Utils
                     rc = mxErrorMsg;
                 else
                 {
-                    var end = mxErrorMsg.IndexOf(MxErrorMessageTypeSeparator);
+                    var end = mxErrorMsg.IndexOf(MxErrorMessageTypeSeparator, StringComparison.Ordinal);
+                    if (end == -1)
+                        end = mxErrorMsg.IndexOf(MxErrorMessageTextSeparator, StringComparison.Ordinal);
                     if (end < 0)
                         rc = mxErrorMsg;
                     else
                     {
                         var errorCode = mxErrorMsg.Snip(start + errorPartStart.Length, end - 1);
-                        var startTextIndex = mxErrorMsg.IndexOf(ErrorTextSeparator, StringComparison.Ordinal); 
+                        var startTextIndex = mxErrorMsg.IndexOf(MxErrorMessageTextSeparator, StringComparison.Ordinal); 
                         if ((startTextIndex < 0) || (errorCode == null))
                             rc = mxErrorMsg;
                         else
                         {
-                            var msg = mxErrorMsg.Substring(startTextIndex + ErrorTextSeparator.Length);
+                            var msg = mxErrorMsg.Substring(startTextIndex + MxErrorMessageTextSeparator.Length);
                             if (msg.StartsWith(ErrorMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))
                                 rc = msg.Substring(ErrorMsgPrecursor.Length);
                             else if (msg.StartsWith(WarningMsgPrecursor, StringComparison.CurrentCultureIgnoreCase))

@@ -33,7 +33,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         //{
         //    var console = new MxConsole();
 
-        //    Assert.Equal("{", console.Write("{"));
+        //    Assert.Equal("{", console.WriteString("{"));
         //}
 
         [Fact]

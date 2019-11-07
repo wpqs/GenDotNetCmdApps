@@ -147,7 +147,7 @@ namespace KLineEdCmdApp.Model
 
         public MxReturnCode<bool> Write(StreamWriter file)
         {
-            var rc = new MxReturnCode<bool>("Body.Write");
+            var rc = new MxReturnCode<bool>("Body.WriteString");
 
             if (file == null)
                 rc.SetError(1100301, MxError.Source.Param, "file is null", MxMsgs.MxErrBadMethodParam);

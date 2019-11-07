@@ -91,11 +91,11 @@ namespace KLineEdCmdApp.Utils
                 {
                     var cursorRow = Console.CursorTop;
                     var cursorCol = Console.CursorLeft;
-                    var WindowWidth = Console.WindowWidth;
-                    var WindowHeight = Console.WindowHeight;
-                    var blankLine = new StringBuilder(WindowWidth).Insert(0, " ", WindowWidth).ToString();
+                    var windowWidth = Console.WindowWidth;
+                    var windowHeight = Console.WindowHeight;
+                    var blankLine = new StringBuilder(windowWidth).Insert(0, " ", windowWidth).ToString();
 
-                    for (int y = 0; y < WindowHeight; y++)
+                    for (int y = 0; y < windowHeight; y++)
                     {
                         Console.CursorLeft = 0;
                         Console.CursorTop = y;
@@ -123,7 +123,7 @@ namespace KLineEdCmdApp.Utils
             else
             {
                 if (props.IsError())
-                    rc.SetError(1210202, MxError.Source.Data, props?.GetValidationError() ?? Program.ValueNotSet, MxMsgs.MxErrInvalidSettingsFile);
+                    rc.SetError(1210202, MxError.Source.Data, props.GetValidationError() ?? Program.ValueNotSet, MxMsgs.MxErrInvalidSettingsFile);
                 else
                 {
                     try
@@ -322,16 +322,23 @@ namespace KLineEdCmdApp.Utils
         {
             var rc = new MxReturnCode<string>($"MxConsole.WriteLine", null);
 
-            string text = null;
             if (line == null)
                 rc.SetError(1211101, MxError.Source.Param, $"line is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
                 {
-                    Console.WriteLine(line, args);  //todo check args is not empty
-                    text = string.Format(line, args);
-                    rc.SetResult(text);
+                    if ((args?.Length ?? 0) == 0)
+                    {
+                        Console.WriteLine(line);
+                        rc.SetResult(line);
+                    }
+                    else
+                    {
+                        Console.WriteLine(line, args); //todo check args is not empty
+                        var text = string.Format(line, args);
+                        rc.SetResult(text);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -362,9 +369,9 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
-        public MxReturnCode<string> Write(string msg, params object[] args)
+        public MxReturnCode<string> WriteString(string msg, params object[] args)
         {
-            var rc = new MxReturnCode<string>($"MxConsole.Write");
+            var rc = new MxReturnCode<string>($"MxConsole.WriteString");
 
             if (msg == null)
                 rc.SetError(1211201, MxError.Source.Param, $"msg is null", MxMsgs.MxErrBadMethodParam);
@@ -372,18 +379,17 @@ namespace KLineEdCmdApp.Utils
             {
                 try
                 {
-                    //if (args.Length == 0)
-                    //{
-                    //    Console.Write(msg);
-                    //    rc = msg;
-                    //}
-                    //else
-                    //{
+                    if ((args?.Length ?? 0) == 0)
+                    {
+                        Console.Write(msg);
+                        rc.SetResult(msg);
+                    }
+                    else
+                    {
                         Console.Write(msg, args);
                         var txt = string.Format(msg, args);
-
-                    // }
-                    rc.SetResult(txt);
+                        rc.SetResult(txt);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -392,6 +398,7 @@ namespace KLineEdCmdApp.Utils
             }
             return rc;
         }
+
 
         public MxReturnCode<char> GetKeyChar(bool hide = false, char defaultVal = ' ')
         {

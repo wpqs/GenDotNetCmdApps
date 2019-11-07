@@ -312,9 +312,8 @@ namespace KLineEdCmdApp
                                     if ((StatusUpdatePeriod != 0) && ((DateTime.UtcNow - lastStatusUpdateUtc).TotalMilliseconds > StatusUpdatePeriod))
                                     {
                                         lastStatusUpdateUtc = DateTime.UtcNow;
-
                                         if (Console.IsWindowSizeChanged(consoleSettings.WindowWidth, consoleSettings.WindowHeight))
-                                            Controller.SetRefresh(true);
+                                            Controller.SetRefresh();
                                         else
                                         {
                                             Model.SetStatusLine();
@@ -323,8 +322,6 @@ namespace KLineEdCmdApp
                                                 rc.SetError(1030404, MxError.Source.Program, $"PauseProcessing failed", MxMsgs.MxErrInvalidCondition);
                                                 break;
                                             }
-
-                                            Console.SetCursorInsertMode((Controller.IsInsertMode()));
                                         }
                                     }
 
@@ -340,7 +337,10 @@ namespace KLineEdCmdApp
                                         if (rcKey.IsError(true))
                                             rc += rcKey;
                                         else
+                                        {
                                             Controller = Controller.ProcessKey(Model, rcKey.GetResult());
+                                            Console.SetCursorInsertMode((Controller.IsInsertMode()));
+                                        }
                                     }
 
                                     var rcErr = Controller.ErrorProcessing(ViewList);
@@ -348,14 +348,14 @@ namespace KLineEdCmdApp
                                         rc += rcErr;
                                     else
                                     {
-                                        if (Controller?.IsRefresh() ?? true)
+                                        if (Controller.IsRefresh())
                                         {
                                             rc += Console.ApplySettings(consoleSettings);
                                             if (rc.IsSuccess())
                                                 Model.Refresh();
                                         }
 
-                                        if (Controller?.IsQuit() ?? true)
+                                        if (Controller.IsQuit() )
                                             break;
                                     }
 

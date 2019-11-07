@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Net.Mime;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using MxReturnCode;
@@ -54,10 +53,10 @@ namespace KLineEdCmdApp
                 {
 
                     IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile("appsettings.json")?.AddUserSecrets<Program>().Build();
-                    var SBQConn = config?["ConnectionStrings:AzureWebJobsServiceBus"] ?? null;
-                    var SBQName = config?["MxLogMsg:AzureServiceBusQueueName"] ?? null;
+                    var sbqConn = config?["ConnectionStrings:AzureWebJobsServiceBus"] ?? null;
+                    var sbqName = config?["MxLogMsg:AzureServiceBusQueueName"] ?? null;
 
-                    rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null, SBQConn, SBQName);
+                    rc.Init(asm: Assembly.GetExecutingAssembly(), reportToEmail: "admin@imageqc.com", supportedLanguages: MxMsgs.SupportedCultures, null, sbqConn, sbqName);
 
                     var rcParams = cmdLineParams.Initialise(args: args);
                     rc += rcParams;
@@ -116,6 +115,7 @@ namespace KLineEdCmdApp
             return rc.GetResult();
         }
 
+        [SuppressMessage("ReSharper", "EmptyGeneralCatchClause")]
         private static void Program_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             try

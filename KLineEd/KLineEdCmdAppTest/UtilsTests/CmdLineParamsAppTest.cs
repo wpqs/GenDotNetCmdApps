@@ -9,6 +9,7 @@ namespace KLineEdCmdAppTest.UtilsTests
     {
         public static readonly string[] StdParamsHelp = { "--Help" };
 
+        // ReSharper disable once NotAccessedField.Local
         private readonly UtilsCmdLineParamsAppFixture _fixture;
 
         public CmdLineParamsAppTest(UtilsCmdLineParamsAppFixture fixture)
@@ -413,10 +414,10 @@ namespace KLineEdCmdAppTest.UtilsTests
             Assert.False(rcParam.GetResult());
             Assert.Contains("error 1020309-user: parameter '--statusupdate' has a bad argument; value 5001 is invalid for 'mS'", rcParam.GetErrorTechMsg());
 
-            rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=49" });
+            rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=9" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020309-user: parameter '--statusupdate' has a bad argument; value 49 is invalid for 'mS'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020309-user: parameter '--statusupdate' has a bad argument; value 9 is invalid for 'mS'", rcParam.GetErrorTechMsg());
 
         }
 
@@ -1457,7 +1458,7 @@ namespace KLineEdCmdAppTest.UtilsTests
         [Fact]
         public void TestGetArgNameNameNotFoundMandatory()
         {
-            var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings file='KLineEdCmdApp.json' update=yes", true);
+            var rc = CmdLineParamsApp.GetArgNameValue("--settings", "display", "--settings file='KLineEdCmdApp.json' update=yes");
             Assert.False(rc.IsSuccess());
             Assert.Equal("error 1023904-user: parameter '--settings' is missing argument 'display'", rc.GetErrorTechMsg());
         }

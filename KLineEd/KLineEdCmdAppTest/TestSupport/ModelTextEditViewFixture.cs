@@ -14,7 +14,7 @@ namespace KLineEdCmdAppTest.TestSupport
             {
                 Error = TestConst.UnitTestNotSet;
                 var console = new MockMxConsole();
-                console.ApplySettings(new MxConsoleProperties(), false);
+                console.ApplySettings(new MxConsoleProperties());
                 View = new TextEditView(console);
                 var rcTerm = View.Setup(AppCmdLineParams);
                 if (rcTerm.IsError())

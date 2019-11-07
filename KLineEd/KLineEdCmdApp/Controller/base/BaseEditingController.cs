@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Model;
-using KLineEdCmdApp.Properties;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View.Base;
 using MxReturnCode;
@@ -11,6 +10,8 @@ namespace KLineEdCmdApp.Controller.Base
 {
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
+    [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
     public abstract class BaseEditingController : IErrorState
     {
         public ChapterModel Chapter { private set; get; }
@@ -27,7 +28,7 @@ namespace KLineEdCmdApp.Controller.Base
 
         private MxReturnCode<bool> _mxErrorState;
         public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
-        public MxReturnCode<bool> GetErrorState() { return _mxErrorState ?? null; }
+        public MxReturnCode<bool> GetErrorState() { return _mxErrorState; }
         public void ResetErrorState() { _mxErrorState = null; }
         public bool SetErrorState(MxReturnCode<bool> mxErr)
         {
@@ -129,8 +130,8 @@ namespace KLineEdCmdApp.Controller.Base
         {
             var rc = new MxReturnCode<bool>("BaseEditingController.ErrorProcessing");
 
-            if ((viewList == null) ||  ((Chapter?.Ready ?? false) == false) )
-                rc.SetError(1250201, MxError.Source.Param, $"viewList is null, or model null, or not ready  ", MxMsgs.MxErrBadMethodParam);
+            if ((viewList == null) ||  ((Chapter?.Ready ?? false) == false) || (Chapter?.MsgLine == null ))
+                rc.SetError(1250201, MxError.Source.Param, $"viewList is null, or model null, or not ready ", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if (_userErrorResetRequest)
@@ -143,21 +144,24 @@ namespace KLineEdCmdApp.Controller.Base
                 }
                 else
                 {
-                    var err = GetAllErrorStates(viewList);
-                    if (err == null)
-                        rc.SetResult(true);
-                    else
+                    if (Chapter.MsgLine.Length == 0)
                     {
-                        SetErrorState(err);
-                        var mxErrorMsg = err.GetErrorUserMsg();
-                        var msgClass = MxDotNetUtilsLib.EnumOps.XlatToString(MxReturnCodeUtils.GetErrorClass(mxErrorMsg));
-                        var msgText = MxReturnCodeUtils.GetErrorText(mxErrorMsg);
-                        var msgErrCode = MxReturnCodeUtils.GetErrorCode(mxErrorMsg);
-                        Chapter.SetMsgLine($"{msgClass} {msgErrCode}: {msgText ?? Program.ValueNotSet}"); //FORMAT MESSAGE FOR DISPLAY - message only displayed if Chapter.MsgLine != msg  
-                        _userErrorResetRequest = false;
-
-                        if ((err.GetErrorType() != MxError.Source.Exception))
+                        var err = GetAllErrorStates(viewList);
+                        if (err == null)
                             rc.SetResult(true);
+                        else
+                        {
+                            SetErrorState(err);
+                            var mxErrorMsg = err.GetErrorUserMsg();
+                            var msgClass = MxDotNetUtilsLib.EnumOps.XlatToString(MxReturnCodeUtils.GetErrorClass(mxErrorMsg));
+                            var msgText = MxReturnCodeUtils.GetErrorText(mxErrorMsg);
+                            var msgErrCode = MxReturnCodeUtils.GetErrorCode(mxErrorMsg);
+                            Chapter.SetMsgLine($"{msgClass} {msgErrCode}: {msgText ?? Program.ValueNotSet}"); //FORMAT MESSAGE FOR DISPLAY - message only displayed if Chapter.MsgLine != msg  
+                            _userErrorResetRequest = false;
+
+                            if ((err.GetErrorType() != MxError.Source.Exception))
+                                rc.SetResult(true);
+                        }
                     }
                 }
             }

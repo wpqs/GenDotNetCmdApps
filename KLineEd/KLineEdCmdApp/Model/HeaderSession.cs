@@ -152,7 +152,7 @@ namespace KLineEdCmdApp.Model
 
         public MxReturnCode<bool> Write(StreamWriter file)
         {
-            var rc = new MxReturnCode<bool>("HeaderSession.Write");
+            var rc = new MxReturnCode<bool>("HeaderSession.WriteString");
 
             if ((file == null) || (IsError() == true))
                 rc.SetError(1060101, MxError.Source.Param, "file is null or not initialized", MxMsgs.MxErrBadMethodParam);

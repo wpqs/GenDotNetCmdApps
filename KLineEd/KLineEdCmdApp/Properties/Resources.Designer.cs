@@ -61,7 +61,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Internal parameter is invalid. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        ///   Looks up a localized string similar to Internal parameter is invalid. This is a coding defect. Please restart..
         /// </summary>
         internal static string MxErrBadMethodParam {
             get {
@@ -79,7 +79,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected exception. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        ///   Looks up a localized string similar to Unexpected exception. This is a coding defect. Please restart..
         /// </summary>
         internal static string MxErrException {
             get {
@@ -151,7 +151,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Invalid condition. This is a coding defect which has been reported. Please use alternative functionality until fixed..
+        ///   Looks up a localized string similar to Invalid condition. This is a coding defect. Please restart without saving..
         /// </summary>
         internal static string MxErrInvalidCondition {
             get {
@@ -232,7 +232,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unexpected system problem. There may be something wrong with your system. Please reboot your computer and try again.
+        ///   Looks up a localized string similar to Unexpected system problem. System error detected. Reboot and try again.
         /// </summary>
         internal static string MxErrSystemFailure {
             get {
@@ -250,7 +250,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Parameter not supported. This is a coding defect which has been reported. Please try again with another parameter or install a later version of the application.
+        ///   Looks up a localized string similar to Parameter not supported. This is a coding defect. Please restart..
         /// </summary>
         internal static string MxErrUnsupportedParam {
             get {

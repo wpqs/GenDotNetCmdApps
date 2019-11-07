@@ -15,6 +15,7 @@ namespace KLineEdCmdApp.Utils
             _observers = new List<IObserver<NotificationItem>>();
         }
         [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public IDisposable Subscribe(IObserver<NotificationItem> observer)
         {
             IDisposable rc = null;

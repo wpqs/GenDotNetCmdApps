@@ -6,7 +6,6 @@ using System.Runtime.Serialization;
 using KLineEdCmdApp.Model.Base;
 using KLineEdCmdApp.Utils;
 using KLineEdCmdApp.View;
-using KLineEdCmdApp.View.Base;
 using MxDotNetUtilsLib;
 
 namespace KLineEdCmdApp.Model
@@ -17,6 +16,7 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "RedundantBoolCompare")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
+    [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
     public class ChapterModel : NotifierModel, IErrorState
     {
         public enum CursorState
@@ -431,7 +431,7 @@ namespace KLineEdCmdApp.Model
 
         private MxReturnCode<bool> Write(string pathFilename, bool newFile = false)
         {
-            var rc = new MxReturnCode<bool>("ChapterModel.Write");
+            var rc = new MxReturnCode<bool>("ChapterModel.WriteString");
 
             if (string.IsNullOrEmpty(pathFilename) || ((Ready == false) && (newFile == false)))
                 rc.SetError(1051101, MxError.Source.Param, $"pathFilename={pathFilename ?? "[null]"}", MxMsgs.MxErrBadMethodParam);

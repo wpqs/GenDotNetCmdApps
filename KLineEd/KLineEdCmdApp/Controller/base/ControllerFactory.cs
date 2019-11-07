@@ -52,7 +52,7 @@ namespace KLineEdCmdApp.Controller.Base
             }
 
             if (rc.IsError(true))
-                model.SetErrorState(rc);
+                model?.SetErrorState(rc);
 
             return controller;
         }

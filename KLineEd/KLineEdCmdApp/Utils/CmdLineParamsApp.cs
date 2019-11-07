@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Reflection;
 using System.Runtime.Serialization;
 using KLineEdCmdApp.Model;
 using Newtonsoft.Json;
@@ -190,7 +189,7 @@ namespace KLineEdCmdApp.Utils
           public const string ParamGeneralStatusUpdate = "--statusupdate";
 
                 public static readonly string ArgStatusUpdatePeriod = "mS";      //  0  <min 1 max 10> //(0 is off)
-                public const int ArgStatusUpdatePeriodMin = 50;
+                public const int ArgStatusUpdatePeriodMin = 10;
                 public const int ArgStatusUpdatePeriodMax = 5000;
                 public const int ArgStatusUpdatePeriodDefault = 200;     
 

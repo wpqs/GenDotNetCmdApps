@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using KLineEdCmdApp.Model;
 using MxReturnCode;
@@ -97,6 +98,7 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private static int GetSplitIndex(string line, int maxColIndex)
         {
             var rc = Program.PosIntegerNotSet;

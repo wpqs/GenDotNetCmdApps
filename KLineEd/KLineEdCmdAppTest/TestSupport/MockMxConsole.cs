@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using KLineEdCmdApp;
 using KLineEdCmdApp.Utils;
 using MxReturnCode;
 
@@ -138,9 +137,9 @@ namespace KLineEdCmdAppTest.TestSupport
             return rc;
         }
 
-        public MxReturnCode<string> Write(string msg, params object[] args)
+        public MxReturnCode<string> WriteString(string msg, params object[] args)
         {
-            var rc = new MxReturnCode<string>($"MockMxConsole.Write");
+            var rc = new MxReturnCode<string>($"MockMxConsole.WriteString");
             rc.SetResult(string.Format(msg, args));
             return rc;
         }

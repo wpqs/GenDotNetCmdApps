@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using MxReturnCode;

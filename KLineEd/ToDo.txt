@@ -11,22 +11,25 @@ Development work v1.0.44.0
 
 3. Prepare for alpha release
     - done Error handling refactor
-	- Convert MxConsole to MxReturnCode
+	- done Convert MxConsole to MxReturnCode
 	- BugFixes 
+	- implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
     - Check Chapter/Session stats are correct
 	- Test in Production Build
 
 4. Publish and Test
 	- Windows
-	- iOS
 
 5. Create pre-release ZIP for GitHub
+	- initial technical writeup
 	
 
 Development work v1.0.45.0
 --------------------------
 
-1. Refactor Application structure
+1. Test
+	- iOS
+2. Refactor Application structure
      - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
@@ -37,12 +40,12 @@ Development work v1.0.45.0
 		- Integrate KScribeLib Class Library with KScribeCmdApp - Program.cs, KScribeEditor, Terminal.cs.
 	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
 
-2. Create new GitHub private project in imageqc - KScribe and clone to local C:\Users\wills\source\repos\ImageQC\KScribe
-3. Import code from C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd
+3. Create new GitHub private project in imageqc - KScribe and clone to local C:\Users\wills\source\repos\ImageQC\KScribe
+4. Import code from C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd
 	- test
 	- version
-4. Push changes to KScribe v1.0.45.0
-5. Delete C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd and clone from v1.0.44.0
+5. Push changes to KScribe v1.0.45.0
+6. Delete C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd and clone from v1.0.44.0
     - test
 
 
@@ -70,6 +73,8 @@ Development work v1.0.46.0
 
 5. Implement 
     --settings and use any settings found in the specified file to override those given in the default (global) .json
+		- add username / email / password - use for Azure Logging
+		- add last file.ksx
 	- use updated MxDotNetUtils to call SettingsFileProc() appropriately
 
 

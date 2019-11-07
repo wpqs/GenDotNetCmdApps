@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Serialization;
 using MxReturnCode;
 
 using KLineEdCmdApp.Utils;
@@ -12,7 +11,8 @@ namespace KLineEdCmdApp.View.Base
     [SuppressMessage("ReSharper", "RedundantCaseLabel")]
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     [SuppressMessage("ReSharper", "SimplifyConditionalTernaryExpression")]
-    public abstract partial class BaseView : ObserverView, IErrorState
+    [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
+    public abstract class BaseView : ObserverView, IErrorState
     {
 
         [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -39,7 +39,7 @@ namespace KLineEdCmdApp.View.Base
 
         private MxReturnCode<bool> _mxErrorState;
         public bool IsErrorState() { return (_mxErrorState?.IsError(true) ?? false) ? true : false; }
-        public MxReturnCode<bool> GetErrorState() { return _mxErrorState ?? null; }
+        public MxReturnCode<bool> GetErrorState() { return _mxErrorState; }
         public void ResetErrorState() { _mxErrorState = null; }
         public bool SetErrorState(MxReturnCode<bool> mxErr)
         {
@@ -172,7 +172,7 @@ namespace KLineEdCmdApp.View.Base
                 rc += rcCursorColStart;
                 if (rcCursorColStart.IsSuccess(true))
                 {
-                    var rcWrite = Console.Write(BlankLine);
+                    var rcWrite = Console.WriteString(BlankLine);
                     rc += rcWrite;
                     if (rcWrite.IsSuccess(true))
                     {
@@ -201,7 +201,7 @@ namespace KLineEdCmdApp.View.Base
 
                 if (rc.IsSuccess(true))
                 {
-                    var rcWrite = Console.Write(BaseView.TruncateTextForLine(text, WindowWidth - colIndex-1)); //column=WindowWidth-1 is the right most column, writing to next col generates a new line
+                    var rcWrite = Console.WriteString(BaseView.TruncateTextForLine(text, WindowWidth - colIndex-1)); //column=WindowWidth-1 is the right most column, writing to next col generates a new line
                     if (rcWrite.IsError(true)) 
                         rc.SetError(1110402, MxError.Source.Data, $"window rowIndex={rowIndex}, colIndex={colIndex}, text={text}: error={rcWrite.GetErrorTechMsg()}", MxMsgs.MxErrInvalidCondition);
                     else
@@ -225,7 +225,7 @@ namespace KLineEdCmdApp.View.Base
                 rc += SetCursorPosition(rowIndex, colIndex);
                 if (rc.IsSuccess(true))
                 {
-                    var rcWrite = Console.Write(BaseView.TruncateTextForLine(word, WindowWidth - colIndex - 1)); //column=WindowWidth-1 is the right most column, writing to next col generates a new line
+                    var rcWrite = Console.WriteString(BaseView.TruncateTextForLine(word, WindowWidth - colIndex - 1)); //column=WindowWidth-1 is the right most column, writing to next col generates a new line
                     if (rcWrite.IsError(true))
                         rc.SetError(1110502, MxError.Source.Data, $"window rowIndex={rowIndex}, colIndex={colIndex}, text={word}: error={rcWrite.GetErrorTechMsg()}", MxMsgs.MxErrInvalidCondition);
                     else

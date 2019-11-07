@@ -5,6 +5,7 @@ namespace KLineEdCmdAppTest
 {
     public class KLineEditorTest : IClassFixture<ModelTextEditViewFixture>
     {
+        // ReSharper disable once NotAccessedField.Local
         private readonly ModelTextEditViewFixture _fixture;
 
         public KLineEditorTest(ModelTextEditViewFixture fixture)
