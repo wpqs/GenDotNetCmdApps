@@ -35,7 +35,9 @@ namespace KLineEdCmdApp
         public static readonly string CmdAppName = typeof(Program).GetTypeInfo()?.Assembly?.GetName().Name ?? Program.ValueNotSet;
         public static readonly string CmdAppCopyright = typeof(Program).GetTypeInfo()?.Assembly?.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? Program.ValueNotSet;
         public static readonly string CmdAppHelpUrl = $"https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual" + HelpVersion;
-
+        
+        public static readonly string AppSettingsFile = "appsettings.json";
+        public static readonly string UserSettingsFile = "KLineEdCmdApp.json";
 
         static int Main(string[] args)
         {
@@ -51,8 +53,8 @@ namespace KLineEdCmdApp
                 rc += rcLine;
                 if (rcLine.IsSuccess(true))
                 {
-
-                    IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile("appsettings.json")?.AddUserSecrets<Program>().Build();
+                    var AppSettingsPathFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\{AppSettingsFile}"; 
+                    IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile(AppSettingsPathFileName)?.AddUserSecrets<Program>().Build();
                     var sbqConn = config?["ConnectionStrings:AzureWebJobsServiceBus"] ?? null;
                     var sbqName = config?["MxLogMsg:AzureServiceBusQueueName"] ?? null;
 

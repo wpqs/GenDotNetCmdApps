@@ -107,7 +107,7 @@ namespace KLineEdCmdApp.Utils
             public static readonly string ArgSettingsUpdate = "update";
             public static readonly bool   ArgSettingsUpdateDefault = false;
             public static readonly string ArgSettingsPathFileName = "file";
-            public static readonly string ArgSettingsPathFileNameDefault = $"{Program.CmdAppName}.json";
+            public static readonly string ArgSettingsPathFileNameDefault = $"{AppDomain.CurrentDomain.BaseDirectory}\\{Program.UserSettingsFile}";
 
         public const string ParamGeneralBackGndColour = "--backgnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
         public const string ParamGeneralForeGndColour = "--foregnd";     //  (text COLOUR) (msg-error COLOUR) (msg-warn COLOUR) (msg-note COLOUR) (cmds COLOUR) (status COLOUR) (rule COLOUR)
