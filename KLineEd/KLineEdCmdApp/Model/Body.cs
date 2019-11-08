@@ -224,7 +224,7 @@ namespace KLineEdCmdApp.Model
                                         rc.SetError(1100404, MxError.Source.User, $"last line is {lastLine ?? "[null]"}", MxMsgs.MxErrInvalidCondition);
                                     else
                                     {
-                                        var rcRefresh = Refresh(TextLines.Count - 1, GetMaxColCursorIndexForRow(TextLines.Count - 1));
+                                        var rcRefresh = Refresh();
                                         rc += rcRefresh;
                                         if (rcRefresh.IsSuccess(true))
                                         {
@@ -244,7 +244,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> Refresh(int rowIndex, int colIndex)
+        public MxReturnCode<bool> Refresh()
         {
             var rc = new MxReturnCode<bool>("Body.Refresh");
 
@@ -271,7 +271,7 @@ namespace KLineEdCmdApp.Model
 
                 if (rc.IsSuccess())
                 {
-                    var rcCursor = SetCursorInChapter(TextLines.Count-1, colIndex);
+                    var rcCursor = SetCursorInChapter(TextLines.Count-1, GetMaxColCursorIndexForRow(TextLines.Count - 1));
                     rc += rcCursor;
                     if (rcCursor.IsSuccess(true))
                     {

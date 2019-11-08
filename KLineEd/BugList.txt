@@ -15,6 +15,9 @@ BugList
 	8. done - Ctrl+Q takes a long time in PropsEdit 
 	9. Filename in props doesn't update/change as filename itself is changed
 	6. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
+		- stops splitting at fifth line (E)
+		    - Refresh() - LeftJustifyLinesInParagraph may insert lines into TextLines[] so while (row < GetTextLines()) ??? - possibly not an issue
+			   end of LeftJustifyLinesInParagraph doesn't add the remaining oversized line as a collection of lines - i.e. TextLines[] still same size - InsertLine never called
 
 3. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange
 4. Console problems:

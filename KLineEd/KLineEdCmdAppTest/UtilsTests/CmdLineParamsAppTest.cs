@@ -161,7 +161,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] {"--help", "--settings", "display=yes", "file='KLineEdCmdApp.json'", "update=yes" });
 
             Assert.True(rcParam.GetResult());
-            Assert.Equal("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
+            Assert.Contains("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
             Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.SettingsDisplay);
             Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.SettingsUpdate);
             Assert.Contains("Help request:", cmdLineParams.HelpHint);
@@ -175,7 +175,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--help", "--settings" });
 
             Assert.True(rcParam.GetResult());
-            Assert.Equal("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
+            Assert.Contains("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
             Assert.Contains("Help request:", cmdLineParams.HelpHint);
         }
 
@@ -409,10 +409,10 @@ namespace KLineEdCmdAppTest.UtilsTests
         public void TestStatusUpdatePeriodParamsFailRange()
         {
             var cmdLineParams = new CmdLineParamsApp();
-            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=5001" });
+            var rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=60001" });
 
             Assert.False(rcParam.GetResult());
-            Assert.Contains("error 1020309-user: parameter '--statusupdate' has a bad argument; value 5001 is invalid for 'mS'", rcParam.GetErrorTechMsg());
+            Assert.Contains("error 1020309-user: parameter '--statusupdate' has a bad argument; value 60001 is invalid for 'mS'", rcParam.GetErrorTechMsg());
 
             rcParam = cmdLineParams.Initialise(new[] { "--help", "--statusupdate", "mS=9" });
 
@@ -1385,7 +1385,7 @@ namespace KLineEdCmdAppTest.UtilsTests
             var rcParam = cmdLineParams.Initialise(new[] { "--edit", "Test.ksx", "--settings display=no file='KLineEdCmdApp.json' update=yes" });
             Assert.True(rcParam.GetResult());
             Assert.Equal(CmdLineParamsApp.BoolValue.No, cmdLineParams.SettingsDisplay);
-            Assert.Equal("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
+            Assert.Contains("KLineEdCmdApp.json", cmdLineParams.SettingsPathFileName);
             Assert.Equal(CmdLineParamsApp.BoolValue.Yes, cmdLineParams.SettingsUpdate);
         }
 

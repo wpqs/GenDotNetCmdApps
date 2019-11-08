@@ -190,8 +190,8 @@ namespace KLineEdCmdApp.Utils
 
                 public static readonly string ArgStatusUpdatePeriod = "mS";      //  0  <min 1 max 10> //(0 is off)
                 public const int ArgStatusUpdatePeriodMin = 10;
-                public const int ArgStatusUpdatePeriodMax = 5000;
-                public const int ArgStatusUpdatePeriodDefault = 200;     
+                public const int ArgStatusUpdatePeriodMax = 60000;
+                public const int ArgStatusUpdatePeriodDefault = 5000;     
 
         //edit operational parameters - text editor
 

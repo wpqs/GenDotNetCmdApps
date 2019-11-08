@@ -9,7 +9,7 @@ namespace KLineEdCmdApp.View
     [SuppressMessage("ReSharper", "ArrangeStaticMemberQualifier")]
     public class SpellEditView : EditAreaView
     {
-        public static readonly string Introduction = "Spelling Correction for selected word";
+        public static readonly string Introduction = "Spellings for ";
         public static readonly string NotYetImplemented = "*** Feature has not been implemented ***";
         public static readonly string SpellEditorMode = "Spelling Correction:";
         public SpellEditView(IMxConsole console) : base(console) { }
