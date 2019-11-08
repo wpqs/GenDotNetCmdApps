@@ -13,6 +13,7 @@ BugList
 	6. done - Clear ErrorState when switching views - startup press F10 (warning error incorrect char) press F2 moves but TextEditingView but error still displayed
 	7. done - Incorrect char in PropsEdit produces a warning, but an error in TextEditing view
 	8. done - Ctrl+Q takes a long time in PropsEdit 
+	9. Filename in props doesn't update/change as filename itself is changed
 	6. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
 
 3. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange
