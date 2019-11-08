@@ -10,9 +10,9 @@ BugList
 		done - Error 1110402 BaseView.DisplayLine() throws an exception so returns null - happens when no final parabreak and empty bottom line
 	4. done - MxConsole.Setup() - doesn't report exception - fixed as a consequence of error handling refactoring
 	5. done - now default to the same directory as assembly - appsettings.json and KLineEdCmd.json must be in the same directory as d:\test\mytest.ksx
-	6. Clear ErrorState when switching views - startup press F10 (warning error incorrect char) press F2 moves but TextEditingView but error still displayed
-	7. Incorrect char in PropsEdit produces a warning, but an error in TextEditing view
-	8. Ctrl+Q takes a long time in PropsEdit 
+	6. done - Clear ErrorState when switching views - startup press F10 (warning error incorrect char) press F2 moves but TextEditingView but error still displayed
+	7. done - Incorrect char in PropsEdit produces a warning, but an error in TextEditing view
+	8. done - Ctrl+Q takes a long time in PropsEdit 
 	6. Changing --display cols=25 results in some lines not being truncated by SplitLongLine()
 
 3. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange

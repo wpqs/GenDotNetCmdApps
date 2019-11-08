@@ -14,7 +14,6 @@ Development work v1.0.44.0
 	- done Convert MxConsole to MxReturnCode
 	- BugFixes 
 	- implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
-    - Check Chapter/Session stats are correct
 	- Test in Production Build
 
 4. Publish and Test
@@ -29,6 +28,7 @@ Development work v1.0.45.0
 
 1. Test
 	- iOS
+	    - Check Chapter/Session stats are correct
 2. Refactor Application structure
      - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.

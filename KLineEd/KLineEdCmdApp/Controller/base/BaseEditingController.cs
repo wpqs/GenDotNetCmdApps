@@ -96,6 +96,8 @@ namespace KLineEdCmdApp.Controller.Base
                 SearchUrl = searchUrl;
                 ThesaurusUrl = thesaurusUrl;
                 SpellUrl = spellUrl;
+
+                Chapter?.SetMsgLine("");    //clear any message
                 
                 rc.SetResult(true);
             }

@@ -617,7 +617,7 @@ namespace KLineEdCmdApp.Model
                     try
                     {
                         if (Body.GetErrorsInText(text) != null)
-                            rc.SetError(1101103, MxError.Source.User, Body.GetErrorsInText(text, Cursor.RowIndex+1, Cursor.ColIndex+1));
+                            rc.SetError(1101103, MxError.Source.User, $"{MxReturnCodeUtils.WarningMsgPrecursor}{Body.GetErrorsInText(text, Cursor.RowIndex+1, Cursor.ColIndex+1)}");
                         else
                         {
                             if (linesCount <= 0)
@@ -1262,7 +1262,7 @@ namespace KLineEdCmdApp.Model
                         else
                         {
                             if (Body.GetErrorsInText(line) != null)
-                                rc.SetError(1103004, MxError.Source.User, Body.GetErrorsInText(line, Cursor.RowIndex + 2));
+                                rc.SetError(1103004, MxError.Source.User, $"{MxReturnCodeUtils.WarningMsgPrecursor}{Body.GetErrorsInText(line, Cursor.RowIndex + 2)}");
                             else
                             {
                                 if ((rowIndex + 1) >= linesCount)

@@ -18,7 +18,9 @@ namespace KLineEdCmdApp.Controller
             var rc = new MxReturnCode<bool>("PropsEditingController. ProcessKey");
 
             BaseEditingController controller = this;
-            if ((base.ProcessKey(model, keyInfo) != null)) // && (IsErrorState() == false))
+            if ((base.ProcessKey(model, keyInfo) == null)) // && (IsErrorState() == false))
+                rc.SetResult(true);     //key handled by base class - no further action needed
+            else
             {
                 //do stuff related to TextEditing, updating the model as needed
                 var  props = model?.ChapterHeader?.Properties;

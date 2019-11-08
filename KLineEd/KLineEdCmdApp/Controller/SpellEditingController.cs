@@ -2,6 +2,7 @@
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.View;
+using MxReturnCode;
 
 namespace KLineEdCmdApp.Controller
 {
@@ -11,13 +12,28 @@ namespace KLineEdCmdApp.Controller
 
         public override BaseEditingController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
+            var rc = new MxReturnCode<bool>($"SpellEditingController.ProcessKey");
+
             BaseEditingController controller = this;
-            if ((base.ProcessKey(model, keyInfo) != null)) // && (IsErrorState() == false))
+            if ((base.ProcessKey(model, keyInfo) == null)) // && (IsErrorState() == false))
+                rc.SetResult(true);     //key handled by base class - no further action needed  
+            else
             {
-                //do stuff related to TextEditing, updating the model as needed
+                //do stuff related to SpellEditing, updating the model as needed
                 if (keyInfo.Key == ConsoleKey.F2)
+                {
                     controller = ControllerFactory.Make(Chapter, ControllerFactory.TextEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
+                    rc.SetResult(true);
+                }
+                else
+                {
+                    rc.SetResult(true);
+                }
             }
+
+            if (rc.IsError(true))
+                SetErrorState(rc);
+
             return controller;
         }
 
