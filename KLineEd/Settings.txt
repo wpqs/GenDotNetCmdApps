@@ -66,9 +66,9 @@ Settings that can be set from command line
 Main operations 
 
 --help														//display help info
---export from='drive:path\*.ksx' to='drive:path\*.txt'		//export edit.ksx to export.txt 
---import from='drive:path\*.txt' to='drive:path\*.ksx'		//import import.txt to edit.ksx
---edit 'drive:path\*.ksx'									//edit specified .ksx file
+--export from='drive:path\*.ksx' to='drive:path\*.txt' ([clearkey='xxx' | hiddenkey='yyyy']) (steganimg='drive:path\*.mp4') 	    //export edit.ksx to export.txt 
+--import from='drive:path\*.txt' to='drive:path\*.ksx'  ([clearkey='xxx' | hiddenkey='yyyy']) (steganimg='drive:path\*.mp4')		//import import.txt to edit.ksx
+--edit 'drive:path\*.ksx' ([clearkey='xxx' | hiddenkey='yyyy'])	/edit specified .ksx file
  
 Additional options for edit operation (--edit)
 

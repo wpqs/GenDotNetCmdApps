@@ -12,8 +12,9 @@ Development work v1.0.44.0
 3. Prepare for alpha release
     - done Error handling refactor
 	- done Convert MxConsole to MxReturnCode
+	- Cursor move - 
+		- Ctrl+Home = top of chapter, Ctrl+End bottom of chapter, Home = start of line, End = end of line, Ctrl+Left = one word left, Ctrl+Right = one word right,
 	- BugFixes 
-	- implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
 	- Test in Production Build
 
 4. Publish and Test
@@ -26,10 +27,15 @@ Development work v1.0.44.0
 Development work v1.0.45.0
 --------------------------
 
-1. Test
+1. 	Implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
+
+2.	Implement SaveAs - switch to PropsView and enable changing of filename / no filename is abort without saving
+
+3. Test
 	- iOS
 	    - Check Chapter/Session stats are correct
-2. Refactor Application structure
+
+4. Refactor Application structure
      - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
@@ -83,7 +89,12 @@ Development work v1.0.47.0
 
 1. Implement Secret Manager lookup for json settings (SVN)
 
-2. Refactor
+2. Implement encryption --edit 'drive:path\*.ksx' ([clearkey='xxx' | hiddenkey='yyyy'])
+
+3. Implement Steganography --export ... (steganimg='drive:path\*.mp4') --import ... (steganimg='drive:path\*.mp4') 
+  https://www.loginworks.com/blogs/use-steganography-c/
+
+3. Refactor
     - Update KScribe for new version of MxReturnCode (C++ interop)
 
 Development work v1.0.48.0
@@ -159,6 +170,7 @@ Release work v1.2
 1. Create ConsoleApp launcher for Cmd Line version (Windows only)
 2. Create KScribeWinApp - window version
 3. Create KScribeMacApp - iOS version
+4. Create KScribeAndApp - Andriod phone version
 4. Integrate with SVN
 		- store user settings
 		- create repository (delete from cmd line - intentional difficult)

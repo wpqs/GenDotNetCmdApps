@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.421
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KLineEdCmdApp", "KLineEdCmdApp\KLineEdCmdApp.csproj", "{F416C783-640D-4408-B5F8-2551454BCFB2}"
 EndProject
@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{27E0A82D-1
 	ProjectSection(SolutionItems) = preProject
 		BugList.txt = BugList.txt
 		Deployment.txt = Deployment.txt
+		FunctionalTests.txt = FunctionalTests.txt
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
 		Settings.txt = Settings.txt

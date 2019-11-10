@@ -1,0 +1,17 @@
+Functional Tests - Basic, Manual Smoke Test
+
+Prep:
+
+a. copy KLineEd\KLineEdCmdApp\mytest.ksx to KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2
+
+1. Changing Display Cols
+
+ --edit mytest.ksx --display cols=25 
+   compare with KLineEd\FunctionalTestResults\mytestDisplayCols25.jpg
+ save
+   compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with mytestBodyDisplayCols25.jpg
+
+--edit mytest.ksx --display cols=65
+    compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
+save
+	compare KLineEd\KLineEdCmdApp\mytest.ksx with KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx - should be identical
