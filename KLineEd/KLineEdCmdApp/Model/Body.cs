@@ -746,7 +746,7 @@ namespace KLineEdCmdApp.Model
                     rc.SetResult(hint);
                 else
                 {
-                    var updatedCursor = new CursorPosition(originalCursor);
+                    CursorPosition updatedCursor = new CursorPosition(originalCursor);
                     var rowIndex = cursorRowIndex;
                     do
                     {
@@ -762,31 +762,34 @@ namespace KLineEdCmdApp.Model
                                 hint = ChapterModel.ChangeHint.End;
                         }
 
-                        var rcSplit = SplitLongLine2(rowIndex, updatedCursor, out var resultCursor);
-                        if (rcSplit.IsError(true) || (resultCursor == null))
+                        var rcSplit = SplitLongLine2(rowIndex, originalCursor, out var resultCursor);
+                        if (rcSplit.IsError(true))
                         {
                             rc += rcSplit;
-                            if (resultCursor == null)
-                                rc.SetError(1101302, MxError.Source.Program, $"resultCursor is null", MxMsgs.MxErrInvalidCondition);
                             break;
                         }
                         else
                         {
+                            if (originalCursor.RowIndex == rowIndex)
+                                updatedCursor = resultCursor?.Copy() ?? null;
                             if (rcSplit.GetResult() == true)
                                 hint = ChapterModel.ChangeHint.End;
-                            if (updatedCursor.IsSame(resultCursor) == false)
-                                updatedCursor = resultCursor.Copy();
                         }
                     }
                     while ((rowIndex = GetNextLineIndex(rowIndex)) != Program.PosIntegerNotSet);
 
-                    if (rc.IsSuccess() && (updatedCursor != null))
+                    if (rc.IsSuccess()) 
                     {
-                        var rcCursor = SetCursorInChapter(updatedCursor.RowIndex, updatedCursor.ColIndex);
-                        rc += rcCursor;
-                        if (rcCursor.IsSuccess(true))
+                        if (updatedCursor == null)
+                            rc.SetError(1101302, MxError.Source.Program, $"updatedCursor is null", MxMsgs.MxErrInvalidCondition);
+                        else
                         {
-                            rc.SetResult(hint);
+                            var rcCursor = SetCursorInChapter(updatedCursor.RowIndex, updatedCursor.ColIndex);
+                            rc += rcCursor;
+                            if (rcCursor.IsSuccess(true))
+                            {
+                                rc.SetResult(hint);
+                            }
                         }
                     }
                 }
@@ -845,7 +848,7 @@ namespace KLineEdCmdApp.Model
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
             updatedCursor = (originalCursor.ColIndex < (maxColIndex+1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor.RowIndex, maxColIndex+1);
 
-            if ((updatedCursor == null) || (TextLines == null) || (maxColIndex < 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax) )
+            if ((TextLines == null) || (maxColIndex < 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax) )
                 rc.SetError(1101601, MxError.Source.Param, $"updatedCursor is null, TextLines is null, maxColIndex={maxColIndex}", MxMsgs.MxErrInvalidCondition);
             else
             {
@@ -861,28 +864,35 @@ namespace KLineEdCmdApp.Model
                         rc.SetResult(false);
                     else
                     {
+                        string existLine, insertLine;
                         currentLineLen = currentLine.Length; //include any paraBreak
-                        var existLine = "";
-                        var insertLine = "";
                         var splitIndex = Body.GetSplitIndexFromEnd(currentLine, maxColIndex);
                         if (splitIndex == Program.PosIntegerNotSet)
-                        { //line doesn't contain any spaces or otherwise cannot be split as word boundary
+                        {                       //line doesn't contain any spaces or otherwise cannot be split as word boundary
                             existLine = currentLine.Snip(0, maxColIndex); //cursor doesn't change as updatedCursor.colIndex must be <= maxColIndex
                             if (((insertLine = currentLine.Snip(maxColIndex + 1, currentLineLen - 1)) != null))
-                                WordCount++; //increment word count as word in currentLine is split into two
+                                WordCount++;    //increment word count as word in currentLine is split into two
                         }
                         else
                         {
                             existLine = currentLine.Snip(0, splitIndex - 1); //space is removed
                             insertLine = currentLine.Snip(splitIndex + 1, currentLineLen - 1);
-                            if ((updatedCursor.RowIndex == rowIndex) && (updatedCursor.ColIndex > splitIndex))
-                            {
-                                updatedCursor.ColIndex = (updatedCursor.ColIndex > maxColIndex) ? insertLine.Length : (updatedCursor.ColIndex - (splitIndex - 1));
+                            if ((originalCursor.RowIndex == rowIndex) && (originalCursor.ColIndex > splitIndex))
+                            {                   //only update cursor when processing the first row in paragraph
+                                //if (originalCursor.ColIndex > maxColIndex)
+                                //    updatedCursor.ColIndex = insertLine.Length;
+                                //else
+                                //    updatedCursor.ColIndex = (originalCursor.ColIndex - (splitIndex+1));
+                                //if (originalCursor.ColIndex > maxColIndex)
+                                //    updatedCursor.ColIndex = maxColIndex - splitIndex;
+                                //else
+                                //    updatedCursor.ColIndex = (originalCursor.ColIndex - (splitIndex + 1));
+                                updatedCursor.ColIndex = (originalCursor.ColIndex > maxColIndex) ? maxColIndex - splitIndex : (originalCursor.ColIndex - (splitIndex + 1));
                                 updatedCursor.RowIndex++;
                             }
                         }
 
-                        if (string.IsNullOrEmpty(existLine) || (string.IsNullOrEmpty(insertLine)) || (updatedCursor.IsValid(TextLines.Count, maxColIndex) == false))
+                        if (string.IsNullOrEmpty(existLine) || (string.IsNullOrEmpty(insertLine)) || (updatedCursor.IsValid(TextLines.Count, maxColIndex+1) == false))
                             rc.SetError(1101603, MxError.Source.Program, $"existLine.Length={existLine?.Length ?? -1}, insertLine.Length={insertLine?.Length ?? -1}, updatedCursor={updatedCursor.ToString()}", MxMsgs.MxErrInvalidCondition);
                         else
                         {
