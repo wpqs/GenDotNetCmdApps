@@ -14,7 +14,10 @@ Development work v1.0.44.0
 	- done Convert MxConsole to MxReturnCode
 	- Cursor move - 
 		- Ctrl+Home = top of chapter, Ctrl+End bottom of chapter, Home = start of line, End = end of line, Ctrl+Left = one word left, Ctrl+Right = one word right,
+    - Implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
+	- Implement SaveAs - switch to PropsView and enable changing of filename / no filename is abort without saving
 	- BugFixes 
+
 	- Test in Production Build
 
 4. Publish and Test
@@ -27,15 +30,11 @@ Development work v1.0.44.0
 Development work v1.0.45.0
 --------------------------
 
-1. 	Implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
-
-2.	Implement SaveAs - switch to PropsView and enable changing of filename / no filename is abort without saving
-
-3. Test
+1. Test
 	- iOS
 	    - Check Chapter/Session stats are correct
 
-4. Refactor Application structure
+2. Refactor Application structure
      - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam

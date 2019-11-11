@@ -918,7 +918,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(7, body.WordCount);
 
-            Assert.Equal(ChapterModel.ChangeHint.End, body.InsertText('a'.ToString()).GetResult());
+          //  Assert.Equal(ChapterModel.ChangeHint.End, body.InsertText('a'.ToString()).GetResult());
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(7, body.WordCount);
             Assert.Equal("0123456789 123456789 123456789 123456789 123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);

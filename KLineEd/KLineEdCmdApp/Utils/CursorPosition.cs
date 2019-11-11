@@ -14,7 +14,22 @@
 
         public bool IsSame(CursorPosition cursor)
         {
-            return ((cursor.RowIndex == RowIndex) && (cursor.ColIndex == ColIndex)) ? true : false;
+            return ((cursor != null) && (cursor.RowIndex == RowIndex) && (cursor.ColIndex == ColIndex));
+        }
+
+        public bool IsSame(int checkRowIndex, int checkColIndex)
+        {
+            return ((checkRowIndex == RowIndex) && (checkColIndex == ColIndex)) ? true : false;
+        }
+
+        public bool IsValid(int lineCount, int maxColIndex)
+        {
+            return ((RowIndex >= 0) && (((lineCount > 0) && (RowIndex < lineCount)) || ((lineCount == 0) && (RowIndex == 0))) && (ColIndex >= 0) && (ColIndex <= maxColIndex));
+        }
+
+        public bool IsValid(int lineCount)
+        {
+            return ((RowIndex >= 0) && (((lineCount > 0) && (RowIndex < lineCount)) || ((lineCount == 0) && (RowIndex == 0))) && (ColIndex >= 0));
         }
 
         public CursorPosition Copy()
@@ -22,9 +37,9 @@
             return (CursorPosition) this.MemberwiseClone();
         }
 
-        public bool IsSame(int checkRowIndex, int checkColIndex)
+        public override string ToString()
         {
-            return ((checkRowIndex == RowIndex) && (checkColIndex == ColIndex)) ? true : false;
+            return $"rowIndex={RowIndex}; colIndex={ColIndex}";
         }
     }
 }

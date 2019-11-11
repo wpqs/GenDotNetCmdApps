@@ -5,13 +5,55 @@ Prep:
 a. copy KLineEd\KLineEdCmdApp\mytest.ksx to KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2
 
 1. Changing Display Cols
+------------------------
 
- --edit mytest.ksx --display cols=25 
+--edit mytest.ksx --display cols=25 
    compare with KLineEd\FunctionalTestResults\mytestDisplayCols25.jpg
- save
+save
    compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with mytestBodyDisplayCols25.jpg
 
 --edit mytest.ksx --display cols=65
     compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
 save
 	compare KLineEd\KLineEdCmdApp\mytest.ksx with KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx - should be identical
+
+
+2. Deleting paraBreak
+---------------------
+
+--edit mytest.ksx --display cols=65
+
+move cursor to line 12, col 12
+press Del
+   compare with KLineEd\FunctionalTestResults\mytestAddR12C12Del.jpg
+press CR
+    compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
+
+3. Adding and deleting characters before end of line
+----------------------------------------------------
+
+--edit mytest.ksx --display cols=65
+
+move cursor to line 11, col 12
+press INS
+type ABCDE
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C12ABCDE.jpg
+type F
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C12ABCDEF.jpg
+press BS
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C12ABCDE.jpg
+
+
+ 4. Adding and deleting characters at end of line
+ ------------------------------------------------
+
+--edit mytest.ksx --display cols=65
+
+move cursor to line 11, col 61
+type ABCDE
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61ABCDE.jpg
+type F
+   CHECK cursor is line 12, col 16
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61ABCDEF.jpg
+press BS
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61ABCDE.jpg
