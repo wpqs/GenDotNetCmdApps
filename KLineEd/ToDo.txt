@@ -12,11 +12,12 @@ Development work v1.0.44.0
 3. Prepare for alpha release
     - done Error handling refactor
 	- done Convert MxConsole to MxReturnCode
+	- done BugFixes 
 	- Cursor move - 
 		- Ctrl+Home = top of chapter, Ctrl+End bottom of chapter, Home = start of line, End = end of line, Ctrl+Left = one word left, Ctrl+Right = one word right,
     - Implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
+
 	- Implement SaveAs - switch to PropsView and enable changing of filename / no filename is abort without saving
-	- BugFixes 
 
 	- Test in Production Build
 

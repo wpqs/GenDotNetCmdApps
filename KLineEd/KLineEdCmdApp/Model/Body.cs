@@ -747,7 +747,8 @@ namespace KLineEdCmdApp.Model
                 else
                 {
                     CursorPosition updatedCursor = new CursorPosition(originalCursor);
-                    var rowIndex = cursorRowIndex;
+                    var previousRowIndex = GetPreviousLineIndex(cursorRowIndex);
+                    var rowIndex = (previousRowIndex != Program.PosIntegerNotSet) ? previousRowIndex : cursorRowIndex;
                     do
                     {
                         var rcFill = FillShortLine2(rowIndex);
@@ -1464,6 +1465,19 @@ namespace KLineEdCmdApp.Model
             {
                 if ((rowIndex + 1) < TextLines.Count)
                     rc = rowIndex + 1;
+            }
+            return (rc != 0) ? rc : Program.PosIntegerNotSet;
+        }
+
+        private int GetPreviousLineIndex(int rowIndex)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            var row = rowIndex - 1;
+            if ((row >= 0) && (row < TextLines.Count) && (TextLines[row].EndsWith(ParaBreakChar) == false))
+            {
+                if ((row) < TextLines.Count)
+                    rc = row;
             }
             return (rc != 0) ? rc : Program.PosIntegerNotSet;
         }
