@@ -630,7 +630,7 @@ namespace KLineEdCmdApp.Model
                                 var hint = rc.GetResult(); //unknown unless InsertParaBreak invoked in which case it is End, or Line
                                 var line = TextLines[Cursor.RowIndex];
                                 var existWordCount = GetWordCountInLine(line);
-       
+
                                 if ((Cursor.ColIndex == line.Length) || insert)
                                     line = line.Insert(Cursor.ColIndex, text);
                                 else
@@ -813,8 +813,9 @@ namespace KLineEdCmdApp.Model
                 while ((nextRowIndex = GetNextLineIndex(currentRowIndex)) != Program.PosIntegerNotSet)
                 {
                     var nextLine = TextLines[nextRowIndex]; // GetNextLineIndex() ensures ((nextRowIndex < TextLines.Count) && (nextRowIndex == currentRowIndex+1)) or fail 
-                    var splitIndex = Body.GetSplitIndexFromStart(nextLine, (maxColIndex + 1) - (TextLines[currentRowIndex].Length - 1));
-                    if ((splitIndex < 0) || (splitIndex >= maxColIndex))
+                    var spaceAtEndOfCurrentLine = (maxColIndex + 1) - (TextLines[currentRowIndex].Length - 1);
+                    var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine);
+                    if ((splitIndex < 0) || (splitIndex >= (spaceAtEndOfCurrentLine-1))) // maxColIndex))
                         break;                              //next line cannot be split or is too long be put into current line
                     else 
                     { 
@@ -879,15 +880,7 @@ namespace KLineEdCmdApp.Model
                             insertLine = currentLine.Snip(splitIndex + 1, currentLineLen - 1);
                             if ((originalCursor.RowIndex == rowIndex) && (originalCursor.ColIndex > splitIndex))
                             {                   //only update cursor when processing the first row in paragraph
-                                //if (originalCursor.ColIndex > maxColIndex)
-                                //    updatedCursor.ColIndex = insertLine.Length;
-                                //else
-                                //    updatedCursor.ColIndex = (originalCursor.ColIndex - (splitIndex+1));
-                                //if (originalCursor.ColIndex > maxColIndex)
-                                //    updatedCursor.ColIndex = maxColIndex - splitIndex;
-                                //else
-                                //    updatedCursor.ColIndex = (originalCursor.ColIndex - (splitIndex + 1));
-                                updatedCursor.ColIndex = (originalCursor.ColIndex > maxColIndex) ? maxColIndex - splitIndex : (originalCursor.ColIndex - (splitIndex + 1));
+                                updatedCursor.ColIndex = (originalCursor.ColIndex <= maxColIndex) ? (originalCursor.ColIndex - (splitIndex + 1)) : (maxColIndex - (splitIndex-1));
                                 updatedCursor.RowIndex++;
                             }
                         }

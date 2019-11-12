@@ -25,7 +25,7 @@ save
 
 move cursor to line 12, col 12
 press Del
-   compare with KLineEd\FunctionalTestResults\mytestAddR12C12Del.jpg
+   compare with KLineEd\FunctionalTestResults\mytestAddR12C12-Del.jpg
 press CR
     compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
 
@@ -37,11 +37,11 @@ press CR
 move cursor to line 11, col 12
 press INS
 type ABCDE
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C12ABCDE.jpg
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C12-ABCDE.jpg
 type F
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C12ABCDEF.jpg
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C12-ABCDEF.jpg
 press BS
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C12ABCDE.jpg
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C12-ABCDE.jpg
 
 
  4. Adding and deleting characters at end of line
@@ -51,9 +51,26 @@ press BS
 
 move cursor to line 11, col 61
 type ABCDE
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C61ABCDE.jpg
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDE.jpg
 type F
    CHECK cursor is line 12, col 16
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C61ABCDEF.jpg
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDEF.jpg
 press BS
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C61ABCDE.jpg
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDE.jpg
+type F
+   CHECK cursor is line 12, col 16
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDEF.jpg
+move cursor to line 11, col 51
+type space followed by 123456789ABCDE
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
+type F
+   CHECK cursor is line 12, col 16
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDEF.jpg
+press BS
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
+press INS
+type F
+   CHECK cursor is line 12, col 16
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDEF.jpg
+press BS
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
