@@ -53,8 +53,8 @@ namespace KLineEdCmdApp
                 rc += rcLine;
                 if (rcLine.IsSuccess(true))
                 {
-                    var AppSettingsPathFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\{AppSettingsFile}"; 
-                    IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile(AppSettingsPathFileName)?.AddUserSecrets<Program>().Build();
+                    var appSettingsPathFileName = $"{AppDomain.CurrentDomain.BaseDirectory}\\{AppSettingsFile}"; 
+                    IConfigurationRoot config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())?.AddJsonFile(appSettingsPathFileName)?.AddUserSecrets<Program>().Build();
                     var sbqConn = config?["ConnectionStrings:AzureWebJobsServiceBus"] ?? null;
                     var sbqName = config?["MxLogMsg:AzureServiceBusQueueName"] ?? null;
 

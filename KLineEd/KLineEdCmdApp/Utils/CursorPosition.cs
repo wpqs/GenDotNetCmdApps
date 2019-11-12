@@ -19,7 +19,7 @@
 
         public bool IsSame(int checkRowIndex, int checkColIndex)
         {
-            return ((checkRowIndex == RowIndex) && (checkColIndex == ColIndex)) ? true : false;
+            return ((checkRowIndex == RowIndex) && (checkColIndex == ColIndex));
         }
 
         public bool IsValid(int lineCount, int maxColIndex)

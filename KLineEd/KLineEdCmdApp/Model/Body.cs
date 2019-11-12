@@ -738,7 +738,7 @@ namespace KLineEdCmdApp.Model
             var originalCursor = new CursorPosition(cursorRowIndex, cursorColIndex);
 
             if ((TextLines == null) || (maxColIndex <= 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax) ||  (originalCursor.IsValid(TextLines.Count) == false) ) 
-                rc.SetError(1101301, MxError.Source.Param, $"TextLines == null, maxColIndex={maxColIndex} or invalid originalCursor={originalCursor.ToString()}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1101301, MxError.Source.Param, $"TextLines == null, maxColIndex={maxColIndex} or invalid originalCursor={originalCursor}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var hint = ChapterModel.ChangeHint.Line;
@@ -853,7 +853,7 @@ namespace KLineEdCmdApp.Model
             else
             {
                 if ((rowIndex < 0) || (rowIndex >= TextLines.Count) || (updatedCursor.IsValid(TextLines.Count, maxColIndex+1) == false))
-                    rc.SetError(1101602, MxError.Source.Param, $"rowIndex={rowIndex}; cursor={updatedCursor.ToString()}", MxMsgs.MxErrBadMethodParam);
+                    rc.SetError(1101602, MxError.Source.Param, $"rowIndex={rowIndex}; cursor={updatedCursor}", MxMsgs.MxErrBadMethodParam);
                 else
                 {
                     var currentRowIndex = rowIndex;
@@ -893,7 +893,7 @@ namespace KLineEdCmdApp.Model
                         }
 
                         if (string.IsNullOrEmpty(existLine) || (string.IsNullOrEmpty(insertLine)) || (updatedCursor.IsValid(TextLines.Count, maxColIndex+1) == false))
-                            rc.SetError(1101603, MxError.Source.Program, $"existLine.Length={existLine?.Length ?? -1}, insertLine.Length={insertLine?.Length ?? -1}, updatedCursor={updatedCursor.ToString()}", MxMsgs.MxErrInvalidCondition);
+                            rc.SetError(1101603, MxError.Source.Program, $"existLine.Length={existLine?.Length ?? -1}, insertLine.Length={insertLine?.Length ?? -1}, updatedCursor={updatedCursor}", MxMsgs.MxErrInvalidCondition);
                         else
                         {
                             TextLines[currentRowIndex] = existLine;
