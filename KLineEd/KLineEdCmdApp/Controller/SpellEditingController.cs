@@ -8,7 +8,7 @@ namespace KLineEdCmdApp.Controller
 {
     public class SpellEditingController : BaseEditingController
     {
-        public static readonly string EditorHelpText = $"{SpellEditView.SpellEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F2=Text editing";
+        public static readonly string EditorHelpText = $"{SpellEditView.SpellEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F12=Text editing";
 
         public override BaseEditingController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
@@ -20,7 +20,7 @@ namespace KLineEdCmdApp.Controller
             else
             {
                 //do stuff related to SpellEditing, updating the model as needed
-                if (keyInfo.Key == ConsoleKey.F2)
+                if (keyInfo.Key == ConsoleKey.F12)
                 {
                     controller = ControllerFactory.Make(Chapter, ControllerFactory.TextEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
                     rc.SetResult(true);

@@ -238,8 +238,8 @@ namespace KLineEdCmdApp.Controller.Base
                     }
                     else if (keyInfo.Key == ConsoleKey.F1)
                     {
-                        LaunchBrowser(model?.ChapterBody, HelpUrl, false);
-                        rc.SetResult(true);
+                        var rcBrowser = LaunchBrowser(model?.ChapterBody, HelpUrl, false);
+                        rc += rcBrowser;
                     }
                     else if (keyInfo.Key == ConsoleKey.Escape)
                     {
@@ -270,7 +270,7 @@ namespace KLineEdCmdApp.Controller.Base
             return this;  
         }
 
-        protected void LaunchBrowser(Body body, string url, bool replaceSelectedWord = false)
+        protected MxReturnCode<bool> LaunchBrowser(Body body, string url, bool replaceSelectedWord = false)
         {
             var rc = new MxReturnCode<bool>($"BaseEditingController.LaunchBrowser");
 
@@ -281,7 +281,10 @@ namespace KLineEdCmdApp.Controller.Base
                 try
                 {
                     if (replaceSelectedWord == false)
+                    {
                         KLineEditor.StartBrowser(BrowserCmd, url);
+                        rc.SetResult(true);
+                    }
                     else
                     {
                         string selectedWord = body.GetSelectedWord();
@@ -305,8 +308,7 @@ namespace KLineEdCmdApp.Controller.Base
                     rc.SetError(1250304, MxError.Source.User, e.Message, null);
                 }
             }
-            if (rc.IsError(true))
-                SetErrorState(rc);
+            return rc;
         }
 
         public virtual string GetEditorHelpLine()

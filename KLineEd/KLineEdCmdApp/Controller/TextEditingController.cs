@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.View;
@@ -8,7 +9,7 @@ namespace KLineEdCmdApp.Controller
 {
     public class TextEditingController : BaseEditingController
     {
-        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Ctrl+Q=Quit Ctrl+S=Save F1=Help F2=Props F3=Spelling F4=Search F5=Thesaurus F6=Spell";
+        public static readonly string EditorHelpText = $"{TextEditView.TextEditorMode} Ctrl+Q=Quit Ctrl+S=Save F1=Help F12=Props F3=Spelling F4=Search F5=Thesaurus F6=Spell";
         public override BaseEditingController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
             var rc = new MxReturnCode<bool>($"TextEditingController.ProcessKey");
@@ -25,10 +26,16 @@ namespace KLineEdCmdApp.Controller
                 {
                     //do stuff related to TextEditing, updating the model as needed
                     var ctrlKeyPressed = ((keyInfo.Modifiers & ConsoleModifiers.Control) != 0);
-                    if (keyInfo.Key == ConsoleKey.F2)
+                    if (keyInfo.Key == ConsoleKey.F12)
                     {
                         controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
                         rc.SetResult(true);
+                        //var rcInsertText = model.BodyInsertText("*", IsInsertMode());
+                        //if (rcInsertText.IsError(true))
+                        //    rc += rcInsertText;
+                        //else
+                        //    rc.SetResult(true);
+
                     }
                     else if (keyInfo.Key == ConsoleKey.F3)
                     {
@@ -37,18 +44,18 @@ namespace KLineEdCmdApp.Controller
                     }
                     else if (keyInfo.Key == ConsoleKey.F4)
                     {
-                        LaunchBrowser(body, SearchUrl, true);
-                        rc.SetResult(true);
+                        var rcBrowser = LaunchBrowser(body, SearchUrl, true);
+                        rc += rcBrowser;
                     }
                     else if (keyInfo.Key == ConsoleKey.F5)
                     {
-                        LaunchBrowser(body, ThesaurusUrl, true);
-                        rc.SetResult(true);
+                        var rcBrowser = LaunchBrowser(body, ThesaurusUrl, true);
+                        rc += rcBrowser;
                     }
                     else if (keyInfo.Key == ConsoleKey.F6)
                     {
-                        LaunchBrowser(body, SpellUrl, true);
-                        rc.SetResult(true);
+                        var rcBrowser = LaunchBrowser(body, SpellUrl, true);
+                        rc += rcBrowser;
                     }
                     else if ((ctrlKeyPressed == false) && (keyInfo.Key == ConsoleKey.UpArrow))
                     {

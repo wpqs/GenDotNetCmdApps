@@ -74,3 +74,4 @@ type F
    compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDEF.jpg
 press BS
    compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
+   CHECK cursor is line 11, col 66

@@ -815,7 +815,9 @@ namespace KLineEdCmdApp.Model
                 {
                     var nextLine = TextLines[nextRowIndex]; // GetNextLineIndex() ensures ((nextRowIndex < TextLines.Count) && (nextRowIndex == currentRowIndex+1)) or fail 
                     var spaceAtEndOfCurrentLine = (maxColIndex + 1) - (TextLines[currentRowIndex].Length - 1);
-                    var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine);
+                    if (nextLine.EndsWith(ParaBreak))
+                        spaceAtEndOfCurrentLine++;
+                    var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine); 
                     if ((splitIndex < 0) || (splitIndex >= (spaceAtEndOfCurrentLine-1))) // maxColIndex))
                         break;                              //next line cannot be split or is too long be put into current line
                     else 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.Properties;
@@ -11,7 +12,7 @@ namespace KLineEdCmdApp.Controller
     [SuppressMessage("ReSharper", "RedundantArgumentDefaultValue")]
     public class PropsEditingController : BaseEditingController
     {
-        public static readonly string EditorHelpText = $"{PropsEditView.PropsEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F2=Text editing";
+        public static readonly string EditorHelpText = $"{PropsEditView.PropsEditorMode} Ctrl+Q=Quit Ctrl+S=Save Esc=Refresh F1=Help F12=Text editing";
 
         public override BaseEditingController ProcessKey(ChapterModel model, ConsoleKeyInfo keyInfo)
         {
@@ -28,7 +29,7 @@ namespace KLineEdCmdApp.Controller
                     rc.SetError(1230101, MxError.Source.Program, "model?.ChapterHeader?.Properties is null", MxMsgs.MxErrInvalidCondition);
                 else
                 {
-                    if (keyInfo.Key == ConsoleKey.F2)
+                    if (keyInfo.Key == ConsoleKey.F12)
                     {
                         controller = ControllerFactory.Make(Chapter, ControllerFactory.TextEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
                         rc.SetResult(true);
