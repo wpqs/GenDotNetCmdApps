@@ -60,6 +60,7 @@ press BS
 type F
    CHECK cursor is line 12, col 16
    compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDEF.jpg
+
 move cursor to line 11, col 51
 type space followed by 123456789ABCDE
    compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
@@ -68,6 +69,7 @@ type F
    compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDEF.jpg
 press BS
    compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
+
 press INS
 type F
    CHECK cursor is line 12, col 16
@@ -75,3 +77,29 @@ type F
 press BS
    compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
    CHECK cursor is line 11, col 66
+
+ 5. Adding characters to make a short line
+ -----------------------------------------
+
+ --edit mytest.ksx --display cols=65
+
+move cursor to line 11, col 61
+type abcde
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-abcde.jpg
+type f
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-abcdef.jpg
+press BS
+   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-abcde.jpg
+
+ 6. Deleting characters to make a short line
+ -------------------------------------------
+
+ --edit mytest.ksx --display cols=65
+
+move cursor to line 12, col 5
+type space
+   compare with KLineEd\FunctionalTestResults\mytestAddR12C5-L123.jpg
+type 4
+   compare with KLineEd\FunctionalTestResults\mytestAddR12C5-L1234.jpg
+type DEL
+Ctrl+Q

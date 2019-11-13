@@ -29,9 +29,12 @@ Development work v1.0.44.0
 Development work v1.0.45.0
 --------------------------
 
-1. Test
+1. Implement --fix
+	delete all <session> with Duration: 00:00:00 and renumber any following ones
+
+2. Test
 	- iOS
-	    - Check Chapter/Session stats are correct
+	- Check Chapter/Session stats are correct
 
 2. Refactor Application structure
      - resolve const / readonly issue

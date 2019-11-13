@@ -21,6 +21,7 @@ namespace KLineEdCmdApp.Model
     [SuppressMessage("ReSharper", "InvertIf")]
     [SuppressMessage("ReSharper", "RedundantCaseLabel")]
     [SuppressMessage("ReSharper", "RedundantTernaryExpression")]
+    [SuppressMessage("ReSharper", "ArrangeRedundantParentheses")]
     public class Body
     {
         public static readonly string OpeningElement = "<body>";
@@ -751,7 +752,7 @@ namespace KLineEdCmdApp.Model
                     var rowIndex = (previousRowIndex != Program.PosIntegerNotSet) ? previousRowIndex : cursorRowIndex;
                     do
                     {
-                        var rcFill = FillShortLine2(rowIndex);
+                        var rcFill = FillShortLine2(rowIndex, originalCursor, out var resultCursorFill);
                         if (rcFill.IsError(true))
                         {
                             rc += rcFill;
@@ -763,7 +764,7 @@ namespace KLineEdCmdApp.Model
                                 hint = ChapterModel.ChangeHint.End;
                         }
 
-                        var rcSplit = SplitLongLine2(rowIndex, originalCursor, out var resultCursor);
+                        var rcSplit = SplitLongLine2(rowIndex, originalCursor, out var resultCursorSplit);
                         if (rcSplit.IsError(true))
                         {
                             rc += rcSplit;
@@ -771,8 +772,14 @@ namespace KLineEdCmdApp.Model
                         }
                         else
                         {
-                            if (originalCursor.RowIndex == rowIndex)
-                                updatedCursor = resultCursor?.Copy() ?? null;
+                            if ((originalCursor.RowIndex == rowIndex+1) && (rcFill.GetResult()))
+                            {
+                                updatedCursor = resultCursorFill?.Copy() ?? null;
+                            }
+                            if ((originalCursor.RowIndex == rowIndex) && (rcSplit.GetResult()))
+                            {
+                                updatedCursor = resultCursorSplit?.Copy() ?? null;
+                            }
                             if (rcSplit.GetResult() == true)
                                 hint = ChapterModel.ChangeHint.End;
                         }
@@ -798,48 +805,61 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> FillShortLine2(int rowIndex)
+        public MxReturnCode<bool> FillShortLine2(int rowIndex, CursorPosition originalCursor, out CursorPosition updatedCursor)
         {
             var rc = new MxReturnCode<bool>("Body.FillShortLine2");
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
-            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            updatedCursor = (originalCursor.ColIndex < (maxColIndex + 1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor.RowIndex, maxColIndex + 1);
 
-            if ((TextLines == null) || (rowIndex < 0) || (rowIndex >= lineCount) || (maxColIndex < 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax))
-                rc.SetError(1101501, MxError.Source.Param, $"rowIndex={rowIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
+            if ((TextLines == null) ||  (maxColIndex < 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax))
+                rc.SetError(1101501, MxError.Source.Param, $"rowIndex={rowIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrInvalidCondition);
             else
             {
-                var currentRowIndex = rowIndex;
-                var nextRowIndex = Program.PosIntegerNotSet;
-                while ((nextRowIndex = GetNextLineIndex(currentRowIndex)) != Program.PosIntegerNotSet)
+                if ((rowIndex < 0) || (rowIndex >= TextLines.Count) || (updatedCursor.IsValid(TextLines.Count, maxColIndex + 1) == false))
+                    rc.SetError(1101502, MxError.Source.Param, $"rowIndex={rowIndex}; cursor={updatedCursor}", MxMsgs.MxErrBadMethodParam);
+                else
                 {
-                    var nextLine = TextLines[nextRowIndex]; // GetNextLineIndex() ensures ((nextRowIndex < TextLines.Count) && (nextRowIndex == currentRowIndex+1)) or fail 
-                    var spaceAtEndOfCurrentLine = (maxColIndex + 1) - (TextLines[currentRowIndex].Length - 1);
-                    if (nextLine.EndsWith(ParaBreak))
-                        spaceAtEndOfCurrentLine++;
-                    var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine); 
-                    if ((splitIndex < 0) || (splitIndex >= (spaceAtEndOfCurrentLine-1))) // maxColIndex))
-                        break;                              //next line cannot be split or is too long be put into current line
-                    else 
-                    { 
-                        var start = nextLine.Snip(0, (nextLine[splitIndex] != ' ') ? splitIndex : splitIndex - 1);
-                        if (TextLines[currentRowIndex].EndsWith(' ') == false)
-                            TextLines[currentRowIndex] += " " + start;
+                    var currentRowIndex = rowIndex;
+                    var nextRowIndex = Program.PosIntegerNotSet;
+                    while ((nextRowIndex = GetNextLineIndex(currentRowIndex)) != Program.PosIntegerNotSet)
+                    {
+                        var nextLine = TextLines[nextRowIndex]; // GetNextLineIndex() ensures ((nextRowIndex < TextLines.Count) && (nextRowIndex == currentRowIndex+1)) or fail 
+                        var spaceAtEndOfCurrentLine = (maxColIndex + 1) - (TextLines[currentRowIndex].Length - 1);
+                        if (nextLine.EndsWith(ParaBreak))
+                            spaceAtEndOfCurrentLine++;
+                        var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine);
+                        if ((splitIndex < 0) || (splitIndex >= (spaceAtEndOfCurrentLine - 1))) // maxColIndex))
+                            break; //next line cannot be split or is too long be put into current line
                         else
-                            TextLines[currentRowIndex] += start;
+                        {
+                            var start = nextLine.Snip(0, (nextLine[splitIndex] != ' ') ? splitIndex : splitIndex - 1);
+                            if (TextLines[currentRowIndex].EndsWith(' ') == false) 
+                                TextLines[currentRowIndex] += " " + start;
+                            else
+                                TextLines[currentRowIndex] += start;
 
-                        var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1);
-                        if (string.IsNullOrEmpty(end) == false)
-                            TextLines[nextRowIndex] = end;
-                        else
-                            TextLines.RemoveAt(nextRowIndex);
+                            var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1);
+                            if (string.IsNullOrEmpty(end) == false)
+                                TextLines[nextRowIndex] = end;
+                            else
+                                TextLines.RemoveAt(nextRowIndex);
 
-                        if (currentRowIndex == rowIndex)
-                            rc.SetResult(true);
+                            if (currentRowIndex == rowIndex)
+                            {
+                                if (originalCursor.ColIndex <= (splitIndex+1))
+                                {
+                                    var adj = ((start.Length - originalCursor.ColIndex) > 0) ? start.Length - originalCursor.ColIndex : 0;
+                                    updatedCursor.RowIndex = currentRowIndex;
+                                    updatedCursor.ColIndex = TextLines[currentRowIndex].Length - adj;
+                                }
+                                rc.SetResult(true);
+                            }
+                        }
                     }
+                    if ((rc.IsSuccess()) && (rc.IsSuccess(true) == false))
+                        rc.SetResult(false);
                 }
-                if ((rc.IsSuccess()) && (rc.IsSuccess(true) == false))
-                    rc.SetResult(false);
             }
             return rc;
         }

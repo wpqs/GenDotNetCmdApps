@@ -69,7 +69,8 @@ Main operations
 --export from='drive:path\*.ksx' to='drive:path\*.txt' ([clearkey='xxx' | hiddenkey='yyyy']) (steganimg='drive:path\*.mp4') 	    //export edit.ksx to export.txt 
 --import from='drive:path\*.txt' to='drive:path\*.ksx'  ([clearkey='xxx' | hiddenkey='yyyy']) (steganimg='drive:path\*.mp4')		//import import.txt to edit.ksx
 --edit 'drive:path\*.ksx' ([clearkey='xxx' | hiddenkey='yyyy'])	/edit specified .ksx file
- 
+--fix 'drive:path\*.ksx' (session=duration0)
+
 Additional options for edit operation (--edit)
 
 	General options page
