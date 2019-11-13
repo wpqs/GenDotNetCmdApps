@@ -825,7 +825,7 @@ namespace KLineEdCmdApp.Model
                     while ((nextRowIndex = GetNextLineIndex(currentRowIndex)) != Program.PosIntegerNotSet)
                     {
                         var nextLine = TextLines[nextRowIndex]; // GetNextLineIndex() ensures ((nextRowIndex < TextLines.Count) && (nextRowIndex == currentRowIndex+1)) or fail 
-                        var spaceAtEndOfCurrentLine = (maxColIndex + 1) - (TextLines[currentRowIndex].Length - 1);
+                        var spaceAtEndOfCurrentLine = (maxColIndex + 1) - (TextLines[currentRowIndex].Length); // - 1);
                         if (nextLine.EndsWith(ParaBreak))
                             spaceAtEndOfCurrentLine++;
                         var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine);

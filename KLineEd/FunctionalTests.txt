@@ -4,6 +4,10 @@ Prep:
 
 a. copy KLineEd\KLineEdCmdApp\mytest.ksx to KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2
 
+--edit mytest.ksx --display cols=35 - delete paraBreak @ L123456789 > doesn't trigger appending of next line and other problems need to delete 2 chars not 1
+--edit mytest.ksx --display cols=25 - 
+--edit mytest.ksx --display cols=68 - no problems found
+
 1. Changing Display Cols
 ------------------------
 
