@@ -810,52 +810,59 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.FillShortLine2");
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
-            updatedCursor = (originalCursor.ColIndex < (maxColIndex + 1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor.RowIndex, maxColIndex + 1);
+            updatedCursor = ((originalCursor?.ColIndex ?? Program.PosIntegerNotSet) < (maxColIndex + 1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor.RowIndex, maxColIndex + 1);
 
             if ((TextLines == null) ||  (maxColIndex < 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax))
                 rc.SetError(1101501, MxError.Source.Param, $"rowIndex={rowIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrInvalidCondition);
             else
             {
-                if ((rowIndex < 0) || (rowIndex >= TextLines.Count) || (updatedCursor.IsValid(TextLines.Count, maxColIndex + 1) == false))
-                    rc.SetError(1101502, MxError.Source.Param, $"rowIndex={rowIndex}; cursor={updatedCursor}", MxMsgs.MxErrBadMethodParam);
+                if ((rowIndex < 0) || (rowIndex >= TextLines.Count) || (originalCursor == null) || (updatedCursor.IsValid(TextLines.Count, maxColIndex + 1) == false)) 
+                    rc.SetError(1101502, MxError.Source.Param, $"rowIndex={rowIndex}; cursor={originalCursor?.ToString() ?? Program.ValueNotSet}", MxMsgs.MxErrBadMethodParam);
                 else
                 {
-                    var currentRowIndex = rowIndex;
-                    var nextRowIndex = Program.PosIntegerNotSet;
-                    while ((nextRowIndex = GetNextLineIndex(currentRowIndex)) != Program.PosIntegerNotSet)
+                    int nextRowIndex = Program.PosIntegerNotSet;
+                    while ((nextRowIndex = GetNextLineIndex(rowIndex)) != Program.PosIntegerNotSet)
                     {
-                        var nextLine = TextLines[nextRowIndex]; // GetNextLineIndex() ensures ((nextRowIndex < TextLines.Count) && (nextRowIndex == currentRowIndex+1)) or fail 
-                        var spaceAtEndOfCurrentLine = (maxColIndex + 1) - (TextLines[currentRowIndex].Length); // - 1);
-                        if (nextLine.EndsWith(ParaBreak))
-                            spaceAtEndOfCurrentLine++;
-                        var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine);
-                        if ((splitIndex < 0) || (splitIndex >= (spaceAtEndOfCurrentLine - 1))) // maxColIndex))
-                            break; //next line cannot be split or is too long be put into current line
+                        var spaceAtEndOfCurrentLine = (maxColIndex + 1) - ((TextLines[rowIndex].EndsWith(' ') == false) ? TextLines[rowIndex].Length : TextLines[rowIndex].Length + 1); //if current row ends with space then there will be two spaces between the last word of current row and first word from next nextLine
+                        var nextLine = TextLines[nextRowIndex];
+
+                        var splitIndex = Body.GetSplitIndexFromStart2(nextLine, spaceAtEndOfCurrentLine); //splitIndex is index of a space in next line, or if entire line can fit then index of last char (inc paraBreak) 
+                        if (splitIndex < 0)
+                            break; //next nextLine cannot be split or is too long be put into current nextLine
+
+                        var start = nextLine.Snip(0, splitIndex).TrimEnd();
+                        if (string.IsNullOrEmpty(start) == false)
+                            TextLines[rowIndex] += (TextLines[rowIndex].EndsWith(' ') == false) ? (" " + start) : start;
+
+                        var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1);
+                        if (string.IsNullOrEmpty(end) == false)
+                            TextLines[nextRowIndex] = end;
                         else
+                            TextLines.RemoveAt(nextRowIndex);
+
+                        if (originalCursor.RowIndex == nextRowIndex) //if (originalCursor.ColIndex <= (splitIndex + 1))
                         {
-                            var start = nextLine.Snip(0, (nextLine[splitIndex] != ' ') ? splitIndex : splitIndex - 1);
-                            if (TextLines[currentRowIndex].EndsWith(' ') == false) 
-                                TextLines[currentRowIndex] += " " + start;
-                            else
-                                TextLines[currentRowIndex] += start;
-
-                            var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1);
-                            if (string.IsNullOrEmpty(end) == false)
-                                TextLines[nextRowIndex] = end;
-                            else
-                                TextLines.RemoveAt(nextRowIndex);
-
-                            if (currentRowIndex == rowIndex)
+                            int col = 0;
+                            var row = (string.IsNullOrEmpty(end) ? rowIndex : nextRowIndex);
+                            updatedCursor.RowIndex = row;
+                            if (row == rowIndex)
                             {
-                                if (originalCursor.ColIndex <= (splitIndex+1))
-                                {
-                                    var adj = ((start.Length - originalCursor.ColIndex) > 0) ? start.Length - originalCursor.ColIndex : 0;
-                                    updatedCursor.RowIndex = currentRowIndex;
-                                    updatedCursor.ColIndex = TextLines[currentRowIndex].Length - adj;
-                                }
-                                rc.SetResult(true);
+                                if (string.IsNullOrEmpty(start) == false)
+                                    col = TextLines[row].Length - (((start.Length - originalCursor.ColIndex) > 0) ? (start.Length - originalCursor.ColIndex) : 0);
                             }
+                            else
+                            {
+                                if (string.IsNullOrEmpty(end) == false)
+                                {
+                                    if (end.EndsWith(Body.ParaBreak))
+                                        col = (((end.Length - 1) - originalCursor.ColIndex) > 0) ? ((end.Length - 1) - originalCursor.ColIndex) : 0;
+                                    else
+                                        col = ((end.Length - originalCursor.ColIndex) > 0) ? (end.Length - originalCursor.ColIndex) : 0;
+                                }
+                            }
+                            updatedCursor.ColIndex = col;
                         }
+                        rc.SetResult(true);
                     }
                     if ((rc.IsSuccess()) && (rc.IsSuccess(true) == false))
                         rc.SetResult(false);
@@ -1172,6 +1179,29 @@ namespace KLineEdCmdApp.Model
                 }
             }
             return rc;
+        }
+
+        public static int GetSplitIndexFromStart2(string nextLine, int spaceAvailable)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if ((spaceAvailable > 0) && (string.IsNullOrEmpty(nextLine) == false))
+            {
+                var nextLineLen = (nextLine.EndsWith(Body.ParaBreak)) ? nextLine.Length : nextLine.Length+1; //nextLine always prepended with a space to ensure last word in current line is separated from first word in next line
+                if (nextLineLen <= spaceAvailable)  
+                    rc = nextLine.Length -1;
+                else
+                {
+                    var splitIndex = Program.PosIntegerNotSet;
+                    for (var x = 0; x < spaceAvailable; x++)      //spaceAvailable-1 allows for space between last word in current line and text from next line (ensure there are two words)
+                    {
+                        if (nextLine[x] == ' ') 
+                            splitIndex = x;
+                    }
+                    rc = splitIndex;
+                }
+            }
+            return rc;  //1) Program.PosIntegerNotSet, cannot be split; 2) nextLine.Length -1, can move entire line 3) index of last space 
         }
 
         public static int GetSplitIndexFromStart(string line, int spaceAvailable)

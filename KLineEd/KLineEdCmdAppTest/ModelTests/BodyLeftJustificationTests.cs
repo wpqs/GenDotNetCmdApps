@@ -538,7 +538,37 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void FillShortLineBasicTest()
+        public void FillShortLineBasicOneLineTest()
+        {
+            var maxColIndex = 24;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+ 
+            var line1 = "0123456789 123456789";
+            Assert.Equal(20, line1.Length);
+            body.SetTestLine(line1);
+
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            var originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
+            Assert.Equal(0, originalCursor.RowIndex);
+            Assert.Equal(20, originalCursor.ColIndex);
+
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.False(rcFill.GetResult());
+
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal(0, updatedCursor.RowIndex);
+            Assert.Equal(20, updatedCursor.ColIndex);
+        }
+
+        [Fact]
+        public void FillShortLineBasicTwoLineTest()
         {
             var maxColIndex = 24;
             var body = new MockModelBody();
@@ -560,7 +590,10 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, originalCursor.RowIndex);
             Assert.Equal(2, originalCursor.ColIndex);
 
-            Assert.True(body.FillShortLine2(0, originalCursor, out var updatedCursor).GetResult());
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.True(rcFill.GetResult());
+
 
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(4, body.WordCount);
@@ -570,7 +603,43 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void FillShortLineBasicParaBreakTest()
+        public void FillShortLineBasicTwoLineParaBreakTest()
+        {
+            var maxColIndex = 24;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
+
+            var line1 = "0123456789 123456789";
+            Assert.Equal(20, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "ABCD" + Body.ParaBreak;
+            Assert.Equal(5, line2.Length);
+            body.SetTestLine(line2);
+
+            Assert.Equal(2, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("ABCD>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(line2.Length - 1, body.Cursor.ColIndex);
+            CursorPosition originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
+            Assert.Equal(1, originalCursor.RowIndex);
+            Assert.Equal(4, originalCursor.ColIndex);
+
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.True(rcFill.GetResult());
+
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal("0123456789 123456789 ABCD>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+
+            Assert.Equal(0, updatedCursor.RowIndex);
+            Assert.Equal(25, updatedCursor.ColIndex);
+        }
+
+        [Fact]
+        public void FillShortLineThreeWordTwoLineParaBreakTest()
         {
             var maxColIndex = 24;
             var body = new MockModelBody();
@@ -580,7 +649,7 @@ namespace KLineEdCmdAppTest.ModelTests
             var line1 = "0123456789 123456789 1";
             Assert.Equal(22, line1.Length);
             body.SetTestLine(line1);
-            var line2 = "AB" + Body.ParaBreak; 
+            var line2 = "AB" + Body.ParaBreak;
             Assert.Equal(3, line2.Length);
             body.SetTestLine(line2);
 
@@ -588,13 +657,15 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(4, body.WordCount);
             Assert.Equal("0123456789 123456789 1", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("AB>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-            Assert.Equal(line2.Length-1, body.Cursor.ColIndex);
+            Assert.Equal(line2.Length - 1, body.Cursor.ColIndex);
             CursorPosition originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
             Assert.Equal(1, originalCursor.RowIndex);
             Assert.Equal(2, originalCursor.ColIndex);
 
-            Assert.True(body.FillShortLine2(0, originalCursor, out var updatedCursor).GetResult());
-
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.True(rcFill.GetResult());
+            
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(4, body.WordCount);
             Assert.Equal("0123456789 123456789 1 AB>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
@@ -604,7 +675,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void FillShortLineLongestTest()
+        public void FillShortLineLongestTwoLineTest()
         {
             var maxColIndex = 24;
             var body = new MockModelBody();
@@ -626,7 +697,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, originalCursor.RowIndex);
             Assert.Equal(4, originalCursor.ColIndex);
 
-            Assert.True(body.FillShortLine2(0, originalCursor, out var updatedCursor).GetResult());
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.True(rcFill.GetResult());
 
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal("0123456789 123456789 ABCD", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
@@ -636,7 +709,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void FillShortLineLongestParaBreakTest()
+        public void FillShortLineLongestTwoLineParaBreakTest()
         {
             var maxColIndex = 24;
             var body = new MockModelBody();
@@ -659,7 +732,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, originalCursor.RowIndex);
             Assert.Equal(4, originalCursor.ColIndex);
 
-            Assert.True(body.FillShortLine2(0, originalCursor, out var updatedCursor).GetResult());
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.True(rcFill.GetResult());
 
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal("0123456789 123456789 ABCD>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
@@ -669,7 +744,7 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void FillShortLineTooLongTest()
+        public void FillShortLineTooLongTwoLineTest()
         {
             var maxColIndex = 24;
             var body = new MockModelBody();
@@ -692,8 +767,11 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, originalCursor.RowIndex);
             Assert.Equal(5, originalCursor.ColIndex);
 
-            Assert.False(body.FillShortLine2(0, originalCursor, out var updatedCursor).GetResult());
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.False(rcFill.GetResult());
 
+ 
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(3, body.WordCount);
             Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
@@ -703,10 +781,8 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
 
-
-
         [Fact]
-        public void FillShortLineTooLongParaBreakTest()
+        public void FillShortLineTooLongTwoLineParaBreakTest()
         {
             var maxColIndex = 24;
             var body = new MockModelBody();
@@ -729,7 +805,9 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(1, originalCursor.RowIndex);
             Assert.Equal(5, originalCursor.ColIndex);
 
-            Assert.False(body.FillShortLine2(0, originalCursor, out var updatedCursor).GetResult());
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.False(rcFill.GetResult());
 
             Assert.Equal(2, body.GetLineCount());
             Assert.Equal(3, body.WordCount);
@@ -739,33 +817,42 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(5, updatedCursor.ColIndex);
         }
 
-        //[Fact]
-        //public void FillShortLineSpaceLineTest()
-        //{
-        //    var maxColIndex = 24;
-        //    var body = new MockModelBody();
-        //    Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
-        //    Assert.False(body.IsError());
+        [Fact]
+        public void FillShortLineSpaceLineTest()
+        {
+            var maxColIndex = 24;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
 
-        //    var line1 = "0123456789 123456789";
-        //    Assert.Equal(20, line1.Length);
-        //    body.SetTestLine(line1);
-        //    var line2 = "ABCDE F";
-        //    Assert.Equal(7, line2.Length);
-        //    body.SetTestLine(line2);
+            var line1 = "0123456789 123456789";
+            Assert.Equal(20, line1.Length);
+            body.SetTestLine(line1);
+            var line2 = "ABCD E";
+            Assert.Equal(6, line2.Length);
+            body.SetTestLine(line2);
 
-        //    Assert.Equal(2, body.GetLineCount());
-        //    Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-        //    Assert.Equal("ABCDE F", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-        //    Assert.Equal(4, body.WordCount);
+            Assert.Equal(2, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("ABCD E", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
 
-        //    Assert.True(body.FillShortLine2(0).GetResult());
+            CursorPosition originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
+            Assert.Equal(1, originalCursor.RowIndex);
+            Assert.Equal(6, originalCursor.ColIndex);
 
-        //    Assert.Equal(2, body.GetLineCount());
-        //    Assert.Equal("0123456789 123456789 ABCDE", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-        //    Assert.Equal("F", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-        //    Assert.Equal(4, body.WordCount);
-        //}
+            var rcFill = body.FillShortLine2(0, originalCursor, out var updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.True(rcFill.GetResult());
+
+
+            Assert.Equal(2, body.GetLineCount());
+            Assert.Equal(4, body.WordCount);
+            Assert.Equal("0123456789 123456789 ABCD", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("E", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(1, updatedCursor.RowIndex);
+            Assert.Equal(0, updatedCursor.ColIndex);  //should be 1
+        }
 
         //[Fact]
         //public void FillShortParaBreakLineSpaceLineTest()
@@ -855,74 +942,52 @@ namespace KLineEdCmdAppTest.ModelTests
         //    Assert.Equal(3, body.WordCount);
         //}
 
-        //[Fact]
-        //public void FillShortLineLongestLineNoSpaceTest()
-        //{
-        //    var maxColIndex = 9;
-        //    var body = new MockModelBody();
-        //    Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
-        //    Assert.False(body.IsError());
 
-        //    var line1 = "012345";
-        //    Assert.Equal(6, line1.Length);
-        //    body.SetTestLine(line1);
-        //    var line2 = "789";
-        //    Assert.Equal(3, line2.Length);
-        //    body.SetTestLine(line2);
+        [Fact]
+        public void FillShortLineParamFailTest()
+        {
+            var maxColIndex = 24;
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
+            Assert.False(body.IsError());
 
-        //    Assert.Equal("012345", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-        //    Assert.Equal("789", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-        //    Assert.Equal(2, body.WordCount);
-        //    Assert.Equal(3, body.Cursor.ColIndex);
+            CursorPosition originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
+            Assert.Equal(0, originalCursor.RowIndex);
+            Assert.Equal(0, originalCursor.ColIndex);
+            CursorPosition updatedCursor;
+            Assert.False(body.FillShortLine2(0, originalCursor, out updatedCursor).GetResult());
+            Assert.False(body.FillShortLine2(-1, originalCursor, out updatedCursor).GetResult());
+            Assert.False(body.FillShortLine2(1, originalCursor, out updatedCursor).GetResult());
 
-        //    Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            var line1 = "0123456789 123456789";
+            Assert.Equal(20, line1.Length);
+            body.SetTestLine(line1);
 
-        //    Assert.Equal(0, updatedCursorColIndex);
-        //    Assert.Equal("012345 789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
-        //    Assert.Equal(1, body.GetLineCount());
-        //    Assert.Equal(2, body.WordCount);
-        //}
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(2, body.WordCount);
+            Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
+            Assert.Equal(0, originalCursor.RowIndex);
+            Assert.Equal(20, originalCursor.ColIndex);
 
-        //[Fact]
-        //public void FillShortLineParaBreakLongestLineNoSpaceTest()
-        //{
-        //    var maxColIndex = 9;
-        //    var body = new MockModelBody();
-        //    Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
-        //    Assert.False(body.IsError());
+            var rcFill = body.FillShortLine2(0, null, out updatedCursor);
+            Assert.True(rcFill.IsError(true));
+            Assert.Contains("error 1101502-param: rowIndex=0; cursor=[not set]", rcFill.GetErrorTechMsg());
 
-        //    var line1 = "012345";
-        //    Assert.Equal(6, line1.Length);
-        //    body.SetTestLine(line1);
-        //    var line2 = "789" + Body.ParaBreak;
-        //    Assert.Equal(4, line2.Length);
-        //    body.SetTestLine(line2);
+            originalCursor.RowIndex = 1;
 
-        //    Assert.Equal("012345", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-        //    Assert.Equal("789>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-        //    Assert.Equal(2, body.WordCount);
-        //    Assert.Equal(3, body.Cursor.ColIndex);
+            rcFill = body.FillShortLine2(0, originalCursor, out updatedCursor);
+            Assert.True(rcFill.IsError(true));
+            Assert.Contains("error 1101502-param: rowIndex=0; cursor=rowIndex=1; colIndex=20", rcFill.GetErrorTechMsg());
 
-        //    Assert.True(body.FillShortLine(0, 0, maxColIndex, out var updatedCursorColIndex).GetResult());
+            originalCursor.RowIndex = 0;
+            originalCursor.ColIndex = 26;  //one more than the max col for cursor
 
-        //    Assert.Equal(0, updatedCursorColIndex);
-        //    Assert.Equal("012345 789>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
-        //    Assert.Equal(1, body.GetLineCount());
-        //    Assert.Equal(2, body.WordCount);
-        //}
-
-        //[Fact]
-        //public void FillShortLineParamFailTest()
-        //{
-        //    var maxColIndex = 24;
-        //    var body = new MockModelBody();
-        //    Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
-        //    Assert.False(body.IsError());
-
-        //    Assert.False(body.FillShortLine2(0).GetResult());
-        //    Assert.False(body.FillShortLine2(-1).GetResult());
-        //    Assert.False(body.FillShortLine2(1).GetResult());
-        //}
+            rcFill = body.FillShortLine2(0, originalCursor, out updatedCursor);
+            Assert.False(rcFill.IsError(true));
+            Assert.Equal(0, updatedCursor.RowIndex);
+            Assert.Equal(25, updatedCursor.ColIndex);
+        }
 
         //[Fact]
         //public void LeftJustifyLinesInParagraphParamFailTest()

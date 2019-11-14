@@ -187,7 +187,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Line is too long. You have reached the end of the line. Press the Enter key to continue.
+        ///   Looks up a localized string similar to Line is too long. You have reached the end of the nextLine. Press the Enter key to continue.
         /// </summary>
         internal static string MxErrLineTooLong {
             get {
@@ -205,7 +205,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        ///   Looks up a localized string similar to Duplicate argument name found. Command nextLine parameters are incorrect. Please try again with correct parameters and arguments.
         /// </summary>
         internal static string MxErrParamArgNameDuplicateFound {
             get {
@@ -214,7 +214,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        ///   Looks up a localized string similar to Argument name not found. Command nextLine parameters are incorrect. Please try again with correct parameters and arguments.
         /// </summary>
         internal static string MxErrParamArgNameNotFound {
             get {
@@ -223,7 +223,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments.
+        ///   Looks up a localized string similar to Value of argument not found. Command nextLine parameters are incorrect. Please try again with correct parameters and arguments.
         /// </summary>
         internal static string MxErrParamArgValueNotFound {
             get {
@@ -268,7 +268,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Warning: you cannot backspace at the start of a line..
+        ///   Looks up a localized string similar to Warning: you cannot backspace at the start of a nextLine..
         /// </summary>
         internal static string MxWarnBackspaceAtStartOfLine {
             get {
@@ -295,7 +295,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Warning: you are at the end of the line. Press the left arrow key and try again..
+        ///   Looks up a localized string similar to Warning: you are at the end of the nextLine. Press the left arrow key and try again..
         /// </summary>
         internal static string MxWarnEndOfLine {
             get {
@@ -340,7 +340,7 @@ namespace KLineEdCmdApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Warning: you are at the start of the line. Press the right arrow key or enter a character..
+        ///   Looks up a localized string similar to Warning: you are at the start of the nextLine. Press the right arrow key or enter a character..
         /// </summary>
         internal static string MxWarnStartOfLine {
             get {

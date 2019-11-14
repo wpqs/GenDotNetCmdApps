@@ -2,7 +2,7 @@
 {
     public class CursorPosition
     {
-        public CursorPosition( CursorPosition cursor) : this(cursor.RowIndex, cursor.ColIndex) { }
+        public CursorPosition( CursorPosition cursor) : this(cursor?.RowIndex ?? Program.PosIntegerNotSet, cursor?.ColIndex ?? Program.PosIntegerNotSet) { }
 
         public CursorPosition(int rowIndex, int colIndex)
         {

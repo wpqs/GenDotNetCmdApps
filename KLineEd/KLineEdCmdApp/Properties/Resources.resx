@@ -160,19 +160,19 @@
     <value>Word found at current cursor position is invalid. Move cursor and try again</value>
   </data>
   <data name="MxErrLineTooLong" xml:space="preserve">
-    <value>Line is too long. You have reached the end of the line. Press the Enter key to continue</value>
+    <value>Line is too long. You have reached the end of the nextLine. Press the Enter key to continue</value>
   </data>
   <data name="MxErrNoWordSelected" xml:space="preserve">
     <value>No word found at current cursor position. Move cursor and try again</value>
   </data>
   <data name="MxErrParamArgNameDuplicateFound" xml:space="preserve">
-    <value>Duplicate argument name found. Command line parameters are incorrect. Please try again with correct parameters and arguments</value>
+    <value>Duplicate argument name found. Command nextLine parameters are incorrect. Please try again with correct parameters and arguments</value>
   </data>
   <data name="MxErrParamArgNameNotFound" xml:space="preserve">
-    <value>Argument name not found. Command line parameters are incorrect. Please try again with correct parameters and arguments</value>
+    <value>Argument name not found. Command nextLine parameters are incorrect. Please try again with correct parameters and arguments</value>
   </data>
   <data name="MxErrParamArgValueNotFound" xml:space="preserve">
-    <value>Value of argument not found. Command line parameters are incorrect. Please try again with correct parameters and arguments</value>
+    <value>Value of argument not found. Command nextLine parameters are incorrect. Please try again with correct parameters and arguments</value>
   </data>
   <data name="MxErrSystemFailure" xml:space="preserve">
     <value>Unexpected system problem. System error detected. Reboot and try again</value>
@@ -187,7 +187,7 @@
     <value>Message not found. Coding defect. Please report this problem</value>
   </data>
   <data name="MxWarnBackspaceAtStartOfLine" xml:space="preserve">
-    <value>Warning: you cannot backspace at the start of a line.</value>
+    <value>Warning: you cannot backspace at the start of a nextLine.</value>
   </data>
   <data name="MxWarnChapterEmpty" xml:space="preserve">
     <value>Warning: Chapter is empty. Please type a character and try again.</value>
@@ -196,7 +196,7 @@
     <value>Warning: you cannot move beyond the end of the chapter</value>
   </data>
   <data name="MxWarnEndOfLine" xml:space="preserve">
-    <value>Warning: you are at the end of the line. Press the left arrow key and try again.</value>
+    <value>Warning: you are at the end of the nextLine. Press the left arrow key and try again.</value>
   </data>
   <data name="MxWarnInvalidChar" xml:space="preserve">
     <value>Warning: invalid character. Please press another key.</value>
@@ -211,7 +211,7 @@
     <value>Warning: you cannot move beyond the start of the chapter</value>
   </data>
   <data name="MxWarnStartOfLine" xml:space="preserve">
-    <value>Warning: you are at the start of the line. Press the right arrow key or enter a character.</value>
+    <value>Warning: you are at the start of the nextLine. Press the right arrow key or enter a character.</value>
   </data>
   <data name="MxWarnTooManyLines" xml:space="preserve">
     <value>Warning: Line limit reached. Please start a new chapter.</value>

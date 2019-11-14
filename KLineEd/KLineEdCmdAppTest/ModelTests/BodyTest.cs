@@ -51,22 +51,22 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
 
-        [Fact]
-        public void GetEnteredTextErrorsTest()
-        {
-            Assert.Null(Body.GetErrorsInText(""));
-            Assert.Null(Body.GetErrorsInText("this text is fine"));
-            // Assert.Null(Body.GetErrorsInText(Environment.NewLine));  //new line in col 0 is fine too
-            Assert.StartsWith("unexpected text (null). This is a program error. Please save your work and restart the program.", Body.GetErrorsInText(null));
-            Assert.StartsWith("attempt to enter a new line at column 7", Body.GetErrorsInText($"hello {Environment.NewLine}"));
-            Assert.StartsWith("attempt to enter the disallowed character '<' at column 8", Body.GetErrorsInText($"hello .<hi"));
-            Assert.StartsWith("attempt to enter the disallowed character '>' at column 9", Body.GetErrorsInText($"hello hi>"));
+        //[Fact]
+        //public void GetEnteredTextErrorsTest()
+        //{
+        //    Assert.Null(Body.GetErrorsInText(""));
+        //    Assert.Null(Body.GetErrorsInText("this text is fine"));
+        //    // Assert.Null(Body.GetErrorsInText(Environment.NewLine));  //new line in col 0 is fine too
+        //    Assert.StartsWith("unexpected text (null). This is a program error. Please save your work and restart the program.", Body.GetErrorsInText(null));
+        //    Assert.StartsWith("attempt to enter a new line at column 7", Body.GetErrorsInText($"hello {Environment.NewLine}"));
+        //    Assert.StartsWith("attempt to enter the disallowed character '<' at column 8", Body.GetErrorsInText($"hello .<hi"));
+        //    Assert.StartsWith("attempt to enter the disallowed character '>' at column 9", Body.GetErrorsInText($"hello hi>"));
 
-            var line = new String('x', KLineEditor.MaxSplitLineLength+1);
+        //    var line = new String('x', KLineEditor.MaxSplitLineLength+1);
 
-            Assert.StartsWith($"line 7: attempt to enter {KLineEditor.MaxSplitLineLength + 1} characters, but only {KLineEditor.MaxSplitLineLength} allowed", Body.GetErrorsInText(line, 7));
+        //    Assert.StartsWith($"line 7: attempt to enter {KLineEditor.MaxSplitLineLength + 1} characters, but only {KLineEditor.MaxSplitLineLength} allowed", Body.GetErrorsInText(line, 7));
 
-        }
+        //}
 
         [Fact]
         public void GetEnteredCharErrorsTest()
