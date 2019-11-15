@@ -30,12 +30,6 @@ namespace KLineEdCmdApp.Controller
                     {
                         controller = ControllerFactory.Make(Chapter, ControllerFactory.PropsEditingController, BrowserCmd, HelpUrl, SearchUrl, ThesaurusUrl, SpellUrl);
                         rc.SetResult(true);
-                        //var rcInsertText = model.BodyInsertText("*", IsInsertMode());
-                        //if (rcInsertText.IsError(true))
-                        //    rc += rcInsertText;
-                        //else
-                        //    rc.SetResult(true);
-
                     }
                     else if (keyInfo.Key == ConsoleKey.F3)
                     {

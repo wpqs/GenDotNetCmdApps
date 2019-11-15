@@ -851,7 +851,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal("0123456789 123456789 ABCD", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
             Assert.Equal("E", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
             Assert.Equal(1, updatedCursor.RowIndex);
-            Assert.Equal(0, updatedCursor.ColIndex);  //should be 1
+            Assert.Equal(1, updatedCursor.ColIndex);  //should be 1
         }
 
         //[Fact]

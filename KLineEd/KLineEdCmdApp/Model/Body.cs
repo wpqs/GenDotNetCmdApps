@@ -840,33 +840,35 @@ namespace KLineEdCmdApp.Model
                         else
                             TextLines.RemoveAt(nextRowIndex);
 
-                        if (originalCursor.RowIndex == nextRowIndex) //if (originalCursor.ColIndex <= (splitIndex + 1))
-                        {
-                            int col = 0;
-                            var row = (string.IsNullOrEmpty(end) ? rowIndex : nextRowIndex);
-                            updatedCursor.RowIndex = row;
-                            if (row == rowIndex)
-                            {
-                                if (string.IsNullOrEmpty(start) == false)
-                                    col = TextLines[row].Length - (((start.Length - originalCursor.ColIndex) > 0) ? (start.Length - originalCursor.ColIndex) : 0);
-                            }
-                            else
-                            {
-                                if (string.IsNullOrEmpty(end) == false)
-                                {
-                                    if (end.EndsWith(Body.ParaBreak))
-                                        col = (((end.Length - 1) - originalCursor.ColIndex) > 0) ? ((end.Length - 1) - originalCursor.ColIndex) : 0;
-                                    else
-                                        col = ((end.Length - originalCursor.ColIndex) > 0) ? (end.Length - originalCursor.ColIndex) : 0;
-                                }
-                            }
-                            updatedCursor.ColIndex = col;
-                        }
+                        if (originalCursor.RowIndex == nextRowIndex) 
+                            updatedCursor = UpdateCursorOnFillShortLine(rowIndex, nextRowIndex, originalCursor, end, start);
+
                         rc.SetResult(true);
                     }
                     if ((rc.IsSuccess()) && (rc.IsSuccess(true) == false))
                         rc.SetResult(false);
                 }
+            }
+            return rc;
+        }
+
+        private CursorPosition UpdateCursorOnFillShortLine(int fillRowIndex, int removeRowIndex, CursorPosition originalCursor, string removeText, string fillText)
+        {
+            CursorPosition rc = null;
+
+            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            var maxCol = (EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet) + 1;
+
+            if ((TextLines != null) && (lineCount != Program.PosIntegerNotSet) && (fillRowIndex >= 0) && (fillRowIndex < lineCount) && (maxCol != Program.PosIntegerNotSet) && (string.IsNullOrEmpty(fillText) == false))
+            {
+                var updatedCursor = new CursorPosition(string.IsNullOrEmpty(removeText) ? fillRowIndex : removeRowIndex, 0);
+                if (updatedCursor.RowIndex == fillRowIndex)
+                    updatedCursor.ColIndex = TextLines[fillRowIndex].Length - (((fillText.Length - originalCursor.ColIndex) > 0) ? (fillText.Length - originalCursor.ColIndex) : 0);
+                else
+                   updatedCursor.ColIndex = ((originalCursor.ColIndex - (fillText.Length + 1)) > 0) ? (originalCursor.ColIndex - (fillText.Length + 1)) : 0;
+
+                if (updatedCursor.IsValid(lineCount, maxCol))
+                    rc = updatedCursor;
             }
             return rc;
         }
