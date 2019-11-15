@@ -292,73 +292,102 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(0, originalCursor.RowIndex);
             Assert.Equal(20, originalCursor.ColIndex);
 
-            //CursorPosition updatedCursor;
+            CursorPosition updatedCursor;
 
-            //var rcSplit = body.SplitLongLine2(-1, originalCursor, out updatedCursor);
-            //Assert.True(rcSplit.IsError(true));
-            //Assert.Contains("error 1101502-param: rowIndex=0; cursor=[not set]", rcSplit.GetErrorTechMsg());
+            var rcSplit = body.SplitLongLine2(-1, originalCursor, out updatedCursor);
+            Assert.True(rcSplit.IsError(true));
+            Assert.Contains("error 1101602-param: rowIndex=-1; cursor=rowIndex=0; colIndex=20", rcSplit.GetErrorTechMsg());
+            Assert.True(originalCursor.IsSame(updatedCursor));
 
-            //Assert.False(body.SplitLongLine2(1, originalCursor, out updatedCursor).IsSuccess(true));
-            //Assert.False(body.SplitLongLine2(0, null, out updatedCursor).IsSuccess(true));
+            rcSplit = body.SplitLongLine2(1, originalCursor, out updatedCursor);
+            Assert.True(rcSplit.IsError(true));
+            Assert.Contains("error 1101602-param: rowIndex=1; cursor=rowIndex=0; colIndex=20", rcSplit.GetErrorTechMsg());
 
+            rcSplit = body.SplitLongLine2(0, null, out updatedCursor);
+            Assert.True(rcSplit.IsError(true));
+            Assert.Contains("error 1101602-param: rowIndex=0; cursor=[not set]", rcSplit.GetErrorTechMsg());
+
+            originalCursor.RowIndex = 1;
+            rcSplit = body.SplitLongLine2(0, originalCursor, out updatedCursor);
+            Assert.True(rcSplit.IsError(true));
+            Assert.Contains("error 1101602-param: rowIndex=0; cursor=rowIndex=1; colIndex=20", rcSplit.GetErrorTechMsg());
+
+            originalCursor.RowIndex = 0;
+            originalCursor.ColIndex = 26;  //one more than the max col for cursor
+
+            rcSplit = body.SplitLongLine2(0, originalCursor, out updatedCursor);
+            Assert.False(rcSplit.IsError(true));
+            Assert.Equal(0, updatedCursor.RowIndex);
+            Assert.Equal(25, updatedCursor.ColIndex);
         }
 
         [Fact]
-        public void SplitLongLineBasicTest()
+        public void SplitLongLineBasicSingleLineTest()
         {
-            var maxColIndex = 9;
+            var maxColIndex = 24;
             var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
-            var line = "0123 56789ABC";
-            Assert.Equal(13, line.Length);
+            var line = "0123456789 123456789 1234ABCDEF";
+            Assert.Equal(31, line.Length);
             body.SetTestLine(line); //use test method to add line > maxColIndex
 
-            Assert.Equal("0123 56789ABC", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("0123456789 123456789 1234ABCDEF", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            Assert.Equal(line.Length, body.Cursor.ColIndex);
-            Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(2, body.WordCount);
+            Assert.Equal(3, body.WordCount);
+            var originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
+            Assert.Equal(0, originalCursor.RowIndex);
+            Assert.Equal(31, originalCursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, 9, maxColIndex, out var updatedCursorIndex).GetResult());
+            CursorPosition updatedCursor;
 
-            Assert.Equal("0123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("56789ABC", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-            Assert.Equal(8, updatedCursorIndex);
+            var rcSplit = body.SplitLongLine2(0, originalCursor, out updatedCursor);
+            Assert.True(rcSplit.IsSuccess(true));
+
             Assert.Equal(2, body.GetLineCount());
-            Assert.Equal(2, body.WordCount);
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("1234ABCDEF", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(1, updatedCursor.RowIndex);
+            Assert.Equal(10, updatedCursor.ColIndex);
         }
 
         [Fact]
-        public void SplitLongLineParaBreakBasicTest()
+        public void SplitLongLineBasicSingleLineParamBreakTest()
         {
-            var maxColIndex = 9;
+            var maxColIndex = 24;
             var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, maxColIndex + 1).GetResult());
             Assert.False(body.IsError());
 
-            var line = "0123 56789ABC";
-            Assert.Equal(13, line.Length);
-            body.SetTestLine(line + Body.ParaBreak); //use test method to add line > maxColIndex
+            var line = "0123456789 123456789 1234ABCDEF" + Body.ParaBreak;
+            Assert.Equal(32, line.Length);
+            body.SetTestLine(line); //use test method to add line > maxColIndex
 
-            Assert.Equal("0123 56789ABC>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
+            Assert.Equal("0123456789 123456789 1234ABCDEF>", body.GetEditAreaLinesForDisplay(1).GetResult()[0]);
 
-            Assert.Equal(line.Length, body.Cursor.ColIndex);
-            Assert.Equal(0, body.Cursor.RowIndex);
             Assert.Equal(1, body.GetLineCount());
-            Assert.Equal(2, body.WordCount);
+            Assert.Equal(3, body.WordCount);
+            var originalCursor = new CursorPosition(body.Cursor.RowIndex, body.Cursor.ColIndex);
+            Assert.Equal(0, originalCursor.RowIndex);
+            Assert.Equal(31, originalCursor.ColIndex);
 
-            Assert.True(body.SplitLongLine(0, 9, maxColIndex, out var updatedCursorIndex).GetResult());
+            CursorPosition updatedCursor;
 
-            Assert.Equal("0123", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
-            Assert.Equal("56789ABC>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
-            Assert.Equal(8, updatedCursorIndex);
+            var rcSplit = body.SplitLongLine2(0, originalCursor, out updatedCursor);
+            Assert.True(rcSplit.IsSuccess(true));
+
             Assert.Equal(2, body.GetLineCount());
-            Assert.Equal(2, body.WordCount);
+            Assert.Equal(3, body.WordCount);
+            Assert.Equal("0123456789 123456789", body.GetEditAreaLinesForDisplay(2).GetResult()[0]);
+            Assert.Equal("1234ABCDEF>", body.GetEditAreaLinesForDisplay(2).GetResult()[1]);
+            Assert.Equal(1, updatedCursor.RowIndex);
+            Assert.Equal(10, updatedCursor.ColIndex);
         }
-        
+
+
         [Fact]
         public void SplitLongLineTooShortFailTest()
         {
