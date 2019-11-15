@@ -43,7 +43,7 @@ namespace KLineEdCmdApp.Utils
                                         var splitIndex = 0;
                                         while ((splitIndex != Program.PosIntegerNotSet) && (lineEnd.Length > 0))
                                         {
-                                            splitIndex = Body.GetSplitIndexFromEnd(lineEnd, displayCols);
+                                            splitIndex = Body.GetSplitIndexFromEnd2(lineEnd, displayCols);
                                             if ((splitIndex <= 0) || (splitIndex >= lineEnd.Length))
                                                 textLines.Add(lineEnd+Body.ParaBreak);
                                             else

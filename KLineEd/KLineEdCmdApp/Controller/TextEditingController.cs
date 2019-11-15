@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using KLineEdCmdApp.Controller.Base;
 using KLineEdCmdApp.Model;
 using KLineEdCmdApp.View;

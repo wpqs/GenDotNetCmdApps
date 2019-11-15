@@ -258,7 +258,7 @@ namespace KLineEdCmdApp.Model
                 var rowCountIndex = 0;
                 while (rowCountIndex < TextLines.Count)
                 {
-                    var rcJustify = LeftJustifyLinesInParagraph2(rowCountIndex, 0);
+                    var rcJustify = LeftJustifyLinesInParagraph2(rowCountIndex);
                     if (rcJustify.IsError(true))
                     {
                         rc += rcJustify;
@@ -731,7 +731,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<ChapterModel.ChangeHint> LeftJustifyLinesInParagraph2(int cursorRowIndex, int cursorColIndex)
+        public MxReturnCode<ChapterModel.ChangeHint> LeftJustifyLinesInParagraph2(int cursorRowIndex, int cursorColIndex=0)
         {
             var rc = new MxReturnCode<ChapterModel.ChangeHint>("Body.LeftJustifyLinesInParagraph2", ChapterModel.ChangeHint.Unknown);
 
@@ -810,7 +810,7 @@ namespace KLineEdCmdApp.Model
             var rc = new MxReturnCode<bool>("Body.FillShortLine2");
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
-            updatedCursor = ((originalCursor?.ColIndex ?? Program.PosIntegerNotSet) < (maxColIndex + 1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor.RowIndex, maxColIndex + 1);
+            updatedCursor = ((originalCursor?.ColIndex ?? Program.PosIntegerNotSet) < (maxColIndex + 1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor?.RowIndex ?? Program.PosIntegerNotSet, maxColIndex + 1);
 
             if ((TextLines == null) ||  (maxColIndex < 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax))
                 rc.SetError(1101501, MxError.Source.Param, $"rowIndex={rowIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrInvalidCondition);
@@ -841,34 +841,13 @@ namespace KLineEdCmdApp.Model
                             TextLines.RemoveAt(nextRowIndex);
 
                         if (originalCursor.RowIndex == nextRowIndex) 
-                            updatedCursor = UpdateCursorOnFillShortLine(rowIndex, nextRowIndex, originalCursor, end, start);
+                            updatedCursor = UpdateCursorOnFillShortLine(rowIndex, nextRowIndex, originalCursor, start, end);
 
                         rc.SetResult(true);
                     }
                     if ((rc.IsSuccess()) && (rc.IsSuccess(true) == false))
                         rc.SetResult(false);
                 }
-            }
-            return rc;
-        }
-
-        private CursorPosition UpdateCursorOnFillShortLine(int fillRowIndex, int removeRowIndex, CursorPosition originalCursor, string removeText, string fillText)
-        {
-            CursorPosition rc = null;
-
-            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            var maxCol = (EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet) + 1;
-
-            if ((TextLines != null) && (lineCount != Program.PosIntegerNotSet) && (fillRowIndex >= 0) && (fillRowIndex < lineCount) && (maxCol != Program.PosIntegerNotSet) && (string.IsNullOrEmpty(fillText) == false))
-            {
-                var updatedCursor = new CursorPosition(string.IsNullOrEmpty(removeText) ? fillRowIndex : removeRowIndex, 0);
-                if (updatedCursor.RowIndex == fillRowIndex)
-                    updatedCursor.ColIndex = TextLines[fillRowIndex].Length - (((fillText.Length - originalCursor.ColIndex) > 0) ? (fillText.Length - originalCursor.ColIndex) : 0);
-                else
-                   updatedCursor.ColIndex = ((originalCursor.ColIndex - (fillText.Length + 1)) > 0) ? (originalCursor.ColIndex - (fillText.Length + 1)) : 0;
-
-                if (updatedCursor.IsValid(lineCount, maxCol))
-                    rc = updatedCursor;
             }
             return rc;
         }
@@ -899,7 +878,7 @@ namespace KLineEdCmdApp.Model
                     {
                         string existLine, insertLine;
                         currentLineLen = currentLine.Length; //include any paraBreak
-                        var splitIndex = Body.GetSplitIndexFromEnd(currentLine, maxColIndex);
+                        var splitIndex = Body.GetSplitIndexFromEnd2(currentLine, maxColIndex);
                         if (splitIndex == Program.PosIntegerNotSet)
                         {                       //line doesn't contain any spaces or otherwise cannot be split as word boundary
                             existLine = currentLine.Snip(0, maxColIndex); //cursor doesn't change as updatedCursor.colIndex must be <= maxColIndex
@@ -1183,6 +1162,27 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public CursorPosition UpdateCursorOnFillShortLine(int fillRowIndex, int removeRowIndex, CursorPosition originalCursor, string moveText, string remainText = null)
+        {
+            CursorPosition rc = null;
+
+            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            var maxCol = (EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet) + 1;
+
+            if ((TextLines != null) && (lineCount != Program.PosIntegerNotSet) && (fillRowIndex >= 0) && (fillRowIndex < lineCount) && (maxCol != Program.PosIntegerNotSet) && (string.IsNullOrEmpty(moveText) == false) && (originalCursor != null))
+            {
+                var updatedCursor = new CursorPosition(string.IsNullOrEmpty(remainText) ? fillRowIndex : removeRowIndex, 0);
+                if (updatedCursor.RowIndex == fillRowIndex)
+                    updatedCursor.ColIndex = TextLines[fillRowIndex].Length - (((moveText.Length - originalCursor.ColIndex) > 0) ? (moveText.Length - originalCursor.ColIndex) : 0);
+                else
+                    updatedCursor.ColIndex = ((originalCursor.ColIndex - (moveText.Length + 1)) > 0) ? (originalCursor.ColIndex - (moveText.Length + 1)) : 0;
+
+                if (updatedCursor.IsValid(lineCount, remainText?.Length ?? maxCol))
+                    rc = updatedCursor;
+            }
+            return rc;
+        }
+
         public static int GetSplitIndexFromStart2(string nextLine, int spaceAvailable)
         {
             var rc = Program.PosIntegerNotSet;
@@ -1204,6 +1204,29 @@ namespace KLineEdCmdApp.Model
                 }
             }
             return rc;  //1) Program.PosIntegerNotSet, cannot be split; 2) nextLine.Length -1, can move entire line 3) index of last space 
+        }
+
+        public static int GetSplitIndexFromEnd2(string line, int columnLimitIndex)
+        {
+            var rc = Program.PosIntegerNotSet;
+
+            if ((line != null) && (columnLimitIndex > 0) && (columnLimitIndex < (line.Length)))
+            {
+                var splitIndex = line.Length - 1;
+                var endIndex = line.Length - 1;
+                for (var x = endIndex; x >= 0; x--)
+                {
+                    if (line[x] == ' ')
+                        splitIndex = x;
+                    if (splitIndex <= columnLimitIndex)
+                        break;
+                    if (x == 0)
+                        splitIndex = Program.PosIntegerNotSet;
+                }
+
+                rc = (splitIndex < line.Length - 1) ? splitIndex : Program.PosIntegerNotSet;
+            }
+            return rc;
         }
 
         public static int GetSplitIndexFromStart(string line, int spaceAvailable)
@@ -1241,15 +1264,15 @@ namespace KLineEdCmdApp.Model
                 var endIndex = line.Length - 1;
                 for (var x = endIndex; x >= 0; x--)
                 {
-                    if (line[x] == ' ') 
+                    if (line[x] == ' ')
                         splitIndex = x;
-                    if (splitIndex <= columnLimitIndex) 
+                    if (splitIndex <= columnLimitIndex)
                         break;
                     if (x == 0)
                         splitIndex = Program.PosIntegerNotSet;
                 }
 
-                rc = (splitIndex < line.Length-1) ? splitIndex : Program.PosIntegerNotSet;
+                rc = (splitIndex < line.Length - 1) ? splitIndex : Program.PosIntegerNotSet;
             }
             return rc;
         }

@@ -172,6 +172,7 @@ Release work v1.2
 2. Create KScribeWinApp - window version
 3. Create KScribeMacApp - iOS version
 4. Create KScribeAndApp - Andriod phone version
+5. Create Blazor TextEditing Control
 4. Integrate with SVN
 		- store user settings
 		- create repository (delete from cmd line - intentional difficult)
