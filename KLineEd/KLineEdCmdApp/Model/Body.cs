@@ -258,7 +258,7 @@ namespace KLineEdCmdApp.Model
                 var rowCountIndex = 0;
                 while (rowCountIndex < TextLines.Count)
                 {
-                    var rcJustify = LeftJustifyLinesInParagraph2(rowCountIndex);
+                    var rcJustify = LeftJustifyLinesInParagraph(rowCountIndex);
                     if (rcJustify.IsError(true))
                     {
                         rc += rcJustify;
@@ -443,7 +443,7 @@ namespace KLineEdCmdApp.Model
                                         //rowIndex == -1 or rowIndex == TextLines.Count are errors needing specific reporting
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
             if ((linesCount == Program.PosIntegerNotSet) || (rowIndex < -1) || (rowIndex > linesCount) || (colIndex < -1) || (colIndex > (EditAreaViewCursorLimit?.ColIndex+1 ?? colIndex-1))) //allow cursor to move one character after last permitted col
-                rc.SetError(1100701, MxError.Source.Param, $"rowIndex={rowIndex} > max({linesCount}), colIndex={colIndex} > max({EditAreaViewCursorLimit?.ColIndex ?? colIndex-1}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1100701, MxError.Source.Param, $"rowIndex={rowIndex} > max({linesCount}), colIndex={colIndex} > max={EditAreaViewCursorLimit?.ColIndex ?? colIndex-1}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 if ((Cursor == null) || (TextLines == null))
@@ -581,7 +581,7 @@ namespace KLineEdCmdApp.Model
                                     TextLines.Insert(Cursor.RowIndex + 1, after ?? ParaBreak);
 
                                     //adjust rest of paragraph lines - avoids need for SetCursorInChapter(Cursor.RowIndex + 1, 0);
-                                    var rcJustify = LeftJustifyLinesInParagraph2(Cursor.RowIndex+1, 0);
+                                    var rcJustify = LeftJustifyLinesInParagraph(Cursor.RowIndex+1, 0);
                                     rc += rcJustify;
                                     if (rcJustify.IsSuccess(true))
                                     {
@@ -645,7 +645,7 @@ namespace KLineEdCmdApp.Model
                                 }
                                 TextLines[Cursor.RowIndex] = line; //may be longer than maxColIndex, but fixed by LeftJustifyLinesInParagraph
 
-                                var rcJustify = LeftJustifyLinesInParagraph2(Cursor.RowIndex, Cursor.ColIndex + text.Length);
+                                var rcJustify = LeftJustifyLinesInParagraph(Cursor.RowIndex, Cursor.ColIndex + text.Length);
                                 rc += rcJustify;
                                 if (rcJustify.IsSuccess(true))
                                 {
@@ -714,7 +714,7 @@ namespace KLineEdCmdApp.Model
 
                         if (rc.IsSuccess())
                         {
-                            var rcJustify = LeftJustifyLinesInParagraph2(rowIndex, colIndex);
+                            var rcJustify = LeftJustifyLinesInParagraph(rowIndex, colIndex);
                             rc += rcJustify;
                             if (rcJustify.IsSuccess(true))
                             {
@@ -731,15 +731,15 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<ChapterModel.ChangeHint> LeftJustifyLinesInParagraph2(int cursorRowIndex, int cursorColIndex=0)
+        public MxReturnCode<ChapterModel.ChangeHint> LeftJustifyLinesInParagraph(int cursorRowIndex, int cursorColIndex=0)
         {
-            var rc = new MxReturnCode<ChapterModel.ChangeHint>("Body.LeftJustifyLinesInParagraph2", ChapterModel.ChangeHint.Unknown);
+            var rc = new MxReturnCode<ChapterModel.ChangeHint>("Body.LeftJustifyLinesInParagraph", ChapterModel.ChangeHint.Unknown);
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
             var originalCursor = new CursorPosition(cursorRowIndex, cursorColIndex);
 
             if ((TextLines == null) || (maxColIndex <= 0) || (maxColIndex >= CmdLineParamsApp.ArgTextEditorDisplayColsMax) ||  (originalCursor.IsValid(TextLines.Count) == false) ) 
-                rc.SetError(1101301, MxError.Source.Param, $"TextLines == null, maxColIndex={maxColIndex} or invalid originalCursor={originalCursor}", MxMsgs.MxErrBadMethodParam);
+                rc.SetError(1101301, MxError.Source.Param, $"TextLines={(TextLines?.Count ?? -1)}, maxColIndex={maxColIndex} or invalid originalCursor={originalCursor}", MxMsgs.MxErrBadMethodParam);
             else
             {
                 var hint = ChapterModel.ChangeHint.Line;
@@ -752,7 +752,7 @@ namespace KLineEdCmdApp.Model
                     var rowIndex = (previousRowIndex != Program.PosIntegerNotSet) ? previousRowIndex : cursorRowIndex;
                     do
                     {
-                        var rcFill = FillShortLine2(rowIndex, originalCursor, out var resultCursorFill);
+                        var rcFill = FillShortLine(rowIndex, originalCursor, out var resultCursorFill);
                         if (rcFill.IsError(true))
                         {
                             rc += rcFill;
@@ -764,7 +764,7 @@ namespace KLineEdCmdApp.Model
                                 hint = ChapterModel.ChangeHint.End;
                         }
 
-                        var rcSplit = SplitLongLine2(rowIndex, originalCursor, out var resultCursorSplit);
+                        var rcSplit = SplitLongLine(rowIndex, originalCursor, out var resultCursorSplit);
                         if (rcSplit.IsError(true))
                         {
                             rc += rcSplit;
@@ -794,7 +794,7 @@ namespace KLineEdCmdApp.Model
                         {
                             var rcCursor = SetCursorInChapter(updatedCursor.RowIndex, updatedCursor.ColIndex);
                             rc += rcCursor;
-                            if (rcCursor.IsSuccess(true))
+                            if (rcCursor.IsSuccess(true))  //SetCursorInChapter returns ChangeHint.Cursor - fixed in next release of MxReturnCode
                             {
                                 rc.SetResult(hint);
                             }
@@ -805,9 +805,9 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> FillShortLine2(int rowIndex, CursorPosition originalCursor, out CursorPosition updatedCursor)
+        public MxReturnCode<bool> FillShortLine(int rowIndex, CursorPosition originalCursor, out CursorPosition updatedCursor)
         {
-            var rc = new MxReturnCode<bool>("Body.FillShortLine2");
+            var rc = new MxReturnCode<bool>("Body.FillShortLine");
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
             updatedCursor = ((originalCursor?.ColIndex ?? Program.PosIntegerNotSet) < (maxColIndex + 1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor?.RowIndex ?? Program.PosIntegerNotSet, maxColIndex + 1);
@@ -826,7 +826,7 @@ namespace KLineEdCmdApp.Model
                         var spaceAtEndOfCurrentLine = (maxColIndex + 1) - ((TextLines[rowIndex].EndsWith(' ') == false) ? TextLines[rowIndex].Length : TextLines[rowIndex].Length + 1); //if current row ends with space then there will be two spaces between the last word of current row and first word from next nextLine
                         var nextLine = TextLines[nextRowIndex];
 
-                        var splitIndex = Body.GetSplitIndexFromStart2(nextLine, spaceAtEndOfCurrentLine); //splitIndex is index of a space in next line, or if entire line can fit then index of last char (inc paraBreak) 
+                        var splitIndex = Body.GetSplitIndexFromStart(nextLine, spaceAtEndOfCurrentLine); //splitIndex is index of a space in next line, or if entire line can fit then index of last char (inc paraBreak) 
                         if (splitIndex < 0)
                             break; //next nextLine cannot be split or is too long be put into current nextLine
 
@@ -852,9 +852,9 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<bool> SplitLongLine2(int rowIndex, CursorPosition originalCursor, out CursorPosition updatedCursor)
+        public MxReturnCode<bool> SplitLongLine(int rowIndex, CursorPosition originalCursor, out CursorPosition updatedCursor)
         {
-            var rc = new MxReturnCode<bool>("Body.SplitLongLine2");
+            var rc = new MxReturnCode<bool>("Body.SplitLongLine");
 
             var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
             updatedCursor = ((originalCursor?.ColIndex ?? Program.PosIntegerNotSet) < (maxColIndex + 1)) ? new CursorPosition(originalCursor) : new CursorPosition(originalCursor?.RowIndex ?? Program.PosIntegerNotSet, maxColIndex + 1);
@@ -874,7 +874,7 @@ namespace KLineEdCmdApp.Model
                     {
                         string existLine, insertLine;
                         currentLineLen = currentLine.Length; //include any paraBreak
-                        var splitIndex = Body.GetSplitIndexFromEnd2(currentLine, maxColIndex);
+                        var splitIndex = Body.GetSplitIndexFromEnd(currentLine, maxColIndex);
                         if (splitIndex == Program.PosIntegerNotSet)
                         {                                   //line doesn't contain any spaces or otherwise cannot be split as word boundary
                             existLine = currentLine.Snip(0, maxColIndex); //cursor doesn't change as updatedCursor.colIndex must be <= maxColIndex
@@ -915,198 +915,6 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public MxReturnCode<ChapterModel.ChangeHint> LeftJustifyLinesInParagraph(int startRowIndex, int startColIndex)
-        {
-            var rc = new MxReturnCode<ChapterModel.ChangeHint>("Body.LeftJustifyLinesInParagraph", ChapterModel.ChangeHint.Unknown);
-
-            var maxColIndex = EditAreaViewCursorLimit?.ColIndex ?? Program.PosIntegerNotSet;
-            if ((startRowIndex < 0) || (startColIndex < 0) || (maxColIndex < 0) )
-                rc.SetError(1101301, MxError.Source.Param, $"cursorRowIndex={startRowIndex}, colIndex={startColIndex}, maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                var hint = ChapterModel.ChangeHint.Line;
-                var rowIndex = startRowIndex;
-                var cursorRowIndex = startRowIndex;
-                var cursorColIndex = startColIndex;
-                var endRowIndex = Program.PosIntegerNotSet;
-                while ((endRowIndex = GetNextParaBreakRowIndex(rowIndex)) != Program.PosIntegerNotSet)
-                {
-                    var linesCount = TextLines.Count;
-                    var line = TextLines[rowIndex];
-                    var lineLen = line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length;
-                    if (lineLen <= (maxColIndex + 1))
-                    {
-                        var rcFill = FillShortLine(rowIndex, startColIndex, maxColIndex, out var updatedCursorColIndex);
-                        rc += rcFill;
-                        if (rcFill.IsSuccess(true) && (rcFill.GetResult() == true)) 
-                        {
-                            hint = ChapterModel.ChangeHint.End;
-                            if (TextLines.Count < linesCount)
-                                endRowIndex--;
-                            if ((rowIndex == startRowIndex) && (updatedCursorColIndex != Program.PosIntegerNotSet))
-                            {
-                                cursorColIndex = (updatedCursorColIndex < maxColIndex) ? updatedCursorColIndex : maxColIndex;
-                            }
-                        }
-                        else
-                        {
-                            rowIndex++;
-                        }
-                    }
-                    else
-                    {
-                        var rcSplit = SplitLongLine(rowIndex, startColIndex, maxColIndex, out var updatedCursorColIndex);  //allow long line to be split into two or more lines and inserted into TextLines[]
-                        rc += rcSplit;
-                        if (rcSplit.IsSuccess(true) && (rcSplit.GetResult() == true))
-                        {
-                            hint = ChapterModel.ChangeHint.End;
-                            if (TextLines.Count > linesCount)
-                                endRowIndex += TextLines.Count - linesCount;
-                            if ((rowIndex == startRowIndex) && (updatedCursorColIndex != Program.PosIntegerNotSet))
-                            {
-                                cursorRowIndex++;
-                                cursorColIndex = (updatedCursorColIndex < maxColIndex) ? updatedCursorColIndex : maxColIndex;
-                            }
-                        }
-                        rowIndex++;
-                    }
-                    if (rc.IsError())
-                        break;
-                }
-                if (rc.IsSuccess())
-                {
-                    if ((endRowIndex == rowIndex - 1) || (endRowIndex == Program.PosIntegerNotSet))
-                    {
-                        var rcCursor = SetCursorInChapter(cursorRowIndex, cursorColIndex);
-                        rc += rcCursor;
-                        if (rcCursor.IsSuccess(true))
-                        {
-                            rc.SetResult(hint);
-                        }
-                    }
-                }
-            }
-            return rc;
-        }
-
-        public MxReturnCode<bool> FillShortLine(int rowIndex, int colIndex, int maxColIndex, out int updatedCursorColIndex)
-        {
-            var rc = new MxReturnCode<bool>("Body.FillShortLine");
-
-            updatedCursorColIndex = Program.PosIntegerNotSet;
-
-            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((TextLines == null) || (rowIndex >= lineCount) || (rowIndex < 0) || (colIndex < 0) ||  (maxColIndex < 0))
-                rc.SetError(1101501, MxError.Source.Param, $"rowIndex={rowIndex}; colIndex={colIndex} maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                updatedCursorColIndex = colIndex;
-                if ((rowIndex+1) >= lineCount)
-                    rc.SetResult(false);                      //last line in chapter cannot be filled with text from subsequent lines ;-)
-                else
-                {
-                    var currentLine = TextLines[rowIndex];
-                    if (currentLine.EndsWith(ParaBreakChar)) //current line is end of paragraph so cannot fill from next line
-                        rc.SetResult(false);
-                    else
-                    { 
-                        var currentLineLen = (currentLine.EndsWith(ParaBreakChar)) ? currentLine.Length - 1 : currentLine.Length;
-                        var nextLine = TextLines[rowIndex + 1];
-
-                        var splitIndex = Body.GetSplitIndexFromStart(nextLine, (maxColIndex + 1) - currentLineLen - 1);
-                        if ((splitIndex == Program.PosIntegerNotSet) || (splitIndex >= maxColIndex))
-                            rc.SetResult(false); //split text in next line is too long be put into current line
-                        else
-                        {
-                            var start = nextLine.Snip(0, (nextLine[splitIndex] != ' ') ? splitIndex : splitIndex-1);
-                            if (TextLines[rowIndex].EndsWith(' ') == false)
-                                TextLines[rowIndex] +=  " " + start;  
-                            else
-                                TextLines[rowIndex] += start;       
-
-                            var end = nextLine.Snip(splitIndex + 1, nextLine.Length - 1); // nextLineLen - 1); // nextLine.Length - 1);
-                            if (string.IsNullOrEmpty(end) == false)
-                                TextLines[rowIndex + 1] = end;
-                            else
-                            {
-                                TextLines.RemoveAt(rowIndex + 1);
-                            }
-                            rc.SetResult(true);
-                        }
-                    }
-                }
-            }
-            return rc;
-        }
-
-        public MxReturnCode<bool> SplitLongLine(int rowIndex, int colIndex, int maxColIndex, out int updatedCursorColIndex)
-        {
-            var rc = new MxReturnCode<bool>("Body.SplitLongLine");
-
-            updatedCursorColIndex = Program.PosIntegerNotSet;
-
-            var lineCount = TextLines?.Count ?? Program.PosIntegerNotSet;
-            if ((TextLines == null) ||  (rowIndex < 0) || (rowIndex >= lineCount) || (colIndex < 0)) //(maxColIndex < CmdLineParamsApp.ArgTextEditorDisplayColsMin) ||
-                rc.SetError(1101601, MxError.Source.Param, $"rowIndex={rowIndex}; colIndex={colIndex}; maxColIndex={maxColIndex}", MxMsgs.MxErrBadMethodParam);
-            else
-            {
-                var line = TextLines[rowIndex];
-                var lineLen = line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length;
-
-                if (maxColIndex >= line.Length-1)
-                    rc.SetError(1101602, MxError.Source.Program, $"maxColIndex={maxColIndex} >= line.Length-1={line.Length - 1}", MxMsgs.MxErrInvalidCondition);
-                else
-                {
-                    var existLine = "";
-                    var insertLine = "";
-                    var repositionCursor = false;
-
-                    var splitIndex = Body.GetSplitIndexFromEnd(line, maxColIndex); 
-                    if (splitIndex == Program.PosIntegerNotSet)
-                    { //line doesn't contain any spaces or otherwise cannot be split
-                        existLine = line.Snip(0, maxColIndex); // + "-";
-                        if (((insertLine = line.Snip(maxColIndex+1, lineLen - 1)) != null))
-                            WordCount++;
-                        repositionCursor = true;
-                    }
-                    else
-                    {
-                        existLine = line.Snip(0, splitIndex - 1); //space is removed
-                        insertLine = line.Snip(splitIndex + 1, lineLen - 1);
-                        repositionCursor = (colIndex > splitIndex) ? true : false;
-                    }
-
-                    if (rowIndex < TextLines.Count - 1)
-                        insertLine = insertLine + " " + TextLines[rowIndex + 1]; 
-
-                    if (string.IsNullOrEmpty(existLine) || (string.IsNullOrEmpty(insertLine)))
-                        rc.SetError(1101603, MxError.Source.Program, $"existLine.Length={existLine?.Length ?? -1}, insertLine.Length={insertLine?.Length ?? -1}", MxMsgs.MxErrInvalidCondition);
-                    else
-                    {
-                        if (line.EndsWith(ParaBreakChar) && ((insertLine.EndsWith(ParaBreakChar) == false)))
-                            insertLine += ParaBreak;
-
-                        TextLines[rowIndex] = existLine;
-
-                        if (rowIndex + 1 < TextLines.Count)
-                            TextLines[rowIndex + 1] = insertLine;
-                        else
-                        {
-                            var rcInsert = InsertLine(rowIndex, insertLine);
-                            rc += rcInsert;
-                        }
-
-                        if (rc.IsSuccess())
-                        {
-                            if (repositionCursor)
-                                updatedCursorColIndex = (insertLine.EndsWith(ParaBreakChar)) ? insertLine.Length - 1 : insertLine.Length;
-                            rc.SetResult(true);
-                        }
-                    }
-                }
-            }
-            return rc;
-        }
 
         public MxReturnCode<string> GetEditAreaCursorLineForDisplay()
         {
@@ -1182,7 +990,7 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
-        public static int GetSplitIndexFromStart2(string nextLine, int spaceAvailable)
+        public static int GetSplitIndexFromStart(string nextLine, int spaceAvailable)
         {
             var rc = Program.PosIntegerNotSet;
 
@@ -1205,7 +1013,7 @@ namespace KLineEdCmdApp.Model
             return rc;  //1) Program.PosIntegerNotSet, cannot be split; 2) nextLine.Length -1, can move entire line 3) index of last space 
         }
 
-        public static int GetSplitIndexFromEnd2(string line, int columnLimitIndex)
+        public static int GetSplitIndexFromEnd(string line, int columnLimitIndex)  //refactor candidate
         {
             var rc = Program.PosIntegerNotSet;
 
@@ -1222,59 +1030,11 @@ namespace KLineEdCmdApp.Model
                     if (x == 0)
                         splitIndex = Program.PosIntegerNotSet;
                 }
-
                 rc = (splitIndex < line.Length - 1) ? splitIndex : Program.PosIntegerNotSet;
             }
             return rc;
         }
 
-        public static int GetSplitIndexFromStart(string line, int spaceAvailable)
-        {
-            var rc = Program.PosIntegerNotSet;
-
-            if ((spaceAvailable > 0) && (line != null))
-            {
-                var lineLen = line.Length;
-                if (lineLen <= spaceAvailable)
-                    rc = lineLen - 1;
-                else
-                {
-                    var splitIndex = Program.PosIntegerNotSet;
-                    for (var x = 0; x < line.Length; x++)
-                    {   
-                        if (((line[x] == ' ') || (line[x] == Body.ParaBreakChar)) && (x <= spaceAvailable)) 
-                            splitIndex = x;
-                        if (x > spaceAvailable)
-                            break;
-                    }
-                    rc = splitIndex;
-                }
-            }
-            return rc;
-        }
-
-        public static int GetSplitIndexFromEnd(string line, int columnLimitIndex)
-        {
-            var rc = Program.PosIntegerNotSet;
-
-            if ((line != null) && (columnLimitIndex > 0) && (columnLimitIndex < (line.Length)))
-            {
-                var splitIndex = line.Length - 1;
-                var endIndex = line.Length - 1;
-                for (var x = endIndex; x >= 0; x--)
-                {
-                    if (line[x] == ' ')
-                        splitIndex = x;
-                    if (splitIndex <= columnLimitIndex)
-                        break;
-                    if (x == 0)
-                        splitIndex = Program.PosIntegerNotSet;
-                }
-
-                rc = (splitIndex < line.Length - 1) ? splitIndex : Program.PosIntegerNotSet;
-            }
-            return rc;
-        }
 
         public static string GetErrorsInText(string text, int lineNo=-1, int colStartNo=1) //todo update after next release of MxReturnCode
         {

@@ -2,13 +2,55 @@ Functional Tests - Basic, Manual Smoke Test
 
 Prep:
 
-a. copy KLineEd\KLineEdCmdApp\mytest.ksx to KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2
+a. copy to KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2 
+     - KLineEd\TestFiles\mytest.ksx
+	 - KLineEd\TestFiles\NoiseComplaint.txt
+	 - KLineEdCmdApp\KLineEdCmdApp.json
 
---edit mytest.ksx --display cols=35 - delete paraBreak @ L123456789 > doesn't trigger appending of next line and other problems need to delete 2 chars not 1
---edit mytest.ksx --display cols=25 - 
---edit mytest.ksx --display cols=68 - no problems found
+	  
+1. Help
+-------
 
-1. Changing Display Cols
+--help															//display help info
+
+
+2. Import
+---------
+
+--import from='NoiseComplaint.txt' to='NoiseComplaint.ksx'		
+
+importing NoiseComplaint.txt to NoiseComplaint.ksx...
+Succeeded: 17 lines have been imported from NoiseComplaint.txt to NoiseComplaint.ksx
+program ends - bye-bye :-) return code 0 - success
+
+--edit NoiseComplaint.ksx
+
+ compare with KLineEd\FunctionalTestResults\NoiseComplaintDisplayCols65.jpg
+
+ quick checks:
+  delete paraBreak after 'at least.'
+
+
+3.  Export
+-----------
+
+--export from='NoiseComplaint.ksx' to='NoiseComplaint-0.txt'
+
+exporting NoiseComplaint.ksx to NoiseComplaint-0.txt...
+Succeeded: NoiseComplaint.ksx exported 21 lines to NoiseComplaint-0.txt
+program ends - bye-bye :-) return code 0 - success
+
+ compare NoiseComplaint-0.txt with KLineEd\FunctionalTestFiles\NoiseComplaint.txt
+
+4. Edit
+-------
+
+--edit mytest.ksx --display cols=25 
+--edit mytest.ksx --display cols=35
+--edit mytest.ksx --display cols=68
+--edit mytest.ksx --display cols=65 
+
+a. Changing Display Cols
 ------------------------
 
 --edit mytest.ksx --display cols=25 
@@ -16,13 +58,18 @@ a. copy KLineEd\KLineEdCmdApp\mytest.ksx to KLineEd\KLineEdCmdApp\bin\Debug\netc
 save
    compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with mytestBodyDisplayCols25.jpg
 
+--edit mytest.ksx --display cols=68
+    compare with KLineEd\FunctionalTestResults\mytestDisplayCols68.jpg
+save
+	compare KLineEd\KLineEdCmdApp\mytest.ksx with KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx - should be identical
+
 --edit mytest.ksx --display cols=65
     compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
 save
 	compare KLineEd\KLineEdCmdApp\mytest.ksx with KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx - should be identical
 
 
-2. Deleting paraBreak
+b. Deleting paraBreak
 ---------------------
 
 --edit mytest.ksx --display cols=65
@@ -35,7 +82,7 @@ press CR
     compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
 	cursor line 13 col 1
 
-3. Adding and deleting characters before end of line
+c. Adding and deleting characters before end of line
 ----------------------------------------------------
 
 --edit mytest.ksx --display cols=65
@@ -50,8 +97,8 @@ press BS
    compare with KLineEd\FunctionalTestResults\mytestR11C12-ABCDE.jpg
 
 
- 4. Adding and deleting characters at end of line
- ------------------------------------------------
+d. Adding and deleting characters at end of line
+------------------------------------------------
 
 --edit mytest.ksx --display cols=65
 
@@ -78,7 +125,7 @@ press BS
    CHECK cursor is line 12, col 66
 
 
-5. Deleting characters to make a short line
+e. Deleting characters to make a short line
 -------------------------------------------
 
  --edit mytest.ksx --display cols=65
