@@ -13,30 +13,20 @@ Development work v1.0.44.0
     - done Error handling refactor
 	- done Convert MxConsole to MxReturnCode
 	- done BugFixes 
-	- Cursor move - Ctrl+Home = top of chapter, Ctrl+End bottom of chapter, Home = start of line, End = end of line, Ctrl+Left = one word left, Ctrl+Right = one word right,
-    - Implement AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
-	- Implement SaveAs - switch to PropsView and enable changing of filename / no filename is abort without saving
+	- done Functional Tests
+	- done Create Release build
+	- done Publish Win-x64
+    - done copy to KLineEd\KLineEdCmdApp\bin\ReleaseX\netcoreapp2.2 \win-x64
+        - KLineEd\TestFiles\mytest.ksx
+	    - KLineEd\TestFiles\NoiseComplaint.txt
+	- done Create ZIP to Release build
+	- done Install on NAS-0 and functional test
 
-	- Test in Production Build
 
-4. Publish and Test
-	- Windows
-
-5. Create pre-release ZIP for GitHub
-	- initial technical writeup
-	
-
-Development work v1.0.45.0
+Development work v1.1.30.0
 --------------------------
 
-1. Implement --fix
-	delete all <session> with Duration: 00:00:00 and renumber any following ones
-
-2. Test
-	- iOS
-	- Check Chapter/Session stats are correct
-
-2. Refactor Application structure
+1. Refactor Application structure
      - resolve const / readonly issue
 	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
@@ -47,21 +37,27 @@ Development work v1.0.45.0
 		- Integrate KScribeLib Class Library with KScribeCmdApp - Program.cs, KScribeEditor, Terminal.cs.
 	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
 
-3. Create new GitHub private project in imageqc - KScribe and clone to local C:\Users\wills\source\repos\ImageQC\KScribe
-4. Import code from C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd
+2. Create new GitHub private project in imageqc - KScribe and clone to local C:\Users\wills\source\repos\ImageQC\KScribe
+3. Import code from C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd
 	- test
 	- version
-5. Push changes to KScribe v1.0.45.0
-6. Delete C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd and clone from v1.0.44.0
+4. Push changes to KScribe v1.0.45.0
+5. Delete C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd and clone from v1.0.44.0
     - test
 
 
-Development work v1.0.46.0
+Development work v1.1.31.0
 --------------------------
 
-1. Implement ModalDlgView - a modal dialog box
+1. Implement --fix
+	delete all <session> with Duration: 00:00:00 and renumber any following ones
+	Cursor move - Ctrl+Home = top of chapter, Ctrl+End bottom of chapter, Home = start of line, End = end of line, Ctrl+Left = one word left, Ctrl+Right = one word right,
+	SaveAs - switch to PropsView and enable changing of filename / no filename is abort without saving (update FunctionalTests.txt to save to tmp file before starting tests)
+	AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
 
-2. Add to KScribeCmdApp UIElements.cs
+2. Implement ModalDlgView - a modal dialog box
+
+3. Add to KScribeCmdApp UIElements.cs
 	- text box
     - button 
 	- radio button selection
@@ -69,23 +65,27 @@ Development work v1.0.46.0
 	- drop down list selection
 	- tab, arrow moves focus (enter acts)
 
-3. Test UIElements.cs
+4. Test UIElements.cs
     - Unit test
 	- Modal Dialog box
 
-4. Refactor
+5. Refactor
     - Move to MxDotNetUtils KLineEditor.StartBrowser,  KLineEditor.StartBrowser, KLineEditor.IsValidUri, and KLineEditor.GetXlatUrl + tests
 	- Move to MxDotNetUtils CmdLineParamApp parameter base class, MxConsole, general MVC and factory stuff as well as UIElements.cs 
     - Update KScribe for new version of MxDotNetUtils
 
-5. Implement 
+6. Implement 
     --settings and use any settings found in the specified file to override those given in the default (global) .json
 		- add username / email / password - use for Azure Logging
 		- add last file.ksx
 	- use updated MxDotNetUtils to call SettingsFileProc() appropriately
 
+7. Test
+	- iOS
+	- Check Chapter/Session stats are correct
 
-Development work v1.0.47.0
+
+Development work v1.1.32.0
 --------------------------
 
 1. Implement Secret Manager lookup for json settings (SVN)
@@ -98,7 +98,7 @@ Development work v1.0.47.0
 3. Refactor
     - Update KScribe for new version of MxReturnCode (C++ interop)
 
-Development work v1.0.48.0
+Development work v1.1.33.0
 --------------------------
 
 1. Implement SettingsView - allow command line parameters to be changed from within the Editor
@@ -121,13 +121,12 @@ Development work v1.0.48.0
 
 8. Improve unit testing and full test
 
-9. Create Windows/iOS Installer - Wix
 
-Release work v1.1 (first beta release)
---------------------------------------
+Release work v1.1.34 (first beta release)
+-----------------------------------------
 
 1.  Create Logo
-2.	Migrate to GitHub KScribe public project and make existing private
+2.  Create Windows/iOS Installer - Wix
 3.  Create GitHub wiki
 		- user manual 
 			- list of views
@@ -141,7 +140,7 @@ Release work v1.1 (first beta release)
 5.  Create KScribe.org website
 
 
-Development work v1.1.30.0
+Development work v1.2.30.0
 --------------------------
 
 WARNING: changes may break iOS version
@@ -165,7 +164,7 @@ WARNING: changes may break iOS version
 	- Ctrl+X
 
 
-Release work v1.2
+Release work v1.3
 -----------------
 
 1. Create ConsoleApp launcher for Cmd Line version (Windows only)

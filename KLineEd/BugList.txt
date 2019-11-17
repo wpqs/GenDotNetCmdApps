@@ -19,7 +19,7 @@ BugList
 			   end of LeftJustifyLinesInParagraph doesn't add the remaining oversized line as a collection of lines - i.e. TextLines[] still same size - InsertLine never called
 	11. awaiting change - Implement AppDomain.ProcessExit Event
 		- Terminate without save if already saved - Session - Duration: 00:00:00, but possibly Typing pauses: 08:24:24,101;08:26:08,67;08:27:21,72;[end]
-
+	12. Delete ParaBreak in col 0 - hint.line not hint.end
 
 
 3. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange

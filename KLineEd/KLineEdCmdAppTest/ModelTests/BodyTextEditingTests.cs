@@ -327,7 +327,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(ChapterModel.ChangeHint.Line, body.DeleteCharacter().GetResult());
             Assert.Equal(ChapterModel.ChangeHint.Line, body.DeleteCharacter().GetResult());
             Assert.Equal(ChapterModel.ChangeHint.Line, body.DeleteCharacter().GetResult());
-            Assert.Equal(ChapterModel.ChangeHint.Line, body.DeleteCharacter().GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.DeleteCharacter().GetResult());
 
             Assert.Equal(ChapterModel.ChangeHint.Unknown, body.DeleteCharacter().GetResult());
         }
@@ -357,7 +357,7 @@ namespace KLineEdCmdAppTest.ModelTests
             Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 1).GetResult());
             Assert.Equal(ChapterModel.ChangeHint.Line, body.DeleteCharacter().GetResult());
             Assert.Equal(ChapterModel.ChangeHint.Cursor, body.SetCursorInChapter(0, 0).GetResult());
-            Assert.Equal(ChapterModel.ChangeHint.Line, body.DeleteCharacter().GetResult());
+            Assert.Equal(ChapterModel.ChangeHint.End, body.DeleteCharacter().GetResult());
 
             Assert.Contains("Warning: Chapter is empty", body.DeleteCharacter().GetErrorUserMsg());
 

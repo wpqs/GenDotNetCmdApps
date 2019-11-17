@@ -2,7 +2,10 @@ Functional Tests - Basic, Manual Smoke Test
 
 Prep:
 
-a. copy to KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2 
+XXX is debug or release
+
+a. delete all files in KLineEd\KLineEdCmdApp\bin\XXX\netcoreapp2.2  and rebuild
+a. copy to KLineEd\KLineEdCmdApp\bin\XXX\netcoreapp2.2 
      - KLineEd\TestFiles\mytest.ksx
 	 - KLineEd\TestFiles\NoiseComplaint.txt
 	 - KLineEdCmdApp\KLineEdCmdApp.json
@@ -20,121 +23,300 @@ a. copy to KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2
 --import from='NoiseComplaint.txt' to='NoiseComplaint.ksx'		
 
 importing NoiseComplaint.txt to NoiseComplaint.ksx...
-Succeeded: 17 lines have been imported from NoiseComplaint.txt to NoiseComplaint.ksx
+Succeeded: 13 lines have been imported from NoiseComplaint.txt to NoiseComplaint.ksx
 program ends - bye-bye :-) return code 0 - success
+
+compare NoiseComplaint.ksx with KLineEd\FunctionalTestResults\2-A\NoiseComplaintBodyKSX.jpg 
 
 --edit NoiseComplaint.ksx
 
- compare with KLineEd\FunctionalTestResults\NoiseComplaintDisplayCols65.jpg
+compare with KLineEd\FunctionalTestResults\2-A\ImportNoiseComplaintBottomTest.jpg 
+press home
+compare with KLineEd\FunctionalTestResults\2-A\ImportNoiseComplaintTopTest.jpg 
+press end
 
- quick checks:
-  delete paraBreak after 'at least.'
-
+(ins mode = off)
+move cursor to line 17, col 1
+press Del
+   compare with KLineEd\FunctionalTestResults\2-A\ImportNoiseComplaintR17C1-Del.jpg 
+   cursor line 17, col 1 (cursor on W)
+press CR
+    compare with KLineEd\FunctionalTestResults\2-A\ImportNoiseComplaintBottomTest.jpg 
+	cursor line 18 col 1 (cursor on W)
+terminate without save
 
 3.  Export
------------
+----------
 
 --export from='NoiseComplaint.ksx' to='NoiseComplaint-0.txt'
 
 exporting NoiseComplaint.ksx to NoiseComplaint-0.txt...
-Succeeded: NoiseComplaint.ksx exported 21 lines to NoiseComplaint-0.txt
+Succeeded: NoiseComplaint.ksx exported 22 lines to NoiseComplaint-0.txt
 program ends - bye-bye :-) return code 0 - success
 
- compare NoiseComplaint-0.txt with KLineEd\FunctionalTestFiles\NoiseComplaint.txt
+
+compare NoiseComplaint-0.txt with KLineEd\FunctionalTestResults\3-A\NoiseComplaint-0TXT.jpg *
+
+Check import of exported file
+.............................
+
+--import from='NoiseComplaint-0.txt' to='NoiseComplaint-0.ksx'		
+
+importing NoiseComplaint-0.txt to NoiseComplaint-0.ksx...
+Succeeded: 14 lines have been imported from NoiseComplaint-0.txt to NoiseComplaint-0.ksx
+program ends - bye-bye :-) return code 0 - success
+
+compare NoiseComplaint-0.ksx with KLineEd\FunctionalTestResults\3-A\NoiseComplaintBodyKSX-0.jpg 
+
+Check imported file is ok
+.........................
+
+--edit NoiseComplaint-0.ksx
+press Del (removes extra line added in import/export)
+check words = 115
+press home
+compare with KLineEd\FunctionalTestResults\3-A\ImportNoiseComplaintTopTest.jpg 
+press end
+compare with KLineEd\FunctionalTestResults\3-A\ImportNoiseComplaintBottomTest.jpg 
+press end
+
+(ins mode = off)
+move cursor to line 17, col 1
+press Del
+   compare with KLineEd\FunctionalTestResults\3-A\ImportNoiseComplaintR17C1-Del.jpg 
+   cursor line 17, col 1
+press CR
+    compare with KLineEd\FunctionalTestResults\3-A\ImportNoiseComplaintBottomTest.jpg *
+	cursor line 18 col 1
+
+Terminate without saving
+
 
 4. Edit
 -------
 
---edit mytest.ksx --display cols=25 
---edit mytest.ksx --display cols=35
---edit mytest.ksx --display cols=68
---edit mytest.ksx --display cols=65 
+a. Create and edit new File
+---------------------------
 
-a. Changing Display Cols
-------------------------
+--edit newtest.ksx //(default --display cols=65) file doesn't exist so create it
+compare with KLineEd\FunctionalTestResults\newtestEmptyChapterTest.jpg
 
---edit mytest.ksx --display cols=25 
-   compare with KLineEd\FunctionalTestResults\mytestDisplayCols25.jpg
-save
-   compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with mytestBodyDisplayCols25.jpg
-
---edit mytest.ksx --display cols=68
-    compare with KLineEd\FunctionalTestResults\mytestDisplayCols68.jpg
-save
-	compare KLineEd\KLineEdCmdApp\mytest.ksx with KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx - should be identical
-
---edit mytest.ksx --display cols=65
-    compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
-save
-	compare KLineEd\KLineEdCmdApp\mytest.ksx with KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx - should be identical
-
-
-b. Deleting paraBreak
----------------------
-
---edit mytest.ksx --display cols=65
-
-move cursor to line 12, col 12
-press Del
-   compare with KLineEd\FunctionalTestResults\mytestR12C12-Del.jpg
-   cursor line 12, col 12
+type hello world
 press CR
-    compare with KLineEd\FunctionalTestResults\mytestDisplayCols65.jpg
-	cursor line 13 col 1
+check Words=2, Line 2, Col 1
+compare with KLineEd\FunctionalTestResults\4-A\newtestAddTextTest.jpg
+press Del
+check line 1, col 1, Words=2
+compare with KLineEd\FunctionalTestResults\4-A\newtestDeleteEmptyLineTest.jpg
+press Del until only world remains
+check line 1, col 1, Words=1
+press Del until only d remains
+check line 1, col 1, Words=1
+press Del 
+check line 1, col 1, word count 0
+compare with KLineEd\FunctionalTestResults\4-A\newtestEmptyChapterTest.jpg
 
-c. Adding and deleting characters before end of line
-----------------------------------------------------
+Terminate without saving
+compare newtest.ksx with KLineEd\FunctionalTestResults\4-A\newtestEmptyBodyTest.jpg
 
---edit mytest.ksx --display cols=65
+b. Changing Display Cols 65 (default)
+-------------------------------------
 
-move cursor to line 11, col 12
-press INS
-type ABCDE
-   compare with KLineEd\FunctionalTestResults\mytestR11C12-ABCDE.jpg
-type F
-   compare with KLineEd\FunctionalTestResults\mytestR11C12-ABCDEF.jpg
-press BS
-   compare with KLineEd\FunctionalTestResults\mytestR11C12-ABCDE.jpg
-
-
-d. Adding and deleting characters at end of line
-------------------------------------------------
-
---edit mytest.ksx --display cols=65
-
-move cursor to line 11, col 61
-type ABCDE
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDE.jpg
-type F
-   CHECK cursor is line 12, col 16
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDEF.jpg
-press BS
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDE.jpg
-type F
-   CHECK cursor is line 12, col 16
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C61-ABCDEF.jpg
-
-move cursor to line 11, col 51
-type space followed by 123456789ABCDE
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
-type F
-   CHECK cursor is line 12, col 16
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDEF.jpg
-press BS
-   compare with KLineEd\FunctionalTestResults\mytestAddR11C51-123456789ABCDE.jpg
-   CHECK cursor is line 12, col 66
+--edit mytest.ksx 
+    compare with KLineEd\FunctionalTestResults\4-B\mytestDisplayCols65Bottom.jpg 
+home
+    compare with KLineEd\FunctionalTestResults\4-B\mytestDisplayCols65.jpg (bottom)
+save
+   compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with KLineEd\FunctionalTestResults\4-B\mytestBodyDisplayCols65.jpg
 
 
-e. Deleting characters to make a short line
--------------------------------------------
-
- --edit mytest.ksx --display cols=65
+deleting ParaBreak
+..................
 
 (ins mode = off)
+check Words=76 Line 15, Col 15
+move cursor to line 12, col 12
+press Del
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR12C12-Del.jpg 
+   cursor line 12, col 12
+press CR
+    compare with KLineEd\FunctionalTestResults\4-B\mytestDisplayCols65Bottom.jpg 
+	cursor line 13 col 1
+
+deleting characters to make a short line
+----------------------------------------
+
+(ins mode = off)
+compare with KLineEd\FunctionalTestResults\4-B\mytestDisplayCols65Bottom.jpg 
 move cursor to line 12, col 5
+check line 12, col 5 Words=76
 type space
-   compare with KLineEd\FunctionalTestResults\mytestAddR12C5-L123.jpg
+  check line 12, col 1 Words=77
+   compare with KLineEd\FunctionalTestResults\4-B\mytestSpaceR12C5-L123.jpg
+cursor left
+	check line 11, col 66 Words=77
 type 4
-   compare with KLineEd\FunctionalTestResults\mytestAddR12C5-L1234.jpg
+   check Line 12 Col 6 Words=77
+   compare with KLineEd\FunctionalTestResults\4-B\mytestFourR12C5-L1234.jpg
 type DEL
-Ctrl+Q
+   check Line 12 Col 6 Words 76
+   compare with KLineEd\FunctionalTestResults\4-B\\mytestDelR12C5-L1234.jpg 
+
+
+Adding and deleting characters before end of line
+.................................................
+
+type end
+compare with KLineEd\FunctionalTestResults\4-B\mytestDisplayCols65Bottom.jpg 
+move cursor to line 11, col 12
+press INS (insert mode on)
+type abcde
+   check Line 11, Col 17, Word=76 
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C12-ABCDE.jpg 
+type f
+   check Line 11, Col 18, Word=76 
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C12-ABCDEF.jpg 
+press BS
+   check Line 11, Col 17, Word=76 
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C12-ABCDE.jpg 
+type f
+   check Line 11, Col 18, Word=76 
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C12-ABCDEF.jpg
+type BS until line 11, col 12
+tpye end
+   compare with KLineEd\FunctionalTestResults\4-B\mytestDisplayCols65Bottom.jpg 
+
+Adding and deleting characters at end of line
+.............................................
+
+press INS (insert mode off)
+move cursor to line 11, col 61 
+type abcde
+   CHECK cursor is line 12, col 66 words=76
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C61-ABCDE.jpg 
+type f
+   CHECK cursor is line 12, col 16 words=76
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C61-ABCDEF.jpg 
+type BS 
+   CHECK cursor is line 12, col 1 words=76
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C61-BS.jpg 
+type cursor left
+   CHECK cursor is line 11, col 66 words=76
+type f
+   CHECK cursor is line 12, col 16 words=76
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C61-ABCDEF.jpg 
+
+move cursor to line 11, col 51 words=76
+type space followed by 123456789abcde
+ CHECK cursor is line 11, col 66 words=77
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C51-123456789ABCDE.jpg 
+type f
+   CHECK cursor is line 12, col 16 words=77
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C51-123456789ABCDEF.jpg 
+press BS
+   compare with KLineEd\FunctionalTestResults\4-B\mytestR11C51-BS.jpg *
+   CHECK cursor is line 12, col 1 words=77
+
+Terminate without saving
+
+c. Changing Display Cols 35
+---------------------------
+ 
+copy  KLineEd\TestFiles\mytest.ksx to KLineEd\KLineEdCmdApp\bin\XXX\netcoreapp2.2 
+
+--edit mytest.ksx --display cols=35
+   CHECK cursor is line 26, col 15 words=76
+   compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols35.jpg
+save
+   compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols35Body.jpg 
+
+move cursor to line 24, col 15
+press Del
+   compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols35R24C15-Del.jpg 
+   check cursor line 24, col 15
+press CR
+press Del
+    compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols35Bottom.jpg 
+	check cursor line 25 col 1
+
+move cursor to line 23, col 11
+press INS (insert mode on)
+type abcdefghijklmn
+   compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols25R23C11-abcdefghijklmn.jpg
+   check cursor line 23 col 25
+type F
+   compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols25R23C11-abcdefghijklmno.jpg 
+   check cursor line 24 col 16
+press BS
+   compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols25R23C11-abcdefghijklmn.jpg
+
+Terminate without saving
+
+
+d. Changing Display Cols 68
+---------------------------
+
+copy  KLineEd\TestFiles\mytest.ksx to KLineEd\KLineEdCmdApp\bin\XXX\netcoreapp2.2 
+
+--edit mytest.ksx --display cols=68
+  check cursor is line 15, col 15 Word=76
+   compare with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols68.jpg 
+save
+   compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols68Body.jpg 
+
+move cursor to line 12, col 12
+   check cursor is line 12, col 12 Word=76
+press Del
+   compare with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols68R12C12-Del.jpg *
+   check cursor is line 12, col 12 Word=76
+press CR
+    compare with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols68Bottom.jpg *
+	check cursor is line 13 col 1 Words=76
+
+move cursor to line 11, col 12
+press INS (insert mode on)
+type abcdefgh
+   compare with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols68R11C12-ABCDEFGH.jpg
+    check cursor is line 11, col 20 Word=76
+type i
+   compare with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols68R11C12-ABCDEFGHI.jpg 
+    check cursor is line 11, col 21 Word=76
+press BS
+   compare with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols68R11C12-ABCDEFGH.jpg
+   check cursor is line 11, col 20 Word=76
+ 
+
+Terminate without saving
+
+e. Changing Display Cols 25
+---------------------------
+
+copy  KLineEd\TestFiles\mytest.ksx to KLineEd\KLineEdCmdApp\bin\XXX\netcoreapp2.2 
+
+--edit mytest.ksx --display cols=25
+
+  check cursor is line 37, col 14 Word=76
+   compare with KLineEd\FunctionalTestResults\4-D\mytestDisplayCols25.jpg 
+save
+   compare KLineEd\KLineEdCmdApp\bin\Debug\netcoreapp2.2\mytest.ksx body section with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25Body.jpg 
+
+move cursor to line 34, col 11
+press Del
+   compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R34C11-Del.jpg 
+   check cursor line 34, col 11 words=76
+press CR
+    compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25Bottom.jpg 
+	cursor line 35 col 1
+
+move cursor to line 33, col 10
+press INS (insert mode on)
+type abcdef
+   compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R33C10-abcdef.jpg 
+type g
+   compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R33C10-abcdefg.jpg*
+press BS
+   compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R33C10-abcdef.jpg 
+
+Terminate without saving
+
+

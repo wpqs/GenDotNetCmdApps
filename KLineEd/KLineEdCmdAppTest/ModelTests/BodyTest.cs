@@ -306,19 +306,36 @@ namespace KLineEdCmdAppTest.ModelTests
         }
 
         [Fact]
-        public void GetCharacterCountInLineTest()
+        public void GetCharacterCountInRowTest()
         {
             var body = new MockModelBody();
             Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
             Assert.False(body.IsError());
             Assert.Equal(0, body.GetLineCount());
-            Assert.Equal(Program.PosIntegerNotSet, body.GetCharacterCountInRow(0));
+            Assert.Equal(0, body.GetCharacterCountInRow(0));
 
             var line1 = "qwerty";
             body.SetTestLine(line1);
             Assert.Equal(1, body.GetLineCount());
             Assert.Equal(line1.Length, body.GetCharacterCountInRow(0));
-            Assert.Equal(Program.PosIntegerNotSet, body.GetCharacterCountInRow(1));
+            Assert.Equal(0, body.GetCharacterCountInRow(1));
+        }
+
+
+        [Fact]
+        public void GetWordCountInRowTest()
+        {
+            var body = new MockModelBody();
+            Assert.True(body.Initialise(TestConst.TextEditorDisplayRows, TestConst.TextEditorDisplayCols).GetResult());
+            Assert.False(body.IsError());
+            Assert.Equal(0, body.GetLineCount());
+            Assert.Equal(0, body.GetWordCountInRow(0));
+
+            var line1 = "one two three";
+            body.SetTestLine(line1);
+            Assert.Equal(1, body.GetLineCount());
+            Assert.Equal(3, body.GetWordCountInRow(0));
+            Assert.Equal(0, body.GetWordCountInRow(1));
         }
     }
 }

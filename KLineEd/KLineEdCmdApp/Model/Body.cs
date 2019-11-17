@@ -679,6 +679,7 @@ namespace KLineEdCmdApp.Model
                 {
                     try
                     {
+                        var forceHintEnd = false;
                         var rowIndex = Cursor.RowIndex;
                         var colIndex = Cursor.ColIndex;
 
@@ -689,11 +690,20 @@ namespace KLineEdCmdApp.Model
                         {
                             if (GetCharacterCountInRow(rowIndex) <= 1)
                             {
-                                WordCount -= line.EndsWith(ParaBreakChar) ? line.Length - 1 : line.Length;
-                                TextLines.RemoveAt(rowIndex);
-
-                                rowIndex = ((TextLines.Count > 0) && (rowIndex == TextLines.Count)) ? rowIndex - 1 : rowIndex;
-                                colIndex = ((TextLines.Count > 0) && (rowIndex < TextLines.Count)) ? GetMaxColCursorIndexForRow(rowIndex) : 0;
+                                var delRowIndex = rowIndex;
+                                WordCount -= GetWordCountInRow(rowIndex);
+                                if (--linesCount == 0)                                              //removal of last line in chapter
+                                {
+                                    rowIndex = 0;
+                                    colIndex = 0;
+                                }
+                                else
+                                {
+                                    rowIndex = (rowIndex == linesCount) ? rowIndex - 1 : rowIndex;  //if deleting last line then move cursor up to previous line, otherwise keep at deleted line
+                                    colIndex = 0;
+                                }
+                                TextLines.RemoveAt(delRowIndex);
+                                forceHintEnd = true;    //ignore hint provided by LeftJustifyLinesInParagraph() - it must rewrite all lines to end
                             }
                             else
                             {
@@ -718,7 +728,7 @@ namespace KLineEdCmdApp.Model
                             rc += rcJustify;
                             if (rcJustify.IsSuccess(true))
                             {
-                                rc.SetResult(rcJustify.GetResult());
+                                rc.SetResult((forceHintEnd == false) ? rcJustify.GetResult() : ChapterModel.ChangeHint.End);
                             }
                         }
                     }
@@ -1378,9 +1388,25 @@ namespace KLineEdCmdApp.Model
             return rc;
         }
 
+        public int GetWordCountInRow(int rowIndex = Body.LastLine)
+        {
+            var rc = 0;
+
+            var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
+            if ((TextLines != null) && (linesCount != Program.PosIntegerNotSet))
+            {
+                rowIndex = (rowIndex == Body.LastLine) ? linesCount - 1 : rowIndex;
+                if ((rowIndex >= 0) && (rowIndex < linesCount) && (TextLines[rowIndex] != null))
+                {
+                    rc = GetWordCountInLine(TextLines[rowIndex]); 
+                }
+            }
+            return rc;
+        }
+
         public int GetCharacterCountInRow(int rowIndex = Body.LastLine) 
         {
-            var rc = Program.PosIntegerNotSet;
+            var rc = 0;
 
             var linesCount = TextLines?.Count ?? Program.PosIntegerNotSet;
             if ((TextLines != null) &&(linesCount != Program.PosIntegerNotSet))
