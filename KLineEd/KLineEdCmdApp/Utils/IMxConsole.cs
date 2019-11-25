@@ -11,6 +11,9 @@ namespace KLineEdCmdApp.Utils
         bool IsKeyAvailable();
         bool IsWindowSizeChanged(int expectedWidth, int expectedHeight);
 
+        int GetLargestWindowHeight();
+        int GetLargestWindowWidth();
+
         MxReturnCode<bool> Close();
 
         MxReturnCode<bool> Clear(bool force = false);

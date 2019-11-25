@@ -27,6 +27,10 @@ namespace KLineEdCmdAppTest.TestSupport
         public bool IsKeyAvailable() { return true; }
         public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight) { return false; }
 
+        public int GetLargestWindowHeight() { return 80; }
+
+        public int GetLargestWindowWidth() { return 240; }
+
         public MxReturnCode<bool> Close()
         {
             var rc = new MxReturnCode<bool>($"MxConsole.Close");
@@ -50,7 +54,8 @@ namespace KLineEdCmdAppTest.TestSupport
         public MxReturnCode<MxConsoleProperties> GetSettings()
         {
             var rc = new MxReturnCode<MxConsoleProperties>($"MockMxConsole.GetSettings");
-            rc.SetResult(new MxConsoleProperties());
+            var console = new MockMxConsole();
+            rc.SetResult(new MxConsoleProperties(console.GetLargestWindowHeight(), console.GetLargestWindowWidth()));
             return rc;
         }
 

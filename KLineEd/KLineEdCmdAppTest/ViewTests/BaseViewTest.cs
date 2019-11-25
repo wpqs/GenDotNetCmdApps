@@ -36,7 +36,7 @@ namespace KLineEdCmdAppTest.ViewTests
         {
             Assert.True(_fixture.View.Ready);       //Formatting of the message may differ - see BaseEditingController.ErrorProcessing()
 
-            Assert.True( _fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Info, $"{MxReturnCodeUtils.InfoMsgPrecursor}(1110201) test"));
+            Assert.True(_fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Info, $"{MxReturnCodeUtils.InfoMsgPrecursor}(1110201) test"));
             Assert.Equal("Info: (1110201) test", _fixture.View.LastConsoleOutput);
 
             Assert.True(_fixture.View.DisplayMsg(MxReturnCodeUtils.MsgClass.Warning, $"{MxReturnCodeUtils.WarningMsgPrecursor}(1110201) testx"));

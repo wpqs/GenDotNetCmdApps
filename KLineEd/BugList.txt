@@ -19,17 +19,18 @@ BugList
 			   end of LeftJustifyLinesInParagraph doesn't add the remaining oversized line as a collection of lines - i.e. TextLines[] still same size - InsertLine never called
 	11. awaiting change - Implement AppDomain.ProcessExit Event
 		- Terminate without save if already saved - Session - Duration: 00:00:00, but possibly Typing pauses: 08:24:24,101;08:26:08,67;08:27:21,72;[end]
-	12. Delete ParaBreak in col 0 - hint.line not hint.end
+	12. done - Delete ParaBreak in col 0 - hint.line not hint.end
 
 
 3. Raise bug for irregular cursor flashing, https://github.com/microsoft/terminal and stack exchange
 4. Console problems:
-	1. Always works when run in release/debug from VS2017 or VS2019, but sometimes crashes when run from Cmd Prompt in non-legacy mode, particularly if window width altered 
+	Always works when run in release/debug from VS2017 or VS2019, but sometimes crashes when run from Cmd Prompt in non-legacy mode, particularly if window width altered 
 		- something to do with Setting Console.BufferSize, Console.WindowSize, Console.WindowTop and Console.WindowLeft Cmd Prompt
 		see https://github.com/microsoft/terminal/issues/3374
-5. Unit test problem - need to run from command console or debug all tests
-     https://github.com/xunit/visualstudio.xunit/issues/178
+5. done - Unit test problem - need to run from command console or debug all tests - VS2019 Test Runner doesn't support Console properly
+	 https://github.com/xunit/visualstudio.xunit/issues/178
 	 https://developercommunity.visualstudio.com/content/problem/803059/update-to-vs2019-some-tests-now-fail-when-run-from.html
+	 https://developercommunity.visualstudio.com/content/problem/832040/unit-tests-involving-console-properties-fail-unles.html
 6. rc.SetResult() not called - generate meaningful error message - see MxReturnCode todo list
 
 

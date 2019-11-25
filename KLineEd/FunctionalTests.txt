@@ -57,8 +57,8 @@ program ends - bye-bye :-) return code 0 - success
 
 compare NoiseComplaint-0.txt with KLineEd\FunctionalTestResults\3-A\NoiseComplaint-0TXT.jpg *
 
-Check import of exported file
-.............................
+Roundtrip - Check import of exported file
+.........................................
 
 --import from='NoiseComplaint-0.txt' to='NoiseComplaint-0.ksx'		
 
@@ -176,14 +176,14 @@ type abcde
 type f
    check Line 11, Col 18, Word=76 
    compare with KLineEd\FunctionalTestResults\4-B\mytestR11C12-ABCDEF.jpg 
-press BS
+type BS
    check Line 11, Col 17, Word=76 
    compare with KLineEd\FunctionalTestResults\4-B\mytestR11C12-ABCDE.jpg 
 type f
    check Line 11, Col 18, Word=76 
    compare with KLineEd\FunctionalTestResults\4-B\mytestR11C12-ABCDEF.jpg
 type BS until line 11, col 12
-tpye end
+type end
    compare with KLineEd\FunctionalTestResults\4-B\mytestDisplayCols65Bottom.jpg 
 
 Adding and deleting characters at end of line
@@ -239,12 +239,12 @@ press Del
     compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols35Bottom.jpg 
 	check cursor line 25 col 1
 
-move cursor to line 23, col 11
+move cursor to line 23, col 1
 press INS (insert mode on)
-type abcdefghijklmn
+type 123456789 abcdefghijklmn
    compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols25R23C11-abcdefghijklmn.jpg
    check cursor line 23 col 25
-type F
+type o
    compare with KLineEd\FunctionalTestResults\4-C\mytestDisplayCols25R23C11-abcdefghijklmno.jpg 
    check cursor line 24 col 16
 press BS
@@ -313,7 +313,7 @@ press INS (insert mode on)
 type abcdef
    compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R33C10-abcdef.jpg 
 type g
-   compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R33C10-abcdefg.jpg*
+   compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R33C10-abcdefg.jpg
 press BS
    compare with KLineEd\FunctionalTestResults\4-E\mytestDisplayCols25R33C10-abcdef.jpg 
 

@@ -21,8 +21,6 @@ namespace KLineEdCmdApp
     {
         public static readonly int MaxSplitLineLength = 25000;  //500 words per page * 5 chars per word * 10 pages - see https://stackoverflow.com/questions/140468/what-is-the-maximum-possible-length-of-a-net-string
 
-        public static readonly int MaxWindowHeight = System.Console.LargestWindowHeight;  
-        public static readonly int MaxWindowWidth = System.Console.LargestWindowWidth;
         public static readonly int MinWindowHeight = 4; //ModeHelp, Msg, Text, Status
         public static readonly int MinWindowWidth = Program.ValueOverflow.Length;
 
@@ -42,7 +40,9 @@ namespace KLineEdCmdApp
         public const int EditAreaMarginBottomRowCount = 10;
         public const int StatusLineRowCount = 1;
 
-    //display horizontal layout:
+        public const int WindowFrameRows = HelpLineRowCount + EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount; 
+
+        //display horizontal layout:
         //TextEditingMode 
         public const int EditAreaMarginLeft = 15;
         //param.DisplayLineWidth
@@ -51,6 +51,9 @@ namespace KLineEdCmdApp
         public const int EditorHelpLineLeftCol = 1;   //width -= ModeHelpLineLeftCol;
         public const int MsgLineLeftCol = 3;        //width -= MsgLineLeftCol;      
         public const int StatusLineLeftCol = 1;     //width -= StatusLineLeftCol;   
+
+        public const int WindowFrameCols = EditAreaMarginLeft + EditAreaMarginRight;
+
 
         public static readonly string ReportSectionDottedLine = $"{Environment.NewLine}....................................................";
 
@@ -72,12 +75,8 @@ namespace KLineEdCmdApp
         public string SpellUrl { private set; get; }
         public bool Ready { private set; get; }
 
-   
-
         private List<BaseView> ViewList { set; get; }
 
-        public static int GetWindowFrameRows() { return HelpLineRowCount + EditAreaMarginTopRowCount + EditAreaMarginTopRuleRowCount + EditAreaMarginBottomRuleRowCount + EditAreaMarginBottomRowCount + StatusLineRowCount;}
-        public static int GetWindowFrameCols() { return EditAreaMarginLeft + EditAreaMarginRight;}
 
         public KLineEditor()
         {
@@ -200,8 +199,8 @@ namespace KLineEdCmdApp
         {
             var rc = new MxReturnCode<bool>("KLineEditor. Initialise");
 
-            if ((param == null) || ((model?.Ready ?? false ) == false)) 
-                rc.SetError(1030201, MxError.Source.Param, $"param is null or model null, not ready", MxMsgs.MxErrBadMethodParam);
+            if ((param == null) || ((model?.Ready ?? false ) == false) || (console == null)) 
+                rc.SetError(1030201, MxError.Source.Param, $"param is null or model null, not ready, console is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 try
@@ -215,12 +214,14 @@ namespace KLineEdCmdApp
                     EditAreaLineWidth = param.TextEditorDisplayCols; //there is actually an additional column used by cursor when at end of line
                     StatusUpdatePeriod = param.StatusUpdatePeriod;
                     AutoSavePeriod = param.TextEditorAutoSavePeriod;
-                    Width = GetWindowFrameCols() + param.TextEditorDisplayCols;  
-                    Height = GetWindowFrameRows() + param.TextEditorDisplayRows;
+                    Width = WindowFrameCols + param.TextEditorDisplayCols;  
+                    Height = WindowFrameRows + param.TextEditorDisplayRows;
 
                     var settings = new MxConsoleProperties
                     {
                         Title = $"{Program.CmdAppName} v{Program.CmdAppVersion} - {param.EditFile ?? "[null]"}: Chapter {model.ChapterHeader?.Properties?.Title ?? Program.ValueNotSet}",
+                        LargestWindowHeight = console.GetLargestWindowHeight(),
+                        LargestWindowWidth = console.GetLargestWindowWidth(),
                         BufferHeight = Height,
                         BufferWidth = Width,
                         WindowHeight = Height,

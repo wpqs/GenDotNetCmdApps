@@ -13,18 +13,18 @@ namespace KLineEdCmdAppTest
             _fixture = fixture;
         }
 
-        [Fact]
-        public void StartTest()
-        {
-            //Assert.True(_fixture?.Model?.Ready ?? false);
-            //Assert.Equal(0, _fixture.Model.GetTextLineCount());
+        //[Fact]
+        //public void StartTest()
+        //{
+        //    //Assert.True(_fixture?.Model?.Ready ?? false);
+        //    //Assert.Equal(0, _fixture.Model.GetTextLineCount());
 
-            //var editor = new KLineEditor();
+        //    //var editor = new KLineEditor();
 
-            //var rcEdit = editor.Start(_fixture.Model);
-            //Assert.True(rcEdit.GetResult());
-            //Assert.True(editor.Ready);
-        }
+        //    //var rcEdit = editor.Start(_fixture.Model);
+        //    //Assert.True(rcEdit.GetResult());
+        //    //Assert.True(editor.Ready);
+        //}
 
         //[Fact]
         //public void StartNullParamOneTest()

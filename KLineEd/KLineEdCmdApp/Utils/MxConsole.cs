@@ -71,6 +71,10 @@ namespace KLineEdCmdApp.Utils
         public bool IsKeyAvailable() { return Console.KeyAvailable; }
         public bool IsWindowSizeChanged(int expectedWidth, int expectedHeight) { return ((Console.WindowWidth != expectedWidth) || (Console.WindowHeight != expectedHeight)) ? true : false; }
 
+        public int GetLargestWindowHeight() { return Console.LargestWindowHeight;}
+
+        public int GetLargestWindowWidth() { return Console.LargestWindowWidth; }
+
         public MxReturnCode<bool> Close()
         {
             var rc = new MxReturnCode<bool>($"MxConsole.Close");
@@ -176,11 +180,13 @@ namespace KLineEdCmdApp.Utils
             var props = new MxConsoleProperties
             {
                 Title = Console.Title,
+                LargestWindowHeight = Console.LargestWindowHeight,
+                LargestWindowWidth = Console.LargestWindowWidth,
                 BufferWidth = Console.BufferWidth,
                 BufferHeight = Console.BufferHeight,
                 WindowWidth = Console.WindowWidth,
                 WindowHeight = Console.WindowHeight,
-                CursorSize = CursorSize,
+                CursorSize = Console.CursorSize,
                 WindowTop = Console.WindowTop,
                 WindowLeft = Console.WindowLeft,
                 CursorTop = Console.CursorTop,

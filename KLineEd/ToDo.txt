@@ -27,8 +27,8 @@ Development work v1.1.30.0
 --------------------------
 
 1. Refactor Application structure
-     - resolve const / readonly issue
-	- create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
+    - done - resolve const / readonly issue
+	- done - create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
 	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
 	- Rename KLineEdCmdApp Project, KLineEditor.cs and KLineEdCmdApp.json to KScribeCmdApp, KScribeEditor.cs, KScribe.json
 	- Rename KLineEdCmdAppTest to KScribeCmdAppTest (KLineEditorTests) 
@@ -36,6 +36,7 @@ Development work v1.1.30.0
 		- Move Controller, Model, Utils, View from KScribeCmdApp (not Terminal.cs)
 		- Integrate KScribeLib Class Library with KScribeCmdApp - Program.cs, KScribeEditor, Terminal.cs.
 	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
+	- Implement System.Text.Json
 
 2. Create new GitHub private project in imageqc - KScribe and clone to local C:\Users\wills\source\repos\ImageQC\KScribe
 3. Import code from C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd

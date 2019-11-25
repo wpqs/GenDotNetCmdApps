@@ -18,6 +18,7 @@ namespace KLineEdCmdApp.View.Base
         [SuppressMessage("ReSharper", "InconsistentNaming")]
 
         protected IMxConsole Console { get; }
+
         public int WindowHeight { private set; get; }
         public int WindowWidth { private set; get; }
         protected int EditAreaWidth { private set; get; }
@@ -104,8 +105,8 @@ namespace KLineEdCmdApp.View.Base
         {
             var rc = new MxReturnCode<bool>("BaseView.ApplySettings");
 
-            if (param == null)
-                rc.SetError(1110101, MxError.Source.Param, $"param is null", MxMsgs.MxErrBadMethodParam);
+            if ((param == null) || (Console == null))
+                rc.SetError(1110101, MxError.Source.Param, $"param or Console is null", MxMsgs.MxErrBadMethodParam);
             else
             {
                 EditAreaWidth = param.TextEditorDisplayCols;                    //todo rename param.DisplayLineWidth 
@@ -121,8 +122,8 @@ namespace KLineEdCmdApp.View.Base
                 WindowHeight = KLineEditor.HelpLineRowCount + KLineEditor.MsgLineRowCount + KLineEditor.EditAreaMarginTopRowCount + KLineEditor.EditAreaMarginTopRuleRowCount + EditAreaHeight + KLineEditor.EditAreaMarginBottomRowCount + KLineEditor.EditAreaMarginTopRuleRowCount + KLineEditor.StatusLineRowCount;
                 WindowWidth = KLineEditor.EditAreaMarginLeft + EditAreaWidth + KLineEditor.EditAreaMarginRight;
 
-                if ((WindowWidth < KLineEditor.MinWindowWidth) || (WindowWidth > KLineEditor.MaxWindowWidth) || (WindowHeight > KLineEditor.MaxWindowHeight) || (WindowHeight < KLineEditor.MinWindowHeight))
-                    rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.TextEditorDisplayCols} (min={KLineEditor.MinWindowWidth}, max={KLineEditor.MaxWindowWidth}), param.DisplayLastLinesCnt{param.TextEditorDisplayRows} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", MxMsgs.MxErrInvalidSettingsFile);
+                if ((WindowWidth < KLineEditor.MinWindowWidth) || (WindowWidth > Console.GetLargestWindowWidth()) || (WindowHeight > Console.GetLargestWindowHeight()) || (WindowHeight < KLineEditor.MinWindowHeight))
+                    rc.SetError(1110102, MxError.Source.User, $"param.DisplayLineWidth={param.TextEditorDisplayCols} (min={KLineEditor.MinWindowWidth}, max={Console.GetLargestWindowHeight()}), param.DisplayLastLinesCnt{param.TextEditorDisplayRows} (min={KLineEditor.MinWindowHeight}, max={KLineEditor.MinWindowHeight}", MxMsgs.MxErrInvalidSettingsFile);
                 else
                 {
                     //BlankLine = "0";  //see also EditAreaView.ClearEditAreaText()
@@ -262,7 +263,7 @@ namespace KLineEdCmdApp.View.Base
         public static string TruncateTextForLine(string text, int maxLength)
         {
             var rc = Program.ValueOverflow;
-            if ((text != null) && (maxLength > 0) && (maxLength <= KLineEditor.MaxWindowWidth) && (maxLength >= Program.ValueOverflow.Length))
+            if ((text != null) && (maxLength > 0) && (maxLength >= Program.ValueOverflow.Length))
             {
                 if (text.Length <= maxLength)
                     rc = text;

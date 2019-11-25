@@ -45,7 +45,7 @@ namespace KLineEdCmdApp
 
             AppDomain.CurrentDomain.UnhandledException += Program_UnhandledException;
             var console = new MxConsole();
-            var cmdLineParams = new CmdLineParamsApp();
+            var cmdLineParams = new CmdLineParamsApp(console);
 
             try
             {

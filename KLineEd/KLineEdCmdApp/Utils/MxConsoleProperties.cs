@@ -23,6 +23,8 @@ namespace KLineEdCmdApp.Utils
         public const MxConsole.Color DefaultBackgroundColor = MxConsole.Color.Black;
 
         public string Title { set; get; }
+        public int LargestWindowHeight { set; get; }
+        public int LargestWindowWidth { set; get; }
         public int BufferHeight {set; get; }
         public int BufferWidth  { set; get; }
         public int WindowHeight  {set; get; }
@@ -43,6 +45,13 @@ namespace KLineEdCmdApp.Utils
 
         public MxConsoleProperties()
         {
+            Error = SetDefaults() ? false : true;
+        }
+
+        public MxConsoleProperties(int largestWindowHeight, int largestWindowWidth)
+        {
+            LargestWindowHeight = largestWindowHeight;
+            LargestWindowWidth = largestWindowWidth;
             Error = SetDefaults() ? false : true;
         }
 
@@ -76,20 +85,6 @@ namespace KLineEdCmdApp.Utils
             return (Error) ? false : true;
         }
 
-        public static string GetSettingsError(string argRowsName, int argRowsValue, int windowSpacingHeight, string argColsName, int argColsValue, int windowSpacingWidth)
-        {
-            string rc = null;
-
-            if ((windowSpacingHeight+argRowsValue+1) > Console.LargestWindowHeight)
-                rc = $"'{argRowsName}={argRowsValue}' is invalid on this machine; max value is {Console.LargestWindowHeight-windowSpacingHeight-1}";
-            else if ((windowSpacingWidth+argColsValue+1) > Console.LargestWindowWidth)
-                rc = $"'{argColsName}={argColsValue}' is invalid on this machine; max value is { Console.LargestWindowWidth-windowSpacingWidth-1}";
-            else
-                rc = null;
-
-            return rc;
-        }
-
         public string GetValidationError()
         {
             // ReSharper disable once RedundantAssignment
@@ -99,43 +94,48 @@ namespace KLineEdCmdApp.Utils
                 rc = $"Title is null";
             else
             {
-                if ((BufferHeight < 0) || (BufferHeight >= Int16.MaxValue) || (BufferHeight < (WindowTop + WindowHeight)))
-                    rc = $"BufferHeight={BufferHeight} is out of range (WindowTop={WindowTop}, WindowHeight={WindowHeight})";
+                if ((LargestWindowHeight <= 0) || (LargestWindowWidth <= 0))
+                    rc = $"LargestWindowHeight={LargestWindowHeight} or LargestWindowWidth={LargestWindowWidth} not set";
                 else
                 {
-                    if ((BufferWidth < 0) || (BufferWidth >= Int16.MaxValue) || (BufferWidth < (WindowLeft + WindowWidth)))
-                        rc = $"BufferWidth={BufferWidth} is out of range (WindowLeft={WindowLeft}, WindowWidth={WindowWidth})";
+                    if ((BufferHeight < 0) || (BufferHeight >= Int16.MaxValue) || (BufferHeight < (WindowTop + WindowHeight)))
+                        rc = $"BufferHeight={BufferHeight} is out of range (WindowTop={WindowTop}, WindowHeight={WindowHeight})";
                     else
                     {
-                        if ((WindowHeight < 0) || ((WindowHeight + WindowTop) >= Int16.MaxValue) || (WindowHeight > Console.LargestWindowHeight))
-                            rc = $"WindowHeight={WindowHeight} is out of range (WindowTop={WindowTop})";
+                        if ((BufferWidth < 0) || (BufferWidth >= Int16.MaxValue) || (BufferWidth < (WindowLeft + WindowWidth)))
+                            rc = $"BufferWidth={BufferWidth} is out of range (WindowLeft={WindowLeft}, WindowWidth={WindowWidth})";
                         else
                         {
-                            if ((WindowWidth < 0) || ((WindowWidth + WindowLeft) >= Int16.MaxValue) || (WindowWidth > Console.LargestWindowWidth))
-                                rc = $"WindowWidth={WindowWidth} is out of range (WindowLeft={WindowLeft})";
+                            if ((WindowHeight < 0) || ((WindowHeight + WindowTop) >= Int16.MaxValue) || (WindowHeight > LargestWindowHeight))
+                                rc = $"WindowHeight={WindowHeight} is out of range (WindowTop={WindowTop})";
                             else
                             {
-                                if (WindowTop < 0) // || ((WindowTop + WindowHeight) > BufferHeight)) - checked by prior BufferHeight test
-                                    rc = $"WindowTop={WindowTop} is less than zero";
+                                if ((WindowWidth < 0) || ((WindowWidth + WindowLeft) >= Int16.MaxValue) || (WindowWidth > LargestWindowWidth))
+                                    rc = $"WindowWidth={WindowWidth} is out of range (WindowLeft={WindowLeft})";
                                 else
                                 {
-                                    if (WindowLeft < 0) // || ((WindowLeft + WindowWidth) > BufferWidth)) - checked by prior BufferWidth test
-                                        rc = $"WindowLeft={WindowLeft} is less than zero";
+                                    if (WindowTop < 0) // || ((WindowTop + WindowHeight) > BufferHeight)) - checked by prior BufferHeight test
+                                        rc = $"WindowTop={WindowTop} is less than zero";
                                     else
                                     {
-                                        if ((CursorSize <= 0) || (CursorSize > 100))
-                                            rc = $"CursorSize={CursorSize} is out of range 1-100";
+                                        if (WindowLeft < 0) // || ((WindowLeft + WindowWidth) > BufferWidth)) - checked by prior BufferWidth test
+                                            rc = $"WindowLeft={WindowLeft} is less than zero";
                                         else
                                         {
-                                            if ((CursorTop < 0) || (CursorTop >= BufferHeight))
-                                                rc = $"CursorTop={CursorTop} is out of range (BufferHeight={BufferHeight})";
+                                            if ((CursorSize <= 0) || (CursorSize > 100))
+                                                rc = $"CursorSize={CursorSize} is out of range 1-100";
                                             else
                                             {
-                                                if ((CursorLeft < 0) || (CursorLeft >= BufferWidth))
-                                                    rc = $"CursorLeft={CursorLeft} is out of range (BufferWidth={BufferWidth})";
+                                                if ((CursorTop < 0) || (CursorTop >= BufferHeight))
+                                                    rc = $"CursorTop={CursorTop} is out of range (BufferHeight={BufferHeight})";
                                                 else
                                                 {
-                                                    rc = null;
+                                                    if ((CursorLeft < 0) || (CursorLeft >= BufferWidth))
+                                                        rc = $"CursorLeft={CursorLeft} is out of range (BufferWidth={BufferWidth})";
+                                                    else
+                                                    {
+                                                        rc = null;
+                                                    }
                                                 }
                                             }
                                         }

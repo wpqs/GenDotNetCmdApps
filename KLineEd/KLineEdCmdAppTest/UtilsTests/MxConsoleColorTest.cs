@@ -5,36 +5,8 @@ using KLineEdCmdApp;
 
 namespace KLineEdCmdAppTest.UtilsTests
 {
-    public class MxConsoleTest
+    public class MxConsoleColorTest
     {
-
-        [Fact]
-        public void SetupTest()
-        {
-            var console = new MxConsole();
-
-            var props = new MxConsoleProperties();
-            Assert.True(console.ApplySettings(props).GetResult());
-        }
-
-        [Fact]
-        public void GetSettingsTest()
-        {
-            var console = new MxConsole();
-
-            var props = console.GetSettings().GetResult();
-            Assert.True(props.IsError() == false);
-
-            Assert.True(console.ApplySettings(props).GetResult());
-        }
-
-        //[Fact]
-        //public void WriteCharactersTest()
-        //{
-        //    var console = new MxConsole();
-
-        //    Assert.Equal("{", console.WriteString("{"));
-        //}
 
         [Fact]
         public void GetConsoleColorTest()

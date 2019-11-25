@@ -262,13 +262,15 @@ namespace KLineEdCmdApp.Utils
 
             public static readonly bool ArgTextEditorAutoCorrectDefault = false;
 
-        public const string ParamTextEditorLinesPerPage = "--linesperpage";
+            public const string ParamTextEditorLinesPerPage = "--linesperpage";
 
             public const int ArgTextEditorLinesPerPageMin = 1;           
             public const int ArgTextEditorLinesPerPageMax = 10000;           
             public const int ArgTextEditorLinesPerPageDefault = 36;     //Counted from Jack Kerouac's book 'On the Road'
 
         //properties that are not set from command line
+        [JsonIgnore]
+        public IMxConsole Console { private set; get; }
         [JsonIgnore]
         public OpMode Op { set; get; }
         [JsonIgnore]
@@ -350,7 +352,6 @@ namespace KLineEdCmdApp.Utils
         public int TextEditorAutoSavePeriod { set; get; }
         public BoolValue TextEditorAutoCorrect { set; get; }
         public int TextEditorLinesPerPage { set; get; }
-
         public bool IsValidForSettingBoolValue(string val){ return ((val == ArgNo) || (val == ArgYes)) ? true : false;  }
 
         public enum BoolValue
@@ -399,6 +400,11 @@ namespace KLineEdCmdApp.Utils
             [EnumMember(Value = ParamTextEditorAutoCorrect)] AutoCorrect,
             [EnumMember(Value = ParamTextEditorLinesPerPage)] LinesPerPage,
             [EnumMember(Value = Program.ValueUnknown)] Unknown
+        }
+
+        public CmdLineParamsApp(IMxConsole console)
+        {
+            Console = console;
         }
 
         public override string ToString()
@@ -973,10 +979,10 @@ namespace KLineEdCmdApp.Utils
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
                     rc.SetError(1020314, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; value '{TextEditorDisplayCols}' is invalid for '{ArgTextEditorDisplayCols}'");
                 }
-                if (MxConsoleProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols()) != null)
+                if (GetConsoleSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, ArgTextEditorDisplayCols, TextEditorDisplayCols) != null)
                 {
                     HelpHint = $"{GetParamHelp((int)Param.Display)}";
-                    rc.SetError(1020315, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; {MxConsoleProperties.GetSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, KLineEditor.GetWindowFrameRows(), ArgTextEditorDisplayCols, TextEditorDisplayCols, KLineEditor.GetWindowFrameCols())}");
+                    rc.SetError(1020315, MxError.Source.User, $"parameter '{ParamTextEditorDisplay}' has a bad argument; {GetConsoleSettingsError(ArgTextEditorDisplayRows, TextEditorDisplayRows, ArgTextEditorDisplayCols, TextEditorDisplayCols)}");
                 }
                 if (TextEditorParaBreakDisplayChar == Program.NullChar)
                 {
@@ -1123,6 +1129,22 @@ namespace KLineEdCmdApp.Utils
             return rc;
         }
 
+        private string GetConsoleSettingsError(string argRowsName, int argRowsValue, string argColsName, int argColsValue)
+        {
+            string rc = null;
+
+            var largestHt = Console?.GetLargestWindowHeight() ?? 0;
+            var largestWd = Console?.GetLargestWindowWidth() ?? 0;
+
+            if ((KLineEditor.WindowFrameRows + argRowsValue + 1) > largestHt)
+                rc = $"'{argRowsName}={argRowsValue}' is invalid on this machine; max value is {largestHt - KLineEditor.WindowFrameRows - 1}";
+            else if ((KLineEditor.WindowFrameCols + argColsValue + 1) > largestWd)
+                rc = $"'{argColsName}={argColsValue}' is invalid on this machine; max value is { largestWd - KLineEditor.WindowFrameCols - 1}";
+            else
+                rc = null;
+            return rc;
+        }
+
         private MxReturnCode<bool> CreateSettingsFile(string settingsPathFileName)
         {
             var rc = new MxReturnCode<bool>("CmdLineParamsApp.CreateSettingsFile");
@@ -1146,7 +1168,7 @@ namespace KLineEdCmdApp.Utils
                         MissingMemberHandling = MissingMemberHandling.Error,
                     };
 
-                    var factoryDefaults = new CmdLineParamsApp();
+                    var factoryDefaults = new CmdLineParamsApp(Console);
                     factoryDefaults.SetFactoryDefaults();
                     var newValues = JsonConvert.SerializeObject(factoryDefaults, jSettings);
                     if (errors.Count > 0)
