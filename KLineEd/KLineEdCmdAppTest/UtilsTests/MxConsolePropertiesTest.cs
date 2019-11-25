@@ -1,8 +1,4 @@
-﻿using System;
-using KLineEdCmdApp.Utils;
-using Xunit;
-
-namespace KLineEdCmdAppTest.UtilsTests
+﻿namespace KLineEdCmdAppTest.UtilsTests
 {
     public class MxConsolePropertiesTest
     {
