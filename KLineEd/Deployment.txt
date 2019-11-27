@@ -1,27 +1,54 @@
 KLineEd Deployment Information
 ==============================
 
-Values in Vault Notes, Azure MxReturnCode Keys
+a. copy to KScribe\KScribeCmdApp\bin\XXX\netcoreapp3.0 
+     - KScribe\TestFiles\mytest.ksx
+	 - KScribe\TestFiles\NoiseComplaint.txt
+	 - KScribeCmdApp\KScribeCmdApp.json
 
-MMM - ConnectionStrings:AzureWebJobsServiceBus
 
-Support for MxDotNetUtils
--------------------------
+NuGet Packages
+--------------
 
-Add package wpqs.MxDotNetUtils
+All Production Projects
+.......................
+
+wpqs.MxReturnCode v1.6.30
+
+Additional for KScribeCmdApp
+............................
+
+Microsoft.Extensions.Configuration v3.0.1
+Microsoft.Extensions.Configuration.Json 
+Microsoft.Extensions.Configuration.UserSecrets
+
+
+All Test Projects
+.................
+
+coverlet.collector v1.0.1
+Microsoft.NET.Test.Sdk v16.2.0
+xunit v2.4.0
+xunit.runner.visualstudio
+
 
 Support for MxReturnCode 
 ------------------------
 
-1.	KLineEdCmdApp - properties - package
+Values in Vault Notes, Azure MxReturnCode Keys
+
+MMM - ConnectionStrings:AzureWebJobsServiceBus
+
+
+1.	KScribeCmdApp - properties - package
 
    Set Assembly Neutral Language = English
-   Product KLineEdCmdApp
+   Product KScribeCmdApp
    Package Version 1.0.0
    Assembly Version 1.0.0.0
    File Version 1.0.0.0
 
-2. Add Packages to KLineEdCmdApp:
+2. Add Packages to KScribeCmdApp:
 
 Microsoft.Extensions.Configuration v2.2.0
 Microsoft.Extensions.Configuration.Json v2.2.
@@ -38,26 +65,26 @@ Microsoft.Extensions.Configuration.UserSecrets v2.2.
   }
 }
 
-4. Set ConnectionStrings.AzureWebJobsServiceBus in Secret Manager (check KLineEdCmdApp.csproj contains <UserSecretsId>)
+4. Set ConnectionStrings.AzureWebJobsServiceBus in Secret Manager (check KScribeCmdApp.csproj contains <UserSecretsId>)
 
-	• Dotnet user-secrets list --project KLineEdCmdApp
-	• Dotnet user-secrets set ConnectionStrings:AzureWebJobsServiceBus "MMM" --project KLineEdCmdApp
-	• Dotnet user-secrets remove <key> --project KLineEdCmdApp
+	• Dotnet user-secrets list --project KScribeCmdApp
+	• Dotnet user-secrets set ConnectionStrings:AzureWebJobsServiceBus "MMM" --project KScribeCmdApp
+	• Dotnet user-secrets remove <key> --project KScribeCmdApp
 
 5. Azure Portal - update configuration of MxReturnCodeFnApp to ensure logs are deleted after expiry date
-
+URL - portal.azure.com
 Login: will.chamby1832@hotmail.com
 Subscription: MxPackage
 Resource Group: resMxReturnCode
 Resource: MxReturnCodeFnApp
    Configuration
-		LogDirectories append ";KLineEdCmdApp" 
+		LogDirectories append ";KScribeCmdApp" 
 
 6. Update Program.cs
 
        static int Main(string[] args)
        {
-            var rc = new MxReturnCode<int>(invokeDetails: $"{Program.CmdAppName} v{Program.CmdAppVersion}", defaultResult: -1);
+            var rc = new MxReturnCode<int>($"{Program.CmdAppName} v{Program.CmdAppVersion}", defaultResult: -1);
 
             var tim = DateTime.UtcNow;
             var cmdLineParams = new CmdLineParamsApp();

@@ -1,42 +1,19 @@
 Todo: KLineEd
 =============
 
-
-Development work v1.0.44.0
---------------------------
-
-1. done - Build and test with VS2019
-
-2. done Add Param --statusupdate 0 is no status line update
-
-3. Prepare for alpha release
-    - done Error handling refactor
-	- done Convert MxConsole to MxReturnCode
-	- done BugFixes 
-	- done Functional Tests
-	- done Create Release build
-	- done Publish Win-x64
-    - done copy to KLineEd\KLineEdCmdApp\bin\ReleaseX\netcoreapp2.2 \win-x64
-        - KLineEd\TestFiles\mytest.ksx
-	    - KLineEd\TestFiles\NoiseComplaint.txt
-	- done Create ZIP to Release build
-	- done Install on NAS-0 and functional test
-
-
 Development work v1.1.30.0
 --------------------------
 
 1. Refactor Application structure
     - done - resolve const / readonly issue
 	- done - create enum for MxColour - allow colour names rather than integer values in KLineEdCmdApp.json.
-	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
 	- Rename KLineEdCmdApp Project, KLineEditor.cs and KLineEdCmdApp.json to KScribeCmdApp, KScribeEditor.cs, KScribe.json
 	- Rename KLineEdCmdAppTest to KScribeCmdAppTest (KLineEditorTests) 
 	- Create KScribeLib Class Library 
 		- Move Controller, Model, Utils, View from KScribeCmdApp (not Terminal.cs)
-		- Integrate KScribeLib Class Library with KScribeCmdApp - Program.cs, KScribeEditor, Terminal.cs.
+		- Integrate KScribeLib Class Library with KScribeCmdApp - MxStdUtils.cs, KScribeEditor, Terminal.cs.
 	- Create KScribeLibTest and move all existing tests except those relating to Program, KScribeEditor
-	- Implement System.Text.Json
+	- Move to MxStdUtilsLib KLineEditor.StartBrowser,  KLineEditor.StartBrowser, KLineEditor.IsValidUri, and KLineEditor.GetXlatUrl + tests
 
 2. Create new GitHub private project in imageqc - KScribe and clone to local C:\Users\wills\source\repos\ImageQC\KScribe
 3. Import code from C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd
@@ -46,19 +23,57 @@ Development work v1.1.30.0
 5. Delete C:\Users\wills\source\repos\wpqs\GenDotNetCmdApps\KLineEd and clone from v1.0.44.0
     - test
 
-
 Development work v1.1.31.0
 --------------------------
 
-1. Implement --fix
-	delete all <session> with Duration: 00:00:00 and renumber any following ones
+1. Update Packages
+
+2. Implement
+	- Refactor CmdLineParamsApp to allow subclass for each parameter - ProcessParam, ValidateParam, HelpForParam
+    - Implement System.Text.Json
+    --fix //delete all <session> with Duration: 00:00:00 and renumber any following ones
+	--export stats //export session data as CSV file
+	
 	Cursor move - Ctrl+Home = top of chapter, Ctrl+End bottom of chapter, Home = start of line, End = end of line, Ctrl+Left = one word left, Ctrl+Right = one word right,
 	SaveAs - switch to PropsView and enable changing of filename / no filename is abort without saving (update FunctionalTests.txt to save to tmp file before starting tests)
 	AppDomain.ProcessExit Event or AppDomain.CurrentDomain.ProcessExit to save file - see https://github.com/dotnet/corefx/issues/10012
 
-2. Implement ModalDlgView - a modal dialog box
+3.	Improve Unit Tests
+		MxBrowserTests
+		CursorPositionTests
+		SizeTests
+		ImportProcTests
+		ExportProcTests
+		ControllerTests
 
-3. Add to KScribeCmdApp UIElements.cs
+4.  Measure test coverage
+
+5.  Renumber ErrorCodes
+
+5.	Check Chapter/Session stats are correct
+
+6.  Publish and release
+	
+Development work v1.1.32.0
+--------------------------
+
+1. Refactor
+    - Copy MxStdUtilsLib.MxReturnCodeUtils and MxStdUtilsLib.IErrorState to MxReturnCode
+    - Update KScribe for new version of MxReturnCode (C++ interop)
+	- Replace string literals with resource strings - support for foreign languages
+	- Improve Unit Testing
+		- Coverage
+		- Mock files so [assembly: Xunit.CollectionBehavior(DisableTestParallelization = true)] can be removed from KScribeLibTest
+
+2. Implement Secret Manager lookup for json settings (SVN)
+
+
+Development work v1.1.33.0
+--------------------------
+
+1. Implement ModalDlgView - a modal dialog box
+
+2. Add to MxStdUtilsLib UIElements.cs
 	- text box
     - button 
 	- radio button selection
@@ -66,40 +81,26 @@ Development work v1.1.31.0
 	- drop down list selection
 	- tab, arrow moves focus (enter acts)
 
-4. Test UIElements.cs
+3. Test UIElements.cs
     - Unit test
 	- Modal Dialog box
 
-5. Refactor
-    - Move to MxDotNetUtils KLineEditor.StartBrowser,  KLineEditor.StartBrowser, KLineEditor.IsValidUri, and KLineEditor.GetXlatUrl + tests
-	- Move to MxDotNetUtils CmdLineParamApp parameter base class, MxConsole, general MVC and factory stuff as well as UIElements.cs 
-    - Update KScribe for new version of MxDotNetUtils
+4. Refactor
+	- Move MxStdUtilsLib and MxConsoleLib to their own packages
+    - Update KScribe to use MxStdUtilsLib and MxConsoleLib packages
 
-6. Implement 
+5. Implement 
     --settings and use any settings found in the specified file to override those given in the default (global) .json
 		- add username / email / password - use for Azure Logging
 		- add last file.ksx
 	- use updated MxDotNetUtils to call SettingsFileProc() appropriately
 
-7. Test
+6. Test
 	- iOS
 	- Check Chapter/Session stats are correct
 
 
-Development work v1.1.32.0
---------------------------
-
-1. Implement Secret Manager lookup for json settings (SVN)
-
-2. Implement encryption --edit 'drive:path\*.ksx' ([clearkey='xxx' | hiddenkey='yyyy'])
-
-3. Implement Steganography --export ... (steganimg='drive:path\*.mp4') --import ... (steganimg='drive:path\*.mp4') 
-  https://www.loginworks.com/blogs/use-steganography-c/
-
-3. Refactor
-    - Update KScribe for new version of MxReturnCode (C++ interop)
-
-Development work v1.1.33.0
+Development work v1.1.34.0
 --------------------------
 
 1. Implement SettingsView - allow command line parameters to be changed from within the Editor
@@ -123,7 +124,7 @@ Development work v1.1.33.0
 8. Improve unit testing and full test
 
 
-Release work v1.1.34 (first beta release)
+Release work v1.2.30 (first beta release)
 -----------------------------------------
 
 1.  Create Logo
@@ -163,6 +164,11 @@ WARNING: changes may break iOS version
 	- Ctrl+V
 	- Ctrl+C
 	- Ctrl+X
+
+4. Implement encryption --edit 'drive:path\*.ksx' ([clearkey='xxx' | hiddenkey='yyyy'])
+
+5. Implement Steganography --export ... (image='drive:path\*.mp4') --import ... (image='drive:path\*.mp4') 
+  https://www.loginworks.com/blogs/use-steganography-c/
 
 
 Release work v1.3

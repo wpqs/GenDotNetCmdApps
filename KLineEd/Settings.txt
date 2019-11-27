@@ -1,19 +1,19 @@
 Settings.txt
 ============
 
-Path=C:\Program Files\Maximodex\KLineEdCmdApp
+Path=C:\Program Files\Maximodex\KScribe
 Command Prompt - Properties - Use Legacy console (Microsoft Windows [Version 10.0.18362.418])
 
 The priorty of settings is:
 
-	1) those found in KLineEdCmdApp.json located in working directory. This is the global settings file and is created if not found 
-	2) implemented in v1.0.46.0: those found in the file specificed by --settings. It is a subset of KLineEdCmdApp.json and created if not found and initialised by settings given in the command line 
+	1) those found in KScriptCmdApp.json located in working directory. This is the global settings file and is created if not found 
+	2) implemented in v1.0.46.0: those found in the file specificed by --settings. It is a subset of KScriptCmdApp.json and created if not found and initialised by settings given in the command line 
 	3) any given on the command line override those in settings files
 
 Command Line Examples
 ---------------------
 
---edit mytest.ksx --displaycols 80 --settings KLineEdCmdApp.json update  //edit mytest.ksx and update displaycols setting in  KLineEdCmdApp.json 
+--edit mytest.ksx --displaycols 80 --settings KScriptCmdApp.json update  //edit mytest.ksx and update displaycols setting in  KScript.json 
 
 
 Settings File
@@ -21,17 +21,17 @@ Settings File
  
 Implemented v1.0.43.0
 
-1. the default (global) settings file is KLineEdCmdApp.json as found in the working directory. It contains all the 
+1. the default (global) settings file is KScribeCmdApp.json as found in the working directory. It contains all the 
    application settings - i.e. properties in Utils\CmdLineParamsApp.cs 
-2. running the app when KLineEdCmdApp.json is not found results in a new file being created using factory defaults
-3. The parameter '--settings KLineEdCmdApp.json update' causes the default settings file to be updated with the given 
+2. running the app when KScribeCmdApp.json is not found results in a new file being created using factory defaults
+3. The parameter '--settings KScribeCmdApp.json update' causes the default settings file to be updated with the given 
    command line params and args	
 
 Implemented v1.0.46.0
 
 4. the settings in the file specified by the --settings parameter (without update) override those found in the default 
    settings file. If not found a new file is created and initialised from parameters and args given in the command line. 
-   The settings in this file can be a subset of those in the default (global) file KLineEdCmdApp.json
+   The settings in this file can be a subset of those in the default (global) file KScribeCmdApp.json
 
 5. the 'update' argument for the --settings parameter causes the settings file to be updated using the parameters and args found
      in the given command line. This updated settings file then defines the settings for the editing session (or other future sessions
@@ -72,7 +72,7 @@ Main operations
 
 not yet implelented
 --fix 'drive:path\*.ksx' (session=duration0)
---export from='drive:path\*.ksx' to='drive:path\*.txt' ([clearkey='xxx' | hiddenkey='yyyy']) (steganimg='drive:path\*.mp4') 	    //export edit.ksx to export.txt 
+--export from='drive:path\*.ksx' to='drive:path\*.txt' (stats) ([clearkey='xxx' | hiddenkey='yyyy']) (steganimg='drive:path\*.mp4') 	    //export edit.ksx to export.txt 
 --import from='drive:path\*.txt' to='drive:path\*.ksx'  ([clearkey='xxx' | hiddenkey='yyyy']) (steganimg='drive:path\*.mp4')		//import import.txt to edit.ksx
 --edit 'drive:path\*.ksx' ([clearkey='xxx' | hiddenkey='yyyy'])	/edit specified .ksx file
 
@@ -103,7 +103,7 @@ Additional options for edit operation (--edit)
 	Tools options page
 
   --toolbrowser exe='explorer.exe'								//was ParamBrowser
-  --toolhelp url=https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual  //Program.CmdAppHelpUrl is default 
+  --toolhelp url=https://github.com/wpqs/GenDotNetCmdApps/wiki/KLineEd-User-Manual  //CmdLineParamsApp.CmdAppHelpUrl is default 
   --toolsearch url=https://www.google.com/search?q=%22<word>%22	//<word> is replaced by selected word in text editor before url is passed to browser
   --toolthesaurus url=https://www.thesaurus.com/browse/<word>	//<word> is replaced by selected word in text editor before url is passed to browser
   --toolspell ulr=http://www.spellcheck.net/<word>				//<word> is replaced by selected word in text editor before url is passed to browser
